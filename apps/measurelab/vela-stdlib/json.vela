@@ -1,0 +1,420 @@
+import "text.vela" as text;
+pub enum Value {
+    Null,
+    Boolean(Bool),
+    Integer(Int),
+    Number(Float64),
+    StringValue(String),
+    Array(List<Value>),
+    Object(List<Member>)
+}
+pub struct Member {
+    name: String,
+    value: Value
+}
+pub enum Error {
+    Syntax(Int, String),
+    Encoding(Int),
+    Limit,
+    NonFinite,
+    Duplicate(String)
+}
+struct Reader {
+    data: String,
+    cursor: List<Int>,
+    nodes: List<Int>
+}
+struct Writer {
+    parts: StringList,
+    size: List<Int>,
+    nodes: List<Int>
+}
+fn position(r: Reader) -> Int effects { state } {
+    return list_get(r.cursor, 0);
+}
+fn move(r: Reader, n: Int) -> Unit effects { state } {
+    list_set(r.cursor, 0, n);
+}
+fn failure<T>(r: Reader, message: String) -> Result<T, Error> effects { state } {
+    return Result<T, Error>::Err(Error::Syntax(position(r), message));
+}
+fn peek(r: Reader) -> Int effects { state } {
+    if position(r) >= str_len(r.data) {
+        return -1;
+    }
+    return str_byte(r.data, position(r));
+}
+fn skip(r: Reader) -> Unit effects { state } {
+    while peek(r) == 32 || peek(r) == 9 || peek(r) == 10 || peek(r) == 13 {
+        move(r, position(r) + 1);
+    }
+}
+fn take_byte(r: Reader, expected: Int) -> Bool effects { state } {
+    if peek(r) != expected {
+        return false;
+    }
+    move(r, position(r) + 1);
+    return true;
+}
+fn hex(b: Int) -> Int {
+    if b >= 48 && b <= 57 {
+        return b - 48;
+    }
+    if b >= 65 && b <= 70 {
+        return b - 65 + 10;
+    }
+    if b >= 97 && b <= 102 {
+        return b - 97 + 10;
+    }
+    return -1;
+}
+fn hex4(r: Reader) -> Result<Int, Error> effects { state } {
+    var n = 0;
+    for unused in 0 .. 4 {
+        let digit = hex(peek(r));
+        if digit < 0 {
+            return failure<Int>(r, "expected four hex digits");
+        }
+        n = n * 16 + digit;
+        move(r, position(r) + 1);
+    }
+    return Result<Int, Error>::Ok(n);
+}
+fn string_value(r: Reader) -> Result<String, Error> effects { state } {
+    if !take_byte(r, 34) {
+        return failure<String>(r, "expected string");
+    }
+    let parts = strings_new();
+    var start = position(r);
+    while peek(r) >= 0 {
+        let b = peek(r);
+        if b == 34 {
+            strings_push(parts, str_slice(r.data, start, position(r)));
+            move(r, position(r) + 1);
+            return Result<String, Error>::Ok(strings_join(parts, ""));
+        }
+        if b < 32 {
+            return failure<String>(r, "unescaped control character");
+        }
+        if b != 92 {
+            move(r, position(r) + 1);
+            continue;
+        }
+        strings_push(parts, str_slice(r.data, start, position(r)));
+        move(r, position(r) + 1);
+        let escape = peek(r);
+        if escape < 0 {
+            return failure<String>(r, "incomplete escape");
+        }
+        move(r, position(r) + 1);
+        var piece = "";
+        if escape == 34 || escape == 92 || escape == 47 {
+            piece = str_from_byte(escape);
+        } else if escape == 98 {
+            piece = str_from_byte(8);
+        } else if escape == 102 {
+            piece = str_from_byte(12);
+        } else if escape == 110 {
+            piece = "\n";
+        } else if escape == 114 {
+            piece = "\r";
+        } else if escape == 116 {
+            piece = "\t";
+        } else if escape == 117 {
+            var cp = hex4(r)?;
+            if cp >= 55296 && cp <= 56319 {
+                if !take_byte(r, 92) || !take_byte(r, 117) {
+                    return failure<String>(r, "missing low surrogate");
+                }
+                let low = hex4(r)?;
+                if low < 56320 || low > 57343 {
+                    return failure<String>(r, "invalid low surrogate");
+                }
+                cp = 65536 + (cp - 55296) * 1024 + low - 56320;
+            }
+            match text::codepoint(cp) {
+                Result::Ok(t) => {
+                    piece = t.data;
+                }
+                Result::Err(_) => {
+                    return failure<String>(r, "invalid Unicode scalar");
+                }
+            }
+        } else {
+            return failure<String>(r, "invalid escape");
+        }
+        strings_push(parts, piece);
+        start = position(r);
+    }
+    return failure<String>(r, "unterminated string");
+}
+fn digit(b: Int) -> Bool {
+    return b >= 48 && b <= 57;
+}
+fn number(r: Reader) -> Result<Value, Error> effects { state } {
+    let start = position(r);
+    let negative = take_byte(r, 45);
+    if take_byte(r, 48) {
+        if digit(peek(r)) {
+            return failure<Value>(r, "leading zero");
+        }
+    } else {
+        if peek(r) < 49 || peek(r) > 57 {
+            return failure<Value>(r, "expected number");
+        }
+        while digit(peek(r)) {
+            move(r, position(r) + 1);
+        }
+    }
+    var integral = true;
+    if take_byte(r, 46) {
+        integral = false;
+        if !digit(peek(r)) {
+            return failure<Value>(r, "expected fraction");
+        }
+        while digit(peek(r)) {
+            move(r, position(r) + 1);
+        }
+    }
+    if peek(r) == 101 || peek(r) == 69 {
+        integral = false;
+        move(r, position(r) + 1);
+        if peek(r) == 43 || peek(r) == 45 {
+            move(r, position(r) + 1);
+        }
+        if !digit(peek(r)) {
+            return failure<Value>(r, "expected exponent");
+        }
+        while digit(peek(r)) {
+            move(r, position(r) + 1);
+        }
+    }
+    if position(r) - start > 4096 {
+        return Result<Value, Error>::Err(Error::Limit);
+    }
+    let token = str_slice(r.data, start, position(r));
+    if integral {
+        match parse_int(token) {
+            IntResult::Ok(n) => {
+                return Result<Value, Error>::Ok(Value::Integer(n));
+            }
+            IntResult::Err(_) => {}
+        }
+    }
+    match parse_float(token) {
+        FloatResult::Ok(n) => {
+            return Result<Value, Error>::Ok(Value::Number(n));
+        }
+        FloatResult::Err(_) => {
+            return failure<Value>(r, "number outside Float64 range");
+        }
+    }
+}
+fn keyword_value(r: Reader, word: String, value: Value) -> Result<Value, Error> effects { state } {
+    let start = position(r);
+    if start + str_len(word) > str_len(r.data) {
+        return failure<Value>(r, "incomplete keyword");
+    }
+    if str_slice(r.data, start, start + str_len(word)) != word {
+        return failure<Value>(r, "invalid keyword");
+    }
+    move(r, start + str_len(word));
+    return Result<Value, Error>::Ok(value);
+}
+fn read_value(r: Reader, depth: Int) -> Result<Value, Error> effects { state } {
+    if depth > 128 || list_get(r.nodes, 0) >= 65536 {
+        return Result<Value, Error>::Err(Error::Limit);
+    }
+    list_set(r.nodes, 0, list_get(r.nodes, 0) + 1);
+    skip(r);
+    let b = peek(r);
+    if b == 34 {
+        return Result<Value, Error>::Ok(Value::StringValue(string_value(r)?));
+    }
+    if b == 110 {
+        return keyword_value(r, "null", Value::Null);
+    }
+    if b == 116 {
+        return keyword_value(r, "true", Value::Boolean(true));
+    }
+    if b == 102 {
+        return keyword_value(r, "false", Value::Boolean(false));
+    }
+    if b == 45 || digit(b) {
+        return number(r);
+    }
+    if take_byte(r, 91) {
+        let values = list_new<Value>();
+        skip(r);
+        if take_byte(r, 93) {
+            return Result<Value, Error>::Ok(Value::Array(values));
+        }
+        while true {
+            list_push(values, read_value(r, depth + 1)?);
+            skip(r);
+            if take_byte(r, 93) {
+                return Result<Value, Error>::Ok(Value::Array(values));
+            }
+            if !take_byte(r, 44) {
+                return failure<Value>(r, "expected comma or closing bracket");
+            }
+        }
+    }
+    if take_byte(r, 123) {
+        let members = list_new<Member>();
+        let seen = dict_new<String, Bool>();
+        skip(r);
+        if take_byte(r, 125) {
+            return Result<Value, Error>::Ok(Value::Object(members));
+        }
+        while true {
+            skip(r);
+            let name = string_value(r)?;
+            skip(r);
+            if dict_has(seen, name) {
+                return Result<Value, Error>::Err(Error::Duplicate(name));
+            }
+            dict_set(seen, name, true);
+            if !take_byte(r, 58) {
+                return failure<Value>(r, "expected colon");
+            }
+            list_push(members, Member(name: name, value: read_value(r, depth + 1)?));
+            skip(r);
+            if take_byte(r, 125) {
+                return Result<Value, Error>::Ok(Value::Object(members));
+            }
+            if !take_byte(r, 44) {
+                return failure<Value>(r, "expected comma or closing brace");
+            }
+        }
+    }
+    return failure<Value>(r, "expected JSON value");
+}
+pub fn parse(data: String) -> Result<Value, Error> effects { state } {
+    if str_len(data) > 16777216 {
+        return Result<Value, Error>::Err(Error::Limit);
+    }
+    let invalid = text::invalid_offset(data);
+    if invalid >= 0 {
+        return Result<Value, Error>::Err(Error::Encoding(invalid));
+    }
+    let cursor = list_new<Int>();
+    list_push(cursor, 0);
+    let nodes = list_new<Int>();
+    list_push(nodes, 0);
+    let reader = Reader(data: data, cursor: cursor, nodes: nodes);
+    let parsed = read_value(reader, 0)?;
+    skip(reader);
+    if position(reader) != str_len(data) {
+        return failure<Value>(reader, "trailing data");
+    }
+    return Result<Value, Error>::Ok(parsed);
+}
+fn put(w: Writer, data: String) -> Result<Bool, Error> effects { state } {
+    if str_len(data) > 16777216 - list_get(w.size, 0) {
+        return Result<Bool, Error>::Err(Error::Limit);
+    }
+    list_set(w.size, 0, list_get(w.size, 0) + str_len(data));
+    strings_push(w.parts, data);
+    return Result<Bool, Error>::Ok(true);
+}
+fn quoted(w: Writer, data: String) -> Result<Bool, Error> effects { state } {
+    let invalid = text::invalid_offset(data);
+    if invalid >= 0 {
+        return Result<Bool, Error>::Err(Error::Encoding(invalid));
+    }
+    let opened = put(w, "\"")?;
+    var start = 0;
+    for i in 0 .. str_len(data) {
+        let b = str_byte(data, i);
+        if b < 32 || b == 34 || b == 92 {
+            let chunk = put(w, str_slice(data, start, i))?;
+            var escape = "\\" + str_from_byte(b);
+            if b < 32 {
+                let digits = "0123456789abcdef";
+                escape = "\\u00" + str_slice(digits, b / 16, b / 16 + 1) + str_slice(digits, b % 16, b % 16 + 1);
+            }
+            let escaped = put(w, escape)?;
+            start = i + 1;
+        }
+    }
+    let tail = put(w, str_slice(data, start, str_len(data)))?;
+    return put(w, "\"");
+}
+fn emit_value(w: Writer, value: Value, depth: Int) -> Result<Bool, Error> effects { state } {
+    if depth > 128 || list_get(w.nodes, 0) >= 65536 {
+        return Result<Bool, Error>::Err(Error::Limit);
+    }
+    list_set(w.nodes, 0, list_get(w.nodes, 0) + 1);
+    match value {
+        Value::Null => {
+            return put(w, "null");
+        }
+        Value::Boolean(b) => {
+            return put(w, to_string(b));
+        }
+        Value::Integer(n) => {
+            return put(w, to_string(n));
+        }
+        Value::Number(n) => {
+            if !float_is_finite(n) {
+                return Result<Bool, Error>::Err(Error::NonFinite);
+            }
+            var token = float_to_string(n);
+            var decimal = false;
+            for i in 0 .. str_len(token) {
+                let b = str_byte(token, i);
+                if b == 46 || b == 101 {
+                    decimal = true;
+                }
+            }
+            if !decimal {
+                token = token + ".0";
+            }
+            return put(w, token);
+        }
+        Value::StringValue(data) => {
+            return quoted(w, data);
+        }
+        Value::Array(values) => {
+            let opened = put(w, "[")?;
+            var first = true;
+            for item in values {
+                if !first {
+                    let comma = put(w,",")?;
+                }
+                first = false;
+                let emitted = emit_value(w, item, depth + 1)?;
+            }
+            return put(w, "]");
+        }
+        Value::Object(members) => {
+            let opened = put(w, "{")?;
+            var first = true;
+            let seen = dict_new<String, Bool>();
+            for member in members {
+                if dict_has(seen, member.name) {
+                    return Result<Bool, Error>::Err(Error::Duplicate(member.name));
+                }
+                dict_set(seen, member.name, true);
+                if !first {
+                    let comma = put(w,",")?;
+                }
+                first = false;
+                let name = quoted(w, member.name)?;
+                let colon = put(w,":")?;
+                let emitted = emit_value(w, member.value, depth + 1)?;
+            }
+            return put(w, "}");
+        }
+    }
+}
+pub fn stringify(value: Value) -> Result<String, Error> effects { state } {
+    let size = list_new<Int>();
+    list_push(size, 0);
+    let nodes = list_new<Int>();
+    list_push(nodes, 0);
+    let writer = Writer(parts: strings_new(), size: size, nodes: nodes);
+    let success = emit_value(writer, value, 0)?;
+    return Result<String, Error>::Ok(strings_join(writer.parts, ""));
+}

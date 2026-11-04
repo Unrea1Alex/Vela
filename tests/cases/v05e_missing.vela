@@ -1,0 +1,1 @@
+fn main()->Unit {let x=match Option<Int>::None {Option::None=>0};}

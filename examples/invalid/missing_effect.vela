@@ -1,0 +1,4 @@
+// Expected: E209. print requires effects { io } in this signature.
+fn main() -> Unit {
+    print("This function has not declared its io effect.");
+}

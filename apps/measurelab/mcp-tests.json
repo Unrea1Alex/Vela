@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "tools": [
+    "vela_get_context",
+    "vela_get_help",
+    "vela_check",
+    "vela_format",
+    "vela_symbols",
+    "vela_build",
+    "vela_test",
+    "vela_run"
+  ],
+  "transport": "official SDK / local stdio",
+  "native_tools_in_current_chat": false,
+  "compiler_id": "b4a8f64ada2925b3410c8aed84447cea0a45d8df5fa3f4693633eb862e62b199",
+  "execution_toolchain_id": "e810d30e42eef207fdc89ca29816929290e337894631fa35e29d0fce687d718f",
+  "named_tests": 12,
+  "exit_code": 3,
+  "stdout": "Saved: isolated-report.html\r\nscenarios=3 samples=60 over_budget=1\r\nРазбор JSON · 128 КБ: mean=4.04 p95=4.30 sigma=0.19 мс\r\nПостроение поискового индекса: mean=13.68 p95=22.10 sigma=3.35 мс\r\nЭкспорт отчёта в HTML: mean=6.63 p95=7.10 sigma=0.31 мс\r\n",
+  "native_adapter_allowed_by_sha256": true,
+  "generated_html_not_exported": true
+}

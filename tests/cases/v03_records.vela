@@ -1,0 +1,8 @@
+struct Point { x: Int, y: Int }
+struct Box { point: Point, title: String }
+fn mark(n: Int) -> Int effects { io } { print(n); return n; }
+fn main() -> Unit effects { io } {
+ var p = Point(y: mark(2), x: mark(1)); let old = p; p.x = 7;
+ var b = Box(title: "box", point: p); b.point.y = 9;
+ print(old.x); print(p.x); print(p.y); print(b.point.y);
+}

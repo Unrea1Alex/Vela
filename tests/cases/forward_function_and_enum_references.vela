@@ -1,0 +1,6 @@
+
+            enum Outer { Item(Inner) }
+            enum Inner { Number(Int) }
+            fn main() -> Int { return later(3); }
+            fn later(n: Int) -> Int { return n; }
+        

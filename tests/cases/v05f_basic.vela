@@ -1,0 +1,2 @@
+type ID = distinct Int;
+fn main()->Unit effects {io}{print(f"n={42:d}, b={true:b}, s={"строка 😀":s}, id={ID(7):display}");print(f"");print(f"literal {{brace}}");}

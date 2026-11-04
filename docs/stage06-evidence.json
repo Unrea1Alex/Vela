@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "version": "0.6.0",
+  "status": "verified",
+  "native": {
+    "platform": "Windows x64/MSVC C11 /O2 /MT",
+    "passed": 887,
+    "failed": 0,
+    "skipped": 0,
+    "compiler_generations": 3,
+    "compiler_fixed_point": true,
+    "bundler_fixed_point": true,
+    "clean_path_without_python_or_node": true,
+    "c_recovery_fixed_point": true,
+    "release_compiler_sha256": "b26d1ab74688b3ee78b7b4e6687bdb2252189ca311a4d6fba884ef50f65b00d5",
+    "logs": [
+      "068-native-final-verify.log",
+      "068-native-clean-final-verify.log",
+      "068-package-recovery-build.log"
+    ]
+  },
+  "stages": [
+    {
+      "id": "0.6.1",
+      "verify": 688
+    },
+    {
+      "id": "0.6.2",
+      "verify": 850,
+      "focused": 164
+    },
+    {
+      "id": "0.6.3",
+      "verify": 878,
+      "focused": 22,
+      "hash_bootstrap_verify": 855
+    },
+    {
+      "id": "0.6.4",
+      "verify": 886,
+      "focused": 29
+    },
+    {
+      "id": "0.6.5",
+      "compiler_build": true,
+      "contract_only": "native/resources implementation depends on FFI 0.7.4–0.7.5"
+    },
+    {
+      "id": "0.6.6",
+      "compiler_build": true,
+      "starter_build_run_test": true
+    },
+    {
+      "id": "0.6.7",
+      "compiler_build": true,
+      "sdk_build": true
+    },
+    {
+      "id": "0.6.8",
+      "native_verify": 887,
+      "archive_gate": true
+    }
+  ],
+  "mcp": {
+    "sdk": "2.4.0",
+    "node": "24.17.0",
+    "sequential_requests": 1000,
+    "cancelled_children": 25,
+    "stress": {
+      "baseline": {
+        "WorkingSet64": 78639104,
+        "HandleCount": 220
+      },
+      "final": {
+        "WorkingSet64": 93843456,
+        "HandleCount": 220
+      }
+    },
+    "wire_cancellations": 6,
+    "stdio_only": true,
+    "execution_tools": false,
+    "clients": [
+      {
+        "name": "Codex CLI",
+        "version": "0.157.0",
+        "model": "gpt-6-astra (client default)",
+        "tested": [
+          "get_context",
+          "get_help",
+          "check",
+          "unsaved text",
+          "project overlay"
+        ],
+        "cold_tasks": 5,
+        "behavior_cases": 13
+      },
+      {
+        "name": "MCP Inspector",
+        "version": "2.13.0",
+        "wire": [
+          "2025-11-25",
+          "2026-07-28"
+        ],
+        "tested": [
+          "tools/list",
+          "get_context",
+          "check",
+          "format",
+          "symbols",
+          "resources/list",
+          "resources/read",
+          "reconnect"
+        ]
+      },
+      {
+        "name": "Official TypeScript SDK client",
+        "version": "2.4.0",
+        "wire": [
+          "2025-11-25",
+          "2026-07-28"
+        ],
+        "tested": [
+          "schemas",
+          "cancel",
+          "disconnect",
+          "stress"
+        ]
+      }
+    ],
+    "evidence": [
+      "mcp-evidence.json",
+      "mcp-wire-evidence.json",
+      "mcp-inspector-evidence.json"
+    ]
+  },
+  "cold_start": {
+    "final_fresh_tasks": 5,
+    "final_checks": 5,
+    "behavior_cases": 13,
+    "initial_policy_failures": 5,
+    "intermediate_successful_tasks": 5,
+    "final_successful_tasks": 5,
+    "final_unknown_apis": 0,
+    "model": "gpt-6-astra",
+    "attempt_reports": [
+      "cold-start-initial-policy-evidence.json",
+      "cold-start-overlay-evidence.json",
+      "cold-start-evidence.json"
+    ]
+  },
+  "corrections": [
+    "Per-file parser boundaries",
+    "No implicit entry-module name leakage",
+    "Protection of unused declared dependencies",
+    "Unsaved source/project overlays after read-only Codex trials",
+    "Strict JSON payload schema",
+    "Lazy compiler clone and cleanup before idle response; real Codex termination left no cache after correction"
+  ],
+  "artifacts": [
+    "dist/vela-0.6.0-windows-x64.zip",
+    "dist/vela-mcp-0.6.0.zip"
+  ],
+  "limitations": [
+    "Windows x64 only; WSL Ubuntu smoke blocked by missing ext4.vhdx",
+    "Public FFI/native resource linking remains future work",
+    "MCP build/test/run remains 0.7",
+    "Forced OS termination during a request is not graceful disconnect; no crash-recovery janitor claimed"
+  ]
+}

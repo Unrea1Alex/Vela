@@ -1,0 +1,51 @@
+import "../../tools/test.vela";
+pub fn stdlib_checks(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let dir = s.dir + "/stdlib 😀";
+    done(make_dir(dir));
+    let child = s.dir + "/stdlib-child.exe";
+    let executable = s.dir + "/stdlib.exe";
+    let child_build = build(s, s.root + "/tests/stdlib/child.vela", child);
+    s = record(s, "stdlib_child_build", child_build.code == 0, child_build.out + child_build.err);
+    let built = build(s, s.root + "/tests/stdlib/main.vela", executable);
+    s = record(s, "stdlib_build", built.code == 0, built.out + built.err);
+    if child_build.code == 0 && built.code == 0 {
+        let args = command(executable);
+        strings_push(args, dir);
+        strings_push(args, child);
+        let actual = invoke(s, args, 30000);
+        let expected = "text/path passed\nJSON/config passed\nCLI/collections passed\nfiles passed\nprocesses passed\nstdlib checks passed\n";
+        s = record(s, "stdlib_behavior", actual.code == 0 && actual.out == expected && actual.err == "", actual.out + actual.err);
+        // A failed publish must remove its private sibling temporary directory.
+        // Directory inventory is checked separately by the host acceptance script.
+    }
+    let app = s.dir + "/config-report.exe";
+    let app_build = build(s, s.root + "/apps/config-report/main.vela", app);
+    s = record(s, "config_report_build", app_build.code == 0, app_build.out + app_build.err);
+    if app_build.code != 0 {
+        return s;
+    }
+    let file = dir + "/config.json";
+    done(write_file(file, "{\"name\":\"Vela 😀\",\"count\":3,\"enabled\":true,\"scale\":1.25}"));
+    let args = command(app);
+    strings_push(args, "--increment");
+    strings_push(args, file);
+    strings_push(args, file);
+    let success = invoke(s, args, 10000);
+    let expected = "{\"name\":\"Vela 😀\",\"count\":4,\"enabled\":true,\"scale\":1.25}\n";
+    s = record(s, "config_report_atomic_in_place", success.code == 0 && success.out == "name=Vela 😀 count=4 enabled=true scale=1.25\n" && success.err == ""&& value(read_file(file)) == expected, success.out + success.err);
+    let invalid = list_new<String>();
+    list_push(invalid, "{\"name\":\"x\",\"name\":\"y\"}");
+    list_push(invalid, "{\"name\":\"x\",\"count\":0,\"enabled\":true,\"scale\":1.0,\"unknown\":0}");
+    list_push(invalid, "{\"name\":\"x\",\"count\":9223372036854775807,\"enabled\":true,\"scale\":1.0}");
+    list_push(invalid, "{\"name\":\"x\",\"count\":0,\"enabled\":true,\"scale\":1}");
+    list_push(invalid, "{\"name\":\"x\",\"count\":0,\"enabled\":true,\"scale\":1e309}");
+    list_push(invalid, str_from_byte(255));
+    for i in 0 .. list_len(invalid) {
+        let original = list_get(invalid, i);
+        done(write_file(file, original));
+        let rejected = invoke(s, args, 10000);
+        s = record(s, "config_report_preserves_invalid_" + to_string(i), rejected.code == 2 && rejected.out == ""&& rejected.err != ""&& value(read_file(file)) == original, rejected.out + rejected.err);
+    }
+    return s;
+}

@@ -1,0 +1,6 @@
+fn done(r: WriteResult) -> Unit effects { io, process } {
+                match r { WriteResult::Ok => {} WriteResult::Err(message) => { eprint(message); exit(9); } }
+            }
+            fn main() -> Unit effects { io } {
+                match read_file("@TMP@\\a.txt") { StringResult::Ok(_) => { print("unexpected"); } StringResult::Err(_) => { print("missing"); } }
+            }

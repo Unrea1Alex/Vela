@@ -1,0 +1,1 @@
+fn main() -> Int effects { args } requires arg_count() > 0; { return 0; }

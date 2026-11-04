@@ -1,0 +1,1 @@
+fn main() -> Unit { parse_int("1"); }

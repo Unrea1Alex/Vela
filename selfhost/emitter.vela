@@ -1,0 +1,571 @@
+import "model.vela";
+import "core.vela";
+import "parser.vela";
+import "types.vela";
+import "intrinsics.vela";
+import "driver.vela";
+import "embedded.vela";
+// Backend APIs accept checked IDs/records, never syntax IDs.
+pub fn emit(c: Context, line: String) -> Unit effects { state } {
+    strings_push(c.output, line + "\n");
+}
+pub fn ctype(c: Context, t: TypeId) -> String effects { state, io, process } {
+    if t == int32_type() { return "int32_t"; }
+    if t == foreign_handle_type() { return "v_foreign_handle*"; }
+    if t == float_type() {
+        return "double";
+    }
+    if t == int_type() {
+        return "int64_t";
+    }
+    if t == bool_type() {
+        return "int";
+    }
+    if t == string_type() {
+        return "v_string";
+    }
+    if t == unit_type() {
+        return "uint8_t";
+    }
+    if t == ints_type() {
+        return "v_int_list*";
+    }
+    if t == strings_type() {
+        return "v_string_list*";
+    }
+    let info = type_info(c, t);
+    if info.kind == 75 {
+        if list_len(info.arguments) == 1 {
+            return "v_list*";
+        }
+        return "v_dict*";
+    }
+    if info.template_index >= 0 {
+        return "v_g_type_" + num(type_number(t));
+    }
+    if str_len(info.name) > 0 && str_byte(info.name, 0) == 64 {
+        return "v_m_type_" + num(type_number(t));
+    }
+    return "v_e_" + info.name;
+}
+pub fn cquote(value: String) -> String effects { state } {
+    let parts = strings_new();
+    strings_push(parts, "\"");
+    var i = 0;
+    while i < str_len(value) {
+        if i > 0 && i % 512 == 0 {
+            strings_push(parts, "\" \"");
+        }
+        let b = str_byte(value, i);
+        strings_push(parts, "\\" + num(b / 64) + num(b / 8 % 8) + num(b % 8));
+        i = i + 1;
+    }
+    strings_push(parts, "\"");
+    return strings_join(parts, "");
+}
+pub fn location(c: Context, span: Span) -> String effects { state } {
+    return cquote(filename_at(c, span.start)) + ", " + num(line_at(c, span.start)) + ", " + num(column_at(c, span.start));
+}
+pub fn local_name(binding: SymbolId) -> String {
+    return "v_l_" + num(symbol_number(binding));
+}
+pub fn temp(c: Context, t: TypeId, value: String) -> String effects { state, io, process } {
+    return raw_temp(c, ctype(c, t), value);
+}
+pub fn raw_temp(c: Context, type_name: String, value: String) -> String effects { state } {
+    var ctl = list_get(c.control, 0);
+    ctl.temporary = ctl.temporary + 1;
+    list_set(c.control, 0, ctl);
+    let name = "v_t_" + num(ctl.temporary);
+    emit(c, type_name + " " + name + " = " + value +";");
+    return name;
+}
+pub fn signature(c: Context, f: CheckedFunction) -> String effects { state, io, process } {
+    let sig = symbol_info(c, f.symbol);
+    let parts = strings_new();
+    var i = 0;
+    while i < list_len(f.parameters) {
+        let id = list_get(f.parameters, i);
+        strings_push(parts, ctype(c, symbol_info(c, id).type_id) + " " + local_name(id));
+        i = i + 1;
+    }
+    var params = strings_join(parts, ", ");
+    if strings_len(parts) == 0 {
+        params = "void";
+    }
+    return "static " + ctype(c, sig.type_id) + " " + function_name(c, f.symbol) + "("+ params +")";
+}
+pub fn zero_value(c: Context, t: TypeId) -> String effects { state, io, process } {
+    if t == string_type() {
+        return "v_text(\"\", 0)";
+    }
+    let kind = type_kind(c, t);
+    if kind == 0 || kind == 75 {
+        return "0";
+    }
+    return "("+ ctype(c, t) + "){0}";
+}
+pub fn emit_arguments(c: Context, args: List<ExprId>) -> StringList effects { state, io, process } {
+    let parts = strings_new();
+    for i in 0 .. list_len(args) {
+        strings_push(parts, emit_expr(c, list_get(args, i)));
+    }
+    return parts;
+}
+pub fn emit_expr(c: Context, id: ExprId) -> String effects { state, io, process } {
+    let n = checked_expr(c, id);
+    let k = n.kind;
+    let t = n.type_id;
+    let value = n.text;
+    if k == 117 {
+        return temp(c, t, value);
+    }
+    if k == 101 {
+        if value == "-9223372036854775808" {
+            return temp(c, t, "INT64_MIN");
+        }
+        if str_byte(value, 0) == 45 {
+            return temp(c, t, "(-INT64_C(" + str_slice(value, 1, str_len(value)) + "))");
+        }
+        return temp(c, t, "INT64_C(" + value +")");
+    }
+    if k == 102 {
+        if value == "true" {
+            return temp(c, t, "1");
+        }
+        return temp(c, t, "0");
+    }
+    if k == 103 {
+        return temp(c, t, "v_text(" + cquote(value) + ", " + num(str_len(value)) +")");
+    }
+    if k == 109 {
+        return temp(c, t, "0");
+    }
+    if k == 104 {
+        return temp(c, t, local_name(n.symbol));
+    }
+    if k == 110 {
+        return temp(c, t, emit_expr(c, n.left) + ".v_m_" + symbol_info(c, n.symbol).name);
+    }
+    if k == 115 {
+        return emit_interpolation(c, n);
+    }
+    if k == 116 {
+        return emit_formatted_value(c, n);
+    }
+    if k == 113 {
+        return emit_match_expression(c, n);
+    }
+    if k == 114 {
+        return emit_propagation(c, n);
+    }
+    if k == 112 {
+        let args = emit_arguments(c, n.arguments);
+        let r = temp(c, t, "{0}");
+        var i = 0;
+        while i < list_len(n.arguments) {
+            emit(c, r + ".v_m_" + symbol_info(c, list_get(n.fields, i)).name + " = " + strings_get(args, i) +";");
+            i = i + 1;
+        }
+        return r;
+    }
+    if k == 105 {
+        let arg = emit_expr(c, n.left);
+        if value == "-" {
+            if t == float_type() {
+                return temp(c, t, "(-" + arg +")");
+            }
+            return temp(c, t, "v_neg(" + arg + ", " + location(c, n.span) +")");
+        }
+        return temp(c, t, "(!" + arg +")");
+    }
+    if k == 106 {
+        var left = emit_expr(c, n.left);
+        if value == "&&" || value == "||" {
+            let r = temp(c, t, left);
+            var test = r;
+            if value == "||" {
+                test = "!"+ r;
+            }
+            emit(c, "if (" + test + ") {");
+            let right = emit_expr(c, n.right);
+            emit(c, r + " = " + right +";");
+            emit(c, "}");
+            return r;
+        }
+        var right = emit_expr(c, n.right);
+        var arithmetic = "";
+        let operand_type = checked_expr(c, n.left).type_id;
+        if operand_type == float_type() {
+            return temp(c, t,"("+ left + " " + value + " " + right +")");
+        }
+        if type_kind(c, operand_type) == 77 {
+            left = left + ".v_m_value";
+            right = right + ".v_m_value";
+        }
+        if value == "+" && t == string_type() {
+            return temp(c, t, "v_str_concat(" + left + ", " + right + ", " + location(c, n.span) +")");
+        }
+        if value == "+" {
+            arithmetic = "add";
+        } else if value == "-" {
+            arithmetic = "sub";
+        } else if value == "*" {
+            arithmetic = "mul";
+        } else if value == "/" {
+            arithmetic = "div";
+        } else if value == "%" {
+            arithmetic = "rem";
+        }
+        if arithmetic != "" {
+            return temp(c, t, "v_" + arithmetic + "("+ left + ", " + right + ", " + location(c, n.span) +")");
+        }
+        if scalar_type(c, operand_type) == string_type() {
+            var code = "v_string_eq(" + left + ", " + right +")";
+            if value == "!=" {
+                code = "!"+ code;
+            }
+            return temp(c, t, code);
+        }
+        return temp(c, t,"("+ left + " " + value + " " + right +")");
+    }
+    if k == 107 {
+        let args = emit_arguments(c, n.arguments);
+        let sig = symbol_info(c, n.symbol);
+        if sig.builtin {
+            return temp(c, t, emit_builtin(c, n, args));
+        }
+        if sig.foreign_library != "" { return emit_foreign(c, n, args); }
+        return temp(c, t, cc_call(function_name(c, n.symbol), args));
+    }
+    if k == 108 {
+        let args = emit_arguments(c, n.arguments);
+        let tag = symbol_info(c, n.symbol).tag;
+        let r = temp(c, t, "{0}");
+        emit(c, r + ".tag = " + num(tag) +";");
+        var i = 0;
+        while i < strings_len(args) {
+            emit(c, r + ".data.k" + num(tag) + ".f" + num(i) + " = " + strings_get(args, i) +";");
+            i = i + 1;
+        }
+        return r;
+    }
+    eprint("velac: internal error: invalid checked expression kind");
+    exit(70);
+    return "";
+}
+pub fn emit_contracts(c: Context, items: List<ExprId>, kind: String) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(items) {
+        let id = list_get(items, i);
+        let n = checked_expr(c, id);
+        let value = emit_expr(c, id);
+        let message = cquote(kind + " failed: " + str_slice(c.source_text, n.span.start, n.span.end));
+        emit(c, "if (!" + value + ") v_panic(" + location(c, n.span) + ", " + message + ");");
+    }
+}
+pub fn emit_block(c: Context, items: List<StmtId>) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(items) {
+        emit_statement(c, list_get(items, i));
+    }
+}
+pub fn emit_statement(c: Context, id: StmtId) -> Unit effects { state, io, process } {
+    let n = checked_stmt(c, id);
+    let k = n.kind;
+    if k == 130 || k == 131 {
+        let value = emit_expr(c, n.value);
+        var name = local_name(n.binding);
+        if k == 130 {
+            name = ctype(c, symbol_info(c, n.binding).type_id) + " " + name;
+        }
+        emit(c, name + " = " + value +";");
+    } else if k == 138 {
+        let value = emit_expr(c, n.value);
+        emit(c, emit_lvalue(c, n.target) + " = " + value +";");
+    } else if k == 133 {
+        let value = emit_expr(c, n.value);
+        emit(c, "(void)" + value +";");
+    } else if k == 132 {
+        emit(c, "{");
+        let value = emit_expr(c, n.value);
+        emit_return_value(c, value);
+        emit(c, "}");
+    } else if k == 134 {
+        let cond = emit_expr(c, n.value);
+        emit(c, "if (" + cond + ") {");
+        emit_block(c, n.yes);
+        if list_len(n.no) > 0 {
+            emit(c, "} else {");
+            emit_block(c, n.no);
+        }
+        emit(c, "}");
+    } else if k == 135 {
+        let label = enter_emitted_loop(c);
+        emit(c, "for (;;) {");
+        let cond = emit_expr(c, n.value);
+        emit(c, "if (!" + cond + ") break;");
+        emit_block(c, n.yes);
+        emit(c, label + "_continue:; }");
+        leave_emitted_loop(c, label);
+    } else if k == 139 || k == 140 {
+        let label = list_get(c.loop_labels, list_len(c.loop_labels) - 1);
+        if k == 139 {
+            emit(c, "goto " + label + "_break;");
+        } else {
+            emit(c, "goto " + label + "_continue;");
+        }
+    } else if k == 141 {
+        emit_for(c, n);
+    } else if k == 136 {
+        let value = emit_expr(c, n.value);
+        emit(c, "switch (" + value + ".tag) {");
+        var i = 0;
+        while i < list_len(n.arms) {
+            let arm = list_get(n.arms, i);
+            let tag = symbol_info(c, arm.variant).tag;
+            emit(c, "case " + num(tag) + ": {");
+            var j = 0;
+            while j < list_len(arm.bindings) {
+                let b = list_get(arm.bindings, j);
+                if has_symbol(b) {
+                    emit(c, ctype(c, symbol_info(c, b).type_id) + " " + local_name(b) + " = " + value + ".data.k" + num(tag) + ".f" + num(j) +";");
+                }
+                j = j + 1;
+            }
+            emit_block(c, arm.body);
+            emit(c, "break; }");
+            i = i + 1;
+        }
+        emit(c, "default: v_panic(" + location(c, n.span) + ", \"invalid enum tag\");");
+        emit(c, "}");
+    } else {
+        eprint("velac: internal error: invalid checked statement kind");
+        exit(70);
+    }
+}
+pub fn emit_types(c: Context) -> Unit effects { state, io, process } {
+    var i = 0;
+    while i < list_len(c.type_order) {
+        let id = list_get(c.type_order, i);
+        let t = type_info(c, id);
+        if t.kind == 76 || t.kind == 77 {
+            emit(c, "typedef struct {");
+            if list_len(t.fields) == 0 {
+                emit(c, "uint8_t empty;");
+            }
+            var j = 0;
+            while j < list_len(t.fields) {
+                let field = symbol_info(c, list_get(t.fields, j));
+                emit(c, ctype(c, field.type_id) + " v_m_" + field.name +";");
+                j = j + 1;
+            }
+            emit(c, "} " + ctype(c, id) +";");
+        } else {
+            emit(c, "typedef struct { int tag; union {");
+            var j = 0;
+            while j < list_len(t.variants) {
+                let v = symbol_info(c, list_get(t.variants, j));
+                emit(c, "struct {");
+                if list_len(v.parameters) == 0 {
+                    emit(c, "uint8_t empty;");
+                }
+                var k = 0;
+                while k < list_len(v.parameters) {
+                    emit(c, ctype(c, symbol_info(c, list_get(v.parameters, k)).type_id) + " f" + num(k) +";");
+                    k = k + 1;
+                }
+                emit(c, "} k" + num(v.tag) +";");
+                j = j + 1;
+            }
+            emit(c, "} data; } " + ctype(c, id) +";");
+        }
+        i = i + 1;
+    }
+}
+pub fn generate(c: Context) -> String effects { state, io, process } {
+    let entry = find_symbol(c, c.signatures, "main");
+    if !has_symbol(entry) {
+        bad(c, "E207", "build/run requires main; use vela test for test-only modules.", empty_span());
+    }
+    return generate_entry(c, entry);
+}
+pub fn generate_entry(c: Context, entry: SymbolId) -> String effects { state, io, process } {
+    strings_truncate(c.output, 0);
+    var initial = list_get(c.control, 0);
+    initial.temporary = 0;
+    list_set(c.control, 0, initial);
+    emit(c, "/* Generated by the Vela typed self-hosted compiler. */");
+    emit(c, runtime_source());
+    emit_types(c);
+    emit(c, "static v_e_IntResult v_result(v_parse_result p) { v_e_IntResult r = {0}; r.tag = p.ok ? 0 : 1; if (p.ok) r.data.k0.f0 = p.value; else r.data.k1.f0 = p.error; return r; }");
+    emit(c, "static v_e_Int32Result v_int32_result(v_parse_result p) { v_e_Int32Result r = {0}; r.tag = p.ok ? 0 : 1; if (p.ok) r.data.k0.f0 = (int32_t)p.value; else r.data.k1.f0 = p.error; return r; }");
+    emit(c, "static v_e_FloatResult v_float_result(v_float_parse p) { v_e_FloatResult r = {0}; r.tag = p.ok ? 0 : 1; if (p.ok) r.data.k0.f0 = p.value; else r.data.k1.f0 = p.error; return r; }");
+    emit(c, "static v_e_ReadResult v_read_result(v_bounded_read p) { v_e_ReadResult r = {0}; r.tag = p.kind; if (p.kind == 0) r.data.k0.f0 = p.value; else if (p.kind == 2) r.data.k2.f0 = p.value; return r; }");
+    emit(c, "static v_e_ProcessResult v_process_result_value(v_process_result p) { v_e_ProcessResult r = {0}; r.tag = p.kind; if (p.kind == 0) r.data.k0.f0 = p.code; else if (p.kind == 2) r.data.k2.f0 = p.message; return r; }");
+    emit(c, "static v_e_StringResult v_string_result(v_io_result p) { v_e_StringResult r = {0}; r.tag = p.ok ? 0 : 1; if (p.ok) r.data.k0.f0 = p.value; else r.data.k1.f0 = p.value; return r; }");
+    emit(c, "static v_e_WriteResult v_write_result(v_io_result p) { v_e_WriteResult r = {0}; r.tag = p.ok ? 0 : 1; if (!p.ok) r.data.k1.f0 = p.value; return r; }");
+    var i = 0;
+    var main_index = 0;
+    while i < list_len(c.functions) {
+        emit(c, signature(c, list_get(c.functions, i)) +";");
+        i = i + 1;
+    }
+    i = 0;
+    while i < list_len(c.functions) {
+        let f = list_get(c.functions, i);
+        let sig = symbol_info(c, f.symbol);
+        if f.symbol == entry {
+            main_index = i;
+        }
+        var ctl = list_get(c.control, 0);
+        ctl.function_index = i;
+        list_set(c.control, 0, ctl);
+        emit(c, signature(c, f) + " {");
+        emit_contracts(c, f.preconditions, "precondition");
+        emit_block(c, f.body);
+        emit(c, "v_panic(" + location(c, f.span) + ", \"unreachable function end\");");
+        emit(c, "return " + zero_value(c, sig.type_id) +";");
+        emit(c, "}");
+        i = i + 1;
+    }
+    let main_func = list_get(c.functions, main_index);
+    emit(c, "int main(int argc, char **argv) { v_argc = argc; v_argv = argv; v_runtime_init(); int code = 0;");
+    if symbol_info(c, main_func.symbol).type_id == int_type() {
+        emit(c, "code = v_exit_code(" + function_name(c, entry) + "(), " + location(c, main_func.span) + ");");
+    } else {
+        emit(c, "(void)" + function_name(c, entry) + "();");
+    }
+    emit(c, "if (fflush(stdout) == EOF) v_panic(" + location(c, main_func.span) + ", \"failed to flush standard output\");");
+    emit(c, "return code; }");
+    return strings_join(c.output, "");
+}
+pub fn function_name(c: Context, id: SymbolId) -> String effects { state, io, process } {
+    let sig = symbol_info(c, id);
+    if sig.template_index >= 0 {
+        return "v_g_f_" + num(symbol_number(id));
+    }
+    if str_len(sig.name) > 0 && str_byte(sig.name, 0) == 64 {
+        return "v_m_f_" + num(symbol_number(id));
+    }
+    return "v_f_" + sig.name;
+}
+pub fn emit_return_value(c: Context, value: String) -> Unit effects { state, io, process } {
+    let f = list_get(c.functions, list_get(c.control, 0).function_index);
+    let name = local_name(f.result_binding);
+    emit(c, ctype(c, symbol_info(c, f.result_binding).type_id) + " " + name + " = " + value +";");
+    emit_contracts(c, f.postconditions, "postcondition");
+    emit(c, "return " + name +";");
+}
+pub fn emit_arm_bindings(c: Context, arm: CheckedArm, value: String) -> Unit effects { state, io, process } {
+    let tag = symbol_info(c, arm.variant).tag;
+    var i = 0;
+    while i < list_len(arm.bindings) {
+        let b = list_get(arm.bindings, i);
+        if has_symbol(b) {
+            emit(c, ctype(c, symbol_info(c, b).type_id) + " " + local_name(b) + " = " + value + ".data.k" + num(tag) + ".f" + num(i) +";");
+        }
+        i = i + 1;
+    }
+}
+pub fn emit_match_expression(c: Context, n: CheckedExpr) -> String effects { state, io, process } {
+    let value = emit_expr(c, n.left);
+    let result_value = temp(c, n.type_id, zero_value(c, n.type_id));
+    emit(c, "switch (" + value + ".tag) {");
+    var i = 0;
+    while i < list_len(n.arms) {
+        let arm = list_get(n.arms, i);
+        emit(c, "case " + num(symbol_info(c, arm.variant).tag) + ": {");
+        emit_arm_bindings(c, arm, value);
+        let selected = emit_expr(c, arm.value);
+        emit(c, result_value + " = " + selected + "; break; }");
+        i = i + 1;
+    }
+    emit(c, "default: v_panic(" + location(c, n.span) + ", \"invalid enum tag\"); }");
+    return result_value;
+}
+pub fn emit_propagation(c: Context, n: CheckedExpr) -> String effects { state, io, process } {
+    let value = emit_expr(c, n.left);
+    let failure = symbol_info(c, n.symbol);
+    emit(c, "if (" + value + ".tag == 1) {");
+    let propagated = temp(c, failure.owner, "{0}");
+    emit(c, propagated + ".tag = 1;");
+    if list_len(failure.parameters) == 1 {
+        emit(c, propagated + ".data.k1.f0 = " + value + ".data.k1.f0;");
+    }
+    emit_return_value(c, propagated);
+    emit(c, "}");
+    return temp(c, n.type_id, value + ".data.k0.f0");
+}
+pub fn enter_emitted_loop(c: Context) -> String effects { state } {
+    var ctl = list_get(c.control, 0);
+    ctl.temporary = ctl.temporary + 1;
+    list_set(c.control, 0, ctl);
+    let label = "v_loop_" + num(ctl.temporary);
+    list_push(c.loop_labels, label);
+    return label;
+}
+pub fn leave_emitted_loop(c: Context, label: String) -> Unit effects { state } {
+    emit(c, label + "_break:;");
+    list_truncate(c.loop_labels, list_len(c.loop_labels) - 1);
+}
+pub fn emit_for(c: Context, n: CheckedStmt) -> Unit effects { state, io, process } {
+    let value = emit_expr(c, n.value);
+    let label = enter_emitted_loop(c);
+    let element = ctype(c, symbol_info(c, n.binding).type_id);
+    let loc = location(c, n.span);
+    var counter = "";
+    var end_value = "";
+    var condition_text = "";
+    var item = "";
+    if n.mode != 0 {
+        end_value = emit_expr(c, n.target);
+        counter = temp(c, int_type(), value);
+        condition_text = counter + " < " + end_value;
+        if n.mode == 2 {
+            condition_text = counter + " <= " + end_value;
+        }
+        item = counter;
+    } else {
+        end_value = temp(c, int_type(), value + "->length");
+        let snapshot = label + "_items";
+        emit(c, element + " *" + snapshot + " = (" + element + "*)v_copy_items(" + value + "->data, " + end_value + ", sizeof(" + element + "), " + loc + ");");
+        counter = temp(c, int_type(), "0");
+        condition_text = counter + " < " + end_value;
+        item = snapshot + "[" + counter + "]";
+    }
+    emit(c, "while (" + condition_text + ") {");
+    emit(c, element + " " + local_name(n.binding) + " = " + item +";");
+    emit_block(c, n.yes);
+    emit(c, label + "_continue:;");
+    if n.mode == 2 {
+        emit(c, "if (" + counter + " == " + end_value + ") break;");
+    }
+    emit(c, counter + " = v_add(" + counter + ", 1, " + loc + "); }");
+    leave_emitted_loop(c, label);
+}
+pub fn emit_formatted_value(c: Context, n: CheckedExpr) -> String effects { state, io, process } {
+    var value = emit_expr(c, n.left);
+    let original = checked_expr(c, n.left).type_id;
+    let scalar = scalar_type(c, original);
+    if type_kind(c, original) == 77 {
+        value = value + ".v_m_value";
+    }
+    if scalar == string_type() {
+        return temp(c, string_type(), value);
+    }
+    if scalar == bool_type() {
+        return temp(c, string_type(),"("+ value + " ? v_text(\"true\", 4) : v_text(\"false\", 5))");
+    }
+    if scalar == float_type() {
+        return temp(c, string_type(), "v_float_to_string(" + value + ", " + location(c, n.span) +")");
+    }
+    return temp(c, string_type(), "v_int_to_string(" + value + ", " + location(c, n.span) +")");
+}
+pub fn emit_interpolation(c: Context, n: CheckedExpr) -> String effects { state, io, process } {
+    let loc = location(c, n.span);
+    let parts = temp(c, strings_type(), "v_strings_new(" + loc +")");
+    for i in 0 .. list_len(n.arguments) {
+        let value = emit_expr(c, list_get(n.arguments, i));
+        emit(c, "v_strings_push(" + parts + ", " + value + ", " + loc + ");");
+    }
+    return temp(c, string_type(), "v_strings_join(" + parts + ", v_text(\"\", 0), " + loc +")");
+}

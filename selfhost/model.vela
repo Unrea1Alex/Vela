@@ -1,0 +1,412 @@
+import "parser.vela";
+import "emitter.vela";
+// Typed per-compilation tables. Only this module unwraps arena IDs.
+pub type AstExprId = distinct Int;
+pub type AstStmtId = distinct Int;
+pub type ExprId = distinct Int;
+pub type StmtId = distinct Int;
+pub type TypeId = distinct Int;
+pub type SymbolId = distinct Int;
+pub struct Span {
+    start: Int,
+    end: Int
+}
+pub struct ProjectDependency {
+    alias: String,
+    path: String,
+    relative: String
+}
+pub struct RelatedLocation {
+    message: String,
+    span: Span
+}
+pub struct DiagnosticDetails {
+    expected_type: String,
+    actual_type: String,
+    callee: String,
+    required_effects: Int,
+    allowed_effects: Int,
+    missing_effects: Int,
+    missing_variants: List<String>,
+    related: List<RelatedLocation>
+}
+pub struct Token {
+    kind: Int,
+    text: String,
+    span: Span
+}
+pub struct SyntaxArgument {
+    label: String,
+    value: AstExprId
+}
+pub struct SyntaxExpr {
+    arms: List<SyntaxArm>,
+    kind: Int,
+    span: Span,
+    text: String,
+    qualifier: String,
+    left: AstExprId,
+    right: AstExprId,
+    arguments: List<SyntaxArgument>,
+    type_arguments: List<String>
+}
+pub struct SyntaxName {
+    name: String,
+    span: Span
+}
+pub struct SyntaxArm {
+    value: AstExprId,
+    owner: String,
+    variant: String,
+    names: List<SyntaxName>,
+    body: List<AstStmtId>,
+    span: Span
+}
+pub struct SyntaxStmt {
+    mode: Int,
+    kind: Int,
+    span: Span,
+    name: String,
+    annotation: String,
+    mutable: Bool,
+    value: AstExprId,
+    target: AstExprId,
+    yes: List<AstStmtId>,
+    no: List<AstStmtId>,
+    arms: List<SyntaxArm>
+}
+pub struct SyntaxField {
+    name: String,
+    annotation: String,
+    span: Span
+}
+pub struct SyntaxVariant {
+    name: String,
+    fields: List<String>,
+    span: Span
+}
+pub struct TypeParameter {
+    name: String,
+    bound: String,
+    span: Span
+}
+pub struct SyntaxType {
+    type_parameters: List<TypeParameter>,
+    kind: Int,
+    name: String,
+    base: String,
+    fields: List<SyntaxField>,
+    variants: List<SyntaxVariant>,
+    span: Span
+}
+pub struct SyntaxFunction {
+    foreign_library: String,
+    foreign_name: String,
+    test_name: String,
+    type_parameters: List<TypeParameter>,
+    name: String,
+    parameters: List<SyntaxField>,
+    return_name: String,
+    effect_mask: Int,
+    preconditions: List<AstExprId>,
+    postconditions: List<AstExprId>,
+    body: List<AstStmtId>,
+    span: Span
+}
+pub struct TypeInfo {
+    template_index: Int,
+    kind: Int,
+    name: String,
+    fields: List<SymbolId>,
+    variants: List<SymbolId>,
+    arguments: List<TypeId>,
+    base: TypeId,
+    base_name: String,
+    span: Span,
+    visit: Int
+}
+pub struct Symbol {
+    foreign_library: String,
+    foreign_name: String,
+    template_index: Int,
+    kind: Int,
+    name: String,
+    type_id: TypeId,
+    owner: TypeId,
+    span: Span,
+    parameters: List<SymbolId>,
+    effect_mask: Int,
+    mutable: Bool,
+    tag: Int,
+    builtin: Bool,
+    abi: String,
+    variables: List<String>,
+    patterns: List<String>,
+    return_pattern: String
+}
+pub struct CheckedExpr {
+    arms: List<CheckedArm>,
+    kind: Int,
+    span: Span,
+    type_id: TypeId,
+    text: String,
+    left: ExprId,
+    right: ExprId,
+    arguments: List<ExprId>,
+    symbol: SymbolId,
+    fields: List<SymbolId>
+}
+pub struct CheckedArm {
+    value: ExprId,
+    variant: SymbolId,
+    bindings: List<SymbolId>,
+    body: List<StmtId>,
+    span: Span
+}
+pub struct CheckedStmt {
+    mode: Int,
+    exits: Bool,
+    kind: Int,
+    span: Span,
+    binding: SymbolId,
+    value: ExprId,
+    target: ExprId,
+    yes: List<StmtId>,
+    no: List<StmtId>,
+    arms: List<CheckedArm>,
+    returns: Bool
+}
+pub struct CheckedFunction {
+    symbol: SymbolId,
+    parameters: List<SymbolId>,
+    result_binding: SymbolId,
+    preconditions: List<ExprId>,
+    postconditions: List<ExprId>,
+    body: List<StmtId>,
+    span: Span
+}
+pub struct FunctionInstance {
+    depth: Int,
+    signature: SymbolId,
+    syntax_index: Int,
+    mapping: Dict<String, TypeId>
+}
+pub struct Control {
+    loop_depth: Int,
+    in_contract: Bool,
+    instance_depth: Int,
+    type_mapping: Dict<String, TypeId>,
+    type_depth: Int,
+    type_instances: Int,
+    cursor: Int,
+    previous_end: Int,
+    depth: Int,
+    return_type: TypeId,
+    allowed_effects: Int,
+    temporary: Int,
+    function_index: Int
+}
+pub struct Context {
+    source_units: List<SourceUnit>,
+    imports: List<ModuleImport>,
+    declarations: List<ModuleDeclaration>,
+    bound_types: List<SyntaxType>,
+    bound_functions: List<SyntaxFunction>,
+    loop_labels: List<String>,
+    instances: List<FunctionInstance>,
+    generic_functions: Dict<String, SymbolId>,
+    source_text: String,
+    source_name: String,
+    json_mode: Bool,
+    lines: List<Int>,
+    output: StringList,
+    tokens: List<Token>,
+    comments: List<Token>,
+    syntax_exprs: List<SyntaxExpr>,
+    syntax_stmts: List<SyntaxStmt>,
+    syntax_types: List<SyntaxType>,
+    syntax_functions: List<SyntaxFunction>,
+    expressions: List<CheckedExpr>,
+    statements: List<CheckedStmt>,
+    types: List<TypeInfo>,
+    symbols: List<Symbol>,
+    functions: List<CheckedFunction>,
+    signatures: List<SymbolId>,
+    scopes: List<List<SymbolId>>,
+    type_order: List<TypeId>,
+    control: List<Control>
+}
+pub struct SourceUnit {
+    path: String,
+    name: String,
+    identity: String,
+    code: String,
+    start: Int,
+    end: Int,
+    line_base: Int
+}
+pub struct ImportSpec {
+    path: String,
+    alias: String,
+    span: Span
+}
+pub struct ModuleImport {
+    owner: Int,
+    target: Int,
+    alias: String,
+    span: Span
+}
+pub struct ModuleDeclaration {
+    owner: Int,
+    name: String,
+    canonical: String,
+    exported: Bool,
+    span: Span
+}
+pub fn empty_span() -> Span {
+    return Span(start: 0, end: 0);
+}
+pub fn no_ast_expr() -> AstExprId {
+    return AstExprId(0);
+}
+pub fn no_ast_stmt() -> AstStmtId {
+    return AstStmtId(0);
+}
+pub fn no_expr() -> ExprId {
+    return ExprId(0);
+}
+pub fn no_stmt() -> StmtId {
+    return StmtId(0);
+}
+pub fn no_type() -> TypeId {
+    return TypeId(0);
+}
+pub fn no_symbol() -> SymbolId {
+    return SymbolId(0);
+}
+pub fn has_ast_expr(id: AstExprId) -> Bool {
+    return id.value != 0;
+}
+pub fn has_expr(id: ExprId) -> Bool {
+    return id.value != 0;
+}
+pub fn has_type(id: TypeId) -> Bool {
+    return id.value != 0;
+}
+pub fn has_symbol(id: SymbolId) -> Bool {
+    return id.value != 0;
+}
+pub fn int_type() -> TypeId {
+    return TypeId(1);
+}
+pub fn bool_type() -> TypeId {
+    return TypeId(2);
+}
+pub fn string_type() -> TypeId {
+    return TypeId(3);
+}
+pub fn unit_type() -> TypeId {
+    return TypeId(4);
+}
+pub fn ints_type() -> TypeId {
+    return TypeId(5);
+}
+pub fn strings_type() -> TypeId {
+    return TypeId(6);
+}
+pub fn float_type() -> TypeId {
+    return TypeId(7);
+}
+pub fn foreign_handle_type() -> TypeId { return TypeId(8); }
+pub fn int32_type() -> TypeId { return TypeId(9); }
+pub fn primitive_type_id(index: Int) -> TypeId {
+    return TypeId(index);
+}
+pub fn symbol_number(id: SymbolId) -> Int {
+    return id.value;
+}
+pub fn type_number(id: TypeId) -> Int {
+    return id.value;
+}
+pub fn table_index(id: Int, length: Int, category: String) -> Int effects { io, process } {
+    if id <= 0 || id > length {
+        eprint("velac: internal error: invalid " + category + " ID " + to_string(id));
+        exit(70);
+    }
+    return id - 1;
+}
+pub fn ast_expr(c: Context, id: AstExprId) -> SyntaxExpr effects { state, io, process } {
+    return table_get(c.syntax_exprs, id.value, "AST expression");
+}
+pub fn ast_stmt(c: Context, id: AstStmtId) -> SyntaxStmt effects { state, io, process } {
+    return table_get(c.syntax_stmts, id.value, "AST statement");
+}
+pub fn checked_expr(c: Context, id: ExprId) -> CheckedExpr effects { state, io, process } {
+    return table_get(c.expressions, id.value, "HIR expression");
+}
+pub fn checked_stmt(c: Context, id: StmtId) -> CheckedStmt effects { state, io, process } {
+    return table_get(c.statements, id.value, "HIR statement");
+}
+pub fn type_info(c: Context, id: TypeId) -> TypeInfo effects { state, io, process } {
+    return table_get(c.types, id.value, "type");
+}
+pub fn symbol_info(c: Context, id: SymbolId) -> Symbol effects { state, io, process } {
+    return table_get(c.symbols, id.value, "symbol");
+}
+pub fn add_ast_expr(c: Context, value: SyntaxExpr) -> AstExprId effects { state } {
+    list_push(c.syntax_exprs, value);
+    return AstExprId(list_len(c.syntax_exprs));
+}
+pub fn add_ast_stmt(c: Context, value: SyntaxStmt) -> AstStmtId effects { state } {
+    list_push(c.syntax_stmts, value);
+    return AstStmtId(list_len(c.syntax_stmts));
+}
+pub fn add_expr(c: Context, value: CheckedExpr) -> ExprId effects { state } {
+    list_push(c.expressions, value);
+    return ExprId(list_len(c.expressions));
+}
+pub fn add_stmt(c: Context, value: CheckedStmt) -> StmtId effects { state } {
+    list_push(c.statements, value);
+    return StmtId(list_len(c.statements));
+}
+pub fn add_type(c: Context, value: TypeInfo) -> TypeId effects { state } {
+    list_push(c.types, value);
+    return TypeId(list_len(c.types));
+}
+pub fn add_symbol(c: Context, value: Symbol) -> SymbolId effects { state } {
+    list_push(c.symbols, value);
+    return SymbolId(list_len(c.symbols));
+}
+pub fn set_type(c: Context, id: TypeId, value: TypeInfo) -> Unit effects { state, io, process } {
+    list_set(c.types, table_index(id.value, list_len(c.types), "type"), value);
+}
+pub fn set_symbol(c: Context, id: SymbolId, value: Symbol) -> Unit effects { state, io, process } {
+    list_set(c.symbols, table_index(id.value, list_len(c.symbols), "symbol"), value);
+}
+pub fn syntax_expression(kind: Int, span: Span, text: String) -> SyntaxExpr effects { state } {
+    return SyntaxExpr(arms: list_new<SyntaxArm>(), kind: kind, span: span, text: text, qualifier: "", left: no_ast_expr(), right: no_ast_expr(), arguments: list_new<SyntaxArgument>(), type_arguments: list_new<String>());
+}
+pub fn syntax_statement(kind: Int, span: Span) -> SyntaxStmt effects { state } {
+    return SyntaxStmt(mode: 0, kind: kind, span: span, name: "", annotation: "", mutable: false, value: no_ast_expr(), target: no_ast_expr(), yes: list_new<AstStmtId>(), no: list_new<AstStmtId>(), arms: list_new<SyntaxArm>());
+}
+pub fn expression_record(kind: Int, span: Span, type_id: TypeId) -> CheckedExpr effects { state } {
+    return CheckedExpr(arms: list_new<CheckedArm>(), kind: kind, span: span, type_id: type_id, text: "", left: no_expr(), right: no_expr(), arguments: list_new<ExprId>(), symbol: no_symbol(), fields: list_new<SymbolId>());
+}
+pub fn statement_record(kind: Int, span: Span) -> CheckedStmt effects { state } {
+    return CheckedStmt(mode: 0, exits: false, kind: kind, span: span, binding: no_symbol(), value: no_expr(), target: no_expr(), yes: list_new<StmtId>(), no: list_new<StmtId>(), arms: list_new<CheckedArm>(), returns: false);
+}
+pub fn type_record(kind: Int, name: String, span: Span) -> TypeInfo effects { state } {
+    return TypeInfo(template_index: -1, kind: kind, name: name, fields: list_new<SymbolId>(), variants: list_new<SymbolId>(), arguments: list_new<TypeId>(), base: no_type(), base_name: "", span: span, visit: 0);
+}
+pub fn symbol_record(kind: Int, name: String, type_id: TypeId, span: Span) -> Symbol effects { state } {
+    return Symbol(foreign_library: "", foreign_name: "", template_index: -1, kind: kind, name: name, type_id: type_id, owner: no_type(), span: span, parameters: list_new<SymbolId>(), effect_mask: 0, mutable: false, tag: 0, builtin: false, abi: "", variables: list_new<String>(), patterns: list_new<String>(), return_pattern: "");
+}
+pub fn table_get<T>(items: List<T>, id: Int, category: String) -> T effects { state, io, process } {
+    return list_get(items, table_index(id, list_len(items), category));
+}
+pub fn last<T>(items: List<T>) -> Option<T> effects { state } {
+    if list_len(items) == 0 {
+        return Option<T>::None;
+    }
+    return Option<T>::Some(list_get(items, list_len(items) - 1));
+}

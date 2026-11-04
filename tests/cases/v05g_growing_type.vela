@@ -1,0 +1,1 @@
+struct B<T>{x:List<B<List<T>>>} fn f(x:B<Int>)->Unit{} fn main()->Unit{}

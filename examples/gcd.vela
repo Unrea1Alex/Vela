@@ -1,0 +1,41 @@
+fn gcd(a: Int, b: Int) -> Int requires a > 0 && b > 0;
+ensures result > 0;
+ensures a % result == 0 && b % result == 0;
+{
+    var x = a;
+    var y = b;
+    while y != 0 {
+        let remainder = x % y;
+        x = y;
+        y = remainder;
+    }
+    return x;
+}
+fn main() -> Int effects { io, args } {
+    if arg_count() != 2 {
+        print("Usage: gcd <positive integer> <positive integer>");
+        return 2;
+    }
+    match arg_int(0) {
+        IntResult::Ok(a) => {
+            match arg_int(1) {
+                IntResult::Ok(b) => {
+                    if a <= 0 || b <= 0 {
+                        print("Both integers must be positive.");
+                        return 2;
+                    }
+                    print(gcd(a, b));
+                    return 0;
+                }
+                IntResult::Err(message) => {
+                    print(message);
+                    return 2;
+                }
+            }
+        }
+        IntResult::Err(message) => {
+            print(message);
+            return 2;
+        }
+    }
+}

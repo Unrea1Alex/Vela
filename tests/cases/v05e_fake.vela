@@ -1,0 +1,1 @@
+enum R{Ok(Int),Err(String)} fn f()->Result<Int,String>{let x=R::Ok(1)?;return Result<Int,String>::Ok(x);} fn main()->Unit{}

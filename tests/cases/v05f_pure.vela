@@ -1,0 +1,2 @@
+fn format(n:Int)->String ensures result=="value=8"; {return f"value={n:d}";}
+fn main()->Unit effects {io}{print(format(8));}

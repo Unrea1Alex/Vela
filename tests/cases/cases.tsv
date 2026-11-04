@@ -1,0 +1,291 @@
+# name|mode|exit|diagnostic|stderr substring
+v03_records|run|0||
+v03_empty_struct|run|0||
+v03_nominal_ids|run|0||
+v03_generic_values|run|0||
+v03_generic_growth|run|0||
+v03_dictionary_growth|run|0||
+v03_dictionary_string_keys|run|0||
+v03_recursive_collections|run|0||
+v03_eager_default_order|run|0||
+v03_string_concatenation_order|run|0||
+v03_nominal_mismatch|check|1|E201|
+v03_nominal_implicit|check|1|E201|
+v03_nominal_arithmetic|check|1|E201|
+v03_nominal_equality|check|1|E201|
+v03_nominal_base|check|1|E201|
+v03_struct_missing|check|1|E210|
+v03_struct_unknown|check|1|E211|
+v03_struct_duplicate|check|1|E202|
+v03_struct_positional|check|1|E210|
+v03_struct_wrong_type|check|1|E201|
+v03_struct_duplicate_decl|check|1|E202|
+v03_struct_cycle|check|1|E204|
+v03_immutable_field|check|1|E213|
+v03_temporary_field|check|1|E213|
+v03_field_type|check|1|E201|
+v03_unknown_field|check|1|E211|
+v03_primitive_field|check|1|E201|
+v03_record_match|check|1|E201|
+v03_record_equality|check|1|E201|
+v03_list_wrong_value|check|1|E201|
+v03_list_wrong_nested|check|1|E201|
+v03_list_type_arity|check|1|E210|
+v03_list_inference|check|1|E201|
+v03_list_missing_effect|check|1|E209|
+v03_list_read_effect|check|1|E209|
+v03_list_contract_effect|check|1|E209|
+v03_dict_key_type|check|1|E201|
+v03_dict_key_mismatch|check|1|E201|
+v03_dict_value_mismatch|check|1|E201|
+v03_dict_kind_mismatch|check|1|E201|
+v03_dict_read_effect|check|1|E209|
+v03_unknown_generic_type|check|1|E200|
+v03_generic_type_arity|check|1|E200|
+v03_reserved_constructor|check|1|E202|
+v03_format_record|check|1|E201|
+v03_mixed_string_plus|check|1|E201|
+v03_named_regular_call|check|1|E210|
+v03_non_generic_function|check|1|E210|
+v03_enum_generic_call|check|1|E210|
+v03_distinct_missing_arg|check|1|E210|
+v03_list_get_bounds|run|70||list index out of bounds
+v03_list_set_bounds|run|70||list index out of bounds
+v03_list_truncate_bounds|run|70||invalid list truncation
+v03_dict_missing|run|70||dictionary key not found
+forward_function_and_enum_references|check|0||
+type_mismatch|check|1|E201|
+no_implicit_numeric_boolean_conversion|check|1|E201|
+local_type_annotation|check|1|E201|
+assignment_type|check|1|E201|
+immutable_binding|check|1|E213|
+parameter_is_immutable|check|1|E213|
+block_scope|check|1|E203|
+shadowing_in_nested_scope|check|0||
+duplicate_binding|check|1|E202|
+duplicate_parameter|check|1|E202|
+duplicate_top_level_name|check|1|E202|
+unknown_type|check|1|E200|
+main_signature|check|1|E207|
+missing_main|check|1|E207|
+missing_return|check|1|E208|
+unreachable|check|1|E212|
+exhaustive_match_return|check|0||
+missing_arm|check|1|E216|
+duplicate_arm|check|1|E215|
+wrong_pattern_arity|check|1|E210|
+wrong_pattern_enum|check|1|E201|
+unknown_variant|check|1|E211|
+constructor_types|check|1|E201|
+no_recursive_value_enum|check|1|E204|
+no_empty_enum|check|1|E204|
+no_duplicate_variant|check|1|E202|
+direct_effect|check|1|E209|
+transitive_effect|check|1|E209|
+arguments_effect|check|1|E209|
+unknown_effect|check|1|E206|
+contracts_are_pure|check|1|E209|
+postcondition_result_type|check|1|E201|
+result_not_available_in_precondition|check|1|E203|
+result_reserved|check|1|E202|
+unused_result_expression|check|1|E214|
+integer_bounds|check|0||
+integer_bounds_2|check|1|E205|
+integer_bounds_3|check|1|E205|
+integer_bounds_4|check|1|E205|
+leading_zero_literal|check|0||
+string_tokens_not_confused_with_operators|check|0||
+invalid_escapes|check|1|E001|
+unterminated_string|check|1|E001|
+unfinished_block|check|1|E100|
+wrong_call_arity|check|1|E210|
+local_name_masks_function|check|1|E201|
+deep_input_has_diagnostic|check|1|E101|
+invalid_argument_is_handled|run|2||
+no_argument_is_handled|run|2||
+operators_and_precedence|run|0||
+arithmetic_edges|run|0||
+short_circuit|run|0||
+evaluation_order|run|0||
+recursive_function|run|0||
+loop_scope_and_conditions|run|0||
+nested_enums_multiple_fields_and_unit|run|0||
+strings_unicode_nul_and_escaping|run|0||
+argument_and_result_contracts|run|0||
+exit_code|run|17||
+list_requires_state|check|1|E209|
+list_items_are_typed|check|1|E201|
+list_equality_rejected|check|1|E201|
+file_io_effect|check|1|E209|
+process_effect|check|1|E209|
+string_result_exhaustiveness|check|1|E216|
+dynamic_string_lifetime_and_bytes|run|0||
+list_aliases_and_growth|run|0||
+string_list_builder|run|0||
+collection_in_enum|run|0||
+file_roundtrip_and_replacement|run|0||
+file_roundtrip_and_replacement_2|run|0||
+nonexistent_process|run|0||
+dynamic_strings_in_pure_contract|run|0||
+temp_directory|run|0||
+overflow|run|70||overflow in addition
+overflow_2|run|70||overflow in addition
+overflow_3|run|70||overflow in subtraction
+overflow_4|run|70||overflow in subtraction
+overflow_5|run|70||overflow in multiplication
+overflow_6|run|70||overflow in multiplication
+overflow_7|run|70||overflow in multiplication
+overflow_8|run|70||overflow in negation
+overflow_9|run|70||overflow in division
+overflow_10|run|70||division by zero
+overflow_11|run|70||remainder by zero
+bounds|run|70||runtime error:
+bounds_2|run|70||runtime error:
+bounds_3|run|70||runtime error:
+bounds_4|run|70||runtime error:
+bounds_5|run|70||runtime error:
+bounds_6|run|70||runtime error:
+bounds_7|run|70||runtime error:
+bounds_8|run|70||runtime error:
+precondition|run|70||precondition failed: n > 0
+postcondition|run|70||postcondition failed: result > 0
+unit_postcondition|run|70||postcondition failed
+exit_range|run|70||main exit code
+parse_bounds|run|0||
+parse_bounds_2|run|0||
+parse_bounds_3|run|0||
+parse_bounds_4|run|2||
+parse_bounds_5|run|2||
+parse_bounds_6|run|2||
+parse_bounds_7|run|2||
+parse_bounds_8|run|2||
+parse_bounds_9|run|2||
+parse_bounds_10|run|2||
+unicode_whitespace|check|0||
+unicode_whitespace_2|check|0||
+unicode_whitespace_3|check|0||
+unicode_whitespace_4|check|0||
+unicode_whitespace_5|check|0||
+list_read_effect|check|1|E209|
+list_contract_effect|check|1|E209|
+example_hello|run|0||
+example_factorial|run|0||
+example_factorial_2|run|0||
+example_sum|run|0||
+example_gcd|run|0||
+example_result|run|0||
+example_word_count|run|0||
+files_roundtrip|run|0||
+v04_file_identity|run|0||
+v04_file_identity_effect|check|1|E209|
+v04_write_stdout|run|0||
+v04_write_stdout_effect|check|1|E209|
+v05g_identity|run|0||
+v05g_records|run|0||
+v05g_enum|run|0||
+v05g_recursion|run|0||
+v05g_recursive_record|run|0||
+v05g_bounds|run|0||
+v05g_order|run|0||
+v05g_unused|check|0||
+v05g_conflict|check|1|E201|
+v05g_uninferred|check|1|E210|
+v05g_arity|check|1|E210|
+v05g_missing|check|1|E210|
+v05g_nominal|check|1|E201|
+v05g_bound|check|1|E210|
+v05g_bound_explicit|check|1|E210|
+v05g_unknown_bound|check|1|E210|
+v05g_duplicate_param|check|1|E210|
+v05g_reserved_param|check|1|E210|
+v05g_body|check|1|E201|
+v05g_effect|check|1|E209|
+v05g_body_effect|check|1|E209|
+v05g_cycle|check|1|E204|
+v05g_growing_type|check|1|E217|
+v05g_growing_fn|check|1|E217|
+v05g_main|check|1|E207|
+v05g_type_arity|check|1|E210|
+v05g_wrong_pattern|check|1|E201|
+v05g_type_limit|check|1|E217|
+v05g_fn_limit|check|1|E217|
+v05e_match|run|0||
+v05e_result|run|0||
+v05e_option|run|0||
+v05e_nested|run|0||
+v05e_order|run|0||
+v05e_shortcircuit|run|0||
+v05e_postconditions|run|0||
+v05e_postcondition_fail|run|70||postcondition failed
+v05e_type|check|1|E201|
+v05e_missing|check|1|E216|
+v05e_duplicate|check|1|E215|
+v05e_scope|check|1|E203|
+v05e_wrong_family|check|1|E201|
+v05e_wrong_error|check|1|E201|
+v05e_legacy|check|1|E218|
+v05e_contract|check|1|E218|
+v05e_requires|check|1|E218|
+v05e_effect|check|1|E209|
+v05e_fake|check|1|E218|
+v05e_reserved|check|1|E202|
+v05c_range|run|0||
+v05c_extrema|run|0||
+v05c_order|run|0||
+v05c_nested|run|0||
+v05c_while_match|run|0||
+v05c_snapshot|run|0||
+v05c_shallow|run|0||
+v05c_legacy|run|0||
+v05c_propagation|run|0||
+v05c_return|run|0||
+v05c_shadow|run|0||
+v05c_break|check|1|E219|
+v05c_continue|check|1|E219|
+v05c_immutable|check|1|E213|
+v05c_scope|check|1|E203|
+v05c_state|check|1|E209|
+v05c_range_type|check|1|E201|
+v05c_iterable|check|1|E201|
+v05c_unreachable|check|1|E212|
+v05c_mixed_exit|check|1|E212|
+v05c_missing_return|check|1|E208|
+v05f_basic|run|0||
+v05f_escapes|run|0||
+v05f_nested|run|0||
+v05f_generic|run|0||
+v05f_extrema|run|0||
+v05f_order|run|0||
+v05f_propagation|run|0||
+v05f_pure|run|0||
+v05f_missing_format|check|1|E100|
+v05f_unknown_format|check|1|E220|
+v05f_wrong_type|check|1|E201|
+v05f_record|check|1|E201|
+v05f_distinct|check|1|E201|
+v05f_unmatched|check|1|E001|
+v05f_unterminated|check|1|E001|
+v05f_empty|check|1|E100|
+v05f_escape|check|1|E001|
+v05f_effect|check|1|E209|
+v05f_unicode_position|check|1|E203|
+v05f_newline|check|1|E001|
+v05f_comment|check|1|E001|
+v05f_depth|check|1|E101|
+v06_sha|run|0||
+v07_float|run|0||
+v07_float_mixed|check|1|E201|
+v07_float_remainder|check|1|E201|
+v07_float_overflow|check|1|E205|
+v07_float_key|check|1|E201|
+v07_float_distinct_key|check|1|E201|
+v07_float_format|check|1|E201|
+v07_float_exponent|check|1|E001|
+v07_float_range|check|1|E201|
+v07_test_pass|check|0||
+v07_test_effect|check|1|E209|
+v07_test_duplicate|check|1|E227|
+v07_test_export|check|1|E227|
+v07_test_name|check|1|E227|
+v07_test_type|check|1|E201|
+v07_test_return|check|1|E201|

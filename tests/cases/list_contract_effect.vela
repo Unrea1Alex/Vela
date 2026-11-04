@@ -1,0 +1,1 @@
+fn size(items: IntList) -> Int effects { state } requires ints_len(items) > 0; { return ints_len(items); } fn main() -> Unit {}

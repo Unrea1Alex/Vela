@@ -1,0 +1,289 @@
+import "model.vela";
+import "core.vela";
+import "source.vela";
+import "lexer.vela";
+import "parser.vela";
+import "types.vela";
+import "driver.vela";
+// Source graph and binding. Syntax remains immutable; declarations are bound separately.
+pub fn parse_import(c: Context) -> ImportSpec effects { state, io, process } {
+    let start = expect(c, "import").span.start;
+    let path = take(c);
+    if path.kind != 52 || path.text == ""|| contains_byte(path.text, 0) || contains_byte(path.text, 10) || contains_byte(path.text, 13) {
+        bad(c, "E221", "Import requires a nonempty file path.", path.span);
+    }
+    if str_byte(path.text, 0) == 47 || str_byte(path.text, 0) == 92 || contains_byte(path.text, 58) {
+        bad(c, "E221", "Import path must be relative.", path.span);
+    }
+    var alias = "";
+    if accept(c, "as") {
+        alias = identifier(c).text;
+    }
+    let end = expect(c,";");
+    return ImportSpec(path: path.text, alias: alias, span: Span(start: start, end: end.span.end));
+}
+pub fn collect_module(units: List<SourceUnit>, imports: List<ModuleImport>, path: String, name: String, code: String, identity: String, json_mode: Bool, depth: Int, dependencies: List<ProjectDependency>) -> Int effects { state, io, process } {
+    for i in 0 .. list_len(units) {
+        if identity != ""&& list_get(units, i).identity == identity {
+            return i;
+        }
+    }
+    let local = make_context(code, name, json_mode);
+    if list_len(units) >= 256 || depth >= 128 {
+        bad(local, "E221", "Module graph limit exceeded.", empty_span());
+    }
+    var start = 0;
+    var line_base = 0;
+    for unit in units {
+        start = unit.end + 1;
+        for i in 0 .. str_len(unit.code) {
+            if str_byte(unit.code, i) == 10 {
+                line_base = line_base + 1;
+            }
+        }
+        line_base = line_base + 1;
+    }
+    if start + str_len(code) > 16777216 {
+        bad(local, "E221", "Module graph exceeds 16 MiB.", empty_span());
+    }
+    let owner = list_len(units);
+    list_push(units, SourceUnit(path: path, name: name, identity: identity, code: code, start: start, end: start + str_len(code), line_base: line_base));
+    lex(local);
+    while at(local, "import") {
+        let spec = parse_import(local);
+        for previous in imports {
+            if spec.alias != ""&& previous.owner == owner && previous.alias == spec.alias {
+                bad(local, "E222", "Duplicate import alias.", spec.span);
+            }
+        }
+        var imported_path = io_value(absolute_path(parent_path(path) + "/" + spec.path));
+        if str_byte(spec.path, 0) == 64 {
+            imported_path = "";
+            for dep in dependencies {
+                if spec.path == "@" + dep.alias {
+                    imported_path = dep.path;
+                }
+            }
+            if imported_path == "" {
+                bad(local, "E221", "Unknown project dependency: " + spec.path, spec.span);
+            }
+        }
+        var imported_code = "";
+        match source_text_result(imported_path) {
+            Result::Ok(text) => {
+                imported_code = text;
+            }
+            Result::Err(message) => {
+                bad(local, "E221", "Cannot import " + spec.path + ": " + message, spec.span);
+            }
+        }
+        let target_identity = io_value(file_identity(imported_path));
+        // Register the edge before recursion so aliases are checked through cycles.
+        let edge = list_len(imports);
+        let span = Span(start: start + spec.span.start, end: start + spec.span.end);
+        list_push(imports, ModuleImport(owner: owner, target: -1, alias: spec.alias, span: span));
+        let target = collect_module(units, imports, imported_path, imported_path, imported_code, target_identity, json_mode, depth + 1, dependencies);
+        list_set(imports, edge, ModuleImport(owner: owner, target: target, alias: spec.alias, span: span));
+    }
+    return owner;
+}
+pub fn module_context(path: String, name: String, code: String, json_mode: Bool) -> Context effects { state, io, process } {
+    return project_module_context(path, name, code, json_mode, list_new<ProjectDependency>());
+}
+pub fn project_module_context(path: String, name: String, code: String, json_mode: Bool, dependencies: List<ProjectDependency>) -> Context effects { state, io, process } {
+    let units = list_new<SourceUnit>();
+    let imports = list_new<ModuleImport>();
+    let entry = collect_module(units, imports, path, name, code, io_value(file_identity(path)), json_mode, 0, dependencies);
+    let parts = strings_new();
+    for unit in units {
+        strings_push(parts, unit.code + "\n");
+    }
+    var c = make_context(strings_join(parts, ""), name, json_mode);
+    c.source_units = units;
+    c.imports = imports;
+    return c;
+}
+pub fn parse_program(c: Context) -> Unit effects { state, io, process } {
+    for unit in c.source_units {
+        var local = c;
+        local.tokens = list_new<Token>();
+        local.comments = list_new<Token>();
+        local.control = list_new<Control>();
+        var control = list_get(c.control, 0);
+        control.cursor = 0;
+        control.previous_end = unit.start;
+        list_push(local.control, control);
+        lex_range(local, unit.start, unit.end);
+        parse_module(local);
+    }
+}
+pub fn module_canonical(owner: Int, name: String) -> String {
+    if owner == 0 {
+        return name;
+    }
+    return "@" + to_string(owner) +"::"+ name;
+}
+pub fn declare_module_name(c: Context, name: String, exported: Bool, span: Span) -> Unit effects { state, io, process } {
+    let owner = source_unit_at(c, span.start);
+    list_push(c.declarations, ModuleDeclaration(owner: owner, name: name, canonical: module_canonical(owner, name), exported: exported, span: span));
+}
+pub fn module_declaration(c: Context, owner: Int, name: String) -> Int effects { state } {
+    for i in 0 .. list_len(c.declarations) {
+        let d = list_get(c.declarations, i);
+        if d.owner == owner && d.name == name {
+            return i;
+        }
+    }
+    return -1;
+}
+pub fn module_alias(c: Context, name: String, span: Span) -> Int effects { state } {
+    let owner = source_unit_at(c, span.start);
+    for edge in c.imports {
+        if edge.owner == owner && edge.alias == name && name != "" {
+            return edge.target;
+        }
+    }
+    return -1;
+}
+pub fn module_global_name(c: Context, name: String, span: Span) -> String effects { state, io, process } {
+    if name == "" {
+        return name;
+    }
+    if str_byte(name, 0) == 64 {
+        return name;
+    }
+    let owner = source_unit_at(c, span.start);
+    for i in 0 .. str_len(name) - 1 {
+        if str_byte(name, i) == 58 && str_byte(name, i + 1) == 58 {
+            let alias = str_slice(name, 0, i);
+            let target = module_alias(c, alias, span);
+            if target < 0 {
+                bad(c, "E222", "Unknown module alias: " + alias, span);
+            }
+            let index = module_declaration(c, target, str_slice(name, i + 2, str_len(name)));
+            if index < 0 {
+                bad(c, "E222", "Unknown module member: " + name, span);
+            }
+            let d = list_get(c.declarations, index);
+            if !d.exported {
+                bad(c, "E223", "Private module member: " + name, span);
+            }
+            return d.canonical;
+        }
+    }
+    let own = module_declaration(c, owner, name);
+    if own >= 0 {
+        return list_get(c.declarations, own).canonical;
+    }
+    var found = "";
+    for edge in c.imports {
+        if edge.owner == owner && edge.alias == "" {
+            let index = module_declaration(c, edge.target, name);
+            if index >= 0 {
+                let d = list_get(c.declarations, index);
+                if d.exported {
+                    if found != ""&& found != d.canonical {
+                        bad(c, "E222", "Ambiguous imported name: " + name, span);
+                    }
+                    found = d.canonical;
+                }
+            }
+        }
+    }
+    if found != "" {
+        return found;
+    }
+    if name == "List" || name == "Dict" || name == "Option" || name == "Result" {
+        return name;
+    }
+    let builtin_type = find_type(c, name);
+    if has_type(builtin_type) && type_info(c, builtin_type).span.end == 0 {
+        return name;
+    }
+    let builtin_function = find_symbol(c, c.signatures, name);
+    if has_symbol(builtin_function) && symbol_info(c, builtin_function).builtin {
+        return name;
+    }
+    return module_canonical(owner, name);
+}
+pub fn module_type_name(c: Context, name: String, parameters: List<TypeParameter>, span: Span, public_api: Bool) -> String effects { state, io, process } {
+    if name == "" {
+        return name;
+    }
+    for parameter in parameters {
+        if parameter.name == name {
+            return name;
+        }
+    }
+    let parts = type_parts(name);
+    let base = module_global_name(c, list_get(parts, 0), span);
+    if public_api {
+        for d in c.declarations {
+            if d.canonical == base && !d.exported {
+                bad(c, "E224", "Public API exposes private type: " + name, span);
+            }
+        }
+    }
+    if list_len(parts) == 1 {
+        return base;
+    }
+    let args = list_new<String>();
+    for i in 1 .. list_len(parts) {
+        list_push(args, module_type_name(c, list_get(parts, i), parameters, span, public_api));
+    }
+    return base + "<" + join_text(args,",") + ">";
+}
+pub fn bind_modules(c: Context) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(c.declarations) {
+        let d = list_get(c.declarations, i);
+        for j in 0 .. i {
+            let previous = list_get(c.declarations, j);
+            if previous.owner == d.owner && previous.name == d.name {
+                duplicate(c, "Duplicate declaration '" + d.name + "'.", d.span, previous.span);
+            }
+        }
+        if has_type(find_type(c, d.name)) || has_symbol(find_symbol(c, c.signatures, d.name)) || d.name == "List" || d.name == "Dict" {
+            bad(c, "E202", "Reserved declaration: " + d.name, d.span);
+        }
+        if module_alias(c, d.name, d.span) >= 0 {
+            bad(c, "E222", "Declaration conflicts with import alias.", d.span);
+        }
+    }
+    for syntax in c.syntax_types {
+        let owner = source_unit_at(c, syntax.span.start);
+        let d = list_get(c.declarations, module_declaration(c, owner, syntax.name));
+        var bound = syntax;
+        bound.name = d.canonical;
+        bound.base = module_type_name(c, syntax.base, syntax.type_parameters, syntax.span, d.exported);
+        bound.fields = list_new<SyntaxField>();
+        for field in syntax.fields {
+            var f = field;
+            f.annotation = module_type_name(c, field.annotation, syntax.type_parameters, field.span, d.exported);
+            list_push(bound.fields, f);
+        }
+        bound.variants = list_new<SyntaxVariant>();
+        for variant in syntax.variants {
+            var v = variant;
+            v.fields = list_new<String>();
+            for field in variant.fields {
+                list_push(v.fields, module_type_name(c, field, syntax.type_parameters, variant.span, d.exported));
+            }
+            list_push(bound.variants, v);
+        }
+        list_push(c.bound_types, bound);
+    }
+    for syntax in c.syntax_functions {
+        let owner = source_unit_at(c, syntax.span.start);
+        let d = list_get(c.declarations, module_declaration(c, owner, syntax.name));
+        var bound = syntax;
+        bound.name = d.canonical;
+        bound.return_name = module_type_name(c, syntax.return_name, syntax.type_parameters, syntax.span, d.exported);
+        bound.parameters = list_new<SyntaxField>();
+        for parameter in syntax.parameters {
+            var p = parameter;
+            p.annotation = module_type_name(c, parameter.annotation, syntax.type_parameters, parameter.span, d.exported);
+            list_push(bound.parameters, p);
+        }
+        list_push(c.bound_functions, bound);
+    }
+}

@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "independent_decoder": "Node JSON.parse",
+  "passed": 5,
+  "results": [
+    {
+      "name": "type",
+      "diagnostic": {
+        "severity": "error",
+        "code": "E201",
+        "message": "Expected Int, found Bool.",
+        "source": "проверка\"😀.vela",
+        "span": {
+          "start": 58,
+          "end": 63,
+          "line": 2,
+          "column": 27,
+          "end_line": 2,
+          "end_column": 32
+        },
+        "notes": [],
+        "details": {
+          "expected_type": "Int",
+          "actual_type": "Bool"
+        },
+        "related": [
+          {
+            "message": "Expected type is declared here.",
+            "source": "проверка\"😀.vela",
+            "span": {
+              "start": 9,
+              "end": 19,
+              "line": 1,
+              "column": 10,
+              "end_line": 1,
+              "end_column": 20
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "effect",
+      "diagnostic": {
+        "severity": "error",
+        "code": "E209",
+        "message": "Call to 'change' requires undeclared effects: io, state.",
+        "source": "проверка\"😀.vela",
+        "span": {
+          "start": 65,
+          "end": 73,
+          "line": 2,
+          "column": 21,
+          "end_line": 2,
+          "end_column": 29
+        },
+        "notes": [],
+        "details": {
+          "callee": "change",
+          "required_effects": [
+            "io",
+            "state"
+          ],
+          "allowed_effects": [],
+          "missing_effects": [
+            "io",
+            "state"
+          ]
+        },
+        "related": [
+          {
+            "message": "Called function declares these effects.",
+            "source": "проверка\"😀.vela",
+            "span": {
+              "start": 0,
+              "end": 44,
+              "line": 1,
+              "column": 1,
+              "end_line": 1,
+              "end_column": 45
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "match",
+      "diagnostic": {
+        "severity": "error",
+        "code": "E216",
+        "message": "Non-exhaustive match; missing: Color::Blue, Color::Green.",
+        "source": "проверка\"😀.vela",
+        "span": {
+          "start": 52,
+          "end": 89,
+          "line": 2,
+          "column": 21,
+          "end_line": 2,
+          "end_column": 58
+        },
+        "notes": [],
+        "details": {
+          "missing_variants": [
+            "Color::Blue",
+            "Color::Green"
+          ]
+        },
+        "related": [
+          {
+            "message": "Enum is declared here.",
+            "source": "проверка\"😀.vela",
+            "span": {
+              "start": 0,
+              "end": 31,
+              "line": 1,
+              "column": 1,
+              "end_line": 1,
+              "end_column": 32
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplicate",
+      "diagnostic": {
+        "severity": "error",
+        "code": "E202",
+        "message": "Duplicate binding 'x' in this scope.",
+        "source": "проверка\"😀.vela",
+        "span": {
+          "start": 33,
+          "end": 43,
+          "line": 3,
+          "column": 2,
+          "end_line": 3,
+          "end_column": 12
+        },
+        "notes": [],
+        "details": {},
+        "related": [
+          {
+            "message": "Previous declaration is here.",
+            "source": "проверка\"😀.vela",
+            "span": {
+              "start": 21,
+              "end": 31,
+              "line": 2,
+              "column": 2,
+              "end_line": 2,
+              "end_column": 12
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "unicode",
+      "diagnostic": {
+        "severity": "error",
+        "code": "E201",
+        "message": "Expected Int, found Bool.",
+        "source": "G:\\Vela\\build\\stage04\\diag-unicode.vela",
+        "span": {
+          "start": 28,
+          "end": 41,
+          "line": 3,
+          "column": 5,
+          "end_line": 3,
+          "end_column": 18
+        },
+        "notes": [],
+        "details": {
+          "expected_type": "Int",
+          "actual_type": "Bool"
+        },
+        "related": []
+      }
+    }
+  ]
+}

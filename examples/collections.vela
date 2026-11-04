@@ -1,0 +1,19 @@
+type NodeId = distinct Int;
+struct Node {
+    id: NodeId,
+    name: String,
+    children: List<Node>
+}
+fn main() -> Unit effects { state, io } {
+    var root = Node(name: "root", children: list_new<Node>(), id: NodeId(1));
+    let child = Node(id: NodeId(2), name: "leaf", children: list_new<Node>());
+    list_push(root.children, child);
+    root.name = root.name + " node";
+    let names = dict_new<NodeId, String>();
+    dict_set(names, root.id, root.name);
+    dict_set(names, child.id, child.name);
+    print(dict_get(names, NodeId(1)));
+    print(list_get(root.children, 0).name);
+    print("count=" + to_string(dict_len(names)));
+    print(dict_get_or(names, NodeId(99), "missing"));
+}

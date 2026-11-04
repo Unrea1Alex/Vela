@@ -1,0 +1,13 @@
+struct Item { value: Int }
+type Key = distinct Int;
+fn main() -> Unit effects { state, io } {
+ let d = dict_new<Key, Item>(); let alias = d; var i = 0;
+ while i < 2000 { dict_set(d, Key(i), Item(value: i * 2)); i = i + 1; }
+ i = 0; while i < 2000 { if dict_get(d, Key(i)).value != i * 2 { print("wrong"); } i = i + 1; }
+ i = 0; while i < 2000 { let removed = dict_remove(alias, Key(i)); i = i + 2; }
+ print(dict_len(d)); print(dict_has(d, Key(0))); print(dict_has(d, Key(1)));
+ i = 0; while i < 2000 { dict_set(alias, Key(i), Item(value: i)); i = i + 1; }
+ print(dict_len(d)); print(dict_get(d, Key(1999)).value);
+ dict_set(d, Key(1999), Item(value: 42)); print(dict_len(d)); print(dict_get(d, Key(1999)).value);
+ print(dict_remove(d, Key(9999))); print(dict_get_or(d, Key(9999), Item(value: -1)).value);
+}

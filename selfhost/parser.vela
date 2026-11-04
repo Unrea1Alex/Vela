@@ -1,0 +1,635 @@
+import "model.vela";
+import "core.vela";
+import "lexer.vela";
+import "modules.vela";
+import "types.vela";
+pub fn current(c: Context) -> Token effects { state } {
+    return list_get(c.tokens, list_get(c.control, 0).cursor);
+}
+pub fn at(c: Context, value: String) -> Bool effects { state } {
+    let t = current(c);
+    return (t.kind == 50 || t.kind == 53 || t.kind == 54) && t.text == value;
+}
+pub fn take(c: Context) -> Token effects { state } {
+    let t = current(c);
+    var ctl = list_get(c.control, 0);
+    if t.kind != 54 {
+        ctl.cursor = ctl.cursor + 1;
+    }
+    ctl.previous_end = t.span.end;
+    list_set(c.control, 0, ctl);
+    return t;
+}
+pub fn accept(c: Context, value: String) -> Bool effects { state } {
+    if at(c, value) {
+        let ignored = take(c);
+        return true;
+    }
+    return false;
+}
+pub fn expect(c: Context, value: String) -> Token effects { state, io, process } {
+    if !at(c, value) {
+        bad(c, "E100", "Expected " + value, current(c).span);
+    }
+    return take(c);
+}
+pub fn identifier(c: Context) -> Token effects { state, io, process } {
+    let t = current(c);
+    if t.kind != 50 || keyword(t.text) {
+        bad(c, "E100", "Expected an identifier.", t.span);
+    }
+    return take(c);
+}
+pub fn through_previous(c: Context, start: Int) -> Span effects { state } {
+    return Span(start: start, end: list_get(c.control, 0).previous_end);
+}
+pub fn precedence(op: String) -> Int {
+    if op == "||" {
+        return 1;
+    }
+    if op == "&&" {
+        return 2;
+    }
+    if op == "==" || op == "!=" {
+        return 3;
+    }
+    if op == "<" || op == "<=" || op == ">" || op == ">=" {
+        return 4;
+    }
+    if op == "+" || op == "-" {
+        return 5;
+    }
+    if op == "*" || op == "/" || op == "%" {
+        return 6;
+    }
+    return -1;
+}
+pub fn parse_type(c: Context) -> String effects { state, io, process } {
+    let token = identifier(c);
+    enter(c, token.span);
+    var name = token.text;
+    while accept(c,"::") {
+        name = name +"::"+ identifier(c).text;
+    }
+    if accept(c, "<") {
+        let parts = strings_new();
+        var more = true;
+        while more {
+            strings_push(parts, parse_type(c));
+            more = accept(c,",");
+        }
+        let close = expect(c, ">");
+        name = name + "<" + strings_join(parts,",") + ">";
+    }
+    leave(c);
+    return name;
+}
+pub fn type_list(c: Context, end: String) -> List<String> effects { state, io, process } {
+    let items = list_new<String>();
+    var more = !at(c, end);
+    while more {
+        list_push(items, parse_type(c));
+        more = accept(c,",") && !at(c, end);
+    }
+    let close = expect(c, end);
+    return items;
+}
+pub fn generic_call_ahead(c: Context) -> Bool effects { state } {
+    if !at(c, "<") {
+        return false;
+    }
+    var i = list_get(c.control, 0).cursor;
+    var depth = 0;
+    while i < list_len(c.tokens) {
+        let t = list_get(c.tokens, i);
+        if t.kind == 54 {
+            return false;
+        }
+        if t.text == "<" {
+            depth = depth + 1;
+        } else if t.text == ">" {
+            depth = depth - 1;
+            if depth == 0 {
+                return list_get(c.tokens, i + 1).text == "("|| list_get(c.tokens, i + 1).text =="::";
+            }
+        } else if t.kind != 50 && t.text !="," && t.text !="::" {
+            return false;
+        }
+        i = i + 1;
+    }
+    return false;
+}
+pub fn expressions(c: Context) -> List<SyntaxArgument> effects { state, io, process } {
+    let items = list_new<SyntaxArgument>();
+    var more = !at(c,")");
+    while more {
+        var label = "";
+        if current(c).kind == 50 && list_get(c.tokens, list_get(c.control, 0).cursor + 1).text ==":" {
+            label = identifier(c).text;
+            let colon = expect(c,":");
+        }
+        let value = expression(c, 0);
+        list_push(items, SyntaxArgument(label: label, value: value));
+        more = accept(c,",") && !at(c,")");
+    }
+    let close = expect(c,")");
+    return items;
+}
+pub fn expression(c: Context, minimum: Int) -> AstExprId effects { state, io, process } {
+    let t = take(c);
+    enter(c, t.span);
+    var n = syntax_expression(0, t.span, t.text);
+    var left = no_ast_expr();
+    if t.kind == 51 {
+        n.kind = 1;
+    } else if t.kind == 57 {
+        n.kind = 12;
+    } else if t.kind == 56 {
+        left = parse_interpolation(c, t);
+    } else if t.kind == 52 {
+        n.kind = 3;
+    } else if t.kind == 50 && (t.text == "true" || t.text == "false") {
+        n.kind = 2;
+    } else if t.kind == 53 && (t.text == "-"|| t.text == "!") {
+        n.kind = 5;
+        n.left = expression(c, 7);
+        n.span = through_previous(c, t.span.start);
+    } else if t.kind == 53 && t.text == "(" {
+        left = expression(c, 0);
+        let close = expect(c,")");
+    } else if t.kind == 50 && t.text == "match" {
+        n.kind = 9;
+        n.left = expression(c, 0);
+        n.arms = parse_arms(c, true);
+        n.span = through_previous(c, t.span.start);
+    } else if t.kind == 50 && !keyword(t.text) {
+        n.kind = 4;
+        var path = n.text;
+        var reading = true;
+        while reading {
+            if generic_call_ahead(c) {
+                let open = expect(c, "<");
+                n.type_arguments = type_list(c, ">");
+            }
+            if accept(c,"::") {
+                if list_len(n.type_arguments) > 0 {
+                    path = path + "<" + join_text(n.type_arguments,",") + ">";
+                    n.type_arguments = list_new<String>();
+                }
+                n.qualifier = path;
+                n.text = identifier(c).text;
+                path = path +"::"+ n.text;
+            } else {
+                reading = false;
+            }
+        }
+        n.span = through_previous(c, t.span.start);
+        left = add_ast_expr(c, n);
+        if generic_call_ahead(c) {
+            let open = expect(c, "<");
+            n.type_arguments = type_list(c, ">");
+        }
+        if accept(c,"(") {
+            n.kind = 7;
+            n.left = left;
+            n.arguments = expressions(c);
+            n.span = through_previous(c, t.span.start);
+            left = add_ast_expr(c, n);
+        }
+    } else {
+        bad(c, "E100", "Expected an expression.", t.span);
+    }
+    if !has_ast_expr(left) {
+        left = add_ast_expr(c, n);
+    }
+    while at(c,".") || at(c,"?") {
+        if accept(c,"?") {
+            var propagation = syntax_expression(10, through_previous(c, ast_expr(c, left).span.start),"?");
+            propagation.left = left;
+            left = add_ast_expr(c, propagation);
+        } else {
+            let dot = expect(c,".");
+            let field = identifier(c);
+            var access = syntax_expression(8, Span(start: ast_expr(c, left).span.start, end: field.span.end), field.text);
+            access.left = left;
+            left = add_ast_expr(c, access);
+        }
+    }
+    while current(c).kind == 53 && precedence(current(c).text) >= minimum {
+        let op = take(c);
+        let right = expression(c, precedence(op.text) + 1);
+        var binary = syntax_expression(6, Span(start: ast_expr(c, left).span.start, end: ast_expr(c, right).span.end), op.text);
+        binary.left = left;
+        binary.right = right;
+        left = add_ast_expr(c, binary);
+    }
+    leave(c);
+    return left;
+}
+pub fn name_fields(c: Context, end: String) -> List<SyntaxField> effects { state, io, process } {
+    let items = list_new<SyntaxField>();
+    var more = !at(c, end);
+    while more {
+        let name = identifier(c);
+        let colon = expect(c,":");
+        let annotation = parse_type(c);
+        list_push(items, SyntaxField(name: name.text, annotation: annotation, span: through_previous(c, name.span.start)));
+        more = accept(c,",") && !at(c, end);
+    }
+    let close = expect(c, end);
+    return items;
+}
+pub fn block(c: Context) -> List<AstStmtId> effects { state, io, process } {
+    let open = expect(c, "{");
+    enter(c, open.span);
+    let body = list_new<AstStmtId>();
+    while !at(c, "}") {
+        list_push(body, statement(c));
+    }
+    let close = expect(c, "}");
+    leave(c);
+    return body;
+}
+pub fn statement(c: Context) -> AstStmtId effects { state, io, process } {
+    let start = current(c).span;
+    enter(c, start);
+    var n = syntax_statement(0, start);
+    if at(c, "let") || at(c, "var") {
+        n.mutable = take(c).text == "var";
+        n.kind = 30;
+        n.name = identifier(c).text;
+        if accept(c,":") {
+            n.annotation = parse_type(c);
+        }
+        let equal = expect(c, "=");
+        n.value = expression(c, 0);
+        let semi = expect(c,";");
+    } else if accept(c, "return") {
+        n.kind = 32;
+        if !at(c,";") {
+            n.value = expression(c, 0);
+        }
+        let semi = expect(c,";");
+    } else if accept(c, "if") {
+        n.kind = 34;
+        n.value = expression(c, 0);
+        n.yes = block(c);
+        if accept(c, "else") {
+            if at(c, "if") {
+                list_push(n.no, statement(c));
+            } else {
+                n.no = block(c);
+            }
+        }
+    } else if at(c, "break") || at(c, "continue") {
+        n.kind = 39;
+        if take(c).text == "continue" {
+            n.kind = 40;
+        }
+        let semi = expect(c,";");
+    } else if accept(c, "for") {
+        n.kind = 41;
+        n.name = identifier(c).text;
+        let in_token = expect(c, "in");
+        n.value = expression(c, 0);
+        if at(c, "..") || at(c, "..=") {
+            n.mode = 1;
+            if take(c).text == "..=" {
+                n.mode = 2;
+            }
+            n.target = expression(c, 0);
+        }
+        n.yes = block(c);
+    } else if accept(c, "while") {
+        n.kind = 35;
+        n.value = expression(c, 0);
+        n.yes = block(c);
+    } else if accept(c, "match") {
+        n.kind = 36;
+        n.value = expression(c, 0);
+        n.arms = parse_arms(c, false);
+    } else if current(c).kind == 50 && list_get(c.tokens, list_get(c.control, 0).cursor + 1).text == "=" {
+        n.kind = 31;
+        n.name = identifier(c).text;
+        let equal = expect(c, "=");
+        n.value = expression(c, 0);
+        let semi = expect(c,";");
+    } else {
+        let value = expression(c, 0);
+        if accept(c, "=") {
+            n.kind = 38;
+            n.target = value;
+            n.value = expression(c, 0);
+        } else {
+            n.kind = 33;
+            n.value = value;
+        }
+        let semi = expect(c,";");
+    }
+    n.span = through_previous(c, start.start);
+    leave(c);
+    return add_ast_stmt(c, n);
+}
+pub fn effect_bit(name: String) -> Int {
+    if name == "io" {
+        return 1;
+    }
+    if name == "args" {
+        return 2;
+    }
+    if name == "state" {
+        return 4;
+    }
+    if name == "process" {
+        return 8;
+    }
+    return 0;
+}
+pub fn has_bit(mask: Int, bit: Int) -> Bool {
+    return mask / bit % 2 == 1;
+}
+pub fn parse_module(c: Context) -> Unit effects { state, io, process } {
+    let declared = dict_new<Int, Bool>();
+    while current(c).kind != 54 {
+        let start = current(c).span.start;
+        let owner = source_unit_at(c, start);
+        if at(c, "import") {
+            if dict_has(declared, owner) {
+                bad(c, "E221", "Imports must precede declarations.", current(c).span);
+            }
+            let spec = parse_import(c);
+            continue;
+        }
+        dict_set(declared, owner, true);
+        let exported = accept(c, "pub");
+        if at(c, "enum") || at(c, "struct") || at(c, "type") {
+            let word = take(c).text;
+            let name = identifier(c);
+            declare_module_name(c, name.text, exported, name.span);
+            var decl = SyntaxType(type_parameters: parse_type_parameters(c), kind: 70, name: name.text, base: "", fields: list_new<SyntaxField>(), variants: list_new<SyntaxVariant>(), span: name.span);
+            if word == "enum" {
+                let open = expect(c, "{");
+                var more = !at(c, "}");
+                while more {
+                    let v = identifier(c);
+                    var fields = list_new<String>();
+                    if accept(c,"(") {
+                        fields = type_list(c,")");
+                    }
+                    list_push(decl.variants, SyntaxVariant(name: v.text, fields: fields, span: through_previous(c, v.span.start)));
+                    more = accept(c,",") && !at(c, "}");
+                }
+                let close = expect(c, "}");
+            } else if word == "struct" {
+                decl.kind = 76;
+                let open = expect(c, "{");
+                decl.fields = name_fields(c, "}");
+            } else {
+                decl.kind = 77;
+                let equal = expect(c, "=");
+                let distinct_token = expect(c, "distinct");
+                decl.base = parse_type(c);
+                let semi = expect(c,";");
+            }
+            var declaration_start = start;
+            if word != "enum" {
+                declaration_start = name.span.start;
+            }
+            decl.span = through_previous(c, declaration_start);
+            list_push(c.syntax_types, decl);
+        } else if accept(c, "extern") {
+            let library = take(c);
+            if library.kind != 52 || !foreign_library_name(library.text) {
+                bad(c, "E228", "extern requires an ASCII DLL basename (1..128 bytes).", library.span);
+            }
+            let keyword = expect(c, "fn");
+            let name = identifier(c);
+            if name.text == "main" || name.text == "vela_ffi_abi_version" {
+                bad(c, "E228", "Reserved foreign function name.", name.span);
+            }
+            declare_module_name(c, name.text, exported, name.span);
+            if at(c, "<") { bad(c, "E228", "Foreign functions cannot be generic.", current(c).span); }
+            let open = expect(c, "(");
+            let params = name_fields(c, ")");
+            let arrow = expect(c, "->");
+            let return_name = parse_type(c);
+            let mask = parse_test_effects(c);
+            if !at(c, ";") { bad(c, "E228", "Foreign declarations end with ';' and have no contracts or body.", current(c).span); }
+            let semi = expect(c, ";");
+            list_push(c.syntax_functions, SyntaxFunction(foreign_library: library.text, foreign_name: name.text, test_name: "", type_parameters: list_new<TypeParameter>(), name: name.text, parameters: params, return_name: return_name, effect_mask: mask, preconditions: list_new<AstExprId>(), postconditions: list_new<AstExprId>(), body: list_new<AstStmtId>(), span: through_previous(c, start)));
+        } else if accept(c, "fn") {
+            let name = identifier(c);
+            declare_module_name(c, name.text, exported, name.span);
+            let type_parameters = parse_type_parameters(c);
+            let open = expect(c,"(");
+            let params = name_fields(c,")");
+            let arrow = expect(c, "->");
+            let return_name = parse_type(c);
+            var mask = 0;
+            if accept(c, "effects") {
+                let opening = expect(c, "{");
+                var more = !at(c, "}");
+                while more {
+                    let e = identifier(c);
+                    let bit = effect_bit(e.text);
+                    if bit == 0 {
+                        bad(c, "E206", "Unknown effect.", e.span);
+                    }
+                    if has_bit(mask, bit) {
+                        bad(c, "E100", "Duplicate effect.", e.span);
+                    }
+                    mask = mask + bit;
+                    more = accept(c,",") && !at(c, "}");
+                }
+                let close = expect(c, "}");
+            }
+            let pre = list_new<AstExprId>();
+            let post = list_new<AstExprId>();
+            while at(c, "requires") || at(c, "ensures") {
+                let word = take(c).text;
+                let value = expression(c, 0);
+                let semi = expect(c,";");
+                if word == "requires" {
+                    list_push(pre, value);
+                } else {
+                    list_push(post, value);
+                }
+            }
+            let body = block(c);
+            list_push(c.syntax_functions, SyntaxFunction(foreign_library: "", foreign_name: "", test_name: "", type_parameters: type_parameters, name: name.text, parameters: params, return_name: return_name, effect_mask: mask, preconditions: pre, postconditions: post, body: body, span: through_previous(c, start)));
+        } else if accept(c, "test") {
+            let name = take(c);
+            if exported || name.kind != 52 || str_len(name.text) == 0 || str_len(name.text) > 256 || contains_byte(name.text, 0) {
+                bad(c, "E227", "test requires a private, nonempty string name of at most 256 bytes without NUL.", name.span);
+            }
+            var count = 0;
+            for previous in c.syntax_functions {
+                if previous.test_name != ""&& source_unit_at(c, previous.span.start) == owner {
+                    count = count + 1;
+                    if previous.test_name == name.text {
+                        bad(c, "E227", "Duplicate test name.", name.span);
+                    }
+                }
+            }
+            if count >= 256 {
+                bad(c, "E227", "At most 256 tests per module.", name.span);
+            }
+            let internal = "@test" + to_string(list_len(c.syntax_functions));
+            declare_module_name(c, internal, false, name.span);
+            let mask = parse_test_effects(c);
+            let body = block(c);
+            list_push(c.syntax_functions, SyntaxFunction(foreign_library: "", foreign_name: "", test_name: name.text, type_parameters: list_new<TypeParameter>(), name: internal, parameters: list_new<SyntaxField>(), return_name: "Unit", effect_mask: mask, preconditions: list_new<AstExprId>(), postconditions: list_new<AstExprId>(), body: body, span: through_previous(c, start)));
+        } else {
+            bad(c, "E100", "Expected fn, enum, struct, type or test.", current(c).span);
+        }
+    }
+}
+pub fn parse_test_effects(c: Context) -> Int effects { state, io, process } {
+    var mask = 0;
+    if accept(c, "effects") {
+        let opening = expect(c, "{");
+        var more = !at(c, "}");
+        while more {
+            let e = identifier(c);
+            let bit = effect_bit(e.text);
+            if bit == 0 {
+                bad(c, "E206", "Unknown effect.", e.span);
+            }
+            if has_bit(mask, bit) {
+                bad(c, "E100", "Duplicate effect.", e.span);
+            }
+            mask = mask + bit;
+            more = accept(c,",") && !at(c, "}");
+        }
+        let close = expect(c, "}");
+    }
+    return mask;
+}
+pub fn foreign_library_name(name: String) -> Bool {
+    let n = str_len(name);
+    if n < 5 || n > 128 || str_slice(name, n - 4, n) != ".dll" { return false; }
+    for i in 0 .. n - 4 {
+        let b = str_byte(name, i);
+        if !(b >= 65 && b <= 90 || b >= 97 && b <= 122 || b >= 48 && b <= 57 || b == 95 || b == 45) { return false; }
+    }
+    return true;
+}
+pub fn parse_type_parameters(c: Context) -> List<TypeParameter> effects { state, io, process } {
+    let items = list_new<TypeParameter>();
+    if accept(c, "<") {
+        var more = true;
+        while more {
+            let name = identifier(c);
+            var bound = "Any";
+            if accept(c,":") {
+                bound = identifier(c).text;
+            }
+            list_push(items, TypeParameter(name: name.text, bound: bound, span: name.span));
+            more = accept(c,",");
+        }
+        let close = expect(c, ">");
+    }
+    return items;
+}
+pub fn parse_arms(c: Context, value_mode: Bool) -> List<SyntaxArm> effects { state, io, process } {
+    let arms = list_new<SyntaxArm>();
+    let open = expect(c, "{");
+    while !at(c, "}") {
+        let owner = identifier(c);
+        let sep = expect(c,"::");
+        var owner_name = owner.text;
+        var variant = identifier(c);
+        while accept(c,"::") {
+            owner_name = owner_name +"::"+ variant.text;
+            variant = identifier(c);
+        }
+        let names = list_new<SyntaxName>();
+        if accept(c,"(") {
+            var more = !at(c,")");
+            while more {
+                let name = identifier(c);
+                list_push(names, SyntaxName(name: name.text, span: name.span));
+                more = accept(c,",") && !at(c,")");
+            }
+            let close = expect(c,")");
+        }
+        let arrow = expect(c, "=>");
+        var body = list_new<AstStmtId>();
+        var value = no_ast_expr();
+        if value_mode {
+            value = expression(c, 0);
+        } else {
+            body = block(c);
+        }
+        list_push(arms, SyntaxArm(value: value, owner: owner_name, variant: variant.text, names: names, body: body, span: through_previous(c, owner.span.start)));
+        let comma = accept(c,",");
+        if value_mode && !comma && !at(c, "}") {
+            bad(c, "E100", "Expected comma between expression arms.", current(c).span);
+        }
+    }
+    let close = expect(c, "}");
+    return arms;
+}
+pub fn interpolation_literal(c: Context, parts: List<SyntaxArgument>, text: String, start: Int, end: Int) -> Unit effects { state } {
+    list_push(parts, SyntaxArgument(label: "", value: add_ast_expr(c, syntax_expression(3, Span(start: start, end: end), text))));
+}
+pub fn interpolation_hole(c: Context, start: Int, end: Int) -> SyntaxArgument effects { state, io, process } {
+    var inner = c;
+    inner.tokens = list_new<Token>();
+    inner.comments = list_new<Token>();
+    inner.control = list_new<Control>();
+    var ctl = list_get(c.control, 0);
+    ctl.cursor = 0;
+    ctl.previous_end = start;
+    list_push(inner.control, ctl);
+    lex_range(inner, start, end);
+    let value = expression(inner, 0);
+    let colon = expect(inner,":");
+    let format = identifier(inner);
+    if current(inner).kind != 54 {
+        bad(inner, "E100", "Unexpected token after interpolation format.", current(inner).span);
+    }
+    return SyntaxArgument(label: format.text, value: value);
+}
+pub fn parse_interpolation(c: Context, token: Token) -> AstExprId effects { state, io, process } {
+    var n = syntax_expression(11, token.span, "");
+    let s = c.source_text;
+    var i = token.span.start + 2;
+    var start = i;
+    let literal = strings_new();
+    while i + 1 < token.span.end {
+        var b = str_byte(s, i);
+        if b == 92 {
+            i = i + 1;
+            b = str_byte(s, i);
+            if b == 110 {
+                b = 10;
+            } else if b == 114 {
+                b = 13;
+            } else if b == 116 {
+                b = 9;
+            } else if b == 48 {
+                b = 0;
+            } else if b != 34 && b != 92 {
+                fail(c, "E001", "Unknown string escape.", i - 1, i + 1);
+            }
+            strings_push(literal, str_from_byte(b));
+            i = i + 1;
+        } else if (b == 123 || b == 125) && str_byte(s, i + 1) == b {
+            strings_push(literal, str_from_byte(b));
+            i = i + 2;
+        } else if b == 123 {
+            interpolation_literal(c, n.arguments, strings_join(literal, ""), start, i);
+            strings_truncate(literal, 0);
+            let end = interpolation_hole_end(c, i + 1);
+            list_push(n.arguments, interpolation_hole(c, i + 1, end));
+            i = end + 1;
+            start = i;
+        } else {
+            strings_push(literal, str_from_byte(b));
+            i = i + 1;
+        }
+    }
+    interpolation_literal(c, n.arguments, strings_join(literal, ""), start, i);
+    return add_ast_expr(c, n);
+}

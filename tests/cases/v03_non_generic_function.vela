@@ -1,0 +1,1 @@
+fn f(x: Int) -> Int { return x; } fn main() -> Unit { let x = f<Int>(1); }

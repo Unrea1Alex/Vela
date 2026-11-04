@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "client": "codex-cli 0.157.0",
+  "model": "client default; see raw logs",
+  "base": "E:\\Temp\\vela-coldstart-hd11Uw",
+  "toolchain": "G:\\Vela\\work\\native-0.6.0-stage",
+  "adapter": "G:\\Vela\\work\\mcp-0.6.0-stage",
+  "tasks": [
+    {
+      "name": "collections",
+      "agent_exit": 0,
+      "cases": [],
+      "check_calls": 0,
+      "help_calls": 3,
+      "failed_checks": 0,
+      "unknown_api_diagnostics": 0,
+      "build_exit": 2,
+      "passed": false
+    },
+    {
+      "name": "result",
+      "agent_exit": 0,
+      "cases": [],
+      "check_calls": 0,
+      "help_calls": 3,
+      "failed_checks": 0,
+      "unknown_api_diagnostics": 0,
+      "build_exit": 2,
+      "passed": false
+    },
+    {
+      "name": "unicode_file",
+      "agent_exit": 0,
+      "cases": [],
+      "check_calls": 2,
+      "help_calls": 3,
+      "failed_checks": 0,
+      "unknown_api_diagnostics": 0,
+      "build_exit": 2,
+      "passed": false
+    },
+    {
+      "name": "dependency",
+      "agent_exit": 0,
+      "cases": [
+        {
+          "index": 0,
+          "passed": false,
+          "exit": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "index": 1,
+          "passed": false,
+          "exit": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "check_calls": 0,
+      "help_calls": 1,
+      "failed_checks": 0,
+      "unknown_api_diagnostics": 0,
+      "build_exit": 0,
+      "passed": false
+    },
+    {
+      "name": "repair",
+      "agent_exit": 0,
+      "cases": [],
+      "check_calls": 1,
+      "help_calls": 3,
+      "failed_checks": 1,
+      "unknown_api_diagnostics": 0,
+      "build_exit": 1,
+      "passed": false
+    }
+  ]
+}

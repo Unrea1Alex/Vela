@@ -1,0 +1,51 @@
+import "@collections" as collections;
+extern "measurelab-math.dll" fn measurelab_sqrt(value: Float64) -> Float64 effects { state, process };
+pub struct Summary {
+    count: Int,
+    mean: Float64,
+    median: Float64,
+    p95: Float64,
+    deviation: Float64,
+    minimum: Float64,
+    maximum: Float64
+}
+pub fn analyze(values: List<Float64>) -> Result<Summary, String> effects { state, process } {
+    let size = list_len(values);
+    if size < 1 || size > 256 {
+        return Result<Summary, String>::Err("Expected 1..256 samples");
+    }
+    var count = 0;
+    var mean = 0.0;
+    var m2 = 0.0;
+    for value in values {
+        if !float_is_finite(value) || value < 0.0 || value > 1000000000.0 {
+            return Result<Summary, String>::Err("Sample out of range");
+        }
+        count = count + 1;
+        let delta = value - mean;
+        mean = mean + delta / float_from_int(count);
+        m2 = m2 + delta * (value - mean);
+    }
+    let ordered = collections::sort_floats(values);
+    let mid = size / 2;
+    var median = list_get(ordered, mid);
+    if size % 2 == 0 {
+        median = (list_get(ordered, mid - 1) + median) / 2.0;
+    }
+    let rank = (95 * size + 99) / 100 - 1;
+    match ffi_load("measurelab-math.dll") {
+        WriteResult::Ok => {}
+        WriteResult::Err(error) => {
+            return Result<Summary, String>::Err("Cannot load math adapter: " + error);
+        }
+    }
+    var variance = m2 / float_from_int(size);
+    if variance < 0.0 {
+        variance = 0.0;
+    }
+    let deviation = measurelab_sqrt(variance);
+    if !float_is_finite(deviation) {
+        return Result<Summary, String>::Err("Math adapter returned a nonfinite value");
+    }
+    return Result<Summary, String>::Ok(Summary(count: size, mean: mean, median: median, p95: list_get(ordered, rank), deviation: deviation, minimum: list_get(ordered, 0), maximum: list_get(ordered, size - 1)));
+}

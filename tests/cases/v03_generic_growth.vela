@@ -1,0 +1,4 @@
+fn main() -> Unit effects { state, io } {
+ let a = list_new<Int>(); var i = 0; while i < 10000 { list_push(a, i); i = i + 1; }
+ print(list_get(a, 9999)); print(list_len(a)); list_truncate(a, 2); print(list_len(a));
+}

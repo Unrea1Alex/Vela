@@ -1,0 +1,1 @@
+fn main() -> Unit effects { state } { let a = list_new<Int>(); list_set(a, -1, 0); }

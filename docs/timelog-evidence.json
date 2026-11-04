@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-04",
+  "platform": "Windows x64 / MSVC C11 /O2 /MT",
+  "compiler_version": "Vela 0.5.0 (self-hosted)",
+  "scope": "Post-release TimeLog application review; no new language semantics",
+  "native_verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 688,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "0.5.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 185161,
+    "tests_run": true
+  },
+  "application_checks_in_native_suite": 58,
+  "added_formatter_regressions": 4,
+  "focused_before_fix": {
+    "passed": 77,
+    "failed": 4,
+    "expected_failure": "generic return type formatting with suffix"
+  },
+  "focused_after_fix": {
+    "passed": 81,
+    "failed": 0
+  },
+  "fmt_check": {
+    "passed": true,
+    "files": [
+      "apps/timelog/main.vela",
+      "selfhost/formatter.vela",
+      "tools/test.vela"
+    ]
+  },
+  "filesystem": {
+    "platform": "Windows x64",
+    "cases": [
+      {
+        "name": "hard_link_input_protected",
+        "passed": true
+      },
+      {
+        "name": "readonly_report_and_temp_cleanup",
+        "passed": true
+      },
+      {
+        "name": "atomic_replace_and_temp_cleanup",
+        "passed": true
+      }
+    ]
+  },
+  "html": {
+    "balanced_tags": true,
+    "rows": 5,
+    "minutes": 290,
+    "project_minutes": [
+      145,
+      110,
+      35
+    ],
+    "external_resources": false,
+    "scripts": false,
+    "visual_browser_check": false,
+    "visual_check_reason": "Browser URL policy rejected file:// navigation; no workaround attempted."
+  },
+  "standalone_package": {
+    "archive": "dist/timelog-windows-x64.zip",
+    "files": [
+      "README.txt",
+      "demo.tsv",
+      "main.vela",
+      "report.html",
+      "timelog.exe"
+    ],
+    "extracted_hashes_match": true,
+    "run_passed": true,
+    "input_preserved": true,
+    "report_matches": true,
+    "initial_path": "Windows/System32 only",
+    "compiler_required_to_run": false
+  },
+  "frozen_compiler_release": {
+    "archive": "dist/vela-0.5.0-windows-x64.zip",
+    "sha256": "25df3bec6d499e7079e28683f030e0d034c46af932aa16e723674e99cb658a68",
+    "native_checks": 626,
+    "reissued": false
+  },
+  "limitations": [
+    "Browser visual check rejected by file:// URL policy",
+    "Linux/macOS/GCC/Clang not tested",
+    "1 MiB input limit checked after whole-file read",
+    "Process-region memory; no long-running memory benchmark",
+    "Crash durability and concurrent path replacement not tested or promised"
+  ],
+  "artifacts": [
+    {
+      "path": "apps/timelog/main.vela",
+      "bytes": 14804,
+      "sha256": "cc2a28bff77a4518562b3a02b095fb8c8e56b59b9b157c3c92d6c1e43d32b279"
+    },
+    {
+      "path": "apps/timelog/demo.tsv",
+      "bytes": 322,
+      "sha256": "e9a5f08c7b57397b793488cda740727b536a4b1a8cff1e25908dde8403bbde59"
+    },
+    {
+      "path": "apps/timelog/report.html",
+      "bytes": 4451,
+      "sha256": "270f39a1693a4f265e375756886cf567fdfbf415e314657b32fcdc235b8d021f"
+    },
+    {
+      "path": "apps/timelog/timelog.exe",
+      "bytes": 201728,
+      "sha256": "007ff64761cb18dceccfc008c2115165afc00df79dd2f5a19a220f1af8bbf3f0"
+    },
+    {
+      "path": "selfhost/formatter.vela",
+      "bytes": 9605,
+      "sha256": "c47b05a5a105eecdd8d809150c44d275b504afbe0000d27a8a373948c59c6013"
+    },
+    {
+      "path": "selfhost/compiler.vela",
+      "bytes": 185161,
+      "sha256": "1844f94c5434044cc0da46b67a190eecb87dc4e5478ea7a9e83a937c8acfe294"
+    },
+    {
+      "path": "tools/test.vela",
+      "bytes": 36909,
+      "sha256": "2cf8c6310827b166131a0af63119b8d5b8c45a00149248f8a70e516b620a69ef"
+    },
+    {
+      "path": "bin/velac.exe",
+      "bytes": 618496,
+      "sha256": "2cddc0e762dff3d98d9eb7b3251e7374a9817e3e79c06520e1f1a14986451143"
+    },
+    {
+      "path": "bin/vela-test.exe",
+      "bytes": 281088,
+      "sha256": "48723b2530a70715a84c423881cf90bd1e437270ca6ec8df45b85bef37b58933"
+    },
+    {
+      "path": "dist/timelog-windows-x64.zip",
+      "bytes": 112820,
+      "sha256": "27f7255ef4c9752bd10befdea838c1364ce2eab99b09c0ad789e5f6607f71671"
+    },
+    {
+      "path": "build/timelog/verify.log",
+      "bytes": 1099,
+      "sha256": "af7ed9c449fb35ecba47d0447ca936f162078773d9502d2dcb3ee5bd88980727"
+    }
+  ],
+  "documentation": {
+    "local_links_checked": 65,
+    "missing_links": 0,
+    "files": [
+      "README.md",
+      "apps/timelog/README.md",
+      "docs/ROADMAP.md",
+      "docs/TIMELOG-REVIEW.md",
+      "docs/VALIDATION.md",
+      "docs/contracts/FORMATTER.md",
+      "tests/README.md"
+    ]
+  }
+}

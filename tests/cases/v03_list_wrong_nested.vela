@@ -1,0 +1,1 @@
+fn main() -> Unit effects { state } { let a: List<List<Int>> = list_new<List<String>>(); }

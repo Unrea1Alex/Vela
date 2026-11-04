@@ -1,0 +1,412 @@
+import "model.vela";
+import "core.vela";
+import "parser.vela";
+import "modules.vela";
+import "generics.vela";
+import "semantic.vela";
+import "embedded.vela";
+// Canonical semantic types and signatures; syntax never reaches the backend.
+pub fn split_text(s: String, delimiter: Int) -> List<String> effects { state } {
+    let parts = list_new<String>();
+    var start = 0;
+    var i = 0;
+    while i < str_len(s) {
+        if str_byte(s, i) == delimiter {
+            list_push(parts, str_slice(s, start, i));
+            start = i + 1;
+        }
+        i = i + 1;
+    }
+    list_push(parts, str_slice(s, start, i));
+    return parts;
+}
+pub fn join_text(items: List<String>, separator: String) -> String effects { state } {
+    let parts = strings_new();
+    for i in 0 .. list_len(items) {
+        strings_push(parts, list_get(items, i));
+    }
+    return strings_join(parts, separator);
+}
+pub fn find_type(c: Context, name: String) -> TypeId effects { state } {
+    for i in 0 .. list_len(c.types) {
+        if list_get(c.types, i).name == name {
+            return primitive_type_id(i + 1);
+        }
+    }
+    return no_type();
+}
+pub fn type_name(c: Context, id: TypeId) -> String effects { state, io, process } {
+    return type_info(c, id).name;
+}
+pub fn type_kind(c: Context, id: TypeId) -> Int effects { state, io, process } {
+    if !has_type(id) {
+        return 0;
+    }
+    return type_info(c, id).kind;
+}
+pub fn scalar_type(c: Context, id: TypeId) -> TypeId effects { state, io, process } {
+    if type_kind(c, id) == 77 {
+        let t = type_info(c, id);
+        if has_type(t.base) {
+            return t.base;
+        }
+        return find_type(c, t.base_name);
+    }
+    return id;
+}
+pub fn is_scalar(id: TypeId) -> Bool {
+    return id == int_type() || id == bool_type() || id == string_type() || id == float_type();
+}
+pub fn find_symbol(c: Context, items: List<SymbolId>, name: String) -> SymbolId effects { state, io, process } {
+    for i in 0 .. list_len(items) {
+        let id = list_get(items, i);
+        if symbol_info(c, id).name == name {
+            return id;
+        }
+    }
+    return no_symbol();
+}
+pub fn require_type(c: Context, actual: TypeId, expected: TypeId, span: Span) -> Unit effects { state, io, process } {
+    require_type_at(c, actual, expected, span, type_info(c, expected).span);
+}
+pub fn require_type_at(c: Context, actual: TypeId, expected: TypeId, span: Span, declaration: Span) -> Unit effects { state, io, process } {
+    if actual != expected {
+        var details = empty_details();
+        details.expected_type = type_name(c, expected);
+        details.actual_type = type_name(c, actual);
+        if declaration.end > declaration.start {
+            list_push(details.related, RelatedLocation(message: "Expected type is declared here.", span: declaration));
+        }
+        fail_details(c, "E201", "Expected " + details.expected_type + ", found " + details.actual_type +".", span, details);
+    }
+}
+pub fn type_parts(name: String) -> List<String> effects { state } {
+    let parts = list_new<String>();
+    var i = 0;
+    while i < str_len(name) && str_byte(name, i) != 60 {
+        i = i + 1;
+    }
+    list_push(parts, str_slice(name, 0, i));
+    if i == str_len(name) {
+        return parts;
+    }
+    i = i + 1;
+    var start = i;
+    var depth = 0;
+    while i + 1 < str_len(name) {
+        let b = str_byte(name, i);
+        if b == 60 {
+            depth = depth + 1;
+        } else if b == 62 {
+            depth = depth - 1;
+        } else if b == 44 && depth == 0 {
+            list_push(parts, str_slice(name, start, i));
+            start = i + 1;
+        }
+        i = i + 1;
+    }
+    list_push(parts, str_slice(name, start, i));
+    return parts;
+}
+pub fn collection_type(c: Context, name: String, args: List<TypeId>, span: Span) -> TypeId effects { state, io, process } {
+    if (name == "List" && list_len(args) != 1) || (name == "Dict" && list_len(args) != 2) || (name != "List" && name != "Dict") {
+        bad(c, "E200", "Invalid generic type or argument count.", span);
+    }
+    if name == "Dict" && (!is_scalar(scalar_type(c, list_get(args, 0))) || scalar_type(c, list_get(args, 0)) == float_type()) {
+        bad(c, "E201", "Dictionary keys must be Int, Bool, String or a distinct primitive.", span);
+    }
+    let names = list_new<String>();
+    var i = 0;
+    while i < list_len(args) {
+        list_push(names, type_name(c, list_get(args, i)));
+        i = i + 1;
+    }
+    let canonical = name + "<" + join_text(names,",") + ">";
+    let found = find_type(c, canonical);
+    if has_type(found) {
+        return found;
+    }
+    var t = type_record(75, canonical, span);
+    t.arguments = args;
+    return add_type(c, t);
+}
+pub fn resolve_pattern(c: Context, name: String, mapping: Dict<String, TypeId>, span: Span) -> TypeId effects { state, io, process } {
+    enter(c, span);
+    var t = no_type();
+    if dict_has(mapping, name) {
+        t = dict_get(mapping, name);
+        if !has_type(t) {
+            bad(c, "E201", "Cannot infer type argument; provide explicit <Types>.", span);
+        }
+    } else {
+        let parts = type_parts(name);
+        if list_len(parts) == 1 {
+            t = find_type(c, module_global_name(c, name, span));
+            if type_kind(c, t) == 78 {
+                bad(c, "E210", "Generic type requires explicit arguments.", span);
+            }
+            if !has_type(t) {
+                bad(c, "E200", "Unknown type: " + name, span);
+            }
+        } else {
+            let args = list_new<TypeId>();
+            var i = 1;
+            while i < list_len(parts) {
+                list_push(args, resolve_pattern(c, list_get(parts, i), mapping, span));
+                i = i + 1;
+            }
+            t = instantiate_type(c, module_global_name(c, list_get(parts, 0), span), args, span);
+        }
+    }
+    leave(c);
+    return t;
+}
+pub fn resolve_type(c: Context, name: String, span: Span) -> TypeId effects { state, io, process } {
+    return resolve_pattern(c, name, list_get(c.control, 0).type_mapping, span);
+}
+pub fn unify_pattern(c: Context, pattern: String, actual: TypeId, mapping: Dict<String, TypeId>, span: Span) -> Unit effects { state, io, process } {
+    enter(c, span);
+    if dict_has(mapping, pattern) {
+        let previous = dict_get(mapping, pattern);
+        if !has_type(previous) {
+            dict_set(mapping, pattern, actual);
+        } else {
+            require_type(c, actual, previous, span);
+        }
+    } else {
+        let parts = type_parts(pattern);
+        if list_len(parts) == 1 {
+            require_type(c, actual, resolve_type(c, pattern, span), span);
+        } else {
+            if list_len(type_info(c, actual).arguments) == 0 {
+                bad(c, "E201", "Expected a collection.", span);
+            }
+            let t = type_info(c, actual);
+            let actual_parts = type_parts(t.name);
+            if list_get(parts, 0) != list_get(actual_parts, 0) || list_len(parts) != list_len(actual_parts) {
+                bad(c, "E201", "Incompatible collection types.", span);
+            }
+            var i = 0;
+            while i < list_len(t.arguments) {
+                unify_pattern(c, list_get(parts, i + 1), list_get(t.arguments, i), mapping, span);
+                i = i + 1;
+            }
+        }
+    }
+    leave(c);
+}
+pub fn require_effects(c: Context, signature_id: SymbolId, span: Span) -> Unit effects { state, io, process } {
+    let sig = symbol_info(c, signature_id);
+    let required = sig.effect_mask;
+    let allowed = list_get(c.control, 0).allowed_effects;
+    var bit = 1;
+    var missing = 0;
+    while bit <= 8 {
+        if has_bit(required, bit) && !has_bit(allowed, bit) {
+            missing = missing + bit;
+        }
+        bit = bit * 2;
+    }
+    if missing != 0 {
+        var details = empty_details();
+        details.callee = sig.name;
+        details.required_effects = required;
+        details.allowed_effects = allowed;
+        details.missing_effects = missing;
+        if !sig.builtin {
+            list_push(details.related, RelatedLocation(message: "Called function declares these effects.", span: sig.span));
+        }
+        fail_details(c, "E209", "Call to '" + sig.name + "' requires undeclared effects: " + strings_join(effect_names(missing), ", ") +".", span, details);
+    }
+}
+pub fn install_prelude(c: Context) -> Unit effects { state, io, process } {
+    let primitive_names = split_text("Int;Bool;String;Unit;IntList;StringList;Float64;ForeignHandle;Int32", 59);
+    var i = 0;
+    while i < list_len(primitive_names) {
+        let id = add_type(c, type_record(0, list_get(primitive_names, i), empty_span()));
+        i = i + 1;
+    }
+    let rows = split_text(builtin_source(), 10);
+    i = 0;
+    while i < list_len(rows) {
+        var row = list_get(rows, i);
+        if str_len(row) > 0 && str_byte(row, str_len(row) - 1) == 13 {
+            row = str_slice(row, 0, str_len(row) - 1);
+        }
+        if row != ""&& str_byte(row, 0) != 35 {
+            let cols = split_text(row, 124);
+            if list_len(cols) != 8 {
+                bad(c, "E900", "Invalid embedded builtin catalog row.", empty_span());
+            }
+            let name = list_get(cols, 1);
+            if list_get(cols, 0) == "enum" && list_get(cols, 2) != "" {
+                install_generic_enum(c, name, list_get(cols, 2), list_get(cols, 3));
+            } else if list_get(cols, 0) == "enum" {
+                let id = add_type(c, type_record(70, name, empty_span()));
+                let t = type_info(c, id);
+                let variants = split_text(list_get(cols, 3), 59);
+                var j = 0;
+                while j < list_len(variants) {
+                    let pair = split_text(list_get(variants, j), 58);
+                    var v = symbol_record(71, list_get(pair, 0), id, empty_span());
+                    v.owner = id;
+                    v.tag = j;
+                    if list_get(pair, 1) != "" {
+                        let fields = split_text(list_get(pair, 1), 44);
+                        var k = 0;
+                        while k < list_len(fields) {
+                            list_push(v.parameters, add_symbol(c, symbol_record(72, "", resolve_type(c, list_get(fields, k), empty_span()), empty_span())));
+                            k = k + 1;
+                        }
+                    }
+                    list_push(t.variants, add_symbol(c, v));
+                    j = j + 1;
+                }
+            } else {
+                var sig = symbol_record(73, name, no_type(), empty_span());
+                sig.builtin = true;
+                sig.abi = list_get(cols, 6);
+                sig.return_pattern = list_get(cols, 4);
+                if list_get(cols, 2) != "" {
+                    sig.variables = split_text(list_get(cols, 2), 59);
+                }
+                if list_get(cols, 3) != "" {
+                    sig.patterns = split_text(list_get(cols, 3), 59);
+                }
+                let names = split_text(list_get(cols, 5), 59);
+                var j = 0;
+                while j < list_len(names) {
+                    sig.effect_mask = sig.effect_mask + effect_bit(list_get(names, j));
+                    j = j + 1;
+                }
+                list_push(c.signatures, add_symbol(c, sig));
+            }
+        }
+        i = i + 1;
+    }
+}
+pub fn builtin_call(c: Context, signature_id: SymbolId, args: List<SyntaxArgument>, explicit: List<String>, span: Span) -> ExprId effects { state, io, process } {
+    let sig = symbol_info(c, signature_id);
+    let mapping = dict_new<String, TypeId>();
+    var i = 0;
+    while i < list_len(sig.variables) {
+        dict_set(mapping, list_get(sig.variables, i), no_type());
+        i = i + 1;
+    }
+    if list_len(explicit) > 0 {
+        if list_len(explicit) != list_len(sig.variables) {
+            bad(c, "E210", "Incorrect type argument count.", span);
+        }
+        i = 0;
+        while i < list_len(explicit) {
+            dict_set(mapping, list_get(sig.variables, i), resolve_type(c, list_get(explicit, i), span));
+            i = i + 1;
+        }
+    }
+    let checked_args = list_new<ExprId>();
+    i = 0;
+    while i < list_len(args) && i < list_len(sig.patterns) {
+        let a = list_get(args, i);
+        if a.label != "" {
+            bad(c, "E210", "Named arguments are reserved for struct constructors.", ast_expr(c, a.value).span);
+        }
+        let checked = check_expr(c, a.value);
+        unify_pattern(c, list_get(sig.patterns, i), checked_expr(c, checked).type_id, mapping, ast_expr(c, a.value).span);
+        list_push(checked_args, checked);
+        i = i + 1;
+    }
+    if list_len(args) != list_len(sig.patterns) {
+        bad(c, "E210", "Incorrect argument count.", span);
+    }
+    if sig.abi == "print" || sig.abi == "format" {
+        if !is_scalar(scalar_type(c, checked_expr(c, list_get(checked_args, 0)).type_id)) {
+            bad(c, "E201", "Formatting requires Int, Float64, Bool, String or a distinct primitive.", span);
+        }
+    }
+    var instance = sig;
+    instance.type_id = resolve_pattern(c, sig.return_pattern, mapping, span);
+    let id = add_symbol(c, instance);
+    require_effects(c, id, span);
+    var n = expression_record(107, span, instance.type_id);
+    n.symbol = id;
+    n.arguments = checked_args;
+    return add_expr(c, n);
+}
+pub fn check_record(c: Context, id: TypeId, args: List<SyntaxArgument>, span: Span) -> ExprId effects { state, io, process } {
+    let t = type_info(c, id);
+    var n = expression_record(112, span, id);
+    let seen = dict_new<SymbolId, Bool>();
+    var i = 0;
+    while i < list_len(args) {
+        let a = list_get(args, i);
+        let arg_span = ast_expr(c, a.value).span;
+        var field = no_symbol();
+        if t.kind == 77 {
+            if a.label != "" {
+                bad(c, "E210", "Distinct constructors take one positional argument.", arg_span);
+            }
+            field = list_get(t.fields, 0);
+        } else {
+            if a.label == "" {
+                bad(c, "E210", "Struct constructors require field: value arguments.", arg_span);
+            }
+            field = find_symbol(c, t.fields, a.label);
+        }
+        if !has_symbol(field) {
+            bad(c, "E211", "Unknown struct field.", arg_span);
+        }
+        if dict_has(seen, field) {
+            bad(c, "E202", "Duplicate constructor field.", arg_span);
+        }
+        dict_set(seen, field, true);
+        let checked = check_expr(c, a.value);
+        require_type(c, checked_expr(c, checked).type_id, symbol_info(c, field).type_id, arg_span);
+        list_push(n.arguments, checked);
+        list_push(n.fields, field);
+        i = i + 1;
+    }
+    if dict_len(seen) != list_len(t.fields) {
+        bad(c, "E210", "Constructor is missing required fields.", span);
+    }
+    return add_expr(c, n);
+}
+pub fn check_access(c: Context, syntax: SyntaxExpr) -> ExprId effects { state, io, process } {
+    let base = check_expr(c, syntax.left);
+    let t = type_info(c, checked_expr(c, base).type_id);
+    if t.kind != 76 && t.kind != 77 {
+        bad(c, "E201", "Field access requires a struct or distinct primitive.", syntax.span);
+    }
+    let field = find_symbol(c, t.fields, syntax.text);
+    if !has_symbol(field) {
+        bad(c, "E211", "Unknown field.", syntax.span);
+    }
+    var n = expression_record(110, syntax.span, symbol_info(c, field).type_id);
+    n.left = base;
+    n.symbol = field;
+    return add_expr(c, n);
+}
+pub fn install_generic_enum(c: Context, name: String, variables: String, variants: String) -> Unit effects { state } {
+    let parameters = list_new<TypeParameter>();
+    let names = split_text(variables, 59);
+    var i = 0;
+    while i < list_len(names) {
+        list_push(parameters, TypeParameter(name: list_get(names, i), bound: "Any", span: empty_span()));
+        i = i + 1;
+    }
+    let items = list_new<SyntaxVariant>();
+    let rows = split_text(variants, 59);
+    i = 0;
+    while i < list_len(rows) {
+        let pair = split_text(list_get(rows, i), 58);
+        var fields = list_new<String>();
+        if list_get(pair, 1) != "" {
+            fields = split_text(list_get(pair, 1), 44);
+        }
+        list_push(items, SyntaxVariant(name: list_get(pair, 0), fields: fields, span: empty_span()));
+        i = i + 1;
+    }
+    var t = type_record(78, name, empty_span());
+    t.template_index = list_len(c.bound_types);
+    let id = add_type(c, t);
+    list_push(c.bound_types, SyntaxType(type_parameters: parameters, kind: 70, name: name, base: "", fields: list_new<SyntaxField>(), variants: items, span: empty_span()));
+}

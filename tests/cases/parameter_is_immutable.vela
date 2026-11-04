@@ -1,0 +1,1 @@
+fn f(x: Int) -> Unit { x = 2; } fn main() -> Unit {}

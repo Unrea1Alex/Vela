@@ -1,0 +1,4 @@
+struct Pair<A,B> { first: A, second: B }
+fn mark<T: Scalar>(x: T) -> T effects { io } { print(x); return x; }
+fn first<A,B>(a: A,b: B) -> A { return a; }
+fn main() -> Unit effects { io } { let p = Pair<Int,Int>(second: mark(2), first: mark(1)); print(first(mark(p.first),mark(p.second))); }

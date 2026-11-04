@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "archive": "G:/Vela/dist/measurelab-1.0-windows-x64.zip",
+  "sha256": "ca7c8a0b293c41db09e9494894241969418f0e051b11351f2aea4d031284a569",
+  "verified_files": 34,
+  "unpacked_native_run": true,
+  "report_bytes_identical": true,
+  "path_without_node_python": true
+}

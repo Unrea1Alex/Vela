@@ -1,0 +1,62 @@
+import "../../std/cli.vela" as cli;
+import "../../std/config.vela" as config;
+import "../../std/json.vela" as json;
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+import "../../std/text.vela" as text;
+fn message<T, E>(value: Result<T, E>, why: String) -> Result<T, String> {
+    return match value {
+        Result::Ok(ok) => Result<T, String>::Ok(ok), Result::Err(_) => Result<T, String>::Err(why)
+    };
+}
+fn work() -> Result<Bool, String> effects { args, state, io } {
+    let specs = list_new < cli::Spec >();
+    list_push(specs, cli::Spec(name: "increment", takes_value: false));
+    let args = message(cli::current(specs), "Invalid command line; usage: config-report [--increment] INPUT OUTPUT")?;
+    if list_len(args.positional) != 2 {
+        return Result<Bool, String>::Err("Usage: config-report [--increment] INPUT OUTPUT");
+    }
+    let input = message(path::checked(list_get(args.positional, 0)), "Invalid input path")?;
+    let output = message(path::checked(list_get(args.positional, 1)), "Invalid output path")?;
+    let raw = message(fs::read_text(input, 1048576), "Cannot read UTF-8 input within 1 MiB")?;
+    let settings = message(config::parse(raw.data), "Invalid JSON object configuration")?;
+    let allowed = list_new<String>();
+    list_push(allowed, "name");
+    list_push(allowed, "count");
+    list_push(allowed, "enabled");
+    list_push(allowed, "scale");
+    let fields = message(config::allow_only(settings, allowed), "Unknown configuration field")?;
+    let name = message(config::string(settings, "name"), "name must be a string")?;
+    var count = message(config::integer(settings, "count"), "count must be an Int")?;
+    let enabled = message(config::boolean(settings, "enabled"), "enabled must be a Bool")?;
+    let scale = message(config::number(settings, "scale"), "scale must be a finite Float64 spelling, such as 1.0")?;
+    if count < 0 || scale <= 0.0 {
+        return Result<Bool, String>::Err("count must be nonnegative and scale positive");
+    }
+    if dict_has(args.options, "increment") {
+        if count == 9223372036854775807 {
+            return Result<Bool, String>::Err("count overflow");
+        }
+        count = count + 1;
+    }
+    let members = list_new < json::Member >();
+    list_push(members, json::Member(name: "name", value: json::Value::StringValue(name)));
+    list_push(members, json::Member(name: "count", value: json::Value::Integer(count)));
+    list_push(members, json::Member(name: "enabled", value: json::Value::Boolean(enabled)));
+    list_push(members, json::Member(name: "scale", value: json::Value::Number(scale)));
+    let serialized = message(json::stringify(json::Value::Object(members)), "Cannot serialize configuration")?;
+    let saved = message(fs::write_text_atomic(output, text::Text(data: serialized + "\n")), "Cannot publish output; inspect destination and cleanup errors before retrying")?;
+    print(f"name={name:s} count={count:d} enabled={enabled:b} scale={scale:display}");
+    return Result<Bool, String>::Ok(true);
+}
+fn main() -> Int effects { args, state, io } {
+    match work() {
+        Result::Ok(_) => {
+            return 0;
+        }
+        Result::Err(error) => {
+            eprint(error);
+            return 2;
+        }
+    }
+}

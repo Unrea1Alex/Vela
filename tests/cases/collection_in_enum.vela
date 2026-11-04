@@ -1,0 +1,4 @@
+enum Store { Items(IntList) }
+            fn modify(s: Store) -> Unit effects { state } { match s { Store::Items(items) => { ints_push(items, 42); } } }
+            fn main() -> Unit effects { state, io } { let items = ints_new(); modify(Store::Items(items)); print(ints_get(items, 0)); }
+        

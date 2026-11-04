@@ -1,0 +1,1 @@
+type A = distinct Int; fn main() -> Unit { let a = A(1) + A(2); }

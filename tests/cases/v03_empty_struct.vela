@@ -1,0 +1,1 @@
+struct Empty {} fn make() -> Empty { return Empty(); } fn main() -> Unit { let e = make(); }

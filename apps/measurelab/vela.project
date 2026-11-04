@@ -1,0 +1,13 @@
+vela-project|1
+name|measurelab
+entry|main.vela
+test|tests.vela
+dep|json|vela-stdlib/json.vela
+dep|config|vela-stdlib/config.vela
+dep|text|vela-stdlib/text.vela
+dep|path|vela-stdlib/path.vela
+dep|fs|vela-stdlib/fs.vela
+dep|cli|vela-stdlib/cli.vela
+dep|collections|vela-stdlib/collections.vela
+dep|testing|vela-stdlib/testing.vela
+native|measurelab-math.dll|native/measurelab-math.dll

@@ -1,0 +1,32 @@
+pub struct Case<I, O> {
+    name: String,
+    input: I,
+    expected: O
+}
+pub fn equal<T: Scalar>(actual: T, expected: T, label: String) -> Unit {
+    assert_true(actual == expected, label + ": expected " + to_string(expected) + ", actual " + to_string(actual));
+}
+pub fn close(actual: Float64, expected: Float64, tolerance: Float64, label: String) -> Unit {
+    assert_true(float_is_finite(actual) && float_is_finite(expected) && float_is_finite(tolerance) && tolerance >= 0.0, label + ": finite values and nonnegative tolerance required");
+    var difference = actual - expected;
+    if difference < 0.0 {
+        difference = -difference;
+    }
+    assert_true(difference <= tolerance, label + ": outside absolute tolerance");
+}
+pub fn is_ok<T, E>(value: Result<T, E>, label: String) -> Unit {
+    match value {
+        Result::Ok(_) => {}
+        Result::Err(_) => {
+            assert_true(false, label + ": expected Ok");
+        }
+    }
+}
+pub fn is_err<T, E>(value: Result<T, E>, label: String) -> Unit {
+    match value {
+        Result::Ok(_) => {
+            assert_true(false, label + ": expected Err");
+        }
+        Result::Err(_) => {}
+    }
+}

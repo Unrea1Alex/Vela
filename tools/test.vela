@@ -1,0 +1,757 @@
+import "../tests/cases/module-cases.vela";
+import "../tests/cases/project-cases.vela";
+import "../tests/cases/stdlib-cases.vela";
+import "../tests/cases/testing-cases.vela";
+import "../tests/cases/ffi-cases.vela";
+// Native black-box language/driver tests. No Python modules or subprocesses.
+pub struct Outcome {
+    code: Int,
+    out: String,
+    err: String
+}
+pub struct Suite {
+    root: String,
+    compiler: String,
+    dir: String,
+    passed: Int,
+    failed: Int
+}
+pub fn value(r: StringResult) -> String effects { io, process } {
+    match r {
+        StringResult::Ok(s) => {
+            return s;
+        }
+        StringResult::Err(e) => {
+            eprint(e);
+            exit(2);
+            return "";
+        }
+    }
+}
+pub fn done(r: WriteResult) -> Unit effects { io, process } {
+    match r {
+        WriteResult::Ok => {}
+        WriteResult::Err(e) => {
+            eprint(e);
+            exit(2);
+        }
+    }
+}
+pub fn replace(s: String, from: String, to: String) -> String effects { state } {
+    let parts = list_new<String>();
+    var start = 0;
+    var i = 0;
+    while i + str_len(from) <= str_len(s) {
+        if str_slice(s, i, i + str_len(from)) == from {
+            list_push(parts, str_slice(s, start, i));
+            list_push(parts, to);
+            i = i + str_len(from);
+            start = i;
+        } else {
+            i = i + 1;
+        }
+    }
+    list_push(parts, str_slice(s, start, str_len(s)));
+    let old = strings_new();
+    i = 0;
+    while i < list_len(parts) {
+        strings_push(old, list_get(parts, i));
+        i = i + 1;
+    }
+    return strings_join(old, "");
+}
+pub fn contains(s: String, part: String) -> Bool {
+    var i = 0;
+    while i + str_len(part) <= str_len(s) {
+        if str_slice(s, i, i + str_len(part)) == part {
+            return true;
+        }
+        i = i + 1;
+    }
+    return false;
+}
+pub fn split(s: String, delimiter: Int) -> List<String> effects { state } {
+    let parts = list_new<String>();
+    var start = 0;
+    var i = 0;
+    while i < str_len(s) {
+        if str_byte(s, i) == delimiter {
+            list_push(parts, str_slice(s, start, i));
+            start = i + 1;
+        }
+        i = i + 1;
+    }
+    list_push(parts, str_slice(s, start, i));
+    return parts;
+}
+pub fn integer(s: String) -> Int effects { io, process } {
+    match parse_int(s) {
+        IntResult::Ok(n) => {
+            return n;
+        }
+        IntResult::Err(e) => {
+            eprint(e);
+            exit(2);
+            return 0;
+        }
+    }
+}
+pub fn command(exe: String) -> StringList effects { state } {
+    let a = strings_new();
+    strings_push(a, exe);
+    return a;
+}
+pub fn invoke(s: Suite, args: StringList, timeout: Int) -> Outcome effects { state, io, process } {
+    let out_path = s.dir + "/child.out";
+    let err_path = s.dir + "/child.err";
+    let code = process_run_files(args, out_path, err_path, timeout);
+    return Outcome(code: code, out: replace(value(read_file(out_path)), "\r\n", "\n"), err: replace(value(read_file(err_path)), "\r\n", "\n"));
+}
+pub fn compiler_command(s: Suite, operation: String, input: String) -> StringList effects { state } {
+    let a = command(s.compiler);
+    strings_push(a, operation);
+    strings_push(a, input);
+    return a;
+}
+pub fn record(s: Suite, name: String, ok: Bool, detail: String) -> Suite effects { io } {
+    var next = s;
+    if ok {
+        next.passed = s.passed + 1;
+    } else {
+        next.failed = s.failed + 1;
+        eprint("FAIL " + name + ": " + detail);
+    }
+    return next;
+}
+pub fn expand(s: Suite, input: String) -> String effects { state } {
+    return replace(replace(input, "@ROOT@", s.root), "@TMP@", s.dir);
+}
+pub fn unescape(s: String) -> String effects { state, io, process } {
+    let parts = strings_new();
+    var i = 0;
+    while i < str_len(s) {
+        let b = str_byte(s, i);
+        if b == 92 {
+            i = i + 1;
+            if i == str_len(s) {
+                eprint("Invalid argument escape");
+                exit(2);
+            }
+            let next = str_byte(s, i);
+            if next == 110 {
+                strings_push(parts, "\n");
+            } else if next == 114 {
+                strings_push(parts, "\r");
+            } else if next == 116 {
+                strings_push(parts, "\t");
+            } else if next == 48 {
+                strings_push(parts, "\0");
+            } else if next == 34 || next == 92 {
+                strings_push(parts, str_from_byte(next));
+            } else {
+                eprint("Unsupported argument escape");
+                exit(2);
+            }
+        } else {
+            strings_push(parts, str_from_byte(b));
+        }
+        i = i + 1;
+    }
+    return strings_join(parts, "");
+}
+pub fn fixture(s: Suite, cols: List<String>, formatted: Bool) -> Suite effects { state, io, process } {
+    let name = list_get(cols, 0);
+    let mode = list_get(cols, 1);
+    let base = s.root + "/tests/cases/" + name;
+    let input = s.dir + "/исходник with space.vela";
+    let exe = s.dir + "/program with space.exe";
+    done(write_file(input, expand(s, value(read_file(base + ".vela")))));
+    let expected_code = integer(list_get(cols, 2));
+    let diagnostic = list_get(cols, 3);
+    let expected_err = list_get(cols, 4);
+    if formatted {
+        let fmt_args = compiler_command(s, "fmt", input);
+        let first = invoke(s, fmt_args, 15000);
+        if diagnostic == "E001" || diagnostic == "E100" || diagnostic == "E206" || diagnostic == "E227" {
+            return record(s, "fmt_reject_" + name, first.code == 1 && first.out == "", first.out + first.err);
+        }
+        if first.code == 1 && diagnostic == "E101" {
+            return record(s, "fmt_depth_" + name, true, "");
+        }
+        if first.code != 0 {
+            return record(s, "fmt_" + name, false, first.out + first.err);
+        }
+        done(write_file(input, first.out));
+        let second = invoke(s, fmt_args, 15000);
+        if second.code != 0 || second.out != first.out {
+            return record(s, "fmt_idempotent_" + name, false, second.out + second.err);
+        }
+    }
+    if mode == "check" {
+        let args = compiler_command(s, "check", input);
+        strings_push(args, "--json");
+        let actual = invoke(s, args, 15000);
+        let ok = actual.code == expected_code && actual.err == ""&& contains(actual.out, "\"schema_version\":1") && (diagnostic == ""|| contains(actual.out, "\"code\":\"" + diagnostic + "\""));
+        return record(s, name, ok, "check exit=" + to_string(actual.code) + " " + actual.out + actual.err);
+    }
+    if mode != "run" {
+        return record(s, name, false, "Unknown fixture mode");
+    }
+    let build_args = compiler_command(s, "build", input);
+    strings_push(build_args, "-o");
+    strings_push(build_args, exe);
+    strings_push(build_args, "--source-name");
+    strings_push(build_args, "test.vela");
+    let built = invoke(s, build_args, 120000);
+    if built.code != 0 {
+        return record(s, name, false, "build: " + built.out + built.err);
+    }
+    let args = command(exe);
+    let raw_args = split(replace(value(read_file(base + ".args")), "\r\n", "\n"), 10);
+    var i = 0;
+    while i + 1 < list_len(raw_args) {
+        strings_push(args, expand(s, unescape(list_get(raw_args, i))));
+        i = i + 1;
+    }
+    let actual = invoke(s, args, 10000);
+    let expected_out = value(read_file(base + ".out"));
+    let ok = actual.code == expected_code && actual.out == expected_out && ((expected_err == ""&& actual.err == "") || (expected_err != ""&& contains(actual.err, expected_err)));
+    return record(s, name, ok, "exit=" + to_string(actual.code) + " stdout=[" + actual.out + "] stderr=[" + actual.err + "]");
+}
+pub fn build(s: Suite, source_path: String, output: String) -> Outcome effects { state, io, process } {
+    let a = compiler_command(s, "build", source_path);
+    strings_push(a, "-o");
+    strings_push(a, output);
+    return invoke(s, a, 120000);
+}
+pub fn protocol(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let input = s.dir + "/protocol.vela";
+    let exe = s.dir + "/protocol.exe";
+    let code = "fn main() -> Int ensures result == 0; { return 0; }";
+    done(write_file(input, code));
+    done(write_file(input, "type Id = distinct Int; struct Row { id: Id, values: List<String> } " + code));
+    let type_symbols = invoke(s, compiler_command(s, "symbols", input), 15000);
+    s = record(s, "symbols_records_and_ids", type_symbols.code == 0 && contains(type_symbols.out, "\"distinct_types\":[{\"name\":\"Id\",\"base\":\"Int\"}]") && contains(type_symbols.out, "\"name\":\"values\",\"type\":\"List<String>\""), type_symbols.out + type_symbols.err);
+    done(write_file(input, code));
+    let symbols = invoke(s, compiler_command(s, "symbols", input), 15000);
+    s = record(s, "symbols_contracts", symbols.code == 0 && contains(symbols.out, "\"verification\":\"runtime\"") && contains(symbols.out, "\"ensures\":1"), symbols.out + symbols.err);
+    let a = compiler_command(s, "emit-c", input);
+    strings_push(a, "-o");
+    strings_push(a, s.dir + "/a.c");
+    let b = compiler_command(s, "emit-c", input);
+    strings_push(b, "-o");
+    strings_push(b, s.dir + "/b.c");
+    let ca = invoke(s, a, 15000);
+    let cb = invoke(s, b, 15000);
+    s = record(s, "deterministic_c", ca.code == 0 && cb.code == 0 && value(read_file(s.dir + "/a.c")) == value(read_file(s.dir + "/b.c")), ca.err + cb.err);
+    let protected = compiler_command(s, "build", input);
+    strings_push(protected, "-o");
+    strings_push(protected, s.dir + "/./protocol.vela");
+    let protected_result = invoke(s, protected, 15000);
+    s = record(s, "protect_source_build", protected_result.code == 2 && value(read_file(input)) == code, protected_result.err);
+    strings_set(protected, 1, "emit-c");
+    let emit_protected = invoke(s, protected, 15000);
+    s = record(s, "protect_source_emit", emit_protected.code == 2 && value(read_file(input)) == code, emit_protected.err);
+    if platform() == "windows" {
+        let unicode_input = s.dir + "/тест.vela";
+        done(write_file(unicode_input, code));
+        let protect_unicode = compiler_command(s, "emit-c", unicode_input);
+        strings_push(protect_unicode, "-o");
+        strings_push(protect_unicode, s.dir + "/ТЕСТ.vela");
+        let unicode_emit = invoke(s, protect_unicode, 15000);
+        s = record(s, "protect_unicode_source_emit", unicode_emit.code == 2 && value(read_file(unicode_input)) == code, unicode_emit.err);
+        strings_set(protect_unicode, 1, "build");
+        let unicode_build = invoke(s, protect_unicode, 15000);
+        s = record(s, "protect_unicode_source_build", unicode_build.code == 2 && value(read_file(unicode_input)) == code, unicode_build.err);
+    }
+    done(write_file(input, "// comment\nfn main() -> Int {\n    return false;\n}\n"));
+    let check = compiler_command(s, "check", input);
+    strings_push(check, "--json");
+    let location = invoke(s, check, 15000);
+    s = record(s, "diagnostic_location", location.code == 1 && contains(location.out, "\"line\":3,\"column\":5") && location.err == "", location.out);
+    done(write_file(exe, "previous build"));
+    let failed_frontend = build(s, input, exe);
+    s = record(s, "atomic_frontend_failure", failed_frontend.code == 1 && value(read_file(exe)) == "previous build", failed_frontend.err);
+    done(write_file(input, code));
+    let previous_cc = env("VELA_CC");
+    set_env("VELA_CC", s.dir + "/nonexistent-cc.exe");
+    let failed_backend = build(s, input, exe);
+    set_env("VELA_CC", previous_cc);
+    s = record(s, "atomic_backend_failure", failed_backend.code == 2 && value(read_file(exe)) == "previous build", failed_backend.err);
+    let stub_source = s.dir + "/compiler-stub.vela";
+    let stub_exe = s.dir + "/compiler-stub.exe";
+    var stub_code = 1;
+    while stub_code <= 17 {
+        done(write_file(stub_source, "fn main() -> Int { return " + to_string(stub_code) + "; }"));
+        let stub_build = build(s, stub_source, stub_exe);
+        if stub_build.code == 0 {
+            set_env("VELA_CC", stub_exe);
+            let stub_failed = build(s, input, exe);
+            set_env("VELA_CC", previous_cc);
+            s = record(s, "backend_exit_" + to_string(stub_code), stub_failed.code == 2 && value(read_file(exe)) == "previous build", stub_failed.err);
+        } else {
+            s = record(s, "backend_exit_stub_build", false, stub_build.err);
+        }
+        stub_code = stub_code + 16;
+    }
+    let run_exit = invoke(s, compiler_command(s, "run", stub_source), 120000);
+    s = record(s, "run_preserves_application_exit", run_exit.code == 17, run_exit.err);
+    done(write_file(input, str_from_byte(255) + "invalid"));
+    let invalid_utf8 = invoke(s, check, 15000);
+    s = record(s, "invalid_utf8_json", invalid_utf8.code == 2 && contains(invalid_utf8.out, "\"code\":\"E900\""), invalid_utf8.out);
+    done(remove_file(input));
+    let missing = invoke(s, check, 15000);
+    s = record(s, "missing_source_json", missing.code == 2 && contains(missing.out, "\"code\":\"E900\""), missing.out);
+    done(write_file(input, str_from_byte(239) + str_from_byte(187) + str_from_byte(191) + "fn main() -> Unit {\r\n let s = \"Привет\";\r}\r\n"));
+    let normalized = invoke(s, check, 15000);
+    s = record(s, "bom_crlf_unicode", normalized.code == 0 && contains(normalized.out, "\"ok\":true"), normalized.out);
+    let run_args = compiler_command(s, "run", s.root + "/examples/sum.vela");
+    strings_push(run_args, "--");
+    strings_push(run_args, "12");
+    strings_push(run_args, "-5");
+    strings_push(run_args, "30");
+    let cli_run = invoke(s, run_args, 120000);
+    s = record(s, "cli_run_arguments", cli_run.code == 0 && cli_run.out == "37\n", cli_run.err);
+    return s;
+}
+pub fn processes(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let helper = s.dir + "/child helper.exe";
+    let built = build(s, s.root + "/tests/helper.vela", helper);
+    s = record(s, "build_process_helper", built.code == 0, built.err);
+    if built.code != 0 {
+        return s;
+    }
+    let a = command(helper);
+    strings_push(a, "args");
+    let values = strings_new();
+    strings_push(values, "");
+    strings_push(values, "a b");
+    strings_push(values, "quote\"inside");
+    strings_push(values, "tail\\");
+    strings_push(values, "Привет");
+    strings_push(values, "%PATH%");
+    strings_push(values, "&echo");
+    strings_push(values, "\\\"");
+    strings_push(values, "ends\\\\");
+    var expected = "";
+    var i = 0;
+    while i < strings_len(values) {
+        let v = strings_get(values, i);
+        strings_push(a, v);
+        expected = expected + to_string(str_len(v)) + "\n" + v + "\n";
+        i = i + 1;
+    }
+    let arguments = invoke(s, a, 15000);
+    s = record(s, "unicode_arguments_without_shell", arguments.code == 0 && arguments.out == expected && arguments.err == "", arguments.out + arguments.err);
+    let streams = command(helper);
+    strings_push(streams, "streams");
+    let captured = invoke(s, streams, 15000);
+    s = record(s, "separate_process_streams", captured.code == 0 && captured.out == "child output\n" && captured.err == "child error\n", captured.out + captured.err);
+    let hang = command(helper);
+    strings_push(hang, "hang");
+    let timed = invoke(s, hang, 100);
+    s = record(s, "process_timeout", timed.code == 124, to_string(timed.code));
+    let wrapper = s.dir + "/redirect.vela";
+    done(write_file(wrapper, "fn main() -> Int effects { state, process } { let a = strings_new(); strings_push(a, \"" + helper + "\"); strings_push(a, \"streams\"); return process_run_to_stderr(a); }"));
+    let redirect_exe = s.dir + "/redirect.exe";
+    let rb = build(s, wrapper, redirect_exe);
+    if rb.code == 0 {
+        let redirected = invoke(s, command(redirect_exe), 15000);
+        s = record(s, "redirect_stdout_to_stderr", redirected.code == 0 && redirected.out == ""&& contains(redirected.err, "child output\n") && contains(redirected.err, "child error\n"), redirected.err);
+    } else {
+        s = record(s, "redirect_stdout_to_stderr", false, rb.err);
+    }
+    return s;
+}
+pub fn standalone(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let copied = s.dir + "/standalone.exe";
+    done(write_file(copied, value(read_file(s.compiler))));
+    let input = s.dir + "/alone.vela";
+    done(write_file(input, "fn main() -> Unit effects { io } { print(6 * 7); }"));
+    let saved_path = env("PATH");
+    let saved_pythonpath = env("PYTHONPATH");
+    let saved_pythonhome = env("PYTHONHOME");
+    let parts = split(saved_path, 59);
+    let path = strings_new();
+    var i = 0;
+    while i < list_len(parts) {
+        let p = list_get(parts, i);
+        if !contains(p, "Python") && !contains(p, "python") && !contains(p, "PYTHON") {
+            strings_push(path, p);
+        }
+        i = i + 1;
+    }
+    set_env("PATH", strings_join(path,";"));
+    set_env("PYTHONPATH", "");
+    set_env("PYTHONHOME", "");
+    let cwd = value(absolute_path("."));
+    done(set_current_dir(s.dir));
+    var isolated = s;
+    isolated.compiler = copied;
+    let executable = s.dir + "/alone.exe";
+    let built = build(isolated, input, executable);
+    var ok = false;
+    var detail = built.err;
+    if built.code == 0 {
+        let ran = invoke(isolated, command(executable), 15000);
+        ok = ran.code == 0 && ran.out == "42\n";
+        detail = ran.err;
+    }
+    done(set_current_dir(cwd));
+    set_env("PATH", saved_path);
+    set_env("PYTHONPATH", saved_pythonpath);
+    set_env("PYTHONHOME", saved_pythonhome);
+    return record(s, "standalone_without_python_or_project", ok, detail);
+}
+pub fn catalog(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let exe = s.dir + "/bundle.exe";
+    let built = build(s, s.root + "/tools/bundle.vela", exe);
+    if built.code != 0 {
+        return record(s, "catalog_bundler_build", false, built.err);
+    }
+    let root = s.dir + "/catalog";
+    done(make_dir(root));
+    done(make_dir(root + "/selfhost"));
+    done(make_dir(root + "/vela"));
+    done(make_dir(root + "/vela/backends"));
+    done(write_file(root + "/selfhost/sources.list", ""));
+    done(write_file(root + "/vela/backends/runtime.h", ""));
+    let destination = root + "/selfhost/compiler.vela";
+    done(write_file(destination, "previous bundle"));
+    let bad = list_new<String>();
+    list_push(bad, "fn|bad\n");
+    list_push(bad, "fn|bad||Int|Int||unknown|0.3\n");
+    list_push(bad, "fn|bad||Int|Int|magic|located|0.3\n");
+    list_push(bad, "fn|bad||Int|Int||located|0.3\nfn|bad||Int|Int||located|0.3\n");
+    var i = 0;
+    while i < list_len(bad) {
+        done(write_file(root + "/vela/builtins.def", list_get(bad, i)));
+        let a = command(exe);
+        strings_push(a, root);
+        let actual = invoke(s, a, 15000);
+        s = record(s, "catalog_rejection_" + to_string(i), actual.code == 2 && contains(actual.err, "Invalid builtin catalog:") && value(read_file(destination)) == "previous bundle", actual.err);
+        i = i + 1;
+    }
+    return s;
+}
+pub fn formatter_checks(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let input = s.dir + "/format.vela";
+    let original = "// heading 😀\nfn main()->Unit effects{io}{let n=0007; // inline\nprint(\"a\\n\\0\\\"b\");print(-n);}// tail\n";
+    done(write_file(input, original));
+    let a = compiler_command(s, "fmt", input);
+    strings_push(a, "--check");
+    let before = invoke(s, a, 15000);
+    s = record(s, "fmt_check_dirty_readonly", before.code == 1 && value(read_file(input)) == original && before.out == "", before.err);
+    strings_set(a, 3, "--write");
+    let written = invoke(s, a, 15000);
+    let canonical = value(read_file(input));
+    s = record(s, "fmt_write_comments_literals", written.code == 0 && contains(canonical, "// heading 😀") && contains(canonical, "// inline") && contains(canonical, "// tail") && contains(canonical, "0007") && contains(canonical, "\"a\\n\\0\\\"b\"") && contains(canonical, "    print(-n);"), written.err + canonical);
+    strings_set(a, 3, "--check");
+    let clean = invoke(s, a, 15000);
+    s = record(s, "fmt_check_clean", clean.code == 0 && clean.out == ""&& clean.err == "", clean.err);
+    let malformed = "fn main() -> Unit { // unfinished\n";
+    done(write_file(input, malformed));
+    strings_set(a, 3, "--write");
+    let rejected = invoke(s, a, 15000);
+    s = record(s, "fmt_preserves_invalid_syntax", rejected.code == 1 && value(read_file(input)) == malformed, rejected.err);
+    let invalid = str_from_byte(255);
+    done(write_file(input, invalid));
+    let encoding = invoke(s, a, 15000);
+    s = record(s, "fmt_preserves_invalid_utf8", encoding.code == 2 && value(read_file(input)) == invalid, encoding.err);
+    let generic_suffixes = list_new<String>();
+    list_push(generic_suffixes, "effects { io }");
+    list_push(generic_suffixes, "requires true;");
+    list_push(generic_suffixes, "ensures true;");
+    list_push(generic_suffixes, "// boundary\neffects { io }");
+    for suffix in generic_suffixes {
+        done(write_file(input, "fn f()->Result<Int,String> " + suffix + " {} fn main()->Unit{}"));
+        let formatted = invoke(s, compiler_command(s, "fmt", input), 15000);
+        done(write_file(input, formatted.out));
+        let again = invoke(s, compiler_command(s, "fmt", input), 15000);
+        s = record(s, "fmt_generic_return_" + suffix, formatted.code == 0 && again.code == 0 && contains(formatted.out, "-> Result<Int, String>") && formatted.out == again.out, formatted.out + formatted.err + again.err);
+    }
+    let rows = split(value(read_file(s.root + "/selfhost/sources.list")), 10);
+    var i = 0;
+    while i < list_len(rows) {
+        let name = replace(list_get(rows, i), "\r", "");
+        if name != "" {
+            let first = invoke(s, compiler_command(s, "fmt", s.root + "/selfhost/" + name + ".vela"), 15000);
+            done(write_file(input, first.out));
+            let second = invoke(s, compiler_command(s, "fmt", input), 15000);
+            s = record(s, "fmt_selfhost_" + name, first.code == 0 && second.code == 0 && first.out == second.out, first.err + second.err);
+        }
+        i = i + 1;
+    }
+    return s;
+}
+pub fn diagnostics(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let input = s.dir + "/diagnostics.vela";
+    let sources = list_new<String>();
+    let expected = list_new<String>();
+    let codes = list_new<String>();
+    list_push(sources, "fn wants(value: Int) -> Unit {}\nfn main() -> Unit { wants(false); }");
+    list_push(expected, "\"expected_type\":\"Int\",\"actual_type\":\"Bool\"");
+    list_push(codes, "E201");
+    list_push(sources, "fn change() -> Unit effects { io, state } {}\nfn main() -> Unit { change(); }");
+    list_push(expected, "\"callee\":\"change\",\"required_effects\":[\"io\",\"state\"],\"allowed_effects\":[],\"missing_effects\":[\"io\",\"state\"]");
+    list_push(codes, "E209");
+    list_push(sources, "enum Color { Red, Blue, Green }\nfn main() -> Unit { match Color::Red { Color::Red => {} } }");
+    list_push(expected, "\"missing_variants\":[\"Color::Blue\",\"Color::Green\"]");
+    list_push(codes, "E216");
+    list_push(sources, "fn main() -> Unit {\n let x = 1;\n let x = 2;\n}");
+    list_push(expected, "Previous declaration is here.");
+    list_push(codes, "E202");
+    var i = 0;
+    while i < list_len(sources) {
+        done(write_file(input, list_get(sources, i)));
+        let a = compiler_command(s, "check", input);
+        strings_push(a, "--json");
+        let checked = invoke(s, a, 15000);
+        s = record(s, "structured_diagnostic_" + list_get(codes, i), checked.code == 1 && checked.err == ""&& contains(checked.out, list_get(expected, i)) && contains(checked.out, "\"related\":[{\"message\":"), checked.out + checked.err);
+        let human = invoke(s, compiler_command(s, "check", input), 15000);
+        s = record(s, "human_diagnostic_" + list_get(codes, i), human.code == 1 && human.out == ""&& contains(human.err, list_get(codes, i)) && contains(human.err, ": note: "), human.err);
+        i = i + 1;
+    }
+    done(write_file(input, str_from_byte(239) + str_from_byte(187) + str_from_byte(191) + "// 😀\r\nfn main() -> Int {\r\n    return false;\r\n}\r\n"));
+    let a = compiler_command(s, "check", input);
+    strings_push(a, "--json");
+    let unicode = invoke(s, a, 15000);
+    s = record(s, "unicode_diagnostic_coordinates", unicode.code == 1 && contains(unicode.out, "\"start\":28,\"end\":41,\"line\":3,\"column\":5,\"end_line\":3,\"end_column\":18"), unicode.out);
+    return s;
+}
+pub fn typed_tables(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let prefix = source_body(value(read_file(s.root + "/selfhost/model.vela"))) + "\n" + source_body(value(read_file(s.root + "/selfhost/core.vela")));
+    let input = s.dir + "/typed-tables.vela";
+    let exe = s.dir + "/typed-tables.exe";
+    let types = split("AstExprId;AstStmtId;ExprId;StmtId;TypeId;SymbolId", 59);
+    let readers = split("ast_expr;ast_stmt;checked_expr;checked_stmt;type_info;symbol_info", 59);
+    let program = strings_new();
+    strings_push(program, prefix);
+    strings_push(program, "\nfn main() -> Int effects { args, state, io, process } { var mode = 0; var id = 0; match arg_int(0) { IntResult::Ok(n) => { mode = n; } IntResult::Err(_) => { return 2; } } match arg_int(1) { IntResult::Ok(n) => { id = n; } IntResult::Err(_) => { return 2; } } let c = make_context(\"\", \"internal-test\", false); ");
+    var i = 0;
+    while i < list_len(types) {
+        strings_push(program, "if mode == " + to_string(i) + " { let item = " + list_get(readers, i) + "(c, " + list_get(types, i) + "(id)); print(item.kind); } ");
+        i = i + 1;
+    }
+    strings_push(program, "return 0; }");
+    done(write_file(input, strings_join(program, "")));
+    let built = build(s, input, exe);
+    s = record(s, "typed_tables_build", built.code == 0, built.err);
+    if built.code == 0 {
+        i = 0;
+        while i < list_len(types) {
+            let invalid = split("0;-1;999999", 59);
+            var j = 0;
+            while j < list_len(invalid) {
+                let a = command(exe);
+                strings_push(a, to_string(i));
+                strings_push(a, list_get(invalid, j));
+                let ran = invoke(s, a, 15000);
+                s = record(s, "invalid_" + list_get(types, i) + "_" + list_get(invalid, j), ran.code == 70 && contains(ran.err, "internal error: invalid"), ran.err);
+                j = j + 1;
+            }
+            i = i + 1;
+        }
+    }
+    i = 0;
+    while i < list_len(types) {
+        let next = (i + 1) % list_len(types);
+        done(write_file(input, prefix + "\nfn wants(id: " + list_get(types, i) + ") -> Unit {} fn main() -> Unit { wants(" + list_get(types, next) + "(1)); }"));
+        let a = compiler_command(s, "check", input);
+        strings_push(a, "--json");
+        let checked = invoke(s, a, 15000);
+        s = record(s, "mixed_" + list_get(types, i), checked.code == 1 && contains(checked.out, "\"code\":\"E201\""), checked.out + checked.err);
+        i = i + 1;
+    }
+    return s;
+}
+pub struct TimelogBadInput {
+    text: String,
+    message: String
+}
+pub fn timelog_run(s: Suite, exe: String, input: String, output: String) -> Outcome effects { state, io, process } {
+    let a = command(exe);
+    strings_push(a, input);
+    strings_push(a, output);
+    return invoke(s, a, 30000);
+}
+pub fn timelog_checks(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let input = s.dir + "/журнал with space.tsv";
+    let output = s.dir + "/отчёт with space.html";
+    let header = "project\tminutes\tnote\n";
+    let source_path = s.root + "/apps/timelog/main.vela";
+    let invalid = list_new<TimelogBadInput>();
+    list_push(invalid, TimelogBadInput(text: "", message: "line 1: expected header"));
+    list_push(invalid, TimelogBadInput(text: "project,minutes,note\n", message: "line 1: expected header"));
+    list_push(invalid, TimelogBadInput(text: header + "A\tx\tn\n", message: "line 2: minutes must contain decimal digits"));
+    list_push(invalid, TimelogBadInput(text: header + "A\t0\tn\n", message: "line 2: minutes must be in 1..1440"));
+    list_push(invalid, TimelogBadInput(text: header + "A\t-1\tn\n", message: "line 2: minutes must contain decimal digits"));
+    list_push(invalid, TimelogBadInput(text: header + "A\t1441\tn\n", message: "line 2: minutes must be in 1..1440"));
+    list_push(invalid, TimelogBadInput(text: header + "A\t9223372036854775808\tn\n", message: "line 2: minutes must be in 1..1440"));
+    list_push(invalid, TimelogBadInput(text: header + "A\t1\textra\ttab\n", message: "line 2: expected 3 tab-separated fields"));
+    list_push(invalid, TimelogBadInput(text: header + " \t1\tn\n", message: "line 2: project must not be empty"));
+    list_push(invalid, TimelogBadInput(text: header + "A\t1\tn\0\n", message: "invalid UTF-8 or control character"));
+    list_push(invalid, TimelogBadInput(text: header + str_from_byte(255), message: "invalid UTF-8 or control character"));
+    list_push(invalid, TimelogBadInput(text: header + str_from_byte(195), message: "invalid UTF-8 or control character"));
+    list_push(invalid, TimelogBadInput(text: header + str_from_byte(237) + str_from_byte(160) + str_from_byte(128), message: "invalid UTF-8 or control character"));
+    list_push(invalid, TimelogBadInput(text: header + "A\t1\tn\rm\n", message: "line 2: unexpected carriage return"));
+    list_push(invalid, TimelogBadInput(text: header + str_from_byte(194) + str_from_byte(133), message: "invalid UTF-8 or control character"));
+    let many = strings_new();
+    strings_push(many, header);
+    for i in 0 .. 10000 {
+        strings_push(many, "A\t1440\tn\n");
+    }
+    let maximum = strings_join(many, "");
+    list_push(invalid, TimelogBadInput(text: maximum + "A\t1\tn\n", message: "line 10002: more than 10000 entries"));
+    var oversized = "x";
+    for i in 0 .. 20 {
+        oversized = oversized + oversized;
+    }
+    list_push(invalid, TimelogBadInput(text: oversized + "x", message: "input exceeds 1 MiB"));
+    var reference = "";
+    for mode in 0 .. 2 {
+        var source = source_path;
+        if mode == 1 {
+            source = s.dir + "/timelog-formatted.vela";
+            let formatted = invoke(s, compiler_command(s, "fmt", source_path), 15000);
+            s = record(s, "timelog_format", formatted.code == 0, formatted.err);
+            done(write_file(source, formatted.out));
+        }
+        let exe = s.dir + "/timelog-" + to_string(mode) + ".exe";
+        let built = build(s, source, exe);
+        s = record(s, "timelog_build_" + to_string(mode), built.code == 0, built.out + built.err);
+        if built.code != 0 {
+            return s;
+        }
+        let help_args = command(exe);
+        strings_push(help_args, "--help");
+        let help = invoke(s, help_args, 10000);
+        s = record(s, "timelog_help", help.code == 0 && help.err == ""&& contains(help.out, "Usage: timelog"), help.out + help.err);
+        let usage = invoke(s, command(exe), 10000);
+        s = record(s, "timelog_usage", usage.code == 2 && usage.out == ""&& contains(usage.err, "Usage: timelog"), usage.out + usage.err);
+        let valid = header + "A&B\t90\t<script>alert(\"x\")</script>\nРисование 😀\t60\tЦвет\nA&B\t30\tO'Reilly\n";
+        done(write_file(input, valid));
+        done(write_file(output, "OLD REPORT"));
+        let success = timelog_run(s, exe, input, output);
+        let report = value(read_file(output));
+        let expected_out = "Saved: " + output + "\nTotal: 180 minutes\n";
+        s = record(s, "timelog_totals_escape_unicode", success.code == 0 && success.out == expected_out && success.err == ""&& contains(report, "3 ч 00 мин") && contains(report, "<strong>A&amp;B</strong><span class=\"time\">2 ч 00 мин</span>") && contains(report, "Рисование 😀") && contains(report, "&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;") && !contains(report, "<script>") && contains(report, "O&#39;Reilly") && value(read_file(input)) == valid, success.out + success.err);
+        if mode == 0 {
+            reference = report;
+        } else {
+            s = record(s, "timelog_formatted_equivalence", report == reference, "HTML differs");
+        }
+        done(write_file(input, str_from_byte(239) + str_from_byte(187) + str_from_byte(191) + replace(header, "\n", "\r\n") + " A \t0005\t \r\n\r\n"));
+        let normalized = timelog_run(s, exe, input, output);
+        s = record(s, "timelog_bom_crlf_trim", normalized.code == 0 && contains(normalized.out, "Total: 5 minutes") && contains(value(read_file(output)), "0 ч 05 мин"), normalized.out + normalized.err);
+        done(write_file(input, header));
+        let empty = timelog_run(s, exe, input, output);
+        s = record(s, "timelog_empty", empty.code == 0 && contains(empty.out, "Total: 0 minutes") && contains(value(read_file(output)), "Журнал пока пуст"), empty.out + empty.err);
+        done(write_file(input, maximum));
+        let boundary = timelog_run(s, exe, input, output);
+        s = record(s, "timelog_10000_entries", boundary.code == 0 && contains(boundary.out, "Total: 14400000 minutes"), boundary.out + boundary.err);
+        for i in 0 .. list_len(invalid) {
+            let test = list_get(invalid, i);
+            done(write_file(input, test.text));
+            done(write_file(output, "OLD REPORT"));
+            let failure = timelog_run(s, exe, input, output);
+            s = record(s, "timelog_invalid_" + to_string(i), failure.code == 2 && failure.out == ""&& contains(failure.err, test.message) && value(read_file(output)) == "OLD REPORT" && value(read_file(input)) == test.text, failure.out + failure.err);
+        }
+        done(write_file(input, valid));
+        let alias = timelog_run(s, exe, input, input);
+        s = record(s, "timelog_source_alias", alias.code == 2 && contains(alias.err, "output must not replace the input file") && value(read_file(input)) == valid, alias.out + alias.err);
+        let missing = timelog_run(s, exe, s.dir + "/missing.tsv", output);
+        s = record(s, "timelog_missing_input", missing.code == 2 && contains(missing.err, "Read input") && value(read_file(output)) == "OLD REPORT", missing.out + missing.err);
+        let bad_output = timelog_run(s, exe, input, s.dir + "/missing-directory/report.html");
+        s = record(s, "timelog_bad_output", bad_output.code == 2 && contains(bad_output.err, "Temporary directory") && value(read_file(input)) == valid, bad_output.out + bad_output.err);
+        let directory = s.dir + "/destination-directory";
+        done(make_dir(directory));
+        let directory_output = timelog_run(s, exe, input, directory);
+        s = record(s, "timelog_directory_output", directory_output.code == 2 && value(read_file(input)) == valid, directory_output.out + directory_output.err);
+    }
+    return s;
+}
+pub fn main() -> Int effects { args, state, io, process } {
+    var compiler = "bin/velac.exe";
+    var root =".";
+    if arg_count() > 0 {
+        compiler = value(arg(0));
+    }
+    if arg_count() > 1 {
+        root = value(arg(1));
+    }
+    root = replace(value(absolute_path(root)), "\\", "/");
+    compiler = replace(value(absolute_path(compiler)), "\\", "/");
+    done(make_dir(root + "/build"));
+    done(make_dir(root + "/build/native"));
+    let dir = replace(value(temp_dir(root + "/build/native")), "\\", "/");
+    var suite = Suite(root: root, compiler: compiler, dir: dir, passed: 0, failed: 0);
+    let names = dict_new<String, Bool>();
+    let rows = split(replace(value(read_file(root + "/tests/cases/cases.tsv")), "\r\n", "\n"), 10);
+    var i = 0;
+    while i < list_len(rows) {
+        let row = list_get(rows, i);
+        if row != ""&& str_byte(row, 0) != 35 {
+            let cols = split(row, 124);
+            if list_len(cols) != 5 {
+                eprint("Invalid fixture row: " + row);
+                return 2;
+            }
+            let name = list_get(cols, 0);
+            if dict_has(names, name) {
+                eprint("Duplicate fixture name: " + name);
+                return 2;
+            }
+            dict_set(names, name, true);
+            suite = fixture(suite, cols, false);
+            suite = fixture(suite, cols, true);
+            if (suite.passed + suite.failed) % 20 == 0 {
+                print(f"Tests: {suite.passed:d} passed, {suite.failed:d} failed");
+            }
+        }
+        i = i + 1;
+    }
+    suite = protocol(suite);
+    suite = processes(suite);
+    suite = standalone(suite);
+    suite = catalog(suite);
+    suite = typed_tables(suite);
+    suite = diagnostics(suite);
+    suite = formatter_checks(suite);
+    suite = timelog_checks(suite);
+    suite = module_checks(suite);
+    suite = project_checks(suite);
+    suite = stdlib_checks(suite);
+    suite = testing_checks(suite);
+    suite = ffi_checks(suite);
+    let report = f"{{\"schema_version\":1,\"runner\":\"Vela\",\"passed\":{suite.passed:d},\"failed\":{suite.failed:d},\"skipped\":0}}\n";
+    done(write_file(root + "/build/native/tests.json", report));
+    print(report);
+    if suite.failed != 0 {
+        eprint("Failure artifacts: " + dir);
+        return 1;
+    }
+    return 0;
+}
+pub fn source_body(text: String) -> String effects { state } {
+    let parts = strings_new();
+    for original in split(text, 10) {
+        var line = original;
+        if str_len(line) >= 7 && str_slice(line, 0, 7) == "import " {
+            continue;
+        }
+        if str_len(line) >= 4 && str_slice(line, 0, 4) == "pub " {
+            line = str_slice(line, 4, str_len(line));
+        }
+        strings_push(parts, line + "\n");
+    }
+    return strings_join(parts, "");
+}

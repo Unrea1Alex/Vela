@@ -1,0 +1,1 @@
+type ID=distinct Int; fn main()->Unit{let s=f"{ID(1):d}";}

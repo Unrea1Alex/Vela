@@ -1,0 +1,2 @@
+fn m(s: String) -> String effects { io } { print(s); return s; }
+fn main() -> Unit effects { io } { print(m("left") + m("right")); print(to_string(true)); print(to_string(-9223372036854775808)); }

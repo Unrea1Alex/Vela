@@ -1,0 +1,1 @@
+fn main() -> Unit { let a: Other<Int> = 1; }

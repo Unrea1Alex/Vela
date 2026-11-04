@@ -1,0 +1,1 @@
+test "wrong return" { return 1; }

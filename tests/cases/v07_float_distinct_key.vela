@@ -1,0 +1,2 @@
+type Id = distinct Float64;
+fn main() -> Unit effects { state } { let map = dict_new<Id, Int>(); }

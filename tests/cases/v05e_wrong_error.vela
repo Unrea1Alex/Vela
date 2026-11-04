@@ -1,0 +1,1 @@
+fn f()->Result<Int,Bool>{let x=Result<Int,String>::Err("bad")?;return Result<Int,Bool>::Ok(x);} fn main()->Unit{}

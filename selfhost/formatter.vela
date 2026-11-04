@@ -1,0 +1,253 @@
+import "model.vela";
+import "core.vela";
+import "lexer.vela";
+import "parser.vela";
+// Formatting uses concrete token spelling and preserved comment spans.
+pub fn format_tokens(c: Context) -> List<Token> effects { state } {
+    let tokens = list_new<Token>();
+    var i = 0;
+    var j = 0;
+    while i + 1 < list_len(c.tokens) || j < list_len(c.comments) {
+        if j < list_len(c.comments) && (i + 1 >= list_len(c.tokens) || list_get(c.comments, j).span.start < list_get(c.tokens, i).span.start) {
+            list_push(tokens, list_get(c.comments, j));
+            j = j + 1;
+        } else {
+            list_push(tokens, list_get(c.tokens, i));
+            i = i + 1;
+        }
+    }
+    return tokens;
+}
+pub fn format_line(parts: StringList, line: String, indentation: Int) -> Unit effects { state } {
+    if line == "" {
+        return;
+    }
+    var prefix = "";
+    var i = 0;
+    while i < indentation {
+        prefix = prefix + "    ";
+        i = i + 1;
+    }
+    strings_push(parts, prefix + line + "\n");
+}
+pub fn format_generic(tokens: List<Token>, index: Int) -> Bool effects { state } {
+    if index == 0 || list_get(tokens, index - 1).kind != 50 {
+        return false;
+    }
+    let previous = list_get(tokens, index - 1).text;
+    if index >= 2 {
+        let declaration = list_get(tokens, index - 2).text;
+        if declaration == "fn" || declaration == "struct" || declaration == "enum" {
+            return true;
+        }
+    }
+    if previous == "List" || previous == "Dict" {
+        return true;
+    }
+    var i = index;
+    var depth = 0;
+    while i < list_len(tokens) {
+        let t = list_get(tokens, i);
+        if t.kind == 55 {
+            i = i + 1;
+        } else {
+            if t.text == "<" {
+                depth = depth + 1;
+            } else if t.text == ">" {
+                depth = depth - 1;
+                if depth == 0 {
+                    var following = i + 1;
+                    while following < list_len(tokens) && list_get(tokens, following).kind == 55 {
+                        following = following + 1;
+                    }
+                    if following >= list_len(tokens) {
+                        return false;
+                    }
+                    let next = list_get(tokens, following).text;
+                    return next == "("|| next =="::"|| next ==")" || next =="," || next == "{" || next == "}"
+                    || next == "=" || next ==";" || next == ">" || next == "effects" || next == "requires" || next == "ensures";
+                }
+            } else if t.kind != 50 && t.text !="," {
+                return false;
+            }
+            i = i + 1;
+        }
+    }
+    return false;
+}
+pub fn format_unary(previous: String, token: String) -> Bool {
+    if token == "!" {
+        return true;
+    }
+    return token == "-"&& (previous == ""|| previous == "("|| previous =="," || previous ==":" || previous == "=" || previous == "return" || previous == "requires" || previous == "ensures" || previous == "if" || previous == "while" || precedence(previous) >= 0 || previous == "!"|| previous == "=>");
+}
+pub fn format_space(previous: String, token: String, previous_unary: Bool, generic: Bool, previous_open_generic: Bool) -> Bool {
+    if previous == ""|| previous_unary || previous_open_generic || generic {
+        return false;
+    }
+    if token =="?" || token ==")" || token =="," || token ==";" || token =="."|| token =="::"|| token ==":" {
+        return false;
+    }
+    if previous == "("|| previous =="."|| previous =="::" {
+        return false;
+    }
+    if token == "("&& previous == ">" {
+        return false;
+    }
+    if token == "("&& previous != "if" && previous != "while" && previous != "return" && previous != "requires" && previous != "ensures" && previous != "=" && precedence(previous) < 0 {
+        return false;
+    }
+    return true;
+}
+pub fn format_source(c: Context) -> String effects { state, io, process } {
+    let tokens = format_tokens(c);
+    let parts = strings_new();
+    let braces = ints_new();
+    var line = "";
+    var indent = 0;
+    var previous = "";
+    var previous_end = 0;
+    var previous_unary = false;
+    var previous_open_generic = false;
+    var closed_inline = false;
+    var declaration = false;
+    var parens = 0;
+    var generics = 0;
+    var i = 0;
+    while i < list_len(tokens) {
+        let t = list_get(tokens, i);
+        let raw = str_slice(c.source_text, t.span.start, t.span.end);
+        let word = t.text;
+        if t.kind == 55 {
+            if line != ""&& line_at(c, previous_end) != line_at(c, t.span.start) {
+                format_line(parts, line, indent);
+                line = "";
+            }
+            if line != "" {
+                line = line + " ";
+            }
+            line = line + raw;
+            format_line(parts, line, indent);
+            line = "";
+        } else {
+            if previous == "}"
+            && !closed_inline && word != "else" && word !=";" && word !="," && word !=")" && word != "}"
+            {
+                format_line(parts, line, indent);
+                line = "";
+            }
+            if t.kind == 50 && (word == "struct" || word == "enum") {
+                declaration = true;
+            }
+            if t.kind == 53 && word == "{" {
+                var kind = 0;
+                if previous == "effects" { kind = 1;
+                } else if declaration {
+                    kind = 2;
+                    declaration = false;
+                }
+                if line != "" {
+                    line = line + " ";
+                }
+                line = line + "{";
+                ints_push(braces, kind);
+                if kind != 1 {
+                    if i + 1 >= list_len(tokens) || list_get(tokens, i + 1).text != "}"
+                    {
+                        format_line(parts, line, indent);
+                        line = "";
+                    }
+                    indent = indent + 1;
+                }
+            } else if t.kind == 53 && word == "}"
+            {
+                let kind = ints_get(braces, ints_len(braces) - 1);
+                ints_truncate(braces, ints_len(braces) - 1);
+                closed_inline = kind == 1;
+                if kind != 1 {
+                    if previous != "{" {
+                        format_line(parts, line, indent);
+                        line = "";
+                    }
+                    indent = indent - 1;
+                    line = line + "}";
+                } else {
+                    if previous != "{" && line != "" {
+                        line = line + " ";
+                    }
+                    line = line + "}";
+                }
+            } else {
+                var generic = false;
+                var open_generic = false;
+                if t.kind == 53 && word == "<" && (generics > 0 || format_generic(tokens, i)) {
+                    generic = true;
+                    open_generic = true;
+                    generics = generics + 1;
+                } else if t.kind == 53 && word == ">" && generics > 0 {
+                    generic = true;
+                    generics = generics - 1;
+                }
+                let unary = format_unary(previous, word);
+                if line != ""&& format_space(previous, word, previous_unary, generic, previous_open_generic) {
+                    line = line + " ";
+                }
+                line = line + raw;
+                if t.kind == 53 && word == "(" {
+                    parens = parens + 1;
+                } else if t.kind == 53 && word ==")" {
+                    parens = parens - 1;
+                }
+                var newline = t.kind == 53 && word ==";";
+                if t.kind == 53 && word =="," && ints_len(braces) > 0 && ints_get(braces, ints_len(braces) - 1) == 2 && parens == 0 && generics == 0 {
+                    newline = true;
+                }
+                if newline {
+                    let inline_comment = i + 1 < list_len(tokens) && list_get(tokens, i + 1).kind == 55 && line_at(c, list_get(tokens, i + 1).span.start) == line_at(c, t.span.end);
+                    if !inline_comment {
+                        format_line(parts, line, indent);
+                        line = "";
+                    }
+                }
+                previous_unary = unary;
+                previous_open_generic = open_generic;
+            }
+            if word == "{" || word == "}"
+            {
+                previous_unary = false;
+                previous_open_generic = false;
+            }
+            previous = word;
+            previous_end = t.span.end;
+        }
+        i = i + 1;
+    }
+    format_line(parts, line, indent);
+    let formatted = strings_join(parts, "");
+    let checked = make_context(formatted, c.source_name, c.json_mode);
+    lex(checked);
+    parse_module(checked);
+    if list_len(checked.tokens) != list_len(c.tokens) || list_len(checked.comments) != list_len(c.comments) {
+        eprint("velac: internal formatter token mismatch");
+        exit(70);
+    }
+    i = 0;
+    while i < list_len(c.tokens) {
+        let a = list_get(c.tokens, i);
+        let b = list_get(checked.tokens, i);
+        if a.kind != b.kind || a.text != b.text || str_slice(c.source_text, a.span.start, a.span.end) != str_slice(formatted, b.span.start, b.span.end) {
+            eprint("velac: internal formatter token mismatch");
+            exit(70);
+        }
+        i = i + 1;
+    }
+    i = 0;
+    while i < list_len(c.comments) {
+        if list_get(c.comments, i).text != list_get(checked.comments, i).text {
+            eprint("velac: internal formatter comment mismatch");
+            exit(70);
+        }
+        i = i + 1;
+    }
+    return formatted;
+}

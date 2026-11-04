@@ -1,0 +1,12 @@
+struct Pair { a: Int, b: String }
+enum Value { PairValue(Pair), Empty }
+fn values() -> List<Pair> effects { state } { return list_new<Pair>(); }
+fn main() -> Unit effects { state, io } {
+ let a = values(); list_push(a, Pair(b: "value", a: 1)); let alias = a;
+ var copy = list_get(a, 0); copy.a = 9; print(list_get(a, 0).a);
+ list_set(alias, 0, copy); print(list_get(a, 0).a);
+ let outer = list_new<List<Pair>>(); list_push(outer, a); print(list_get(list_get(outer, 0), 0).b);
+ let es = list_new<Value>(); list_push(es, Value::PairValue(copy));
+ match list_get(es, 0) { Value::PairValue(p) => { print(p.a); } Value::Empty => {} }
+ list_truncate(alias, 0); print(list_len(a));
+}

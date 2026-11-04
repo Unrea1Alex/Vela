@@ -1,0 +1,7 @@
+type Key = distinct String;
+fn main() -> Unit effects { state, io } {
+ let d = dict_new<Key, String>(); dict_set(d, Key("a\0b"), "first");
+ dict_set(d, Key("a\0c"), "second"); dict_set(d, Key("a" + "\0b"), "updated");
+ print(dict_len(d)); print(dict_get(d, Key("a\0b"))); print(dict_get(d, Key("a\0c")));
+ let b = dict_new<Bool, Int>(); dict_set(b, true, 42); dict_set(b, false, 7); print(dict_get(b, true));
+}

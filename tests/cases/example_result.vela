@@ -1,0 +1,20 @@
+// An application-specific error type: no implicit exceptions or null values.
+enum Division {
+    Value(Int),
+    ZeroDivisor,
+    Overflow,
+}
+
+fn divide(a: Int, b: Int) -> Division {
+    if b == 0 { return Division::ZeroDivisor; }
+    if a == -9223372036854775808 && b == -1 { return Division::Overflow; }
+    return Division::Value(a / b);
+}
+
+fn main() -> Unit effects { io } {
+    match divide(84, 2) {
+        Division::Value(number) => { print(number); }
+        Division::ZeroDivisor => { print("Cannot divide by zero."); }
+        Division::Overflow => { print("Result does not fit in Int."); }
+    }
+}

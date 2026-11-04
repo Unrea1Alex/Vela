@@ -1,0 +1,126 @@
+import "text.vela" as text;
+import "path.vela" as path;
+pub enum Error {
+    InvalidPath(path::Error),
+    Encoding(text::Error),
+    Limit(Int),
+    Io(String, String),
+    Cleanup(String, Bool)
+}
+fn valid(value: path::Path) -> Result < path::Path, Error > {
+    match path::checked(value.value) {
+        Result::Ok(p) => {
+            return Result < path::Path, Error >::Ok(p);
+        }
+        Result::Err(error) => {
+            return Result < path::Path, Error >::Err(Error::InvalidPath(error));
+        }
+    }
+}
+pub fn read_bytes(file: path::Path, limit: Int) -> Result < text::Bytes, Error > effects { io } {
+    let p = valid(file)?;
+    if limit < 0 || limit > 268435456 {
+        return Result < text::Bytes, Error >::Err(Error::Limit(limit));
+    }
+    match read_file_bounded(p.value, limit) {
+        ReadResult::Ok(data) => {
+            return Result < text::Bytes, Error >::Ok(text::Bytes(data: data));
+        }
+        ReadResult::Limit => {
+            return Result < text::Bytes, Error >::Err(Error::Limit(limit));
+        }
+        ReadResult::Err(message) => {
+            return Result < text::Bytes, Error >::Err(Error::Io(p.value, message));
+        }
+    }
+}
+pub fn read_text(file: path::Path, limit: Int) -> Result < text::Text, Error > effects { io } {
+    let data = read_bytes(file, limit)?;
+    match text::decode(data) {
+        Result::Ok(t) => {
+            return Result < text::Text, Error >::Ok(t);
+        }
+        Result::Err(error) => {
+            return Result < text::Text, Error >::Err(Error::Encoding(error));
+        }
+    }
+}
+fn written(value: WriteResult, file: String) -> Result<Bool, Error> {
+    match value {
+        WriteResult::Ok => {
+            return Result<Bool, Error>::Ok(true);
+        }
+        WriteResult::Err(message) => {
+            return Result<Bool, Error>::Err(Error::Io(file, message));
+        }
+    }
+}
+pub fn write_atomic(file: path::Path, data: text::Bytes) -> Result<Bool, Error> effects { io } {
+    let p = valid(file)?;
+    if str_len(data.data) > 268435456 {
+        return Result<Bool, Error>::Err(Error::Limit(268435456));
+    }
+    var absolute = "";
+    match absolute_path(p.value) {
+        StringResult::Ok(s) => {
+            absolute = s;
+        }
+        StringResult::Err(message) => {
+            return Result<Bool, Error>::Err(Error::Io(p.value, message));
+        }
+    }
+    var parent = "";
+    match path::parent(path::Path(value: absolute)) {
+        Result::Ok(value) => {
+            parent = value.value;
+        }
+        Result::Err(error) => {
+            return Result<Bool, Error>::Err(Error::InvalidPath(error));
+        }
+    }
+    var directory = "";
+    match temp_dir(parent) {
+        StringResult::Ok(s) => {
+            directory = s;
+        }
+        StringResult::Err(message) => {
+            return Result<Bool, Error>::Err(Error::Io(parent, message));
+        }
+    }
+    let temporary = directory + "/content";
+    var outcome = written(write_file(temporary, data.data), temporary);
+    var committed = false;
+    match outcome {
+        Result::Ok(_) => {
+            outcome = written(replace_file(temporary, absolute), absolute);
+            match outcome {
+                Result::Ok(_) => {
+                    committed = true;
+                }
+                Result::Err(_) => {}
+            }
+        }
+        Result::Err(_) => {}
+    }
+    if !committed {
+        // Missing temporary is harmless; remove_dir below confirms no file was left.
+        let removed = remove_file(temporary);
+    }
+    match remove_dir(directory) {
+        WriteResult::Ok => {}
+        WriteResult::Err(_) => {
+            return Result<Bool, Error>::Err(Error::Cleanup(directory, committed));
+        }
+    }
+    return outcome;
+}
+pub fn write_text_atomic(file: path::Path, data: text::Text) -> Result<Bool, Error> effects { io } {
+    match text::encode(data) {
+        Result::Ok(bytes) => {
+            return write_atomic(file, bytes);
+        }
+        Result::Err(error) => {
+            return Result<Bool, Error>::Err(Error::Encoding(error));
+        }
+    }
+}

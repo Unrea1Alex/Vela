@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vela-prototype"
+version = "0.2.0"
+description = "An experimental typed language with explicit effects and a native C backend"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+vela-python = "vela.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["vela*"]
+
+[tool.setuptools.package-data]
+"vela" = ["builtins.def"]
+"vela.backends" = ["runtime.h"]

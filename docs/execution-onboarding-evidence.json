@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "workspace": "G:\\Vela\\work\\execution-onboarding-NoyKJc",
+  "exit": 0,
+  "native_mcp_calls": [
+    {
+      "server": "vela",
+      "tool": "vela_get_context",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_check",
+      "status": "failed",
+      "result_status": "rejected"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_check",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_symbols",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_check",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_format",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_build",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_test",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_run",
+      "status": "completed",
+      "result_status": "ok"
+    }
+  ],
+  "skill_path": "",
+  "skill_disk_read": false,
+  "skill_activation": "Client automatically supplies activated skill instructions; disk reading is recorded separately.",
+  "notes": "Skill-file read denied by policy for G:\\Vela\\work\\execution-onboarding-NoyKJc\\.agents\\skills\\vela-app\\SKILL.md; used automatically supplied instructions instead. No skill file was actually read.\nDeliberate invalid draft rejected: E201 at main.vela:2:5–2:22, Expected Int, found String. Corrected source uses the matching installed JSON module, explicit numeric conversion and Float64 display formatting. Native help → check → build → test → run completed successfully. All 3 named tests passed. Run with no arguments exited 0; stdout exactly \"count=3 total=10.5 mean=3.5\\r\\n\", stderr empty. Source remained an unsaved main.vela overlay; no workspace files, connection settings or hashes changed.",
+  "passed": true
+}

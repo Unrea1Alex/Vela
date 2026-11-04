@@ -1,0 +1,17 @@
+fn identity(path: String) -> String effects { io } {
+    match file_identity(path) {
+        StringResult::Ok(value) => { return value; }
+        StringResult::Err(message) => { eprint(message); return "error"; }
+    }
+}
+fn main() -> Unit effects { io } {
+    let first = identity("@ROOT@/README.md");
+    print(first != "" && first != "error");
+    print(first == identity("@ROOT@/./README.md"));
+    print(first != identity("@ROOT@/AGENTS.md"));
+    print(identity("@TMP@/missing-file") == "");
+    match file_identity("bad\0path") {
+        StringResult::Ok(_) => { print("unexpected success"); }
+        StringResult::Err(_) => { print("rejected NUL"); }
+    }
+}

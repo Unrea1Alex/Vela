@@ -1,0 +1,1 @@
+enum E<T>{V(T)} enum F<T>{V(T)} fn f(x:E<Int>)->Int {match x {F::V(n)=>{return n;}}} fn main()->Unit{}

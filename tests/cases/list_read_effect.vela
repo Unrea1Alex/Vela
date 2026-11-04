@@ -1,0 +1,1 @@
+fn size(items: IntList) -> Int { return ints_len(items); } fn main() -> Unit {}

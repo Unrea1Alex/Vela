@@ -1,0 +1,10 @@
+// Compiles, then exits with code 70 and a source-located precondition failure.
+fn positive(n: Int) -> Int
+    requires n > 0;
+{
+    return n;
+}
+
+fn main() -> Unit effects { io } {
+    print(positive(-1));
+}

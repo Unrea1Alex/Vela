@@ -1,0 +1,4 @@
+fn main() -> Unit effects { io } {
+    print("Hello from Vela!");
+    print(6 * 7);
+}

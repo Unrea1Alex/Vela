@@ -1,0 +1,66 @@
+type Distance = distinct Float64;
+struct Reading { value: Float64 }
+fn twice<T: Number>(n: T) -> T { return n + n; }
+fn expect(ok: Bool) -> Unit effects { process } { if !ok { exit(17); } }
+fn parsed(text: String) -> Float64 effects { process } {
+    return match parse_float(text) { FloatResult::Ok(n) => n, FloatResult::Err(_) => fail() };
+}
+fn fail() -> Float64 effects { process } { exit(18); return 0.0; }
+fn rejected(text: String) -> Bool {
+    return match parse_float(text) { FloatResult::Ok(_) => false, FloatResult::Err(_) => true };
+}
+fn main() -> Int effects { io, state, process } {
+    expect(twice(1.25) == 2.5);
+    expect(twice(2) == 4);
+    expect(1e2 + 0.5 == 100.5);
+    expect(5.0 / 2.0 == 2.5 && 4.0 * 0.25 == 1.0);
+    expect(3.0 - 5.0 == -2.0);
+    expect(1.0 < 2.0 && 1.0 <= 1.0 && 2.0 > 1.0 && 2.0 >= 2.0);
+    expect(Distance(1.0) == Distance(1.0));
+    let values = list_new<Reading>();
+    list_push(values, Reading(value: 1.25));
+    expect(list_get(values, 0).value == 1.25);
+    let map = dict_new<String, Float64>();
+    dict_set(map, "x", 2.25);
+    expect(dict_get(map, "x") == 2.25);
+    let zero = -0.0;
+    expect(zero == 0.0 && float_to_string(zero) == "-0");
+    let infinity = 1.0 / 0.0;
+    let nan = 0.0 / 0.0;
+    expect(!float_is_finite(infinity) && float_is_nan(nan));
+    expect(nan != nan && !(nan == nan) && !(nan < 0.0) && !(nan >= 0.0));
+    expect(float_to_string(infinity) == "inf" && float_to_string(1.0 / zero) == "-inf");
+    expect(!float_is_finite(1e308 * 10.0));
+    expect(float_floor(-1.5) == -2.0 && float_ceil(-1.5) == -1.0);
+    expect(float_round(2.5) == 3.0 && float_round(-2.5) == -3.0);
+    expect(float_round(infinity) == infinity && float_is_nan(float_floor(nan)));
+    expect(float_from_int(9007199254740993) == 9007199254740992.0);
+    match float_to_int(-2.9) { IntResult::Ok(n) => { expect(n == -2); } IntResult::Err(_) => { exit(19); } }
+    match float_to_int(-9223372036854775808.0) { IntResult::Ok(n) => { expect(n == -9223372036854775808); } IntResult::Err(_) => { exit(20); } }
+    for bad in list_bad_numbers() {
+        match float_to_int(bad) { IntResult::Ok(_) => { exit(21); } IntResult::Err(_) => {} }
+    }
+    expect(parsed("1.7976931348623157e308") == 1.7976931348623157e308);
+    expect(parsed("4.9406564584124654e-324") > 0.0);
+    expect(parsed("1e-9999") == 0.0);
+    expect(parsed("+12.5e-1") == 1.25);
+    expect(float_is_nan(parsed("nan")) && parsed("+inf") == infinity);
+    expect(rejected("1e309") && rejected("1,5") && rejected(" 1") && rejected("1 "));
+    expect(rejected("0x1p0") && rejected(".5") && rejected("1.") && rejected("1e+") && rejected("1\0"));
+    expect(parsed(float_to_string(1.2345678901234567)) == 1.2345678901234567);
+    var total = 0;
+    for n in 1..3 { total = total + n; }
+    expect(total == 3);
+    print(f"float={2.5:display}");
+    print(Distance(-1.5));
+    print("float checks passed");
+    return 0;
+}
+fn list_bad_numbers() -> List<Float64> effects { state } {
+    let values = list_new<Float64>();
+    list_push(values, 9223372036854775808.0);
+    list_push(values, -1e20);
+    list_push(values, 1.0 / 0.0);
+    list_push(values, 0.0 / 0.0);
+    return values;
+}

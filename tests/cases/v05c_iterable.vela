@@ -1,0 +1,1 @@
+fn main()->Unit{for x in "text" {}}

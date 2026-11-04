@@ -1,0 +1,216 @@
+import "model.vela";
+import "core.vela";
+import "source.vela";
+import "lexer.vela";
+import "parser.vela";
+import "modules.vela";
+import "projects.vela";
+import "semantic.vela";
+import "formatter.vela";
+import "emitter.vela";
+import "driver.vela";
+import "types.vela";
+pub fn capture_data(data: String) -> String effects { state } {
+    if utf8_valid(data) {
+        return data;
+    }
+    let parts = strings_new();
+    let digits = "0123456789abcdef";
+    for i in 0 .. str_len(data) {
+        let b = str_byte(data, i);
+        strings_push(parts, str_slice(digits, b / 16, b / 16 + 1));
+        strings_push(parts, str_slice(digits, b % 16, b % 16 + 1));
+    }
+    return strings_join(parts, "");
+}
+pub fn capture_encoding(data: String) -> String {
+    if utf8_valid(data) {
+        return "utf8";
+    }
+    return "hex";
+}
+pub fn project_test(p: Project, json_mode: Bool) -> Int effects { state, io, process } {
+    let paths = list_new<String>();
+    if p.manifest == "" {
+        list_push(paths, p.entry);
+    } else {
+        if list_len(p.tests) == 0 {
+            project_fail(p.entry, "E225", "Project has no test entries.", json_mode);
+        }
+        for path in p.tests {
+            list_push(paths, path);
+        }
+    }
+    let reports = strings_new();
+    var passed = 0;
+    var failed = 0;
+    var infrastructure = false;
+    for path in paths {
+        let c = project_module_context(path, path, load_source(path, json_mode), json_mode, p.dependencies);
+        parse_program(c);
+        analyze(c);
+        let entries = list_new<SymbolId>();
+        let names = list_new<String>();
+        for declaration in c.bound_functions {
+            if declaration.test_name != ""&& source_unit_at(c, declaration.span.start) == 0 {
+                list_push(entries, find_symbol(c, c.signatures, declaration.name));
+                list_push(names, declaration.test_name);
+            }
+        }
+        if list_len(entries) == 0 {
+            list_push(entries, find_symbol(c, c.signatures, "main"));
+            list_push(names, "main");
+        }
+        for index in 0 .. list_len(entries) {
+            let entry = list_get(entries, index);
+            let name = list_get(names, index);
+            let generated = generate_entry(c, entry);
+            let dir = io_value(temp_dir(""));
+            let exe = dir + "/test.exe";
+            var exit_code = build_or_run_native(generated, exe, strings_new(), false, p.natives);
+            var status = "build_error";
+            var out = "";
+            var err = "";
+            if exit_code == 0 {
+                let args = strings_new();
+                strings_push(args, exe);
+                match process_run_at(args, dir, dir + "/stdout", dir + "/stderr", 30000) {
+                    ProcessResult::Exited(code) => {
+                        exit_code = code;
+                        status = "failed";
+                        if code == 0 {
+                            status = "passed";
+                        }
+                    }
+                    ProcessResult::TimedOut => {
+                        exit_code = 124;
+                        status = "timeout";
+                    }
+                    ProcessResult::Err(message) => {
+                        exit_code = 2;
+                        err = message;
+                    }
+                }
+                match read_file_bounded(dir + "/stdout", 4194304) {
+                    ReadResult::Ok(data) => {
+                        out = data;
+                    }
+                    ReadResult::Limit => {
+                        status = "failed";
+                        err = err + "stdout capture exceeds 4 MiB";
+                    }
+                    ReadResult::Err(_) => {}
+                }
+                match read_file_bounded(dir + "/stderr", 4194304) {
+                    ReadResult::Ok(data) => {
+                        err = err + data;
+                    }
+                    ReadResult::Limit => {
+                        status = "failed";
+                        err = err + "stderr capture exceeds 4 MiB";
+                    }
+                    ReadResult::Err(_) => {}
+                }
+            }
+            if status == "build_error" {
+                infrastructure = true;
+            }
+            ignored_write(remove_file(dir + "/stdout"));
+            ignored_write(remove_file(dir + "/stderr"));
+            ignored_write(remove_file(exe));
+            for native in p.natives { ignored_write(remove_file(dir + "/" + native.name)); }
+            var artifact = "";
+            match remove_dir(dir) {
+                WriteResult::Ok => {}
+                WriteResult::Err(_) => {
+                    artifact = dir;
+                }
+            }
+            if status == "passed" {
+                passed = passed + 1;
+            } else {
+                failed = failed + 1;
+            }
+            strings_push(reports, "{\"name\":" + json_string(name) + ",\"source\":" + json_string(path) + ",\"span\":" + span_json(c, symbol_info(c, entry).span) + ",\"status\":" + json_string(status) + ",\"exit_code\":" + to_string(exit_code) + ",\"stdout\":" + json_string(capture_data(out)) + ",\"stderr\":" + json_string(capture_data(err)) + ",\"stdout_encoding\":" + json_string(capture_encoding(out)) + ",\"stderr_encoding\":" + json_string(capture_encoding(err)) + ",\"artifact_dir\":" + json_string(artifact) + "}");
+            if !json_mode {
+                print(path + " [" + name + "]: " + status + " (exit " + to_string(exit_code) +")");
+                if out != "" {
+                    write_stdout(out);
+                }
+                if err != "" {
+                    eprint(err);
+                }
+                if artifact != "" {
+                    print("Artifacts: " + artifact);
+                }
+            }
+        }
+    }
+    if json_mode {
+        print("{\"schema_version\":2,\"ok\":" + to_string(failed == 0) + ",\"passed\":" + to_string(passed) + ",\"failed\":" + to_string(failed) + ",\"tests\":[" + strings_join(reports,",") + "]}");
+    }
+    if infrastructure {
+        return 2;
+    }
+    if failed != 0 {
+        return 1;
+    }
+    return 0;
+}
+pub fn project_format(p: Project, checking: Bool, writing: Bool, json_mode: Bool) -> Int effects { state, io, process } {
+    if !checking && !writing {
+        eprint("fmt PROJECT requires --check or --write.");
+        return 2;
+    }
+    let excluded = list_new<String>();
+    for dep in p.dependencies {
+        let c = project_module_context(dep.path, dep.path, load_source(dep.path, json_mode), json_mode, p.dependencies);
+        for unit in c.source_units {
+            list_push(excluded, unit.identity);
+        }
+    }
+    let entries = list_new<String>();
+    list_push(entries, p.entry);
+    for test in p.tests {
+        list_push(entries, test);
+    }
+    let visited = list_new<String>();
+    let root = path_key(parent_path(p.manifest));
+    var status = 0;
+    for entry in entries {
+        let c = project_module_context(entry, entry, load_source(entry, json_mode), json_mode, p.dependencies);
+        for unit in c.source_units {
+            var selected = true;
+            for id in excluded {
+                if unit.identity == id {
+                    selected = false;
+                }
+            }
+            for id in visited {
+                if unit.identity == id {
+                    selected = false;
+                }
+            }
+            let path = path_key(unit.path);
+            if str_len(path) < str_len(root) || str_slice(path, 0, str_len(root)) != root {
+                selected = false;
+            }
+            if selected {
+                list_push(visited, unit.identity);
+                let local = make_context(unit.code, unit.path, json_mode);
+                lex(local);
+                parse_module(local);
+                let formatted = format_source(local);
+                if io_value(read_file(unit.path)) != formatted {
+                    if checking {
+                        eprint("Needs formatting: " + unit.path);
+                        status = 1;
+                    } else {
+                        write_atomic(unit.path, formatted);
+                    }
+                }
+            }
+        }
+    }
+    return status;
+}

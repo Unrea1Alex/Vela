@@ -1,0 +1,13 @@
+{
+  "version": "0.5.0",
+  "date": "2026-11-04",
+  "compiler_input": "bootstrap/velac.c",
+  "sha256": "b522c8b6d399096bcb377557c32ab096f86a7f1fe5b3b7d68e36cb26ca11d3d4",
+  "toolchain": "MSVC C11 x64",
+  "requires_prior_vela": false,
+  "requires_python": false,
+  "version_output": "Vela 0.5.0 (self-hosted)",
+  "self_source_check": true,
+  "pipeline_output": "total=10\ninvalid input rejected\n",
+  "log_directory": "build/stage05/recovery"
+}

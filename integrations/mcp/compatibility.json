@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "version": "0.7.0",
+  "sdk": "2.4.0",
+  "node": ">=24",
+  "wire": [
+    "2025-11-25",
+    "2026-07-28"
+  ],
+  "clients": [],
+  "files": {
+    "bin/velac.exe": "b4a8f64ada2925b3410c8aed84447cea0a45d8df5fa3f4693633eb862e62b199",
+    "vela/builtins.def": "554f8a5a458b7cf7194c1abec5e786acfdd5544525393254b3777a9c83a9bdb8",
+    "vela/backends/runtime.h": "28b017223577256293da7d09d9fe343515fdd66a756cf9d76b26752ce1e7329f",
+    "docs/AGENT-QUICKSTART.md": "90a9b00f3e28d7a94f77f7ffebff6c9b307d64fa1567e32899d0ad1da0e09de6",
+    "docs/LANGUAGE.md": "794b6cc7d0b6be301f3a93b01c7c3746d57b0b3c44a75309fc7c3e280b8e41a0",
+    "docs/PROJECTS.md": "a57daf81c2eb0ff767034812db0b13e3b2370e3ea1f19d0c3a3fd606c6d7a5fc",
+    "docs/contracts/MODULES.md": "0f6f64ac54fdd34f5ba69a9b163d364af6bc4217c91720b219f9ee3bdf86bc27",
+    "docs/MEMORY.md": "33a52bc80fcaa629d21f83a78e086cb74d596e7d7baad647255726c61225d72d",
+    "examples/agent-idioms/main.vela": "8918b3018f6d9115ab5c506a6486dbb6587c87e3713debb2f6cc04a958402b05",
+    "docs/contracts/NUMBERS.md": "23efe77badad3568dd96c2c28a0f488698da55f45787e31fcde3b94876ac7bb7",
+    "docs/STDLIB.md": "fd8c579c8a6e7a963dd2182e94d8d35487e4522c48e44ca8c08fef5c2ef270f4",
+    "docs/contracts/TESTING.md": "2140e52a334c9e47529319641dc53a10e0a5e25b3638970cd171e375fdf27d96",
+    "docs/contracts/FFI.md": "e3bca368244dca599b0bb7340845d3ae73825cd190a9fb739e8db23b8299e1c5",
+    "vela/ffi.h": "d3fe86a7219805ecaf47bc1a04f734451a2967defd3e6754363749be3756216a",
+    "std/text.vela": "3bfa82867871c4dfed849b4c51eb788290cf260e078e8f3612bc58d5a03ee2eb",
+    "std/path.vela": "056ed5f8a2c9e687d14b9dfcca047e3f83d0a7f8f4979e7ddce0f4e83e0f14c9",
+    "std/collections.vela": "6f1455003baa002042c3f02f827f57180e871ca1aa9de210e627073b1fed3f48",
+    "std/json.vela": "580a2398af8e0850a0cf14980f59f72bcf6c83c96be0492571bbf41af68ffb0b",
+    "std/cli.vela": "0f1e63ea76a01fe9f3c0addd5840147bb66b73006cf62a5da6dfef8e11781e88",
+    "std/config.vela": "5db9ca475459b0199de2e483a5c066f6c90c11cd78d9d653bd6b7cbf0eb3039f",
+    "std/fs.vela": "408bed63894beb49cecdc9e8edd12cedff27825f7923770b2b66d1019d1b5b59",
+    "std/process.vela": "1d33cf6f3775da2592f276fedecf26f401946d05e81e05cfae9498f81bc78781",
+    "std/testing.vela": "6ceea6af4572e9b3536e272fb7cb86209778d55feae015ee36681bb1d866b1d3"
+  }
+}

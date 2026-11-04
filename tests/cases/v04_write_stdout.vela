@@ -1,0 +1,4 @@
+fn main() -> Unit effects { io } {
+    write_stdout("first\n");
+    write_stdout("second");
+}

@@ -1,0 +1,1 @@
+fn main()->Unit effects {io}{let i=9;for i in 1..2 {for i in 2..3 {print(i);}print(i);}print(i);}

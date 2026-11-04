@@ -1,0 +1,52 @@
+// Windows acceptance probe: a comma-decimal process locale must not change Float64 I/O.
+fn text(r: StringResult) -> String effects { process } {
+    return match r {
+        StringResult::Ok(s) => s, StringResult::Err(_) => fail()
+    };
+}
+fn fail() -> String effects { process } {
+    exit(2);
+    return "";
+}
+fn written(r: WriteResult) -> Unit effects { process } {
+    match r {
+        WriteResult::Ok => {}
+        WriteResult::Err(_) => {
+            exit(2);
+        }
+    }
+}
+fn main() -> Int effects { state, io, process } {
+    if platform() != "windows" {
+        eprint("This gate requires Windows UCRT locales.");
+        return 2;
+    }
+    let source_path = text(absolute_path("build/stage07/float-locale.c"));
+    let executable = text(absolute_path("build/stage07/float-locale.exe"));
+    let object_file = text(absolute_path("build/stage07/float-locale.obj"));
+    let runtime = text(read_file("vela/backends/runtime.h"));
+    let body = "\nint main(int argc, char **argv) { v_argc=argc; v_argv=argv; v_runtime_init();\n" + "if (!setlocale(LC_NUMERIC, \"German_Germany.1252\") || strcmp(localeconv()->decimal_point, \",\")) return 91;\n" + "v_float_parse p=v_parse_float(v_text(\"1.25\",4),\"probe\",1,1); if(!p.ok || p.value!=1.25) return 92;\n" + "if(v_parse_float(v_text(\"1,25\",4),\"probe\",1,1).ok) return 93;\n" + "v_print_Float64(p.value,\"probe\",1,1);\n" + "if(strcmp(localeconv()->decimal_point, \",\")) return 94;\n" + "return 0; }\n";
+    written(write_file(source_path, runtime + body));
+    let args = strings_new();
+    strings_push(args, env("VELA_CC"));
+    strings_push(args, "/nologo");
+    strings_push(args, "/std:c11");
+    strings_push(args, "/O2");
+    strings_push(args, "/fp:strict");
+    strings_push(args, "/MT");
+    strings_push(args, "/Fo" + object_file);
+    strings_push(args, "/Fe" + executable);
+    strings_push(args, source_path);
+    if process_run_files(args, "build/stage07/float-locale-build.out", "build/stage07/float-locale-build.err", 30000) != 0 {
+        return 3;
+    }
+    let run = strings_new();
+    strings_push(run, executable);
+    let status = process_run_files(run, "build/stage07/float-locale.out", "build/stage07/float-locale.err", 10000);
+    let actual = text(read_file("build/stage07/float-locale.out"));
+    if status != 0 || (actual != "1.25\r\n" && actual != "1.25\n") {
+        return 4;
+    }
+    print("Float64 comma-locale isolation passed");
+    return 0;
+}

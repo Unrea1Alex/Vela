@@ -1,0 +1,1 @@
+type A = distinct IntList; fn main() -> Unit {}

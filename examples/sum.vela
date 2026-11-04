@@ -1,0 +1,26 @@
+// Sum any number of signed 64-bit integer arguments.
+// python -m vela run examples/sum.vela -- 12 -5 30
+fn main() -> Int effects { io, args } {
+    if arg_count() == 0 {
+        print("Usage: sum <integer> [integer ...]");
+        return 2;
+    }
+    var total = 0;
+    var index = 0;
+    while index < arg_count() {
+        match arg_int(index) {
+            IntResult::Ok(value) => {
+                total = total + value;
+            }
+            IntResult::Err(message) => {
+                print("Invalid argument at zero-based index:");
+                print(index);
+                print(message);
+                return 2;
+            }
+        }
+        index = index + 1;
+    }
+    print(total);
+    return 0;
+}

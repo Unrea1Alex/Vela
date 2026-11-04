@@ -1,0 +1,1 @@
+fn main() -> Unit effects { state } { let arguments = strings_new(); let status = process_run(arguments); }

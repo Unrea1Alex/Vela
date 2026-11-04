@@ -1,0 +1,1 @@
+fn main() -> Unit effects { state } { let items = ints_new(); ints_push(items, "wrong"); }

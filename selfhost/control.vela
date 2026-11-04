@@ -1,0 +1,49 @@
+import "model.vela";
+import "core.vela";
+import "types.vela";
+import "semantic.vela";
+pub fn block_exits(c: Context, items: List<StmtId>) -> Bool effects { state, io, process } {
+    return match last(items) {
+        Option::Some(id) => checked_stmt(c, id).exits, Option::None => false
+    };
+}
+pub fn enter_loop(c: Context) -> Unit effects { state } {
+    var ctl = list_get(c.control, 0);
+    ctl.loop_depth = ctl.loop_depth + 1;
+    list_set(c.control, 0, ctl);
+}
+pub fn leave_loop(c: Context) -> Unit effects { state } {
+    var ctl = list_get(c.control, 0);
+    ctl.loop_depth = ctl.loop_depth - 1;
+    list_set(c.control, 0, ctl);
+}
+pub fn check_for(c: Context, syntax: SyntaxStmt) -> CheckedStmt effects { state, io, process } {
+    var n = statement_record(141, syntax.span);
+    n.mode = syntax.mode;
+    n.value = check_expr(c, syntax.value);
+    let t = checked_expr(c, n.value).type_id;
+    var element = int_type();
+    if n.mode != 0 {
+        require_type(c, t, int_type(), syntax.span);
+        n.target = check_expr(c, syntax.target);
+        require_type(c, checked_expr(c, n.target).type_id, int_type(), syntax.span);
+    } else {
+        if t == strings_type() {
+            element = string_type();
+        } else if t == ints_type() {
+            element = int_type();
+        } else if type_kind(c, t) == 75 && list_len(type_info(c, t).arguments) == 1 {
+            element = list_get(type_info(c, t).arguments, 0);
+        } else {
+            bad(c, "E201", "for expects a list or an Int range.", syntax.span);
+        }
+        require_effects(c, find_symbol(c, c.signatures, "list_len"), syntax.span);
+    }
+    push_scope(c);
+    n.binding = bind(c, syntax.name, element, false, syntax.span, false);
+    enter_loop(c);
+    n.yes = check_block(c, syntax.yes, false);
+    leave_loop(c);
+    pop_scope(c);
+    return n;
+}

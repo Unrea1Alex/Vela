@@ -1,0 +1,5 @@
+fn main() -> Unit effects { state, io } {
+            let s = strings_new(); print(strings_join(s, ","));
+            strings_push(s, "one"); strings_push(s, "two"); strings_set(s, 1, "three");
+            print(strings_join(s, ":")); strings_truncate(s, 1); print(strings_get(s, 0));
+        }

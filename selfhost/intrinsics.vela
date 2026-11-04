@@ -1,0 +1,143 @@
+import "model.vela";
+import "core.vela";
+import "types.vela";
+import "emitter.vela";
+// Intrinsic lowering uses resolved signatures and checked arguments only.
+pub fn emit_lvalue(c: Context, id: ExprId) -> String effects { state, io, process } {
+    let n = checked_expr(c, id);
+    if n.kind == 104 {
+        return local_name(n.symbol);
+    }
+    return emit_lvalue(c, n.left) + ".v_m_" + symbol_info(c, n.symbol).name;
+}
+pub fn cc_call(name: String, args: StringList) -> String effects { state } {
+    return name + "("+ strings_join(args, ", ") +")";
+}
+pub fn emit_builtin(c: Context, n: CheckedExpr, args: StringList) -> String effects { state, io, process } {
+    let sig = symbol_info(c, n.symbol);
+    let abi = sig.abi;
+    let t = n.type_id;
+    let loc = location(c, n.span);
+    if abi == "print" || abi == "format" {
+        let original = checked_expr(c, list_get(n.arguments, 0)).type_id;
+        let scalar = scalar_type(c, original);
+        var value = strings_get(args, 0);
+        if type_kind(c, original) == 77 {
+            value = value + ".v_m_value";
+        }
+        strings_set(args, 0, value);
+        strings_push(args, loc);
+        if abi == "print" {
+            return cc_call("v_print_" + type_name(c, scalar), args);
+        }
+        if scalar == string_type() {
+            return value;
+        }
+        if scalar == bool_type() {
+            return "("+ value + " ? v_text(\"true\", 4) : v_text(\"false\", 5))";
+        }
+        if scalar == float_type() { return cc_call("v_float_to_string", args); }
+        return cc_call("v_int_to_string", args);
+    }
+    if str_len(abi) >= 5 && str_slice(abi, 0, 5) == "list_" {
+        if abi == "list_new" {
+            strings_push(args, "sizeof(" + ctype(c, list_get(type_info(c, t).arguments, 0)) +")");
+        }
+        if abi == "list_push" {
+            strings_set(args, 1, "&" + strings_get(args, 1));
+        }
+        if abi == "list_set" {
+            strings_set(args, 2, "&" + strings_get(args, 2));
+        }
+        strings_push(args, loc);
+        let code = cc_call("v_" + abi, args);
+        if abi == "list_get" {
+            return "*(" + ctype(c, t) + "*)" + code;
+        }
+        return code;
+    }
+    if str_len(abi) >= 5 && str_slice(abi, 0, 5) == "dict_" {
+        if abi == "dict_new" {
+            let types = type_info(c, t).arguments;
+            let scalar = scalar_type(c, list_get(types, 0));
+            strings_push(args, "sizeof(" + ctype(c, scalar) +")");
+            strings_push(args, "sizeof(" + ctype(c, list_get(types, 1)) +")");
+            var kind = 1;
+            if scalar == bool_type() {
+                kind = 2;
+            } else if scalar == string_type() {
+                kind = 3;
+            }
+            strings_push(args, num(kind));
+        } else if abi != "dict_len" {
+            let collection = checked_expr(c, list_get(n.arguments, 0)).type_id;
+            let key_type = list_get(type_info(c, collection).arguments, 0);
+            var key = strings_get(args, 1);
+            if type_kind(c, key_type) == 77 {
+                key = key + ".v_m_value";
+            }
+            strings_set(args, 1, "&" + key);
+            if abi == "dict_set" || abi == "dict_get_or" {
+                strings_set(args, 2, "&" + strings_get(args, 2));
+            }
+        }
+        strings_push(args, loc);
+        let code = cc_call("v_" + abi, args);
+        if abi == "dict_get" || abi == "dict_get_or" {
+            return "*(" + ctype(c, t) + "*)" + code;
+        }
+        return code;
+    }
+    if abi != "plain" && abi != "int_result" {
+        strings_push(args, loc);
+    }
+    var code = cc_call("v_" + sig.name, args);
+    if abi == "int_result" {
+        code = "v_result(" + code +")";
+    }
+    if abi == "string_result" {
+        code = "v_string_result(" + code +")";
+    }
+    if abi == "write_result" {
+        code = "v_write_result(" + code +")";
+    }
+    if abi == "float_result" { code = "v_float_result(" + code + ")"; }
+    if abi == "int32_result" { code = "v_int32_result(" + code + ")"; }
+    if abi == "read_result" { code = "v_read_result(" + code + ")"; }
+    if abi == "process_result" { code = "v_process_result_value(" + code + ")"; }
+    return code;
+}
+pub fn foreign_ctype(c: Context, t: TypeId) -> String effects { state, io, process } {
+    if t == foreign_handle_type() { return "void*"; }
+    if t == string_type() { return "VelaBytes"; }
+    if t == bool_type() { return "int32_t"; }
+    if t == unit_type() { return "void"; }
+    return ctype(c, t);
+}
+pub fn emit_foreign(c: Context, n: CheckedExpr, args: StringList) -> String effects { state, io, process } {
+    let sig = symbol_info(c, n.symbol);
+    let loc = location(c, n.span);
+    let library = raw_temp(c, "v_foreign_library*", "v_foreign_require(" + cquote(sig.foreign_library) + ", " + loc + ")");
+    let types = strings_new();
+    for i in 0 .. list_len(sig.parameters) {
+        let t = symbol_info(c, list_get(sig.parameters, i)).type_id;
+        strings_push(types, foreign_ctype(c, t));
+        if t == foreign_handle_type() {
+            strings_set(args, i, raw_temp(c, "void*", "v_foreign_unwrap(" + strings_get(args, i) + ", " + library + ", " + loc + ")"));
+        } else if t == string_type() {
+            strings_set(args, i, "(VelaBytes){" + strings_get(args, i) + ".data, (uint64_t)" + strings_get(args, i) + ".length}");
+        }
+    }
+    if strings_len(types) == 0 { strings_push(types, "void"); }
+    let pointer = raw_temp(c, "v_foreign_proc", "v_foreign_symbol(" + library + ", " + cquote(sig.foreign_name) + ", " + loc + ")");
+    let environment = raw_temp(c, "fenv_t", "{0}");
+    emit(c, "if (fegetenv(&" + environment + ")) v_panic(" + loc + ", \"cannot save floating-point environment\");");
+    let call = "((" + foreign_ctype(c, n.type_id) + " (*)(" + strings_join(types, ", ") + "))" + pointer + ")(" + strings_join(args, ", ") + ")";
+    var returned = "0";
+    if n.type_id == unit_type() { emit(c, call + ";"); }
+    else { returned = raw_temp(c, foreign_ctype(c, n.type_id), call); }
+    emit(c, "if (fesetenv(&" + environment + ")) v_panic(" + loc + ", \"cannot restore floating-point environment\");");
+    if n.type_id == foreign_handle_type() { return temp(c, n.type_id, "v_foreign_wrap(" + returned + ", " + library + ", " + loc + ")"); }
+    if n.type_id == bool_type() { emit(c, "if (" + returned + " != 0 && " + returned + " != 1) v_panic(" + loc + ", \"foreign Bool must be 0 or 1\");"); }
+    return returned;
+}

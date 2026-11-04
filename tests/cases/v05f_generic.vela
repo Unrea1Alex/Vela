@@ -1,0 +1,2 @@
+struct Box<T>{value:T} fn id<T>(x:T)->T{return x;}
+fn main()->Unit effects {io}{print(f"{id(Box<Int>(value:9)).value:d}");}

@@ -1,0 +1,38 @@
+[
+  {
+    "compiler": "baseline",
+    "elapsed_ms": 41,
+    "peak_working_set_bytes": 27934720,
+    "exit_code": 0
+  },
+  {
+    "compiler": "baseline",
+    "elapsed_ms": 41,
+    "peak_working_set_bytes": 8044544,
+    "exit_code": 0
+  },
+  {
+    "compiler": "baseline",
+    "elapsed_ms": 31,
+    "peak_working_set_bytes": 17780736,
+    "exit_code": 0
+  },
+  {
+    "compiler": "typed",
+    "elapsed_ms": 45,
+    "peak_working_set_bytes": 27017216,
+    "exit_code": 0
+  },
+  {
+    "compiler": "typed",
+    "elapsed_ms": 46,
+    "peak_working_set_bytes": 27496448,
+    "exit_code": 0
+  },
+  {
+    "compiler": "typed",
+    "elapsed_ms": 45,
+    "peak_working_set_bytes": 27500544,
+    "exit_code": 0
+  }
+]

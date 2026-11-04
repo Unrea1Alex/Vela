@@ -1,0 +1,11 @@
+import "math.vela" as math;
+fn main() -> Int effects { io, state } {
+    let values = list_new<Int>();
+    list_push(values, 20);
+    list_push(values, 22);
+    var total = 0;
+    for value in values { total = total + value; }
+    print(f"total={total:d}");
+    print(math::twice(21));
+    return 0;
+}

@@ -1,0 +1,24 @@
+extern "vela-gui-prototype.dll" fn gui_open(title: String) -> ForeignHandle effects { state, process, io };
+extern "vela-gui-prototype.dll" fn gui_caption(window: ForeignHandle, text: String) -> Bool effects { state, process, io };
+extern "vela-gui-prototype.dll" fn gui_poll(window: ForeignHandle, wait_ms: Int) -> Int effects { state, process, io };
+fn main() -> Unit effects { state, process, io } {
+    let invalid = gui_open("bad\0title");
+    assert_true(ffi_is_null(invalid), "invalid title");
+    let window = gui_open("Vela 0.7 — GUI prototype");
+    assert_true(!ffi_is_null(window), "window creation");
+    assert_true(!gui_caption(window, str_from_byte(255)), "invalid UTF-8");
+    assert_true(gui_poll(window, -1) == -1 && gui_poll(window, 101) == -1, "wait bounds");
+    var count = 0;
+    assert_true(gui_caption(window, "Счётчик Vela: 0"), "initial label");
+    var running = true;
+    while running {
+        let event = gui_poll(window, 50);
+        if event == 1 {
+            count = count + 1;
+            assert_true(gui_caption(window, f"Счётчик Vela: {count:d}"), "updated label");
+        } else if event == 2 { running = false; }
+        else { assert_true(event == 0, "queue overflow or invalid poll"); }
+    }
+    match ffi_close(window, "gui_close") { WriteResult::Ok => {} WriteResult::Err(e) => { assert_true(false, e); } }
+    print(f"gui closed; count={count:d}");
+}

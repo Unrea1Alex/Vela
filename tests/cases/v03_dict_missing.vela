@@ -1,0 +1,1 @@
+fn main() -> Unit effects { state } { let d = dict_new<String, Int>(); let v = dict_get(d, "missing"); }

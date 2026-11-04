@@ -1,0 +1,3 @@
+fn step(ok:Bool)->Result<Int,String> { if ok {return Result<Int,String>::Ok(7);} return Result<Int,String>::Err("bad"); }
+fn work(ok:Bool)->Result<String,String> effects {io} {let n=step(ok)?; print("after"); return Result<String,String>::Ok(to_string(n));}
+fn main()->Unit effects {io} {print(match work(true) {Result::Ok(x)=>x,Result::Err(e)=>e}); print(match work(false) {Result::Ok(x)=>x,Result::Err(e)=>e});}

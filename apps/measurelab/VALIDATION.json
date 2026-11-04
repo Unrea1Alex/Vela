@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "application": "MeasureLab",
+  "version": "1.0",
+  "vela_version": "0.7.0",
+  "platform": "Windows x64/MSVC",
+  "status": "verified",
+  "native_tests": {
+    "passed": 12,
+    "failed": 0,
+    "report": "named-tests.json"
+  },
+  "cli": {
+    "passed": 28,
+    "failed": 0,
+    "report": "cli-tests.json",
+    "windows_powershell_5_1": true,
+    "without_node_or_python_in_path": true,
+    "maximum_scenarios": 12,
+    "maximum_samples_per_scenario": 256
+  },
+  "mcp": {
+    "passed": true,
+    "report": "mcp-tests.json",
+    "transport": "Official TypeScript SDK over stdio",
+    "native_tools_discovered_in_current_chat": false,
+    "isolated_build_test_run": true,
+    "native_dll_allowed_by_reviewed_sha256": true
+  },
+  "browser": {
+    "desktop_visual_review": true,
+    "source_table_expansion": true,
+    "screenshot": "preview.jpg",
+    "responsive_small_viewport_tested": false
+  },
+  "sample": {
+    "synthetic": true,
+    "scenarios": 3,
+    "samples": 60,
+    "over_budget": 1
+  },
+  "hashes": {
+    "bin/measurelab.exe": "991905c2138135a346a4c90dcdfb5074c77851dfeb4de03b82f97961dd4ea791",
+    "bin/measurelab-math.dll": "450f1fd648554c75fb746f15356d382ff74ba89e9dc1b4cb6b193d49b69a79e6",
+    "vela.project": "1122d82ed95c375b09e6416efe438707a7806d07169c59e5afcdf2c9817190d3",
+    "vela.project.lock": "ce3c95736bdb08081701eee21b3029b044003cbfa8cdf69015d1df8a5a9079b4",
+    "sample.json": "4399afb7271be1cea964a93e9763143deb07e309f6fafc950ac856c5e1a05859",
+    "report.html": "f0de9e2f626aa6fd1be32f333098b953d3fbbb9f91fad9cda73143c940b9c343"
+  },
+  "notes": [
+    "All data processing, validation, statistics and rendering are Vela; C supplies sqrt only.",
+    "HTML is standalone and performs no network requests.",
+    "No compiler/runtime changes; full compiler verify was not repeated.",
+    "MCP-generated HTML remains private to its run; use native executable to save a report.",
+    "Source uses the existing process-region memory model with bounded input."
+  ]
+}

@@ -1,0 +1,5 @@
+struct Node { children: List<Node>, table: Dict<Id, Node> } type Id = distinct Int;
+fn main() -> Unit effects { state, io } { let n = Node(children: list_new<Node>(), table: dict_new<Id, Node>());
+ list_push(n.children, n); dict_set(n.table, Id(1), n);
+ print(list_len(dict_get(n.table, Id(1)).children));
+}

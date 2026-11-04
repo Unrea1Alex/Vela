@@ -1,0 +1,1 @@
+fn main() -> Unit { let s = "n=" + 42; }

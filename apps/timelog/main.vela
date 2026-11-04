@@ -1,0 +1,319 @@
+// A complete batch application on the Vela 0.5 public APIs.
+enum AppError {
+    Data(Int, String),
+    Io(String)
+}
+struct Entry {
+    project: String,
+    minutes: Int,
+    note: String
+}
+struct Project {
+    name: String,
+    minutes: Int,
+    entries: Int
+}
+struct Report {
+    entries: List<Entry>,
+    projects: List<Project>,
+    minutes: Int
+}
+fn read_result(r: StringResult) -> Result<String, String> {
+    return match r {
+        StringResult::Ok(s) => Result<String, String>::Ok(s), StringResult::Err(e) => Result<String, String>::Err(e)
+    };
+}
+fn write_result(r: WriteResult) -> Result<Bool, String> {
+    return match r {
+        WriteResult::Ok => Result<Bool, String>::Ok(true), WriteResult::Err(e) => Result<Bool, String>::Err(e)
+    };
+}
+fn with_context<T>(r: Result<T, String>, context: String) -> Result<T, AppError> {
+    return match r {
+        Result::Ok(value) => Result<T, AppError>::Ok(value), Result::Err(e) => Result<T, AppError>::Err(AppError::Io(f"{context:s}: {e:s}"))
+    };
+}
+fn split(text: String, delimiter: Int) -> List<String> effects { state } {
+    let parts = list_new<String>();
+    var start = 0;
+    for i in 0 .. str_len(text) {
+        if str_byte(text, i) == delimiter {
+            list_push(parts, str_slice(text, start, i));
+            start = i + 1;
+        }
+    }
+    list_push(parts, str_slice(text, start, str_len(text)));
+    return parts;
+}
+fn trim(text: String) -> String {
+    var start = 0;
+    var end = str_len(text);
+    while start < end && str_byte(text, start) == 32 {
+        start = start + 1;
+    }
+    while end > start && str_byte(text, end - 1) == 32 {
+        end = end - 1;
+    }
+    return str_slice(text, start, end);
+}
+// Shared text utilities await modules/std.text; validation follows source.vela.
+fn utf8_width(byte: Int) -> Int {
+    if byte < 128 {
+        return 1;
+    }
+    if byte >= 194 && byte <= 223 {
+        return 2;
+    }
+    if byte >= 224 && byte <= 239 {
+        return 3;
+    }
+    if byte >= 240 && byte <= 244 {
+        return 4;
+    }
+    return 0;
+}
+fn valid_text(text: String) -> Bool {
+    var i = 0;
+    while i < str_len(text) {
+        let b = str_byte(text, i);
+        let width = utf8_width(b);
+        if width == 0 || i + width > str_len(text) {
+            return false;
+        }
+        if b < 32 && b != 9 && b != 10 && b != 13 || b == 127 {
+            return false;
+        }
+        for j in 1 .. width {
+            let tail = str_byte(text, i + j);
+            if tail < 128 || tail > 191 {
+                return false;
+            }
+        }
+        if b == 194 && str_byte(text, i + 1) <= 159 {
+            return false;
+        }
+        if width >= 3 {
+            let second = str_byte(text, i + 1);
+            if b == 224 && second < 160 || b == 237 && second > 159 || b == 240 && second < 144 || b == 244 && second > 143 {
+                return false;
+            }
+        }
+        i = i + width;
+    }
+    return true;
+}
+fn minutes_value(text: String, line: Int) -> Result<Int, AppError> {
+    if str_len(text) == 0 {
+        return Result<Int, AppError>::Err(AppError::Data(line, "minutes must contain decimal digits"));
+    }
+    for i in 0 .. str_len(text) {
+        let b = str_byte(text, i);
+        if b < 48 || b > 57 {
+            return Result<Int, AppError>::Err(AppError::Data(line, "minutes must contain decimal digits"));
+        }
+    }
+    let minutes = match parse_int(text) {
+        IntResult::Ok(n) => n, IntResult::Err(_) => 0
+    };
+    if minutes < 1 || minutes > 1440 {
+        return Result<Int, AppError>::Err(AppError::Data(line, "minutes must be in 1..1440"));
+    }
+    return Result<Int, AppError>::Ok(minutes);
+}
+fn parse_entry(line: String, number: Int) -> Result<Entry, AppError> effects { state } {
+    let fields = split(line, 9);
+    if list_len(fields) != 3 {
+        return Result<Entry, AppError>::Err(AppError::Data(number, "expected 3 tab-separated fields"));
+    }
+    let project = trim(list_get(fields, 0));
+    let note = trim(list_get(fields, 2));
+    if project == "" {
+        return Result<Entry, AppError>::Err(AppError::Data(number, "project must not be empty"));
+    }
+    let minutes = minutes_value(trim(list_get(fields, 1)), number)?;
+    return Result<Entry, AppError>::Ok(Entry(project: project, minutes: minutes, note: note));
+}
+fn parse_report(raw: String) -> Result<Report, AppError> effects { state } {
+    if str_len(raw) > 1048576 {
+        return Result<Report, AppError>::Err(AppError::Data(0, "input exceeds 1 MiB"));
+    }
+    if !valid_text(raw) {
+        return Result<Report, AppError>::Err(AppError::Data(0, "invalid UTF-8 or control character"));
+    }
+    var text = raw;
+    if str_len(raw) >= 3 && str_byte(raw, 0) == 239 && str_byte(raw, 1) == 187 && str_byte(raw, 2) == 191 {
+        text = str_slice(raw, 3, str_len(raw));
+    }
+    let lines = split(text, 10);
+    let entries = list_new<Entry>();
+    let projects = list_new<Project>();
+    let indices = dict_new<String, Int>();
+    var total = 0;
+    for i in 0 .. list_len(lines) {
+        var line = list_get(lines, i);
+        if str_len(line) > 0 && str_byte(line, str_len(line) - 1) == 13 {
+            line = str_slice(line, 0, str_len(line) - 1);
+        }
+        for j in 0 .. str_len(line) {
+            if str_byte(line, j) == 13 {
+                return Result<Report, AppError>::Err(AppError::Data(i + 1, "unexpected carriage return"));
+            }
+        }
+        if i == 0 {
+            if line != "project\tminutes\tnote" {
+                return Result<Report, AppError>::Err(AppError::Data(1, "expected header: project<TAB>minutes<TAB>note"));
+            }
+            continue;
+        }
+        if trim(line) == "" {
+            continue;
+        }
+        if list_len(entries) >= 10000 {
+            return Result<Report, AppError>::Err(AppError::Data(i + 1, "more than 10000 entries"));
+        }
+        let entry = parse_entry(line, i + 1)?;
+        list_push(entries, entry);
+        total = total + entry.minutes;
+        if !dict_has(indices, entry.project) {
+            dict_set(indices, entry.project, list_len(projects));
+            list_push(projects, Project(name: entry.project, minutes: 0, entries: 0));
+        }
+        let index = dict_get(indices, entry.project);
+        var project = list_get(projects, index);
+        project.minutes = project.minutes + entry.minutes;
+        project.entries = project.entries + 1;
+        list_set(projects, index, project);
+    }
+    return Result<Report, AppError>::Ok(Report(entries: entries, projects: projects, minutes: total));
+}
+fn html(text: String) -> String effects { state } {
+    let parts = strings_new();
+    var start = 0;
+    for i in 0 .. str_len(text) {
+        let b = str_byte(text, i);
+        var replacement = "";
+        if b == 38 {
+            replacement = "&amp;";
+        } else if b == 60 {
+            replacement = "&lt;";
+        } else if b == 62 {
+            replacement = "&gt;";
+        } else if b == 34 {
+            replacement = "&quot;";
+        } else if b == 39 {
+            replacement = "&#39;";
+        }
+        if replacement != "" {
+            strings_push(parts, str_slice(text, start, i));
+            strings_push(parts, replacement);
+            start = i + 1;
+        }
+    }
+    strings_push(parts, str_slice(text, start, str_len(text)));
+    return strings_join(parts, "");
+}
+fn duration(minutes: Int) -> String requires minutes >= 0;
+{
+    let hours = minutes / 60;
+    let rest = minutes % 60;
+    if rest < 10 {
+        return f"{hours:d} ч 0{rest:d} мин";
+    }
+    return f"{hours:d} ч {rest:d} мин";
+}
+fn render(report: Report, input: String) -> String effects { state } {
+    let parts = strings_new();
+    strings_push(parts, "<!doctype html><html lang=\"ru\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>TimeLog — отчёт по времени</title><style>body{margin:0;background:#f4f6fa;color:#1b263b;font:16px/1.6 system-ui,sans-serif}main{max-width:1000px;margin:50px auto;padding:0 28px}header{border-bottom:1px solid #dce2ed;padding-bottom:25px;margin-bottom:28px}.brand{font-size:12px;letter-spacing:2px;color:#4265c8;font-weight:750}h1{font-size:38px;letter-spacing:-1px;margin:12px 0 5px}h2{font-size:21px;margin:32px 0 14px}.muted{color:#67738b}.stats{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px}.card,.panel{background:#fff;border:1px solid #e1e6ef;border-radius:16px;padding:22px}.card:first-child{background:#2445a0;color:#fff;border-color:#2445a0}.metric{display:block;font-size:27px;font-weight:730;margin-top:5px}.projects{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.project-title{display:flex;justify-content:space-between;gap:12px;overflow-wrap:anywhere}.track{height:7px;border-radius:8px;background:#e9edf7;margin:18px 0 7px}.fill{height:100%;border-radius:8px;background:#5878d7}.detail{font-size:13px;color:#67738b}.table-wrap{overflow:auto;background:#fff;border:1px solid #e1e6ef;border-radius:16px}table{border-collapse:collapse;width:100%;text-align:left}th,td{padding:14px 20px;border-bottom:1px solid #edf0f5;vertical-align:top}th{font-size:12px;color:#67738b;background:#fafbfe}td:last-child{overflow-wrap:anywhere}tr:last-child td{border-bottom:0}.time{white-space:nowrap;font-variant-numeric:tabular-nums}.tag{display:inline-block;color:#3154b0;background:#edf2ff;padding:2px 9px;border-radius:6px;overflow-wrap:anywhere}footer{font-size:12px;color:#67738b;margin:25px 0;overflow-wrap:anywhere}@media(max-width:600px){main{margin:25px auto;padding:0 16px}h1{font-size:30px}.stats{grid-template-columns:1fr}.metric{font-size:25px}th,td{padding:12px}}</style></head><body><main><header><div class=\"brand\">TIMELOG · НАПИСАНО НА VELA</div><h1>На что ушло время</h1><div class=\"muted\">Итоги рабочего журнала — по проектам и записям</div></header>");
+    strings_push(parts, f"<section class=\"stats\" aria-label=\"Итоги\"><div class=\"card\">Всего времени<strong class=\"metric\">{duration(report.minutes):s}</strong></div><div class=\"card\">Проекты<strong class=\"metric\">{list_len(report.projects):d}</strong></div><div class=\"card\">Записи<strong class=\"metric\">{list_len(report.entries):d}</strong></div></section>");
+    if list_len(report.entries) == 0 {
+        strings_push(parts, "<h2>Журнал пока пуст</h2><p class=\"panel muted\">Добавьте записи в TSV-файл и запустите TimeLog ещё раз.</p>");
+    } else {
+        strings_push(parts, "<h2>По проектам</h2><section class=\"projects\">");
+        for project in report.projects {
+            let percent = project.minutes * 100 / report.minutes;
+            strings_push(parts, f"<article class=\"panel\"><div class=\"project-title\"><strong>{html(project.name):s}</strong><span class=\"time\">{duration(project.minutes):s}</span></div><div class=\"track\"><div class=\"fill\" style=\"width:{percent:d}%\"></div></div><div class=\"detail\">{percent:d}% времени · записей: {project.entries:d}</div></article>");
+        }
+        strings_push(parts, "</section><h2>Детали журнала</h2><div class=\"table-wrap\"><table><thead><tr><th>Проект</th><th>Время</th><th>Что сделано</th></tr></thead><tbody>");
+        for entry in report.entries {
+            strings_push(parts, f"<tr><td><span class=\"tag\">{html(entry.project):s}</span></td><td class=\"time\">{duration(entry.minutes):s}</td><td>{html(entry.note):s}</td></tr>");
+        }
+        strings_push(parts, "</tbody></table></div>");
+    }
+    strings_push(parts, f"<footer>Источник: {html(input):s}<br>TimeLog / Vela 0.5 · целые минуты, без округления времени</footer></main></body></html>\n");
+    return strings_join(parts, "");
+}
+fn parent_path(path: String) -> String {
+    var i = str_len(path);
+    while i > 0 {
+        i = i - 1;
+        if str_byte(path, i) == 47 || str_byte(path, i) == 92 {
+            return str_slice(path, 0, i + 1);
+        }
+    }
+    return".";
+}
+fn ignore(r: WriteResult) -> Unit {
+    match r {
+        WriteResult::Ok => {}
+        WriteResult::Err(_) => {}
+    }
+}
+fn save(input: String, output: String, content: String) -> Result<Bool, AppError> effects { state, io } {
+    let absolute = with_context(read_result(absolute_path(output)), "Output path")?;
+    let source_id = with_context(read_result(file_identity(input)), "Input identity")?;
+    let output_id = with_context(read_result(file_identity(absolute)), "Output identity")?;
+    if source_id == output_id {
+        return Result<Bool, AppError>::Err(AppError::Io("output must not replace the input file"));
+    }
+    let dir = with_context(read_result(temp_dir(parent_path(absolute))), "Temporary directory")?;
+    let temporary = dir + "/report.html";
+    var outcome = write_result(write_file(temporary, content));
+    match outcome {
+        Result::Ok(_) => {
+            outcome = write_result(replace_file(temporary, absolute));
+        }
+        Result::Err(_) => {}
+    }
+    ignore(remove_file(temporary));
+    ignore(remove_dir(dir));
+    return with_context(outcome, "Save report");
+}
+fn execute(input: String, output: String) -> Result<Int, AppError> effects { state, io } {
+    let content = with_context(read_result(read_file(input)), "Read input")?;
+    let report = parse_report(content)?;
+    let saved = save(input, output, render(report, input))?;
+    return Result<Int, AppError>::Ok(report.minutes);
+}
+fn main() -> Int effects { args, state, io } {
+    if arg_count() == 1 {
+        let help = match arg(0) {
+            StringResult::Ok(s) => s == "--help", StringResult::Err(_) => false
+        };
+        if help {
+            print("TimeLog: TSV journal to an offline HTML report.\nUsage: timelog INPUT.tsv REPORT.html\nColumns: project<TAB>minutes<TAB>note");
+            return 0;
+        }
+    }
+    if arg_count() != 2 {
+        eprint("Usage: timelog INPUT.tsv REPORT.html (or --help)");
+        return 2;
+    }
+    let input = match arg(0) {
+        StringResult::Ok(s) => s, StringResult::Err(_) => ""
+    };
+    let output = match arg(1) {
+        StringResult::Ok(s) => s, StringResult::Err(_) => ""
+    };
+    match execute(input, output) {
+        Result::Ok(minutes) => {
+            print(f"Saved: {output:s}\nTotal: {minutes:d} minutes");
+            return 0;
+        }
+        Result::Err(error) => {
+            eprint(match error {
+                AppError::Data(line, message) => f"TimeLog: line {line:d}: {message:s}", AppError::Io(message) => f"TimeLog: {message:s}"
+            });
+            return 2;
+        }
+    }
+}

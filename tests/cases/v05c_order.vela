@@ -1,0 +1,2 @@
+fn bound(x:Int)->Int effects {io}{print(x);return x;}
+fn main()->Unit effects {io}{for i in bound(1)..bound(3){print(i);}}

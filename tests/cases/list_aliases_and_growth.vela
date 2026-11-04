@@ -1,0 +1,7 @@
+fn add(items: IntList, value: Int) -> Unit effects { state } { ints_push(items, value); }
+            fn main() -> Unit effects { state, io } {
+                let a = ints_new(); let alias = a; var i = 0;
+                while i < 10000 { add(alias, i); i = i + 1; }
+                ints_set(a, 1, 42); print(ints_get(alias, 1)); print(ints_len(a));
+                print(ints_get(a, 9999)); ints_truncate(alias, 2); print(ints_len(a));
+            }

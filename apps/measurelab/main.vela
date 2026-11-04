@@ -1,0 +1,83 @@
+import "model.vela" as model;
+import "report.vela" as report;
+import "@cli" as cli;
+import "@fs" as fs;
+import "@path" as path;
+import "@text" as text;
+fn usage() -> String {
+    return "MeasureLab 1.0 / Vela 0.7\nUsage: measurelab.exe INPUT.json OUTPUT.html [--fail-on-budget]\n       measurelab.exe --help\nExit 0: saved; 2: input/CLI/I/O/FFI error; 3: saved, budget exceeded.";
+}
+fn io_error(error: fs::Error) -> String {
+    return match error {
+        fs::Error::InvalidPath(_) => "Invalid file path", fs::Error::Encoding(_) => "Invalid UTF-8", fs::Error::Limit(n) => "Input/output exceeds byte limit: " + to_string(n), fs::Error::Io(file, why) => file + ": " + why, fs::Error::Cleanup(folder, committed) => "Cleanup failed in " + folder + "; output committed=" + to_string(committed) + ". Inspect the destination before retrying."
+    };
+}
+fn work() -> Result<Int, String> effects { args, state, io, process } {
+    let specs = list_new < cli::Spec >();
+    list_push(specs, cli::Spec(name: "help", takes_value: false));
+    list_push(specs, cli::Spec(name: "fail-on-budget", takes_value: false));
+    let args = model::explain(cli::current(specs), "Invalid command line.\n" + usage())?;
+    if dict_has(args.options, "help") {
+        print(usage());
+        return Result<Int, String>::Ok(0);
+    }
+    if list_len(args.positional) != 2 {
+        return Result<Int, String>::Err(usage());
+    }
+    let input = model::explain(path::checked(list_get(args.positional, 0)), "Invalid input path")?;
+    let output = model::explain(path::checked(list_get(args.positional, 1)), "Invalid output path")?;
+    var inputId = "";
+    match file_identity(input.value) {
+        StringResult::Ok(id) => {
+            inputId = id;
+        }
+        StringResult::Err(why) => {
+            return Result<Int, String>::Err("Cannot identify input: " + why);
+        }
+    }
+    match file_identity(output.value) {
+        StringResult::Ok(id) => {
+            if id == inputId {
+                return Result<Int, String>::Err("Output aliases input; input is preserved");
+            }
+        }
+        StringResult::Err(_) => {}
+    }
+    var raw = "";
+    match fs::read_text(input, 262144) {
+        Result::Ok(value) => {
+            raw = value.data;
+        }
+        Result::Err(error) => {
+            return Result<Int, String>::Err(io_error(error));
+        }
+    }
+    let data = report::analyze(model::parse(raw)?)?;
+    let html = report::html(data);
+    match fs::write_text_atomic(output, text::Text(data: html)) {
+        Result::Ok(_) => {}
+        Result::Err(error) => {
+            return Result<Int, String>::Err(io_error(error));
+        }
+    }
+    print(f"Saved: {output.value:s}");
+    print(f"scenarios={list_len(data.rows):d} samples={data.total:d} over_budget={data.exceeded:d}");
+    for row in data.rows {
+        print(row.scenario.name + ": mean=" + report::fixed(row.summary.mean) + " p95=" + report::fixed(row.summary.p95) + " sigma=" + report::fixed(row.summary.deviation) + " " + row.scenario.unit);
+    }
+    if data.exceeded > 0 && dict_has(args.options, "fail-on-budget") {
+        return Result<Int, String>::Ok(3);
+    }
+    return Result<Int, String>::Ok(0);
+}
+fn main() -> Int effects { args, state, io, process } {
+    match work() {
+        Result::Ok(code) => {
+            return code;
+        }
+        Result::Err(error) => {
+            eprint(error);
+            return 2;
+        }
+    }
+}

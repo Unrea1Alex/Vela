@@ -1,0 +1,1 @@
+fn f(a: Dict<String, Int>) -> Int { return dict_get(a, "x"); } fn main() -> Unit {}

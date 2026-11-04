@@ -1,0 +1,653 @@
+import "model.vela";
+import "core.vela";
+import "parser.vela";
+import "modules.vela";
+import "types.vela";
+import "generics.vela";
+import "errors.vela";
+import "control.vela";
+import "emitter.vela";
+import "driver.vela";
+// Semantic analysis creates checked tables; syntax tables are read-only here.
+pub fn lookup(c: Context, name: String) -> SymbolId effects { state, io, process } {
+    var i = list_len(c.scopes);
+    while i > 0 {
+        i = i - 1;
+        let found = find_symbol(c, list_get(c.scopes, i), name);
+        if has_symbol(found) {
+            return found;
+        }
+    }
+    return no_symbol();
+}
+pub fn push_scope(c: Context) -> Unit effects { state } {
+    list_push(c.scopes, list_new<SymbolId>());
+}
+pub fn pop_scope(c: Context) -> Unit effects { state } {
+    list_truncate(c.scopes, list_len(c.scopes) - 1);
+}
+pub fn bind(c: Context, name: String, type_id: TypeId, mutable: Bool, span: Span, implicit: Bool) -> SymbolId effects { state, io, process } {
+    if !implicit && (name == "result" || name == "_") {
+        bad(c, "E202", "Reserved binding name.", span);
+    }
+    let scope = list_get(c.scopes, list_len(c.scopes) - 1);
+    let previous = find_symbol(c, scope, name);
+    if has_symbol(previous) {
+        duplicate(c, "Duplicate binding '" + name + "' in this scope.", span, symbol_info(c, previous).span);
+    }
+    var symbol = symbol_record(61, name, type_id, span);
+    symbol.mutable = mutable;
+    let id = add_symbol(c, symbol);
+    list_push(scope, id);
+    return id;
+}
+pub fn check_arguments(c: Context, args: List<SyntaxArgument>, params: List<SymbolId>, span: Span) -> List<ExprId> effects { state, io, process } {
+    let items = list_new<ExprId>();
+    var i = 0;
+    while i < list_len(args) && i < list_len(params) {
+        let a = list_get(args, i);
+        if a.label != "" {
+            bad(c, "E210", "Named arguments require a struct constructor.", ast_expr(c, a.value).span);
+        }
+        let checked = check_expr(c, a.value);
+        let parameter = symbol_info(c, list_get(params, i));
+        require_type_at(c, checked_expr(c, checked).type_id, parameter.type_id, checked_expr(c, checked).span, parameter.span);
+        list_push(items, checked);
+        i = i + 1;
+    }
+    if list_len(args) != list_len(params) {
+        bad(c, "E210", "Incorrect argument count.", span);
+    }
+    return items;
+}
+pub fn check_construct(c: Context, owner: String, name: String, args: List<SyntaxArgument>, span: Span) -> ExprId effects { state, io, process } {
+    let id = resolve_type(c, owner, span);
+    if !has_type(id) || type_kind(c, id) != 70 {
+        bad(c, "E200", "Unknown enum.", span);
+    }
+    let variant = find_symbol(c, type_info(c, id).variants, name);
+    if !has_symbol(variant) {
+        bad(c, "E211", "Unknown enum variant.", span);
+    }
+    var n = expression_record(108, span, id);
+    n.symbol = variant;
+    n.arguments = check_arguments(c, args, symbol_info(c, variant).parameters, span);
+    return add_expr(c, n);
+}
+pub fn normalize_integer(c: Context, syntax: SyntaxExpr, negative: Bool) -> String effects { state, io, process } {
+    let raw = syntax.text;
+    var start = 0;
+    while start + 1 < str_len(raw) && str_byte(raw, start) == 48 {
+        start = start + 1;
+    }
+    var number = str_slice(raw, start, str_len(raw));
+    if negative {
+        number = "-"+ number;
+    }
+    match parse_int(number) {
+        IntResult::Ok(value) => {
+            return to_string(value);
+        }
+        IntResult::Err(_) => {
+            bad(c, "E205", "Integer literal outside signed 64-bit range.", syntax.span);
+            return "0";
+        }
+    }
+}
+pub fn check_expr(c: Context, ast: AstExprId) -> ExprId effects { state, io, process } {
+    let syntax = ast_expr(c, ast);
+    enter(c, syntax.span);
+    let k = syntax.kind;
+    var n = expression_record(0, syntax.span, no_type());
+    var id = no_expr();
+    if k == 1 {
+        n.kind = 101;
+        n.type_id = int_type();
+        n.text = normalize_integer(c, syntax, false);
+    } else if k == 12 {
+        if !float_text_valid(syntax.text) {
+            bad(c, "E205", "Float64 literal outside binary64 range or numeric text limit.", syntax.span);
+        }
+        n.kind = 117;
+        n.type_id = float_type();
+        n.text = syntax.text;
+    } else if k == 2 {
+        n.kind = 102;
+        n.type_id = bool_type();
+        n.text = syntax.text;
+    } else if k == 3 {
+        n.kind = 103;
+        n.type_id = string_type();
+        n.text = syntax.text;
+    } else if k == 4 {
+        if syntax.qualifier != "" {
+            id = check_construct(c, syntax.qualifier, syntax.text, list_new<SyntaxArgument>(), syntax.span);
+        } else {
+            let b = lookup(c, syntax.text);
+            if !has_symbol(b) {
+                bad(c, "E203", "Unknown binding.", syntax.span);
+            }
+            n.kind = 104;
+            n.type_id = symbol_info(c, b).type_id;
+            n.symbol = b;
+        }
+    } else if k == 5 {
+        let operand = ast_expr(c, syntax.left);
+        if syntax.text == "-"&& operand.kind == 1 {
+            n.kind = 101;
+            n.type_id = int_type();
+            n.text = normalize_integer(c, operand, true);
+        } else {
+            n.left = check_expr(c, syntax.left);
+            n.type_id = bool_type();
+            if syntax.text == "-" {
+                n.type_id = int_type();
+                if checked_expr(c, n.left).type_id == float_type() {
+                    n.type_id = float_type();
+                }
+            }
+            require_type(c, checked_expr(c, n.left).type_id, n.type_id, syntax.span);
+            n.kind = 105;
+            n.text = syntax.text;
+        }
+    } else if k == 6 {
+        let left = check_expr(c, syntax.left);
+        let right = check_expr(c, syntax.right);
+        let a = checked_expr(c, left);
+        let b = checked_expr(c, right);
+        let op = syntax.text;
+        n.type_id = int_type();
+        if op == "&&" || op == "||" {
+            require_type(c, a.type_id, bool_type(), a.span);
+            require_type(c, b.type_id, bool_type(), b.span);
+            n.type_id = bool_type();
+        } else if op == "==" || op == "!=" {
+            require_type(c, b.type_id, a.type_id, b.span);
+            if !is_scalar(scalar_type(c, a.type_id)) {
+                bad(c, "E201", "Equality requires scalar values of the same type.", syntax.span);
+            }
+            n.type_id = bool_type();
+        } else if op == "+" && a.type_id == string_type() {
+            require_type(c, b.type_id, string_type(), b.span);
+            n.type_id = string_type();
+        } else {
+            var numeric = int_type();
+            if a.type_id == float_type() && op != "%" {
+                numeric = float_type();
+            }
+            require_type(c, a.type_id, numeric, a.span);
+            require_type(c, b.type_id, numeric, b.span);
+            n.type_id = numeric;
+            if op == "<" || op == "<=" || op == ">" || op == ">=" {
+                n.type_id = bool_type();
+            }
+        }
+        n.kind = 106;
+        n.text = op;
+        n.left = left;
+        n.right = right;
+    } else if k == 11 {
+        id = check_interpolation(c, syntax);
+    } else if k == 9 {
+        n.kind = 113;
+        n.left = check_expr(c, syntax.left);
+        n.arms = check_match_arms(c, checked_expr(c, n.left).type_id, syntax.arms, syntax.span, true);
+        n.type_id = checked_expr(c, list_get(n.arms, 0).value).type_id;
+    } else if k == 10 {
+        id = check_propagation(c, syntax);
+    } else if k == 8 {
+        id = check_access(c, syntax);
+    } else if k == 7 {
+        var target = ast_expr(c, syntax.left);
+        let is_module = module_alias(c, target.qualifier, target.span) >= 0;
+        if is_module {
+            target.text = target.qualifier +"::"+ target.text;
+            target.qualifier = "";
+        }
+        if target.qualifier != "" {
+            if list_len(syntax.type_arguments) > 0 {
+                bad(c, "E210", "Enum constructors are not generic.", syntax.span);
+            }
+            id = check_construct(c, target.qualifier, target.text, syntax.arguments, syntax.span);
+        } else {
+            if has_symbol(lookup(c, target.text)) {
+                bad(c, "E201", "Local binding is not callable.", syntax.span);
+            }
+            target.text = module_global_name(c, target.text, target.span);
+            var t = find_type(c, target.text);
+            if type_kind(c, t) == 78 {
+                if list_len(syntax.type_arguments) == 0 {
+                    bad(c, "E210", "Generic type requires explicit arguments.", syntax.span);
+                }
+                t = resolve_type(c, target.text + "<" + join_text(syntax.type_arguments,",") + ">", syntax.span);
+            }
+            if type_kind(c, t) == 76 || type_kind(c, t) == 77 {
+                if list_len(syntax.type_arguments) > 0 && type_info(c, t).template_index < 0 {
+                    bad(c, "E210", "This constructor is not generic.", syntax.span);
+                }
+                id = check_record(c, t, syntax.arguments, syntax.span);
+            } else {
+                let sig_id = find_symbol(c, c.signatures, target.text);
+                if !has_symbol(sig_id) {
+                    bad(c, "E203", "Unknown function.", syntax.span);
+                }
+                let sig = symbol_info(c, sig_id);
+                if sig.builtin {
+                    id = builtin_call(c, sig_id, syntax.arguments, syntax.type_arguments, syntax.span);
+                } else if sig.template_index >= 0 {
+                    id = generic_function_call(c, sig_id, syntax.arguments, syntax.type_arguments, syntax.span);
+                } else {
+                    if list_len(syntax.type_arguments) > 0 {
+                        bad(c, "E210", "This function is not generic.", syntax.span);
+                    }
+                    n.arguments = check_arguments(c, syntax.arguments, sig.parameters, syntax.span);
+                    require_effects(c, sig_id, syntax.span);
+                    n.kind = 107;
+                    n.type_id = sig.type_id;
+                    n.symbol = sig_id;
+                }
+            }
+        }
+    }
+    if !has_expr(id) {
+        id = add_expr(c, n);
+    }
+    leave(c);
+    return id;
+}
+pub fn condition(c: Context, ast: AstExprId) -> ExprId effects { state, io, process } {
+    let id = check_expr(c, ast);
+    let n = checked_expr(c, id);
+    require_type(c, n.type_id, bool_type(), n.span);
+    return id;
+}
+pub fn checked_conditions(c: Context, items: List<AstExprId>) -> List<ExprId> effects { state, io, process } {
+    let checked = list_new<ExprId>();
+    var i = 0;
+    while i < list_len(items) {
+        list_push(checked, condition(c, list_get(items, i)));
+        i = i + 1;
+    }
+    return checked;
+}
+pub fn block_returns(c: Context, items: List<StmtId>) -> Bool effects { state, io, process } {
+    return match last(items) {
+        Option::Some(id) => checked_stmt(c, id).returns, Option::None => false
+    };
+}
+pub fn check_block(c: Context, items: List<AstStmtId>, nested: Bool) -> List<StmtId> effects { state, io, process } {
+    if nested {
+        push_scope(c);
+    }
+    let checked = list_new<StmtId>();
+    var returns = false;
+    var i = 0;
+    while i < list_len(items) {
+        let ast = list_get(items, i);
+        if returns {
+            bad(c, "E212", "Unreachable statement.", ast_stmt(c, ast).span);
+        }
+        let id = check_statement(c, ast);
+        list_push(checked, id);
+        returns = checked_stmt(c, id).exits;
+        i = i + 1;
+    }
+    if nested {
+        pop_scope(c);
+    }
+    return checked;
+}
+pub fn check_statement(c: Context, ast: AstStmtId) -> StmtId effects { state, io, process } {
+    let syntax = ast_stmt(c, ast);
+    enter(c, syntax.span);
+    let k = syntax.kind;
+    var n = statement_record(k + 100, syntax.span);
+    if k == 30 {
+        n.value = check_expr(c, syntax.value);
+        let value_type = checked_expr(c, n.value).type_id;
+        if syntax.annotation != "" {
+            require_type(c, value_type, resolve_type(c, syntax.annotation, syntax.span), syntax.span);
+        }
+        n.binding = bind(c, syntax.name, value_type, syntax.mutable, syntax.span, false);
+    } else if k == 31 {
+        let b = lookup(c, syntax.name);
+        if !has_symbol(b) {
+            bad(c, "E203", "Unknown binding.", syntax.span);
+        }
+        if !symbol_info(c, b).mutable {
+            bad(c, "E213", "Cannot assign to immutable binding.", syntax.span);
+        }
+        n.value = check_expr(c, syntax.value);
+        require_type(c, checked_expr(c, n.value).type_id, symbol_info(c, b).type_id, syntax.span);
+        n.binding = b;
+    } else if k == 38 {
+        n.target = check_expr(c, syntax.target);
+        var root = checked_expr(c, n.target);
+        while root.kind == 110 {
+            root = checked_expr(c, root.left);
+        }
+        if root.kind != 104 {
+            bad(c, "E213", "Assignment requires a local variable.", syntax.span);
+        }
+        if !symbol_info(c, root.symbol).mutable {
+            bad(c, "E213", "Cannot change a field of an immutable binding.", syntax.span);
+        }
+        n.value = check_expr(c, syntax.value);
+        require_type(c, checked_expr(c, n.value).type_id, checked_expr(c, n.target).type_id, syntax.span);
+    } else if k == 32 {
+        if has_ast_expr(syntax.value) {
+            n.value = check_expr(c, syntax.value);
+        } else {
+            n.value = add_expr(c, expression_record(109, syntax.span, unit_type()));
+        }
+        require_type(c, checked_expr(c, n.value).type_id, list_get(c.control, 0).return_type, syntax.span);
+        n.returns = true;
+        n.exits = true;
+    } else if k == 33 {
+        n.value = check_expr(c, syntax.value);
+        if checked_expr(c, n.value).type_id != unit_type() {
+            bad(c, "E214", "Unused expression value.", syntax.span);
+        }
+    } else if k == 34 {
+        n.value = condition(c, syntax.value);
+        n.yes = check_block(c, syntax.yes, true);
+        n.no = check_block(c, syntax.no, true);
+        n.returns = block_returns(c, n.yes) && block_returns(c, n.no);
+        n.exits = block_exits(c, n.yes) && block_exits(c, n.no);
+    } else if k == 35 {
+        n.value = condition(c, syntax.value);
+        enter_loop(c);
+        n.yes = check_block(c, syntax.yes, true);
+        leave_loop(c);
+    } else if k == 39 || k == 40 {
+        if list_get(c.control, 0).loop_depth == 0 {
+            bad(c, "E219", "Loop exit outside a loop.", syntax.span);
+        }
+        n.exits = true;
+    } else if k == 41 {
+        n = check_for(c, syntax);
+    } else if k == 36 {
+        n.value = check_expr(c, syntax.value);
+        n.arms = check_match_arms(c, checked_expr(c, n.value).type_id, syntax.arms, syntax.span, false);
+        n.returns = true;
+        n.exits = true;
+        var i = 0;
+        while i < list_len(n.arms) {
+            n.returns = n.returns && block_returns(c, list_get(n.arms, i).body);
+            n.exits = n.exits && block_exits(c, list_get(n.arms, i).body);
+            i = i + 1;
+        }
+    }
+    leave(c);
+    return add_stmt(c, n);
+}
+pub fn order_type(c: Context, id: TypeId) -> Unit effects { state, io, process } {
+    var t = type_info(c, id);
+    if t.kind == 0 || t.kind == 75 || t.kind == 78 {
+        return;
+    }
+    if t.visit == 1 {
+        bad(c, "E204", "Recursive by-value type.", t.span);
+    }
+    if t.visit == 2 {
+        return;
+    }
+    enter(c, t.span);
+    t.visit = 1;
+    set_type(c, id, t);
+    var i = 0;
+    if t.kind == 70 {
+        while i < list_len(t.variants) {
+            let fields = symbol_info(c, list_get(t.variants, i)).parameters;
+            var j = 0;
+            while j < list_len(fields) {
+                order_type(c, symbol_info(c, list_get(fields, j)).type_id);
+                j = j + 1;
+            }
+            i = i + 1;
+        }
+    } else {
+        while i < list_len(t.fields) {
+            order_type(c, symbol_info(c, list_get(t.fields, i)).type_id);
+            i = i + 1;
+        }
+    }
+    t.visit = 2;
+    set_type(c, id, t);
+    list_push(c.type_order, id);
+    leave(c);
+}
+pub fn analyze(c: Context) -> Unit effects { state, io, process } {
+    install_prelude(c);
+    bind_modules(c);
+    var i = 0;
+    while i < list_len(c.bound_types) {
+        let syntax = list_get(c.bound_types, i);
+        if syntax.span.end > syntax.span.start {
+            declaration_name_available(c, syntax.name, syntax.span);
+            if syntax.name == "List" || syntax.name == "Dict" {
+                bad(c, "E202", "Reserved type constructor.", syntax.span);
+            }
+            var t = type_record(syntax.kind, syntax.name, syntax.span);
+            t.base_name = syntax.base;
+            if list_len(syntax.type_parameters) > 0 {
+                if syntax.kind == 77 {
+                    bad(c, "E210", "Distinct declarations cannot be generic.", syntax.span);
+                }
+                t.kind = 78;
+                t.template_index = i;
+            }
+            let id = add_type(c, t);
+        }
+        i = i + 1;
+    }
+    i = 0;
+    while i < list_len(c.bound_types) {
+        let syntax = list_get(c.bound_types, i);
+        let id = find_type(c, syntax.name);
+        validate_type_parameters(c, syntax.type_parameters);
+        if type_kind(c, id) != 78 {
+            fill_type(c, id, syntax, dict_new<String, TypeId>());
+        }
+        i = i + 1;
+    }
+    i = 0;
+    while i < list_len(c.bound_functions) {
+        let syntax = list_get(c.bound_functions, i);
+        declaration_name_available(c, syntax.name, syntax.span);
+        validate_type_parameters(c, syntax.type_parameters);
+        let mapping = dict_new<String, TypeId>();
+        var sig = symbol_record(73, syntax.name, no_type(), syntax.span);
+        sig.effect_mask = syntax.effect_mask;
+        if list_len(syntax.type_parameters) > 0 {
+            sig.template_index = i;
+        } else {
+            sig = concrete_signature(c, syntax, syntax.name, mapping);
+        }
+        let id = add_symbol(c, sig);
+        list_push(c.signatures, id);
+        if sig.template_index < 0 && sig.foreign_library == "" {
+            list_push(c.instances, FunctionInstance(depth: 0, signature: id, syntax_index: i, mapping: mapping));
+        }
+        i = i + 1;
+    }
+    let main_id = find_symbol(c, c.signatures, "main");
+    var entry_tests = false;
+    for function in c.bound_functions {
+        if function.test_name != ""&& source_unit_at(c, function.span.start) == 0 {
+            entry_tests = true;
+        }
+    }
+    if !has_symbol(main_id) {
+        if !entry_tests {
+            bad(c, "E207", "Missing main function.", empty_span());
+        }
+    } else {
+        let main_sig = symbol_info(c, main_id);
+        if list_len(main_sig.parameters) != 0 || (main_sig.type_id != int_type() && main_sig.type_id != unit_type()) {
+            bad(c, "E207", "main must take no parameters and return Int or Unit.", empty_span());
+        }
+    }
+    i = 0;
+    while i < list_len(c.instances) {
+        let instance = list_get(c.instances, i);
+        let syntax = list_get(c.bound_functions, instance.syntax_index);
+        let sig_id = instance.signature;
+        let sig = symbol_info(c, sig_id);
+        push_scope(c);
+        let params = list_new<SymbolId>();
+        var j = 0;
+        while j < list_len(syntax.parameters) {
+            let p = list_get(syntax.parameters, j);
+            list_push(params, bind(c, p.name, symbol_info(c, list_get(sig.parameters, j)).type_id, false, p.span, false));
+            j = j + 1;
+        }
+        var ctl = list_get(c.control, 0);
+        ctl.type_mapping = instance.mapping;
+        ctl.instance_depth = instance.depth;
+        ctl.return_type = sig.type_id;
+        ctl.in_contract = true;
+        ctl.allowed_effects = 0;
+        list_set(c.control, 0, ctl);
+        let pre = checked_conditions(c, syntax.preconditions);
+        push_scope(c);
+        let r = bind(c, "result", sig.type_id, false, syntax.span, true);
+        let post = checked_conditions(c, syntax.postconditions);
+        pop_scope(c);
+        ctl = list_get(c.control, 0);
+        ctl.in_contract = false;
+        ctl.allowed_effects = sig.effect_mask;
+        list_set(c.control, 0, ctl);
+        let body = check_block(c, syntax.body, false);
+        if !block_returns(c, body) {
+            if sig.type_id != unit_type() {
+                bad(c, "E208", "Function may reach its end without returning.", syntax.span);
+            }
+            var ret = statement_record(132, syntax.span);
+            ret.value = add_expr(c, expression_record(109, syntax.span, unit_type()));
+            ret.returns = true;
+            list_push(body, add_stmt(c, ret));
+        }
+        list_push(c.functions, CheckedFunction(symbol: sig_id, parameters: params, result_binding: r, preconditions: pre, postconditions: post, body: body, span: syntax.span));
+        pop_scope(c);
+        i = i + 1;
+    }
+    i = 0;
+    while i < list_len(c.types) {
+        order_type(c, primitive_type_id(i + 1));
+        i = i + 1;
+    }
+}
+pub fn declaration_name_available(c: Context, name: String, span: Span) -> Unit effects { state, io, process } {
+    let t = find_type(c, name);
+    if has_type(t) {
+        duplicate(c, "Duplicate or reserved declaration '" + name + "'.", span, type_info(c, t).span);
+    }
+    let sig = find_symbol(c, c.signatures, name);
+    if has_symbol(sig) {
+        duplicate(c, "Duplicate or reserved declaration '" + name + "'.", span, symbol_info(c, sig).span);
+    }
+}
+pub fn check_match_arms(c: Context, enum_id: TypeId, arms: List<SyntaxArm>, span: Span, value_mode: Bool) -> List<CheckedArm> effects { state, io, process } {
+    if type_kind(c, enum_id) != 70 {
+        bad(c, "E201", "match expects an enum value.", span);
+    }
+    let e = type_info(c, enum_id);
+    let seen = dict_new<SymbolId, Bool>();
+    var i = 0;
+    var result_type = no_type();
+    let checked = list_new<CheckedArm>();
+    while i < list_len(arms) {
+        let arm = list_get(arms, i);
+        if module_global_name(c, arm.owner, arm.span) != list_get(type_parts(e.name), 0) {
+            bad(c, "E201", "Wrong enum in pattern.", arm.span);
+        }
+        let variant = find_symbol(c, e.variants, arm.variant);
+        if !has_symbol(variant) {
+            bad(c, "E211", "Unknown pattern variant.", arm.span);
+        }
+        if dict_has(seen, variant) {
+            bad(c, "E215", "Duplicate match arm.", arm.span);
+        }
+        dict_set(seen, variant, true);
+        push_scope(c);
+        let fields = symbol_info(c, variant).parameters;
+        let bindings = list_new<SymbolId>();
+        var j = 0;
+        while j < list_len(arm.names) && j < list_len(fields) {
+            let name = list_get(arm.names, j);
+            var b = no_symbol();
+            if name.name != "_" {
+                b = bind(c, name.name, symbol_info(c, list_get(fields, j)).type_id, false, arm.span, false);
+            }
+            list_push(bindings, b);
+            j = j + 1;
+        }
+        if list_len(arm.names) != list_len(fields) {
+            bad(c, "E210", "Incorrect pattern field count.", arm.span);
+        }
+        var body = list_new<StmtId>();
+        var value = no_expr();
+        if value_mode {
+            value = check_expr(c, arm.value);
+            let actual = checked_expr(c, value).type_id;
+            if has_type(result_type) {
+                require_type(c, actual, result_type, arm.span);
+            } else {
+                result_type = actual;
+            }
+        } else {
+            body = check_block(c, arm.body, false);
+        }
+        pop_scope(c);
+        list_push(checked, CheckedArm(value: value, variant: variant, bindings: bindings, body: body, span: arm.span));
+        i = i + 1;
+    }
+    if dict_len(seen) != list_len(e.variants) {
+        let details = empty_details();
+        var j = 0;
+        while j < list_len(e.variants) {
+            let v = list_get(e.variants, j);
+            if !dict_has(seen, v) {
+                list_push(details.missing_variants, e.name +"::"+ symbol_info(c, v).name);
+            }
+            j = j + 1;
+        }
+        if e.span.end > e.span.start {
+            list_push(details.related, RelatedLocation(message: "Enum is declared here.", span: e.span));
+        }
+        fail_details(c, "E216", "Non-exhaustive match; missing: " + join_text(details.missing_variants, ", ") +".", span, details);
+    }
+    return checked;
+}
+pub fn check_interpolation(c: Context, syntax: SyntaxExpr) -> ExprId effects { state, io, process } {
+    var n = expression_record(115, syntax.span, string_type());
+    for i in 0 .. list_len(syntax.arguments) {
+        let part = list_get(syntax.arguments, i);
+        var value = check_expr(c, part.value);
+        if part.label != "" {
+            let t = checked_expr(c, value).type_id;
+            let format = part.label;
+            if format != "d" && format != "s" && format != "b" && format != "display" {
+                bad(c, "E220", "Unknown interpolation format: " + format, ast_expr(c, part.value).span);
+            }
+            if format == "d" {
+                require_type(c, t, int_type(), ast_expr(c, part.value).span);
+            }
+            if format == "s" {
+                require_type(c, t, string_type(), ast_expr(c, part.value).span);
+            }
+            if format == "b" {
+                require_type(c, t, bool_type(), ast_expr(c, part.value).span);
+            }
+            if format == "display" && !is_scalar(scalar_type(c, t)) {
+                bad(c, "E201", "display requires a scalar value.", ast_expr(c, part.value).span);
+            }
+            var converted = expression_record(116, ast_expr(c, part.value).span, string_type());
+            converted.left = value;
+            value = add_expr(c, converted);
+        }
+        list_push(n.arguments, value);
+    }
+    return add_expr(c, n);
+}

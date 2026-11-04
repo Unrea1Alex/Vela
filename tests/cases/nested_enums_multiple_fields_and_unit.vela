@@ -1,0 +1,17 @@
+
+            enum Outer { Item(Inner, Int), Empty }
+            enum Inner { Pair(String, Bool), Nothing(Unit) }
+            fn unit() -> Unit {}
+            fn main() -> Unit effects { io } {
+                let ignored = Inner::Nothing(unit());
+                let value = Outer::Item(Inner::Pair("nested", true), 42);
+                match value {
+                    Outer::Item(inner, n) => {
+                        match inner {
+                            Inner::Pair(text, flag) => { print(text); print(flag); print(n); }
+                            Inner::Nothing(_) => { print("unexpected"); }
+                        }
+                    }
+                    Outer::Empty => { print("empty"); }
+                }
+            }

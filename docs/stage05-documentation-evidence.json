@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-04",
+  "files": 21,
+  "local_links": 72,
+  "missing_links": 0,
+  "interpolation_unicode_span": {
+    "expected_start": 33,
+    "actual": {
+      "start": 33,
+      "end": 40,
+      "line": 1,
+      "column": 34,
+      "end_line": 1,
+      "end_column": 41
+    }
+  }
+}

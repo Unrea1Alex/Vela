@@ -1,0 +1,48 @@
+extern "fixture.dll" fn echo64(x: Int) -> Int effects { state, process };
+extern "fixture.dll" fn echo32(x: Int32) -> Int32 effects { state, process };
+extern "fixture.dll" fn mixed(a: Int, b: Float64, c: Int32, d: Float64, e: Int, f: Float64) -> Float64 effects { state, process };
+extern "fixture.dll" fn invert(x: Bool) -> Bool effects { state, process };
+extern "fixture.dll" fn bytes_ok(x: String) -> Int effects { state, process };
+extern "fixture.dll" fn tick() -> Unit effects { state, process };
+extern "fixture.dll" fn tick_count() -> Int effects { state, process };
+extern "fixture.dll" fn rounding() -> Int effects { state, process };
+extern "fixture.dll" fn resource(x: Int) -> ForeignHandle effects { state, process };
+extern "fixture.dll" fn null_resource() -> ForeignHandle effects { state, process };
+extern "fixture.dll" fn resource_value(x: ForeignHandle) -> Int effects { state, process };
+extern "fixture.dll" fn release_count() -> Int effects { state, process };
+fn narrowed(x: Int) -> Int32 {
+    return match int32_from_int(x) { Int32Result::Ok(v) => v, Int32Result::Err(message) => bad_value(message) };
+}
+fn bad_value(message: String) -> Int32 { assert_true(false, message); return narrowed(0); }
+fn closed(r: WriteResult) -> Unit {
+    match r { WriteResult::Ok => {} WriteResult::Err(e) => { assert_true(false, e); } }
+}
+fn main() -> Unit effects { state, process, io } {
+    closed(ffi_load("fixture.dll"));
+    assert_true(rounding() == 1, "ABI probe restores fenv");
+    assert_true(echo64(-9223372036854775808) == -9223372036854775808, "Int64 minimum");
+    assert_true(echo64(9223372036854775807) == 9223372036854775807, "Int64 maximum");
+    assert_true(int32_to_int(echo32(narrowed(-2147483648))) == -2147483648, "Int32 minimum");
+    assert_true(int32_to_int(echo32(narrowed(2147483647))) == 2147483647, "Int32 maximum");
+    for x in -1 .. 2 {
+        let outside = 2147483648 + x * 4294967297;
+        if x != 0 { match int32_from_int(outside) { Int32Result::Err(_) => {} Int32Result::Ok(_) => { assert_true(false, "narrowing"); } } }
+    }
+    assert_true(mixed(1, 2.5, narrowed(3), 4.25, 5, 6.75) == 22.5, "register and stack arguments");
+    assert_true(invert(false) && !invert(true), "Bool");
+    assert_true(bytes_ok("A\0😀") == 1, "borrowed bytes");
+    tick();
+    assert_true(tick_count() == 1 && rounding() == 1, "void and fenv");
+    let handle = resource(42);
+    assert_true(!ffi_is_null(handle), "allocation");
+    let alias = handle;
+    assert_true(resource_value(alias) == 42, "handle alias");
+    closed(ffi_close(handle, "release_resource"));
+    assert_true(rounding() == 1 && release_count() == 1, "destructor once and fenv");
+    match ffi_close(alias, "release_resource") { WriteResult::Err(_) => {} WriteResult::Ok => { assert_true(false, "repeated close"); } }
+    assert_true(release_count() == 1, "second close did not enter C");
+    let null = null_resource();
+    assert_true(ffi_is_null(null) && resource_value(null) == -1, "null handle");
+    closed(ffi_close(null, "release_resource"));
+    print("ffi ABI 1 passed");
+}

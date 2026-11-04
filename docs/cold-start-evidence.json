@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "client": "codex-cli 0.157.0",
+  "model": "client default; captured per task",
+  "mode": "read-only agent produces checked source; independent harness saves/builds/runs",
+  "initial_attempts": "cold-start-initial-policy-evidence.json",
+  "base": "E:\\Temp\\vela-coldstart-AwNIJM",
+  "toolchain": "G:\\Vela\\work\\native-0.6.0-stage",
+  "adapter": "G:\\Vela\\work\\mcp-0.6.0-delivery",
+  "tasks": [
+    {
+      "name": "collections",
+      "agent_exit": 0,
+      "cases": [
+        {
+          "index": 0,
+          "passed": true,
+          "exit": 0,
+          "stdout": "11\r\n3\r\n",
+          "stderr": ""
+        },
+        {
+          "index": 1,
+          "passed": true,
+          "exit": 0,
+          "stdout": "0\r\n1\r\n",
+          "stderr": ""
+        },
+        {
+          "index": 2,
+          "passed": true,
+          "exit": 0,
+          "stdout": "0\r\n0\r\n",
+          "stderr": ""
+        }
+      ],
+      "check_calls": 1,
+      "help_calls": 3,
+      "failed_checks": 0,
+      "unknown_api_diagnostics": 0,
+      "model": "gpt-6-astra",
+      "notes": "No failed attempts. vela_check passed once with no diagnostics. Context, help, and check reported matching Vela 0.6.0 compiler fingerprints. No files written; build and execution not performed.",
+      "build_exit": 0,
+      "passed": true
+    },
+    {
+      "name": "result",
+      "agent_exit": 0,
+      "cases": [
+        {
+          "index": 0,
+          "passed": true,
+          "exit": 0,
+          "stdout": "42\r\n",
+          "stderr": ""
+        },
+        {
+          "index": 1,
+          "passed": true,
+          "exit": 0,
+          "stdout": "-8\r\n",
+          "stderr": ""
+        },
+        {
+          "index": 2,
+          "passed": true,
+          "exit": 0,
+          "stdout": "error\r\n",
+          "stderr": ""
+        }
+      ],
+      "check_calls": 1,
+      "help_calls": 3,
+      "failed_checks": 0,
+      "unknown_api_diagnostics": 0,
+      "model": "gpt-6-astra",
+      "notes": "No failed attempts. vela_check passed once with no diagnostics. Context, help, and check compiler fingerprints matched Vela 0.6.0. No files written; no build or runtime tests performed.",
+      "build_exit": 0,
+      "passed": true
+    },
+    {
+      "name": "unicode_file",
+      "agent_exit": 0,
+      "cases": [
+        {
+          "index": 0,
+          "passed": true,
+          "exit": 0,
+          "stdout": "18\r\n",
+          "stderr": ""
+        },
+        {
+          "index": 1,
+          "passed": true,
+          "exit": 0,
+          "stdout": "4\r\n",
+          "stderr": ""
+        }
+      ],
+      "check_calls": 1,
+      "help_calls": 3,
+      "failed_checks": 0,
+      "unknown_api_diagnostics": 0,
+      "model": "gpt-6-astra",
+      "notes": "No failed attempts. vela_check(path=\"main.vela\", text=source) passed with no diagnostics. Context, help, and check fingerprints matched: b26d1ab74688b3ee78b7b4e6687bdb2252189ca311a4d6fba884ef50f65b00d5 (Vela 0.6.0). No files written; no build or runtime tests performed.",
+      "build_exit": 0,
+      "passed": true
+    },
+    {
+      "name": "dependency",
+      "agent_exit": 0,
+      "cases": [
+        {
+          "index": 0,
+          "passed": true,
+          "exit": 0,
+          "stdout": "16\r\n",
+          "stderr": ""
+        },
+        {
+          "index": 1,
+          "passed": true,
+          "exit": 0,
+          "stdout": "-5\r\n",
+          "stderr": ""
+        }
+      ],
+      "check_calls": 1,
+      "help_calls": 5,
+      "failed_checks": 0,
+      "unknown_api_diagnostics": 0,
+      "model": "gpt-6-astra",
+      "notes": "First draft passed vela_check(path=\"vela.project\", overlay_path=\"main.vela\") with no diagnostics. Project symbols confirmed score(Int) -> Int with no effects. Standalone library symbol inspection initially failed with E207 (missing main); project inspection succeeded. Toolchain fingerprint matched across calls: b26d1ab74688b3ee78b7b4e6687bdb2252189ca311a4d6fba884ef50f65b00d5. No files changed; no build or execution performed.",
+      "build_exit": 0,
+      "passed": true
+    },
+    {
+      "name": "repair",
+      "agent_exit": 0,
+      "cases": [
+        {
+          "index": 0,
+          "passed": true,
+          "exit": 0,
+          "stdout": "15\r\n",
+          "stderr": ""
+        },
+        {
+          "index": 1,
+          "passed": true,
+          "exit": 0,
+          "stdout": "0\r\n",
+          "stderr": ""
+        },
+        {
+          "index": 2,
+          "passed": true,
+          "exit": 0,
+          "stdout": "55\r\n",
+          "stderr": ""
+        }
+      ],
+      "check_calls": 1,
+      "help_calls": 3,
+      "failed_checks": 0,
+      "unknown_api_diagnostics": 0,
+      "model": "gpt-6-astra",
+      "notes": "No failed attempts. Final source passed vela_check(path=\"main.vela\", text=source) with no diagnostics. Context, help, and check fingerprints matched Vela 0.6.0. No files written; no build or execution performed.",
+      "build_exit": 0,
+      "passed": true
+    }
+  ]
+}

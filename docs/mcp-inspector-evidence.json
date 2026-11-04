@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "client": "MCP Inspector 2.13.0",
+  "native": "G:\\Vela\\work\\archive released 0.6\\native",
+  "adapter": "G:\\Vela\\work\\archive released 0.6\\mcp",
+  "checks": [
+    {
+      "era": "legacy",
+      "method": "tools/list",
+      "tool": "",
+      "passed": true
+    },
+    {
+      "era": "legacy",
+      "method": "tools/call",
+      "tool": "vela_get_context",
+      "passed": true
+    },
+    {
+      "era": "legacy",
+      "method": "tools/call",
+      "tool": "vela_check",
+      "passed": true
+    },
+    {
+      "era": "legacy",
+      "method": "tools/call",
+      "tool": "vela_format",
+      "passed": true
+    },
+    {
+      "era": "legacy",
+      "method": "tools/call",
+      "tool": "vela_symbols",
+      "passed": true
+    },
+    {
+      "era": "legacy",
+      "method": "resources/list",
+      "tool": "",
+      "passed": true
+    },
+    {
+      "era": "legacy",
+      "method": "resources/read",
+      "tool": "vela://help/builtins",
+      "passed": true
+    },
+    {
+      "era": "modern",
+      "method": "tools/list",
+      "tool": "",
+      "passed": true
+    },
+    {
+      "era": "modern",
+      "method": "tools/call",
+      "tool": "vela_get_context",
+      "passed": true
+    },
+    {
+      "era": "modern",
+      "method": "tools/call",
+      "tool": "vela_check",
+      "passed": true
+    },
+    {
+      "era": "modern",
+      "method": "tools/call",
+      "tool": "vela_format",
+      "passed": true
+    },
+    {
+      "era": "modern",
+      "method": "tools/call",
+      "tool": "vela_symbols",
+      "passed": true
+    },
+    {
+      "era": "modern",
+      "method": "resources/list",
+      "tool": "",
+      "passed": true
+    },
+    {
+      "era": "modern",
+      "method": "resources/read",
+      "tool": "vela://help/builtins",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+// Generic data processing, explicit error conversion and early propagation.
+struct Batch<T> {
+    values: List<T>
+}
+fn parsed(text: String) -> Result<Int, String> {
+    return match parse_int(text) {
+        IntResult::Ok(n) => Result<Int, String>::Ok(n), IntResult::Err(e) => Result<Int, String>::Err(e)
+    };
+}
+fn total(batch: Batch<String>) -> Result < Int, String > effects { state } {
+    var sum = 0;
+    for text in batch.values {
+        let number = parsed(text)?;
+        sum = sum + number;
+    }
+    return Result<Int, String>::Ok(sum);
+}
+fn main() -> Unit effects { state, io } {
+    let values = list_new<String>();
+    for n in 1 ..= 4 {
+        list_push(values, f"{n:d}");
+    }
+    let batch = Batch<String>(values: values);
+    print(match total(batch) {
+        Result::Ok(n) => f"total={n:d}", Result::Err(e) => f"error: {e:s}"
+    });
+    list_push(values, "invalid");
+    print(match total(batch) {
+        Result::Ok(_) => "unexpected success", Result::Err(_) => "invalid input rejected"
+    });
+}

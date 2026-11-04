@@ -1,0 +1,2 @@
+enum Choice{Skip,Stop,Keep}
+fn main()->Unit effects {io}{var i=0;while i<6 {i=i+1;let c=match Option<Int>::Some(i){Option::Some(x)=>Choice::Keep,Option::None=>Choice::Stop};match c {Choice::Skip=>{continue;} Choice::Stop=>{break;} Choice::Keep=>{if i==2 {continue;} if i==4 {break;} print(i);}} } print(i);}

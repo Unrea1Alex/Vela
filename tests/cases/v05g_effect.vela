@@ -1,0 +1,1 @@
+fn f<T>(x:T)->T effects {io} {print(x);return x;} fn main()->Unit { f(1); }

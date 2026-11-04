@@ -1,0 +1,1 @@
+fn main() -> Unit effects { state } { let a = dict_new<Int, String>(); dict_set(a, 1, 2); }

@@ -1,0 +1,1 @@
+fn f<T>(x:T)->T {print(x);return x;} fn main()->Unit { let value = f(1); }

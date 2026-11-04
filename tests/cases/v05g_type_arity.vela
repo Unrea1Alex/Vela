@@ -1,0 +1,1 @@
+struct B<T>{x:T} fn main()->Unit {B<Int,String>(x:1);}

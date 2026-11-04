@@ -1,0 +1,245 @@
+import "model.vela";
+import "core.vela";
+import "source.vela";
+import "modules.vela";
+import "driver.vela";
+import "parser.vela";
+import "errors.vela";
+pub struct NativeDependency {
+    name: String,
+    path: String,
+    relative: String
+}
+pub struct Project {
+    manifest: String,
+    text: String,
+    name: String,
+    entry: String,
+    dependencies: List<ProjectDependency>,
+    natives: List<NativeDependency>,
+    tests: List<String>
+}
+pub fn project_split(text: String, separator: Int) -> List<String> effects { state } {
+    let parts = list_new<String>();
+    var start = 0;
+    for i in 0 .. str_len(text) {
+        if str_byte(text, i) == separator {
+            list_push(parts, str_slice(text, start, i));
+            start = i + 1;
+        }
+    }
+    list_push(parts, str_slice(text, start, str_len(text)));
+    return parts;
+}
+pub fn project_identifier(text: String) -> Bool {
+    if text == "" {
+        return false;
+    }
+    for i in 0 .. str_len(text) {
+        let b = str_byte(text, i);
+        if !(b >= 65 && b <= 90 || b >= 97 && b <= 122 || b == 95 || i > 0 && b >= 48 && b <= 57) {
+            return false;
+        }
+    }
+    return true;
+}
+pub fn project_fail(path: String, code: String, message: String, json_mode: Bool) -> Unit effects { state, io, process } {
+    bad(make_context("", path, json_mode), code, message, empty_span());
+}
+pub fn project_relative(path: String, owned: Bool) -> Bool effects { state } {
+    if path == "" {
+        return false;
+    }
+    if str_byte(path, 0) == 47 || str_byte(path, 0) == 92 {
+        return false;
+    }
+    for i in 0 .. str_len(path) {
+        let b = str_byte(path, i);
+        if b < 32 || b == 58 || b == 92 {
+            return false;
+        }
+    }
+    if owned {
+        for part in project_split(path, 47) {
+            if part == ".." {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+pub fn project_is_manifest(path: String) -> Bool {
+    let n = str_len(path);
+    return n >= 6 && str_slice(path, n - 6, n) == ".vproj" || n >= 12 && str_slice(path, n - 12, n) == "vela.project" && (n == 12 || str_byte(path, n - 13) == 47 || str_byte(path, n - 13) == 92);
+}
+pub fn project_load(input: String, json_mode: Bool) -> Project effects { state, io, process } {
+    var p = Project(manifest: "", text: "", name: "", entry: input, dependencies: list_new<ProjectDependency>(), natives: list_new<NativeDependency>(), tests: list_new<String>());
+    if !project_is_manifest(input) {
+        return p;
+    }
+    p.manifest = input;
+    p.text = load_source(input, json_mode);
+    p.entry = "";
+    if str_len(p.text) > 1048576 {
+        project_fail(input, "E225", "Manifest exceeds 1 MiB.", json_mode);
+    }
+    var header = false;
+    for line in project_split(p.text, 10) {
+        if line != ""&& str_byte(line, 0) != 35 {
+            let fields = project_split(line, 124);
+            let kind = list_get(fields, 0);
+            if !header {
+                if line != "vela-project|1" {
+                    project_fail(input, "E225", "Expected vela-project|1.", json_mode);
+                }
+                header = true;
+            } else if kind == "name" && list_len(fields) == 2 && p.name == "" {
+                p.name = list_get(fields, 1);
+                if !project_identifier(p.name) {
+                    project_fail(input, "E225", "Invalid project name.", json_mode);
+                }
+            } else if kind == "entry" && list_len(fields) == 2 && p.entry == "" {
+                let path = list_get(fields, 1);
+                if !project_relative(path, true) {
+                    project_fail(input, "E225", "Invalid entry path.", json_mode);
+                }
+                p.entry = io_value(absolute_path(parent_path(input) + "/" + path));
+            } else if kind == "dep" && list_len(fields) == 3 {
+                let alias = list_get(fields, 1);
+                let path = list_get(fields, 2);
+                if !project_identifier(alias) || !project_relative(path, false) || list_len(p.dependencies) >= 128 {
+                    project_fail(input, "E225", "Invalid dependency.", json_mode);
+                }
+                for dep in p.dependencies {
+                    if dep.alias == alias {
+                        project_fail(input, "E225", "Duplicate dependency alias.", json_mode);
+                    }
+                }
+                list_push(p.dependencies, ProjectDependency(alias: alias, path: io_value(absolute_path(parent_path(input) + "/" + path)), relative: path));
+            } else if kind == "native" && list_len(fields) == 3 {
+                let name = list_get(fields, 1);
+                let path = list_get(fields, 2);
+                if !foreign_library_name(name) || !project_relative(path, false) || list_len(p.natives) >= 128 {
+                    project_fail(input, "E225", "Invalid native dependency.", json_mode);
+                }
+                for previous in p.natives {
+                    if path_key(previous.name) == path_key(name) { project_fail(input, "E225", "Duplicate native library.", json_mode); }
+                }
+                list_push(p.natives, NativeDependency(name: name, path: io_value(absolute_path(parent_path(input) + "/" + path)), relative: path));
+            } else if kind == "test" && list_len(fields) == 2 {
+                let path = list_get(fields, 1);
+                if !project_relative(path, true) || list_len(p.tests) >= 128 {
+                    project_fail(input, "E225", "Invalid test path.", json_mode);
+                }
+                let absolute = io_value(absolute_path(parent_path(input) + "/" + path));
+                for previous in p.tests {
+                    if path_key(previous) == path_key(absolute) {
+                        project_fail(input, "E225", "Duplicate test.", json_mode);
+                    }
+                }
+                list_push(p.tests, absolute);
+            } else {
+                project_fail(input, "E225", "Unknown, duplicate or malformed manifest field: " + kind, json_mode);
+            }
+        }
+    }
+    if !header || p.name == ""|| p.entry == "" {
+        project_fail(input, "E225", "Manifest requires header, name and entry.", json_mode);
+    }
+    return p;
+}
+pub fn project_lock_text(p: Project, json_mode: Bool) -> String effects { state, io, process } {
+    let lines = strings_new();
+    strings_push(lines, "vela-lock|1\nmanifest|" + sha256(p.text) + "\n");
+    for dep in p.dependencies {
+        let c = project_module_context(dep.path, dep.path, load_source(dep.path, json_mode), json_mode, p.dependencies);
+        let graph = strings_new();
+        for unit in c.source_units {
+            strings_push(graph, sha256(unit.code) + "\n");
+        }
+        for edge in c.imports {
+            strings_push(graph, to_string(edge.owner) + "|" + to_string(edge.target) + "|" + edge.alias + "\n");
+        }
+        strings_push(lines, "dep|" + dep.alias + "|" + dep.relative + "|" + sha256(strings_join(graph, "")) + "\n");
+    }
+    for native in p.natives {
+        strings_push(lines, "native|" + native.name + "|" + native.relative + "|" + sha256(io_value(read_file(native.path))) + "\n");
+    }
+    return strings_join(lines, "");
+}
+pub fn project_verify_lock(p: Project, json_mode: Bool) -> Unit effects { state, io, process } {
+    if list_len(p.dependencies) == 0 && list_len(p.natives) == 0 {
+        return;
+    }
+    let expected = project_lock_text(p, json_mode);
+    match source_text_result(p.manifest + ".lock") {
+        Result::Ok(actual) => {
+            if actual == expected {
+                return;
+            }
+        }
+        Result::Err(_) => {}
+    }
+    project_fail(p.manifest, "E226", "Missing or stale lock; run vela lock PROJECT after reviewing dependencies.", json_mode);
+}
+pub fn project_write_lock(p: Project, json_mode: Bool) -> Int effects { state, io, process } {
+    if p.manifest == "" {
+        project_fail(p.entry, "E225", "lock requires a project manifest.", json_mode);
+    }
+    let lock = p.manifest + ".lock";
+    let identity = io_value(file_identity(lock));
+    let c = project_module_context(p.entry, p.entry, load_source(p.entry, json_mode), json_mode, p.dependencies);
+    for unit in c.source_units {
+        if path_key(lock) == path_key(unit.path) || identity != ""&& identity == unit.identity {
+            project_fail(lock, "E226", "Lock must not overwrite source.", json_mode);
+        }
+    }
+    for dep in p.dependencies {
+        let graph = project_module_context(dep.path, dep.path, load_source(dep.path, json_mode), json_mode, p.dependencies);
+        for unit in graph.source_units {
+            if path_key(lock) == path_key(unit.path) || identity != ""&& identity == unit.identity {
+                project_fail(lock, "E226", "Lock must not overwrite dependency source.", json_mode);
+            }
+        }
+    }
+    for test in p.tests {
+        if path_key(lock) == path_key(test) || identity != ""&& identity == io_value(file_identity(test)) {
+            project_fail(lock, "E226", "Lock must not overwrite test source.", json_mode);
+        }
+    }
+    if identity != ""&& identity == io_value(file_identity(p.manifest)) {
+        project_fail(lock, "E226", "Lock must not overwrite manifest.", json_mode);
+    }
+    for native in p.natives {
+        if path_key(lock) == path_key(native.path) || identity != "" && identity == io_value(file_identity(native.path)) {
+            project_fail(lock, "E226", "Lock must not overwrite native input.", json_mode);
+        }
+    }
+    write_atomic(lock, project_lock_text(p, json_mode));
+    if json_mode {
+        print("{\"schema_version\":1,\"ok\":true,\"lock\":" + json_string(lock) + "}");
+    } else {
+        print("Locked: " + p.manifest);
+    }
+    return 0;
+}
+pub fn stage_native(natives: List<NativeDependency>, directory: String) -> Result<Bool, String> effects { state, io, process } {
+    // Preflight every destination before writing any companion.
+    for native in natives {
+        let destination = directory + "/" + native.name;
+        let identity = from_string(file_identity(destination))?;
+        let data = from_string(read_file(native.path))?;
+        if identity != "" {
+            if from_string(read_file(destination))? != data {
+                return Result<Bool, String>::Err("Conflicting native output: " + destination);
+            }
+        }
+    }
+    for native in natives {
+        let destination = directory + "/" + native.name;
+        if from_string(file_identity(destination))? == "" {
+            let saved = write_atomic_result(destination, from_string(read_file(native.path))?)?;
+        }
+    }
+    return Result<Bool, String>::Ok(true);
+}

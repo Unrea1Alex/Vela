@@ -1,0 +1,2 @@
+fn value(x:Option<Int>)->Option<String> {return Option<String>::Some(to_string(x?));}
+fn main()->Unit effects {io} {print(match value(Option<Int>::None) {Option::Some(x)=>x,Option::None=>"none"});print(match value(Option<Int>::Some(4)) {Option::Some(x)=>x,Option::None=>"none"});}

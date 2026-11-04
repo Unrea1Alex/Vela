@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "version": "0.7.0",
+  "status": "payload_verified",
+  "native": {
+    "compiler_sha256": "b4a8f64ada2925b3410c8aed84447cea0a45d8df5fa3f4693633eb862e62b199",
+    "clean_verify": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 974,
+      "failed": 0,
+      "skipped": 0
+    },
+    "application_build": true,
+    "application_tests": 3,
+    "application_stdout": "count=3 total=10.5 mean=3.5\r\n",
+    "requires_node": false,
+    "requires_python": false
+  },
+  "mcp": {
+    "npm_ci_omit_dev": true,
+    "setup_doctor": true,
+    "windows_powershell_5_1_prepare": true,
+    "pinned_cache_files": 3219,
+    "execution": {
+      "schema_version": 1,
+      "tools": 8,
+      "compiler_id": "b4a8f64ada2925b3410c8aed84447cea0a45d8df5fa3f4693633eb862e62b199",
+      "execution_toolchain_id": "6b03b0ba6eb9e14eac1ca3b2965fd79e999f3372099e7e7797c6a11eed4b4085",
+      "tests": 3,
+      "stdout": "count=3 total=10.5 mean=3.5\r\n",
+      "passed": true
+    }
+  },
+  "archives": [
+    "dist/vela-0.7.0-windows-x64.zip",
+    "dist/vela-mcp-0.7.0.zip"
+  ],
+  "archive_integrity_report": "dist/stage07-archive-hashes.json",
+  "archive_integrity_note": "Archive SHA-256 and post-extraction verification are recorded separately beside the archives to avoid a self-referential checksum.",
+  "historical_0_6_archives_preserved": true,
+  "logs": [
+    "build/stage07/078-package-npm.log",
+    "build/stage07/078-package-setup.log",
+    "build/stage07/078-package-app-build.log",
+    "build/stage07/078-package-app-tests.json",
+    "build/stage07/078-packaged-prepare.log",
+    "build/stage07/078-packaged-execution-setup.log",
+    "build/stage07/078-packaged-execution.log"
+  ]
+}

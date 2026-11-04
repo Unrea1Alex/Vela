@@ -1,0 +1,3 @@
+fn greet(name: String) -> String ensures str_len(result) == str_len(name) + 3;
+            { return str_concat("Hi ", name); }
+            fn main() -> Unit effects { io } { print(greet("Vela")); }

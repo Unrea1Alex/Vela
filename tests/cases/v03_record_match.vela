@@ -1,0 +1,1 @@
+struct P {} fn main() -> Unit { match P() { P::X => {} } }

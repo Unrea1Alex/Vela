@@ -1,0 +1,1 @@
+fn main() -> Unit { var x = 1; x = false; }

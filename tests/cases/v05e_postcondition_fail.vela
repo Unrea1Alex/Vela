@@ -1,0 +1,2 @@
+fn work()->Option<Int> ensures false; { let x=Option<String>::None?; return Option<Int>::Some(1); }
+fn main()->Unit {let r=work();}

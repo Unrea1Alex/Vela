@@ -1,0 +1,29 @@
+import "../../std/json.vela" as json;
+extern "vela-net-prototype.dll" fn http_get(port: Int, path: String) -> ForeignHandle effects { state, process, io };
+extern "vela-net-prototype.dll" fn http_error(response: ForeignHandle) -> Int effects { state, process };
+extern "vela-net-prototype.dll" fn http_status(response: ForeignHandle) -> Int effects { state, process };
+extern "vela-net-prototype.dll" fn http_size(response: ForeignHandle) -> Int effects { state, process };
+extern "vela-net-prototype.dll" fn http_byte(response: ForeignHandle, index: Int) -> Int effects { state, process };
+fn argument(index: Int) -> String effects { args } {
+    return match arg(index) { StringResult::Ok(s) => s, StringResult::Err(_) => "" };
+}
+fn number(text: String) -> Int {
+    return match parse_int(text) { IntResult::Ok(n) => n, IntResult::Err(_) => -1 };
+}
+fn main() -> Unit effects { args, state, process, io } {
+    let response = http_get(number(argument(0)), argument(1));
+    assert_true(!ffi_is_null(response), "response allocation");
+    let error = http_error(response);
+    let status = http_status(response);
+    let size = http_size(response);
+    assert_true(http_byte(response, -1) == -1 && http_byte(response, size) == -1, "body bounds");
+    let parts = strings_new();
+    for i in 0 .. size { strings_push(parts, str_from_byte(http_byte(response, i))); }
+    let body = strings_join(parts, "");
+    if argument(1) == "/json" && error == 0 {
+        match json::parse(body) { Result::Ok(_) => {} Result::Err(_) => { assert_true(false, "JSON response"); } }
+    }
+    match ffi_close(response, "http_close") { WriteResult::Ok => {} WriteResult::Err(e) => { assert_true(false, e); } }
+    print(f"error={error:d} status={status:d} bytes={size:d}");
+    if size < 256 { write_stdout(body); }
+}

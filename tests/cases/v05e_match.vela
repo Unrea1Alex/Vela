@@ -1,0 +1,3 @@
+enum Choice { First(Int), Other(String) }
+fn mark(x:Int)->Int effects {io} {print(x);return x;}
+fn main()->Unit effects {io} { let n = match Choice::First(3) { Choice::First(x) => mark(x), Choice::Other(_) => mark(9), }; print(n); print(match Option<String>::None {Option::Some(s)=>s,Option::None=>"none"}); }

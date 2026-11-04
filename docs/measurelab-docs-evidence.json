@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "version": "0.7.0",
+  "revision": "post-measurelab-docs",
+  "status": "verified",
+  "roadmap": {
+    "items": 61,
+    "added": [
+      "0.8.7",
+      "0.8.8",
+      "0.8.9",
+      "0.8.10",
+      "0.9.7",
+      "0.9.8",
+      "0.9.9"
+    ],
+    "all_added_unimplemented": true,
+    "next": "0.8.1"
+  },
+  "documents": {
+    "files": 44,
+    "local_links": 190,
+    "missing": []
+  },
+  "native": {
+    "compiler_rebuilt": false,
+    "runtime_tests_rerun": false,
+    "reason": "Documentation and planning only; native/runtime/library bytes match verified pins.",
+    "compiler_sha256": "b4a8f64ada2925b3410c8aed84447cea0a45d8df5fa3f4693633eb862e62b199",
+    "checks": [
+      "quickstart-main",
+      "quickstart-result",
+      "stdlib-json",
+      "ffi-declarations",
+      "examples/agent-idioms/main.vela",
+      "apps/measurelab/vela.project",
+      "resource rejected E225",
+      "old-native rejected E225"
+    ]
+  },
+  "skill": {
+    "quick_validate": true,
+    "installed_measurelab_copy_updated": true,
+    "sha256": "454d6d3d3ae673ca6e58c05b7768881cf7911da1894c13293a1dc68fd8df3dd9"
+  },
+  "archives": {
+    "unchanged": true,
+    "sha256": {
+      "dist/vela-0.7.0-windows-x64.zip": "4b661ec9e531f5cb41061bc033f2782bab3d682f1d933e3b0b49a564595611af",
+      "dist/vela-mcp-0.7.0.zip": "730dce30be2b6122efa79e656c542dbf00e7852c91ee7a1446ca24b1eebf4eeb",
+      "dist/measurelab-1.0-windows-x64.zip": "ca7c8a0b293c41db09e9494894241969418f0e051b11351f2aea4d031284a569"
+    }
+  },
+  "mcp": {
+    "pending": false,
+    "compatibility_sha256": "af4fd8d19906bd1d42785226f0ecafa1338a023941ec817739e4f7d1769c483b",
+    "changed_document_pins": [
+      "docs/AGENT-QUICKSTART.md",
+      "docs/LANGUAGE.md",
+      "docs/PROJECTS.md",
+      "docs/MEMORY.md",
+      "docs/contracts/NUMBERS.md",
+      "docs/STDLIB.md",
+      "docs/contracts/TESTING.md",
+      "docs/contracts/FFI.md"
+    ],
+    "help_topics": 11,
+    "resources": 11,
+    "exact_file_bytes": true,
+    "native_check": true,
+    "native_rejection": "E201",
+    "setup_test": {
+      "passed": 1,
+      "failed": 0,
+      "idempotence": true,
+      "preserved_client_settings": true
+    },
+    "measurelab_doctor": {
+      "tools": 8,
+      "execution": true,
+      "client_discovery": "not_tested"
+    },
+    "transport": "Official SDK / stdio",
+    "native_tools_in_current_chat": "not_tested",
+    "logs": [
+      "build/docs-measurelab/mcp-help.log",
+      "build/docs-measurelab/mcp-help.json",
+      "build/docs-measurelab/mcp-setup.log",
+      "build/docs-measurelab/measurelab-doctor.log"
+    ]
+  },
+  "limitations": [
+    "New roadmap features are planned, not implemented.",
+    "No compiler/runtime rebuild or full semantic suite for this documentation-only change.",
+    "Doctor/SDK validation does not establish tool discovery in the current chat.",
+    "Existing release and MeasureLab ZIPs retain their original documentation; updated working-tree docs need their matching compatibility manifest."
+  ]
+}

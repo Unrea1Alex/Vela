@@ -1,0 +1,4 @@
+struct Box<T> { value: T }
+struct Pair<A,B> { first: A, second: B }
+fn get<T>(b: Box<T>) -> T { return b.value; }
+fn main() -> Unit effects { io } { let b = Box<Int>(value: 7); let p = Pair<Box<Int>,String>(second: "pair", first: b); print(get(p.first)); print(p.second); }

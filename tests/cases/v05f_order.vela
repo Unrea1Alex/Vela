@@ -1,0 +1,2 @@
+fn mark(n:Int)->Int effects {io}{print(n);return n;}
+fn main()->Unit effects {io}{print(f"{mark(1):d}-{mark(2):d}-{mark(3):d}");}

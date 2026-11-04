@@ -1,0 +1,4 @@
+type ID = distinct Int;
+fn show<T: Scalar>(x: T) -> String { return to_string(x); }
+fn add<T: Number>(x: T) -> T { return x+1; }
+fn main() -> Unit effects { io } { print(show(ID(5))); print(add(6)); }

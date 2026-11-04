@@ -1,0 +1,2 @@
+struct Node<T> { value: T, children: List<Node<T>> }
+fn main() -> Unit effects { state, io } { let n = Node<Int>(value: 8, children: list_new<Node<Int>>()); list_push(n.children,n); print(list_get(n.children,0).value); }

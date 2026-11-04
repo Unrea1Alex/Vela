@@ -1,0 +1,9 @@
+# Compatibility manifests hash exact bytes. Do not normalize checkout line endings.
+* -text
+*.exe binary
+*.dll binary
+*.jpg binary
+*.png binary
+bootstrap/velac.c linguist-generated=true
+selfhost/compiler.vela linguist-generated=true
+selfhost/embedded.vela linguist-generated=true

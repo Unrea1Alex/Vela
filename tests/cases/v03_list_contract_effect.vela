@@ -1,0 +1,1 @@
+fn len(a: List<Int>) -> Int effects { state } requires list_len(a) > 0; { return list_len(a); } fn main() -> Unit {}

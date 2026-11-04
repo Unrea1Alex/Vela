@@ -1,0 +1,7 @@
+fn main() -> Unit effects { io } {
+            print("Привет, Vela!");
+            print("a\0b" == "a\0b");
+            print("a\0b" != "a\0c");
+            print("\"\\\t");
+            print("a\0b");
+        }

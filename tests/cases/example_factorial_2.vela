@@ -1,0 +1,35 @@
+// Build: python -m vela build examples/factorial.vela -o bin/factorial.exe
+// Run:   bin/factorial.exe 10
+fn factorial(n: Int) -> Int
+    requires n >= 0 && n <= 20;
+    ensures result >= 1;
+{
+    var product = 1;
+    var i = 2;
+    while i <= n {
+        product = product * i;
+        i = i + 1;
+    }
+    return product;
+}
+
+fn main() -> Int effects { io, args } {
+    if arg_count() != 1 {
+        print("Usage: factorial <integer 0..20>");
+        return 2;
+    }
+    match arg_int(0) {
+        IntResult::Ok(n) => {
+            if n < 0 || n > 20 {
+                print("Expected an integer between 0 and 20.");
+                return 2;
+            }
+            print(factorial(n));
+            return 0;
+        }
+        IntResult::Err(message) => {
+            print(message);
+            return 2;
+        }
+    }
+}

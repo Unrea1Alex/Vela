@@ -1,0 +1,1 @@
+fn main() -> Unit effects { io } { match read_file("x") { StringResult::Ok(value) => {} } }

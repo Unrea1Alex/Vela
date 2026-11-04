@@ -1,0 +1,1 @@
+fn main() -> Unit effects { state } { strings_truncate(strings_new(), 1); }

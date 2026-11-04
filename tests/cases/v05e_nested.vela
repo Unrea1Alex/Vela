@@ -1,0 +1,2 @@
+fn get<T>(x:Result<T,String>)->Result<T,String>{return Result<T,String>::Ok(x?);}
+fn main()->Unit effects {io} { let r=Result<Option<Int>,String>::Ok(Option<Int>::Some(6)); print(match get(r) {Result::Ok(o)=>match o {Option::Some(x)=>x,Option::None=>0},Result::Err(_)=>-1}); }

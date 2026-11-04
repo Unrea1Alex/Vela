@@ -1,0 +1,11 @@
+{
+  "version": "0.4.0",
+  "c_only_recovery": true,
+  "compiler_source_check": true,
+  "collection_example_output": [
+    "root node",
+    "leaf",
+    "count=2",
+    "missing"
+  ]
+}

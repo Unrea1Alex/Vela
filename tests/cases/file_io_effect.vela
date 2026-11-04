@@ -1,0 +1,1 @@
+fn main() -> Unit { let result_value = read_file("x"); }

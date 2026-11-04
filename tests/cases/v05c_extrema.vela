@@ -1,0 +1,1 @@
+fn main()->Unit effects {io}{for i in 9223372036854775806..=9223372036854775807 {print(i);continue;} for i in -9223372036854775808..-9223372036854775806 {print(i);} }

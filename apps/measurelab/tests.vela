@@ -1,0 +1,149 @@
+import "model.vela" as model;
+import "statistics.vela" as stats;
+import "report.vela" as report;
+import "@testing" as testing;
+import "@json" as json;
+fn document(samples: String, extra: String) -> String {
+    return "{\"title\":\"Test\",\"scenarios\":[{\"name\":\"Case\",\"unit\":\"ms\",\"baseline\":5,\"budget\":9,\"samples\":" + samples + extra + "}]}";
+}
+fn from_samples(source: String) -> Result < report::Report, String > effects { state, process } {
+    return report::analyze(model::parse(document(source, ""))?);
+}
+test "empty object rejected" effects { state } {
+    testing::is_err(model::parse("{}"), "missing title");
+}
+test "known population statistics and input order" effects { state, process } {
+    let parsed = model::parse(document("[2,4,4,4,5,5,7,9]", ""));
+    match parsed {
+        Result::Ok(data) => {
+            match report::analyze(data) {
+                Result::Ok(r) => {
+                    let s = list_get(r.rows, 0).summary;
+                    testing::equal(s.count, 8, "count");
+                    testing::close(s.mean, 5.0, 0.00000001, "mean");
+                    testing::close(s.median, 4.5, 0.00000001, "median");
+                    testing::close(s.p95, 9.0, 0.00000001, "p95");
+                    testing::close(s.deviation, 2.0, 0.00000001, "population sigma");
+                    testing::equal(r.exceeded, 0, "budget equality passes");
+                    testing::close(list_get(list_get(data.scenarios, 0).samples, 0), 2.0, 0.0, "source preserved");
+                }
+                Result::Err(e) => {
+                    assert_true(false, e);
+                }
+            }
+        }
+        Result::Err(e) => {
+            assert_true(false, e);
+        }
+    }
+}
+test "single sample has zero deviation" effects { state, process } {
+    match from_samples("[0.25]") {
+        Result::Ok(r) => {
+            let s = list_get(r.rows, 0).summary;
+            testing::close(s.mean, 0.25, 0.0, "mean");
+            testing::close(s.median, 0.25, 0.0, "median");
+            testing::close(s.deviation, 0.0, 0.0, "sigma");
+        }
+        Result::Err(e) => {
+            assert_true(false, e);
+        }
+    }
+}
+test "nearest rank and sorting a copy" effects { state, process } {
+    let values = list_new<Float64>();
+    for i in 0 .. 20 {
+        list_push(values, float_from_int(20 - i));
+    }
+    match stats::analyze(values) {
+        Result::Ok(s) => {
+            testing::close(s.p95, 19.0, 0.0, "rank 19, not interpolated");
+            testing::close(s.median, 10.5, 0.0, "even median");
+            testing::close(s.minimum, 1.0, 0.0, "min");
+            testing::close(s.maximum, 20.0, 0.0, "max");
+            testing::close(list_get(values, 0), 20.0, 0.0, "original order");
+        }
+        Result::Err(e) => {
+            assert_true(false, e);
+        }
+    }
+}
+test "odd median zero variance and upper range" effects { state, process } {
+    match from_samples("[1000000000,1000000000,1000000000]") {
+        Result::Ok(r) => {
+            let s = list_get(r.rows, 0).summary;
+            testing::close(s.mean, 1000000000.0, 0.0, "large mean");
+            testing::close(s.median, 1000000000.0, 0.0, "odd median");
+            testing::close(s.deviation, 0.0, 0.0, "constant variance");
+            testing::equal(r.exceeded, 1, "budget exceeded");
+        }
+        Result::Err(e) => {
+            assert_true(false, e);
+        }
+    }
+}
+test "fractional values and negative baseline delta" effects { state, process } {
+    match from_samples("[1.25,2.5,3.75]") {
+        Result::Ok(r) => {
+            let row = list_get(r.rows, 0);
+            testing::close(row.summary.mean, 2.5, 0.00000001, "fractional mean");
+            testing::close(row.summary.deviation, 1.0206207261596576, 0.00000001, "fractional sigma");
+            testing::close(row.change, -50.0, 0.00000001, "delta");
+        }
+        Result::Err(e) => {
+            assert_true(false, e);
+        }
+    }
+}
+test "sample count boundary" effects { state, process } {
+    let values = list_new<Float64>();
+    for i in 1 ..= 256 {
+        list_push(values, float_from_int(i));
+    }
+    match stats::analyze(values) {
+        Result::Ok(s) => {
+            testing::close(s.p95, 244.0, 0.0, "256-sample p95");
+        }
+        Result::Err(e) => {
+            assert_true(false, e);
+        }
+    }
+    list_push(values, 1.0);
+    testing::is_err(stats::analyze(values), "257 samples");
+}
+test "invalid sample tables" effects { state } {
+    let cases = list_new < testing::Case<String, Bool> >();
+    list_push(cases, testing::Case<String, Bool>(name: "empty", input: "[]", expected: false));
+    list_push(cases, testing::Case<String, Bool>(name: "negative", input: "[-1]", expected: false));
+    list_push(cases, testing::Case<String, Bool>(name: "too large", input: "[1000000001]", expected: false));
+    list_push(cases, testing::Case<String, Bool>(name: "string", input: "[\"4\"]", expected: false));
+    list_push(cases, testing::Case<String, Bool>(name: "null", input: "[null]", expected: false));
+    list_push(cases, testing::Case<String, Bool>(name: "overflow", input: "[1e999]", expected: false));
+    for c in cases {
+        testing::is_err(model::parse(document(c.input, "")), c.name);
+    }
+}
+test "duplicate and unknown JSON fields" effects { state } {
+    testing::is_err(model::parse(document("[1]", ",\"extra\":1")), "unknown");
+    testing::is_err(model::parse(document("[1]", ",\"name\":\"other\"")), "duplicate key");
+    testing::is_err(model::parse("{\"title\":\"X\",\"scenarios\":[],\"extra\":1}"), "unknown root");
+}
+test "invalid UTF8 and numeric types" effects { state } {
+    testing::is_err(model::parse(str_from_byte(255)), "UTF8");
+    testing::is_err(model::number(json::Value::Boolean(true)), "no Bool coercion");
+    testing::is_err(model::number(json::Value::Number(1.0 / 0.0)), "infinity");
+}
+test "HTML escaping" effects { state } {
+    testing::equal(report::escaped("<script>\"&'"), "&lt;script&gt;&quot;&amp;&#39;", "all markup escaped");
+    testing::equal(report::escaped("Замер 😀"), "Замер 😀", "Unicode preserved");
+}
+test "display rounding table" effects { state } {
+    let cases = list_new < testing::Case<Float64, String> >();
+    list_push(cases, testing::Case<Float64, String>(name: "carry", input: 1.999, expected: "2.00"));
+    list_push(cases, testing::Case<Float64, String>(name: "negative", input: -1.25, expected: "-1.25"));
+    list_push(cases, testing::Case<Float64, String>(name: "tiny", input: -0.000001, expected: "0.00"));
+    list_push(cases, testing::Case<Float64, String>(name: "leading zero", input: 0.05, expected: "0.05"));
+    for c in cases {
+        testing::equal(report::fixed(c.input), c.expected, c.name);
+    }
+}

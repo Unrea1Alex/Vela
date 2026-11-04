@@ -1,0 +1,1 @@
+fn main() -> Unit effects { io } { print(f"{1.0:d}"); }

@@ -1,0 +1,26 @@
+{
+  "formatted_authored_sources": 21,
+  "files": [
+    "selfhost/model.vela",
+    "selfhost/core.vela",
+    "selfhost/source.vela",
+    "selfhost/lexer.vela",
+    "selfhost/parser.vela",
+    "selfhost/types.vela",
+    "selfhost/semantic.vela",
+    "selfhost/emitter.vela",
+    "selfhost/intrinsics.vela",
+    "selfhost/formatter.vela",
+    "selfhost/driver.vela",
+    "G:\\Vela\\tools\\bundle.vela",
+    "G:\\Vela\\tools\\dev.vela",
+    "G:\\Vela\\tools\\test.vela",
+    "G:\\Vela\\examples\\collections.vela",
+    "G:\\Vela\\examples\\factorial.vela",
+    "G:\\Vela\\examples\\gcd.vela",
+    "G:\\Vela\\examples\\hello.vela",
+    "G:\\Vela\\examples\\result.vela",
+    "G:\\Vela\\examples\\sum.vela",
+    "G:\\Vela\\examples\\word_count.vela"
+  ]
+}

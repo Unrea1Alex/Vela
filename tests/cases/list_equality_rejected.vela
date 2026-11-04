@@ -1,0 +1,1 @@
+fn main() -> Unit effects { state } { let a = ints_new(); let equal = a == a; }

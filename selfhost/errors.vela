@@ -1,0 +1,64 @@
+import "model.vela";
+import "core.vela";
+import "types.vela";
+import "semantic.vela";
+pub fn propagation_family(c: Context, id: TypeId) -> String effects { state, io, process } {
+    if type_kind(c, id) != 70 {
+        return "";
+    }
+    let t = type_info(c, id);
+    let root = list_get(type_parts(t.name), 0);
+    if root != "Option" && root != "Result" {
+        return "";
+    }
+    if t.template_index != type_info(c, find_type(c, root)).template_index {
+        return "";
+    }
+    return root;
+}
+pub fn check_propagation(c: Context, syntax: SyntaxExpr) -> ExprId effects { state, io, process } {
+    let ctl = list_get(c.control, 0);
+    if ctl.in_contract {
+        bad(c, "E218", "Propagation is not allowed in contracts.", syntax.span);
+    }
+    let value = check_expr(c, syntax.left);
+    let operand = checked_expr(c, value).type_id;
+    let family = propagation_family(c, operand);
+    if family == "" {
+        bad(c, "E218", "Propagation requires Option or Result.", syntax.span);
+    }
+    if propagation_family(c, ctl.return_type) != family {
+        bad(c, "E201", "Propagation requires the same return family.", syntax.span);
+    }
+    let t = type_info(c, operand);
+    let target = type_info(c, ctl.return_type);
+    if family == "Result" {
+        require_type(c, list_get(t.arguments, 1), list_get(target.arguments, 1), syntax.span);
+    }
+    var n = expression_record(114, syntax.span, list_get(t.arguments, 0));
+    n.left = value;
+    n.symbol = list_get(target.variants, 1);
+    return add_expr(c, n);
+}
+pub fn from_string(r: StringResult) -> Result<String, String> {
+    return match r {
+        StringResult::Ok(s) => Result<String, String>::Ok(s), StringResult::Err(e) => Result<String, String>::Err(e)
+    };
+}
+pub fn from_write(r: WriteResult) -> Result<Bool, String> {
+    return match r {
+        WriteResult::Ok => Result<Bool, String>::Ok(true), WriteResult::Err(e) => Result<Bool, String>::Err(e)
+    };
+}
+pub fn io_result<T>(r: Result<T, String>, fallback: T) -> T effects { io, process } {
+    match r {
+        Result::Ok(value) => {
+            return value;
+        }
+        Result::Err(message) => {
+            eprint("velac: " + message);
+            exit(2);
+            return fallback;
+        }
+    }
+}

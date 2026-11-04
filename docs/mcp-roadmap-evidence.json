@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-04",
+  "scope": "MCP roadmap planning only",
+  "implementation_started": false,
+  "compiler_runtime_tests_run": false,
+  "reason": "Documentation-only change; checked links, content, statuses and dependency order",
+  "checks": {
+    "local_links": 33,
+    "missing_links": 0,
+    "unique_roadmap_item_ids": 54,
+    "prior_item_ids_retained": 48,
+    "new_items": [
+      "0.6.6",
+      "0.6.7",
+      "0.6.8",
+      "0.7.7",
+      "0.7.8",
+      "0.9.6"
+    ],
+    "all_new_items_unchecked": true,
+    "acceptance_criteria_present": true,
+    "dependency_edges_checked": [
+      [
+        "0.6.5",
+        "0.6.6"
+      ],
+      [
+        "0.6.6",
+        "0.6.7"
+      ],
+      [
+        "0.6.7",
+        "0.6.8"
+      ],
+      [
+        "0.6.8",
+        "0.7.7"
+      ],
+      [
+        "0.7.2",
+        "0.7.7"
+      ],
+      [
+        "0.7.3",
+        "0.7.7"
+      ],
+      [
+        "0.7.7",
+        "0.7.8"
+      ],
+      [
+        "0.8.6",
+        "0.9.6"
+      ],
+      [
+        "0.9.5",
+        "0.9.6"
+      ]
+    ],
+    "next_step": "0.6.1",
+    "native_toolchain_independent_of_node_mcp": true
+  },
+  "content_review": {
+    "local_mvp": "0.6.6–0.6.8",
+    "execution": "0.7.7–0.7.8",
+    "semantic_integration": "0.9.6",
+    "compiler_process_per_request": true,
+    "native_adapter_port": "Decision after 0.8 resource gate and 0.9 analysis service",
+    "remote_http": "Candidate after 0.11 network contracts; not part of local MVP"
+  },
+  "documents": [
+    {
+      "path": "docs/ROADMAP.md",
+      "sha256": "5c297289537fafd7c46b8b63715f95ce484170bdc8f75924fbbde6ba4fc51096"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "2fcb2d5b45590099f937b98255c126277cc9174ff643a0390b1c848e8a8ca40e"
+    }
+  ]
+}

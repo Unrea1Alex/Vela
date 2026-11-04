@@ -1,0 +1,1 @@
+fn main()->Unit effects {io}{print(f"outer {f"inner {3:d}":s}"); print(f"m={match Option<Int>::Some(8){Option::Some(x)=>x,Option::None=>0}:d}");}

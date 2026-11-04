@@ -1,0 +1,6 @@
+fn main() -> Unit effects { io } {
+    print(sha256(""));
+    print(sha256("abc"));
+    print(sha256("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"));
+    print(sha256(str_from_byte(0)));
+}

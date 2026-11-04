@@ -1,0 +1,28 @@
+import "../../std/testing.vela" as testing;
+import "../../std/text.vela" as text;
+import "../../std/json.vela" as json;
+test "UTF-8 rejects overlong encoding" {
+    testing::is_err(text::checked(str_from_byte(192) + str_from_byte(128)), "overlong NUL");
+    testing::is_ok(text::checked("Я😀"), "supplementary text");
+}
+test "integer parsing table" effects { state } {
+    let cases = list_new < testing::Case<String, Int> >();
+    list_push(cases, testing::Case<String, Int>(name: "positive", input: "42", expected: 42));
+    list_push(cases, testing::Case<String, Int>(name: "minimum", input: "-9223372036854775808", expected: -9223372036854775808));
+    for row in cases {
+        match parse_int(row.input) {
+            IntResult::Ok(n) => {
+                testing::equal(n, row.expected, row.name);
+            }
+            IntResult::Err(_) => {
+                assert_true(false, row.name);
+            }
+        }
+    }
+}
+test "JSON duplicate keys and numbers" effects { state } {
+    testing::is_err(json::parse("{\"a\":1,\"a\":2}"), "duplicate object key");
+    testing::is_err(json::parse("1e309"), "number overflow");
+    testing::is_ok(json::parse("[1,1.25,\"😀\"]"), "valid data");
+    testing::close(0.1 + 0.2, 0.3, 0.000000000001, "floating addition");
+}

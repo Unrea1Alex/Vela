@@ -1,0 +1,1 @@
+type A = distinct Int; fn main() -> Int { return A(1); }

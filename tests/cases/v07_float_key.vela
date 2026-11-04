@@ -1,0 +1,1 @@
+fn main() -> Unit effects { state } { let map = dict_new<Float64, Int>(); }

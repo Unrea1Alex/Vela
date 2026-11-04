@@ -1,0 +1,2 @@
+struct Row{items:List<Int>}
+fn main()->Unit effects {state,io}{let xs=list_new<Row>();let inner=list_new<Int>();list_push(xs,Row(items:inner));for row in xs {list_push(row.items,8);}print(list_get(list_get(xs,0).items,0));}

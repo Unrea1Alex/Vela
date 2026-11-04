@@ -1,0 +1,3 @@
+fn main() -> Int {
+            match parse_int("42") { IntResult::Ok(n) => { return 0; } }
+        }

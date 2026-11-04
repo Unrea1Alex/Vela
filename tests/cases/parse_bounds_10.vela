@@ -1,0 +1,1 @@
+fn main() -> Int effects { io, args } { match arg_int(0) { IntResult::Ok(n) => { print(n); return 0; } IntResult::Err(message) => { print("invalid"); return 2; } } }

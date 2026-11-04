@@ -1,0 +1,30 @@
+fn main() -> Int effects { args, io } {
+    match arg(0) {
+        StringResult::Ok(mode) => {
+            if mode == "loop" {
+                while true {}
+            }
+            if mode == "124" {
+                return 124;
+            }
+            match write_file("child.txt", "child cwd") {
+                WriteResult::Ok => {}
+                WriteResult::Err(_) => {
+                    return 3;
+                }
+            }
+            match arg(1) {
+                StringResult::Ok(value) => {
+                    print(value);
+                }
+                StringResult::Err(_) => {
+                    return 4;
+                }
+            }
+            return 17;
+        }
+        StringResult::Err(_) => {
+            return 2;
+        }
+    }
+}

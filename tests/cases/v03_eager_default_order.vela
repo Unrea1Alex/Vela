@@ -1,0 +1,6 @@
+fn mark(x: Int) -> Int effects { io } { print(x); return x; }
+fn main() -> Unit effects { state, io } {
+ let d = dict_new<Int, Int>(); dict_set(d, 1, 9);
+ print(dict_get_or(d, mark(1), mark(2)));
+ let a = list_new<Int>(); list_push(a, 0); list_set(a, mark(0), mark(7)); print(list_get(a, 0));
+}

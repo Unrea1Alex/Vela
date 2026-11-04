@@ -1,0 +1,2 @@
+fn work()->Option<Int>{for i in 0..3 {let value=Option<Int>::None?;} return Option<Int>::Some(9);}
+fn main()->Unit effects {io}{print(match work(){Option::Some(x)=>x,Option::None=>0});}

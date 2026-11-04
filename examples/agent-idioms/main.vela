@@ -1,0 +1,22 @@
+type ProductId = distinct Int;
+enum Movement { Add(Int), Take(Int) }
+struct Box<T> { value: T }
+fn unwrap<T>(box: Box<T>) -> T { return box.value; }
+fn apply(stock: Int, movement: Movement) -> Result<Int, String>
+    requires stock >= 0;
+{
+    let next = match movement { Movement::Add(n) => stock + n, Movement::Take(n) => stock - n };
+    if next < 0 { return Result<Int, String>::Err("insufficient stock"); }
+    return Result<Int, String>::Ok(next);
+}
+fn purchase(stock: Int) -> Result<Int, String> {
+    let added = apply(stock, Movement::Add(3))?;
+    return apply(added, Movement::Take(2));
+}
+fn main() -> Int effects { io } {
+    let id = unwrap(Box<ProductId>(value: ProductId(7)));
+    match purchase(4) {
+        Result::Ok(stock) => { print(f"product={id:display} stock={stock:d}"); return 0; }
+        Result::Err(message) => { eprint(message); return 1; }
+    }
+}

@@ -1,0 +1,17 @@
+model
+core
+source
+lexer
+parser
+modules
+projects
+project_cli
+types
+generics
+semantic
+errors
+control
+emitter
+intrinsics
+formatter
+driver

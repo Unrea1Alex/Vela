@@ -1,0 +1,6 @@
+fn value() -> String { return str_concat("ab", "Привет"); }
+            fn main() -> Unit effects { io } {
+                let s = value(); print(str_slice(s, 2, str_len(s))); print(str_len(s));
+                print(str_byte(s, 0)); print(str_from_byte(0) == "\0");
+                print(int_to_string(-9223372036854775808));
+            }

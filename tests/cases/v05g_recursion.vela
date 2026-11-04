@@ -1,0 +1,3 @@
+fn count<T>(x: T, n: Int) -> T { if n == 0 { return x; } return other(x,n-1); }
+fn other<T>(x: T, n: Int) -> T { return count(x,n); }
+fn main() -> Unit effects { io } { print(count("recursive",4)); }

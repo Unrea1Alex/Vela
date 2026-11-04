@@ -1,0 +1,3 @@
+enum Other { Ok(Int) } fn main() -> Unit {
+            match parse_int("42") { Other::Ok(n) => {} }
+        }

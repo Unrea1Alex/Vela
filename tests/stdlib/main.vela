@@ -1,0 +1,230 @@
+import "../../std/text.vela" as text;
+import "../../std/path.vela" as path;
+import "../../std/collections.vela" as collections;
+import "../../std/json.vela" as json;
+import "../../std/config.vela" as config;
+import "../../std/cli.vela" as cli;
+import "../../std/fs.vela" as fs;
+import "../../std/process.vela" as process;
+fn expect(ok: Bool, label: String) -> Unit effects { io, process } {
+    if !ok {
+        eprint(label);
+        exit(1);
+    }
+}
+fn ok<T, E>(value: Result<T, E>, label: String) -> T effects { io, process } {
+    match value {
+        Result::Ok(v) => {
+            return v;
+        }
+        Result::Err(_) => {
+            eprint(label);
+            exit(2);
+            return ok(value, label);
+        }
+    }
+}
+fn bad<T, E>(value: Result<T, E>) -> Bool {
+    return match value {
+        Result::Ok(_) => false, Result::Err(_) => true
+    };
+}
+fn argument(index: Int) -> String effects { args, process } {
+    match arg(index) {
+        StringResult::Ok(s) => {
+            return s;
+        }
+        StringResult::Err(_) => {
+            exit(3);
+            return "";
+        }
+    }
+}
+fn texts() -> Unit effects { io, process, state } {
+    expect(ok(text::checked("Я😀\0"), "utf8").data == "Я😀\0", "utf8 NUL");
+    expect(bad(text::checked(str_from_byte(192) + str_from_byte(128))), "overlong");
+    expect(bad(text::checked(str_from_byte(237) + str_from_byte(160) + str_from_byte(128))), "surrogate");
+    expect(bad(text::checked(str_from_byte(244) + str_from_byte(144) + str_from_byte(128) + str_from_byte(128))), "too large");
+    expect(bad(text::checked(str_from_byte(240))), "truncated");
+    expect(bad(text::slice(text::Text(data: "Я😀"), 1, 2)), "split codepoint");
+    expect(ok(text::slice(text::Text(data: "Я😀"), 2, 6), "slice").data == "😀", "slice value");
+    expect(bad(text::encode(text::Text(data: str_from_byte(255)))), "forged Text");
+    expect(ok(text::trim(text::Text(data: " \tЯ\r\n")), "trim").data == "Я", "trim value");
+    let parts = ok(text::split(text::Text(data: "a::b::"), text::Text(data:"::")), "split");
+    expect(list_len(parts) == 3 && list_get(parts, 2).data == "", "empty trailing split");
+    expect(bad(text::split(text::Text(data: "a"), text::Text(data: ""))), "empty separator");
+    expect(ok(text::html(text::Text(data: "<&\"'>")), "html").data == "&lt;&amp;&quot;&#39;&gt;", "html value");
+    expect(ok(text::pad_zero(-12, 5), "pad").data == "-0012", "pad sign");
+    expect(bad(text::pad_zero(1, 4097)), "padding bound");
+    expect(bad(path::checked("a\0b")), "NUL path");
+    expect(ok(path::parent(path::Path(value: "/file")), "parent").value == "/", "root parent");
+    expect(ok(path::parent(path::Path(value: "file")), "relative parent").value ==".", "relative parent value");
+    if platform() == "windows" {
+        expect(ok(path::parent(path::Path(value: "C:/file")), "drive parent").value == "C:/", "drive root");
+        expect(ok(path::parent(path::Path(value: "//server/share/file")), "UNC parent").value == "//server/share/", "UNC root");
+    }
+    print("text/path passed");
+}
+fn jsons() -> Unit effects { io, process, state } {
+    let input = "{\"s\":\"Я\\uD83D\\uDE00\\u0000\",\"a\":[true,false,null,-9223372036854775808,9223372036854775807,1.25]}";
+    let canonical = ok(json::stringify(ok(json::parse(input), "parse")), "stringify");
+    expect(canonical == "{\"s\":\"Я😀\\u0000\",\"a\":[true,false,null,-9223372036854775808,9223372036854775807,1.25]}", "JSON canonical");
+    expect(ok(json::stringify(ok(json::parse(canonical), "round trip")), "round trip output") == canonical, "JSON fixed point");
+    let invalid = list_new<String>();
+    list_push(invalid, "");
+    list_push(invalid, "[1,]");
+    list_push(invalid, "{\"x\":1,}");
+    list_push(invalid, "{\"x\":1,\"x\":2}");
+    list_push(invalid, "01");
+    list_push(invalid, "+1");
+    list_push(invalid, ".1");
+    list_push(invalid, "1.");
+    list_push(invalid, "1e+");
+    list_push(invalid, "NaN");
+    list_push(invalid, "1e309");
+    list_push(invalid, "true false");
+    list_push(invalid, "\"\\uD800\"");
+    list_push(invalid, "\"\\uDC00\"");
+    list_push(invalid, "\"\\uD800\\u0041\"");
+    list_push(invalid, "\"\n\"");
+    list_push(invalid, "\"\\x01\"");
+    list_push(invalid, str_from_byte(255));
+    for data in invalid {
+        expect(bad(json::parse(data)), "invalid JSON accepted: " + data);
+    }
+    expect(bad(json::stringify(json::Value::Number(1.0 / 0.0))), "nonfinite serialization");
+    expect(bad(json::stringify(json::Value::StringValue(str_from_byte(255)))), "forged JSON text");
+    expect(ok(json::stringify(json::Value::Number(-0.0)), "negative zero") == "-0.0", "float distinction");
+    var deep = "0";
+    for unused in 0 .. 129 {
+        deep = "[" + deep + "]";
+    }
+    expect(bad(json::parse(deep)), "depth limit");
+    let cycle = list_new < json::Value >();
+    list_push(cycle, json::Value::Array(cycle));
+    expect(bad(json::stringify(json::Value::Array(cycle))), "cyclic forged tree");
+    let members = list_new < json::Member >();
+    list_push(members, json::Member(name: "x", value: json::Value::Null));
+    list_push(members, json::Member(name: "x", value: json::Value::Null));
+    expect(bad(json::stringify(json::Value::Object(members))), "duplicate serialization");
+    let cfg = ok(config::parse("{\"s\":\"yes\",\"n\":1,\"f\":1.0,\"b\":true}"), "config");
+    expect(ok(config::string(cfg, "s"), "config string") == "yes", "string value");
+    expect(ok(config::integer(cfg, "n"), "config int") == 1, "int value");
+    expect(ok(config::number(cfg, "f"), "config float") == 1.0, "float value");
+    expect(bad(config::number(cfg, "n")) && bad(config::integer(cfg, "missing")), "no config coercion");
+    expect(ok(config::boolean(cfg, "b"), "config bool"), "bool value");
+    print("JSON/config passed");
+}
+fn options_and_sort() -> Unit effects { state, io, process } {
+    let specs = list_new < cli::Spec >();
+    list_push(specs, cli::Spec(name: "n", takes_value: true));
+    list_push(specs, cli::Spec(name: "flag", takes_value: false));
+    let argv = list_new<String>();
+    list_push(argv, "--n=-2");
+    list_push(argv, "--flag");
+    list_push(argv, "--");
+    list_push(argv, "--x");
+    let parsed = ok(cli::parse(argv, specs), "CLI");
+    expect(dict_get(parsed.options, "n") == "-2" && list_get(parsed.positional, 0) == "--x", "CLI values");
+    list_truncate(argv, 0);
+    list_push(argv, "--n");
+    expect(bad(cli::parse(argv, specs)), "missing CLI value");
+    list_push(argv, "2");
+    list_push(argv, "--n=3");
+    expect(bad(cli::parse(argv, specs)), "duplicate option");
+    list_truncate(argv, 0);
+    list_push(argv, "--other");
+    expect(bad(cli::parse(argv, specs)), "unknown option");
+    let floats = list_new<Float64>();
+    list_push(floats, 0.0 / 0.0);
+    list_push(floats, 2.0);
+    list_push(floats, -0.0);
+    list_push(floats, 0.0);
+    list_push(floats, -1.0);
+    let sorted = collections::sort_floats(floats);
+    expect(list_get(sorted, 0) == -1.0 && float_to_string(list_get(sorted, 1)) == "-0" && float_to_string(list_get(sorted, 2)) == "0" && float_is_nan(list_get(sorted, 4)), "stable float sort");
+    expect(float_is_nan(list_get(floats, 0)), "sort copies");
+    let ints = list_new<Int>();
+    list_push(ints, 2);
+    list_push(ints, 1);
+    list_push(ints, 2);
+    expect(list_get(collections::sort_ints(ints), 0) == 1, "Int sort");
+    let strings = list_new<String>();
+    list_push(strings, "b");
+    list_push(strings, "a");
+    expect(list_get(collections::sort_strings(strings), 0) == "a", "String sort");
+    print("CLI/collections passed");
+}
+fn files(directory: String) -> Unit effects { io, process } {
+    let file = path::Path(value: directory + "/данные 😀.json");
+    let saved = ok(fs::write_text_atomic(file, text::Text(data: "old")), "atomic write");
+    expect(ok(fs::read_text(file, 3), "bounded read").data == "old", "read exact bound");
+    expect(bad(fs::read_bytes(file, 2)), "read limit");
+    expect(bad(fs::write_text_atomic(file, text::Text(data: str_from_byte(255)))), "invalid encoding write");
+    expect(ok(fs::read_text(file, 3), "preserved").data == "old", "preserved destination");
+    let raw = ok(fs::write_atomic(file, text::Bytes(data: str_from_byte(255))), "raw bytes");
+    expect(bad(fs::read_text(file, 3)), "invalid input encoding");
+    expect(ok(fs::read_bytes(file, 1), "raw read").data == str_from_byte(255), "raw preserves bytes");
+    expect(bad(fs::write_atomic(path::Path(value: directory), text::Bytes(data: "x"))), "rename onto directory");
+    expect(bad(fs::write_atomic(path::Path(value: directory + "/absent/file"), text::Bytes(data: "x"))), "missing parent");
+    let empty = ok(fs::write_atomic(file, text::Bytes(data: "")), "empty write");
+    expect(ok(fs::read_bytes(file, 0), "empty limit").data == "", "empty bytes");
+    print("files passed");
+}
+fn processes(directory: String, child: String) -> Unit effects { io, process, state } {
+    let cwd = path::Path(value: directory);
+    let out = path::Path(value: directory + "/out.txt");
+    let err = path::Path(value: directory + "/err.txt");
+    let argv = list_new<String>();
+    list_push(argv, child);
+    list_push(argv, "echo");
+    list_push(argv, "quotes \" slash\\ Я😀");
+    expect(ok(process::run(argv, cwd, out, err, 10000), "process launch").code == 17, "process exit code");
+    let captured = ok(fs::read_text(out, 4096), "stdout").data;
+    expect(captured == "quotes \" slash\\ Я😀\n" || captured == "quotes \" slash\\ Я😀\r\n", "argv quoting");
+    expect(ok(fs::read_text(path::Path(value: directory + "/child.txt"), 100), "child cwd").data == "child cwd", "cwd applied");
+    list_set(argv, 1, "124");
+    expect(ok(process::run(argv, cwd, out, err, 10000), "exit124").code == 124, "124 is exit");
+    list_set(argv, 1, "loop");
+    match process::run(argv, cwd, out, err, 50) {
+        Result::Ok(_) => {
+            expect(false, "timeout missing");
+        }
+        Result::Err(error) => {
+            match error {
+                process::Error::TimedOut => {}
+                process::Error::InvalidArgument(_) => {
+                    expect(false, "wrong timeout");
+                }
+                process::Error::InvalidPath(_) => {
+                    expect(false, "wrong timeout");
+                }
+                process::Error::InvalidTimeout => {
+                    expect(false, "wrong timeout");
+                }
+                process::Error::OutputAlias => {
+                    expect(false, "wrong timeout");
+                }
+                process::Error::Launch(_) => {
+                    expect(false, "wrong timeout");
+                }
+            }
+        }
+    }
+    list_set(argv, 0, directory + "/missing.exe");
+    expect(bad(process::run(argv, cwd, out, err, 1000)), "missing executable");
+    expect(bad(process::run(argv, cwd, out, out, 1000)), "output alias");
+    list_set(argv, 0, child);
+    list_push(argv, "bad\0arg");
+    expect(bad(process::run(argv, cwd, out, err, 1000)), "NUL argv");
+    print("processes passed");
+}
+fn main() -> Int effects { io, process, state, args } {
+    texts();
+    jsons();
+    options_and_sort();
+    files(argument(0));
+    processes(argument(0), argument(1));
+    print("stdlib checks passed");
+    return 0;
+}

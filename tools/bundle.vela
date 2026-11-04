@@ -1,0 +1,201 @@
+// This bootstrap tool deliberately uses the 0.2 subset, so the frozen seed can build it.
+fn value(r: StringResult) -> String effects { io, process } {
+    match r {
+        StringResult::Ok(s) => {
+            return s;
+        }
+        StringResult::Err(e) => {
+            eprint(e);
+            exit(2);
+            return "";
+        }
+    }
+}
+fn done(r: WriteResult) -> Unit effects { io, process } {
+    match r {
+        WriteResult::Ok => {}
+        WriteResult::Err(e) => {
+            eprint(e);
+            exit(2);
+        }
+    }
+}
+fn split(s: String, delimiter: Int) -> StringList effects { state } {
+    let parts = strings_new();
+    var start = 0;
+    var i = 0;
+    while i < str_len(s) {
+        if str_byte(s, i) == delimiter {
+            strings_push(parts, str_slice(s, start, i));
+            start = i + 1;
+        }
+        i = i + 1;
+    }
+    strings_push(parts, str_slice(s, start, i));
+    return parts;
+}
+fn literal(s: String) -> String effects { state } {
+    let parts = strings_new();
+    strings_push(parts, "\"");
+    var i = 0;
+    while i < str_len(s) {
+        let b = str_byte(s, i);
+        if b == 34 {
+            strings_push(parts, "\\\"");
+        } else if b == 92 {
+            strings_push(parts, "\\\\");
+        } else if b == 10 {
+            strings_push(parts, "\\n");
+        } else if b == 13 {
+            strings_push(parts, "\\r");
+        } else if b == 9 {
+            strings_push(parts, "\\t");
+        } else if b == 0 {
+            strings_push(parts, "\\0");
+        } else {
+            strings_push(parts, str_slice(s, i, i + 1));
+        }
+        i = i + 1;
+    }
+    strings_push(parts, "\"");
+    return strings_join(parts, "");
+}
+fn catalog_error(message: String) -> Unit effects { io, process } {
+    eprint(str_concat("Invalid builtin catalog: ", message));
+    exit(2);
+}
+fn includes(items: StringList, value_text: String) -> Bool effects { state } {
+    var i = 0;
+    while i < strings_len(items) {
+        if strings_get(items, i) == value_text {
+            return true;
+        }
+        i = i + 1;
+    }
+    return false;
+}
+fn validate_catalog(data: String) -> Unit effects { state, io, process } {
+    let rows = split(data, 10);
+    let names = strings_new();
+    var i = 0;
+    let abis = split("plain;located;int_result;int32_result;float_result;read_result;process_result;string_result;write_result;print;format;list_new;list_len;list_get;list_set;list_push;list_truncate;dict_new;dict_len;dict_has;dict_get;dict_get_or;dict_set;dict_remove", 59);
+    let allowed_effects = split("io;args;state;process", 59);
+    while i < strings_len(rows) {
+        var row = strings_get(rows, i);
+        if str_len(row) > 0 && str_byte(row, str_len(row) - 1) == 13 {
+            row = str_slice(row, 0, str_len(row) - 1);
+        }
+        if row != ""&& str_byte(row, 0) != 35 {
+            let cols = split(row, 124);
+            if strings_len(cols) != 8 {
+                catalog_error("expected 8 columns");
+            }
+            let kind = strings_get(cols, 0);
+            let name = strings_get(cols, 1);
+            if kind != "fn" && kind != "enum" {
+                catalog_error("unknown record kind");
+            }
+            if name == ""|| includes(names, name) {
+                catalog_error("empty or duplicate name");
+            }
+            strings_push(names, name);
+            if kind == "fn" {
+                if strings_get(cols, 4) == "" {
+                    catalog_error("missing result type");
+                }
+                if !includes(abis, strings_get(cols, 6)) {
+                    catalog_error("unknown ABI");
+                }
+                if strings_get(cols, 5) != "" {
+                    let effect_names = split(strings_get(cols, 5), 59);
+                    let seen = strings_new();
+                    var j = 0;
+                    while j < strings_len(effect_names) {
+                        let effect_name = strings_get(effect_names, j);
+                        if !includes(allowed_effects, effect_name) || includes(seen, effect_name) {
+                            catalog_error("unknown or duplicate effect");
+                        }
+                        strings_push(seen, effect_name);
+                        j = j + 1;
+                    }
+                }
+            } else {
+                let variants = split(strings_get(cols, 3), 59);
+                var j = 0;
+                let seen = strings_new();
+                while j < strings_len(variants) {
+                    let pair = split(strings_get(variants, j), 58);
+                    if strings_len(pair) != 2 {
+                        catalog_error("invalid enum variant");
+                    }
+                    if strings_get(pair, 0) == ""|| includes(seen, strings_get(pair, 0)) {
+                        catalog_error("duplicate or empty variant");
+                    }
+                    strings_push(seen, strings_get(pair, 0));
+                    j = j + 1;
+                }
+            }
+        }
+        i = i + 1;
+    }
+}
+fn main() -> Int effects { args, io, state, process } {
+    var root =".";
+    if arg_count() > 0 {
+        root = value(arg(0));
+    }
+    var destination = str_concat(root, "/selfhost/compiler.vela");
+    if arg_count() > 1 {
+        destination = value(arg(1));
+    }
+    let catalog = value(read_file(str_concat(root, "/vela/builtins.def")));
+    validate_catalog(catalog);
+    let names = split(value(read_file(str_concat(root, "/selfhost/sources.list"))), 10);
+    let parts = strings_new();
+    var i = 0;
+    while i < strings_len(names) {
+        var name = strings_get(names, i);
+        if str_len(name) > 0 && str_byte(name, str_len(name) - 1) == 13 {
+            name = str_slice(name, 0, str_len(name) - 1);
+        }
+        if name != "" {
+            strings_push(parts, compiler_body(value(read_file(str_concat(str_concat(root, "/selfhost/"), str_concat(name, ".vela"))))));
+            strings_push(parts, "\n");
+        }
+        i = i + 1;
+    }
+    let embedded = str_concat(str_concat(str_concat("pub fn builtin_source() -> String { return ", literal(catalog)), "; }\npub fn runtime_source() -> String { return "), str_concat(literal(value(read_file(str_concat(root, "/vela/backends/runtime.h")))), "; }\n"));
+    strings_push(parts, compiler_body(embedded));
+    let output = strings_join(parts, "");
+    // Temporary sibling and replacement keep the existing bundle intact on errors.
+    let temporary = str_concat(destination, ".pending");
+    done(write_file(temporary, output));
+    done(replace_file(temporary, destination));
+    let embedded_path = str_concat(root, "/selfhost/embedded.vela");
+    done(write_file(str_concat(embedded_path, ".pending"), embedded));
+    done(replace_file(str_concat(embedded_path, ".pending"), embedded_path));
+    print(str_concat("Bundled ", int_to_string(str_len(output))));
+    return 0;
+}
+fn compiler_body(text: String) -> String effects { state } {
+    let lines = split(text, 10);
+    let parts = strings_new();
+    var i = 0;
+    while i < strings_len(lines) {
+        var line = strings_get(lines, i);
+        var imported = false;
+        if str_len(line) >= 7 {
+            imported = str_slice(line, 0, 7) == "import ";
+        }
+        if !imported {
+            if str_len(line) >= 4 {
+                if str_slice(line, 0, 4) == "pub " {
+                    line = str_slice(line, 4, str_len(line));
+                }
+            }
+            strings_push(parts, str_concat(line, "\n"));
+        }
+        i = i + 1;
+    }
+    return strings_join(parts, "");
+}

@@ -1,0 +1,5 @@
+fn increment(n: Int) -> Int
+                requires n < 9223372036854775807;
+                ensures result == n + 1;
+            { return n + 1; }
+            fn main() -> Unit effects { io } { print(increment(41)); }

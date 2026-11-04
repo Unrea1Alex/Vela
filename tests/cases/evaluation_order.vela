@@ -1,0 +1,7 @@
+
+            fn mark(n: Int) -> Int effects { io } { print(n); return n; }
+            fn join(a: Int, b: Int) -> Int { return a * 10 + b; }
+            fn main() -> Unit effects { io } {
+                print(join(mark(1), mark(2)));
+                print(mark(3) + mark(4));
+            }

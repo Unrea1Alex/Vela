@@ -1,0 +1,130 @@
+import "../../tools/test.vela";
+// Native module behavior checks with independent expected results.
+pub struct ModuleCase {
+    name: String,
+    main: String,
+    a: String,
+    b: String,
+    code: Int,
+    expected: String,
+    diagnostic: String
+}
+pub fn module_checks(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let cases = list_new<ModuleCase>();
+    list_push(cases, ModuleCase(name: "qualified", main: "import \"a.vela\" as a; fn main()->Unit effects{io}{print(a::twice(21));}", a: "pub fn twice(n:Int)->Int{return n*2;}", b: "", code: 0, expected: "42\n", diagnostic: ""));
+    list_push(cases, ModuleCase(name: "open", main: "import \"a.vela\"; fn main()->Unit effects{io}{print(twice(21));}", a: "pub fn twice(n:Int)->Int{return n*2;}", b: "", code: 0, expected: "42\n", diagnostic: ""));
+    list_push(cases, ModuleCase(name: "private", main: "import \"a.vela\" as a; fn main()->Int{return a::hidden();}", a: "fn hidden()->Int{return 42;}", b: "", code: 1, expected: "", diagnostic: "E223"));
+    list_push(cases, ModuleCase(name: "private_open", main: "import \"a.vela\"; fn main()->Int{return hidden();}", a: "fn hidden()->Int{return 42;}", b: "", code: 1, expected: "", diagnostic: "E203"));
+    list_push(cases, ModuleCase(name: "ambiguity", main: "import \"a.vela\"; import \"b.vela\"; fn main()->Int{return value();}", a: "pub fn value()->Int{return 1;}", b: "pub fn value()->Int{return 2;}", code: 1, expected: "", diagnostic: "E222"));
+    list_push(cases, ModuleCase(name: "own_wins", main: "import \"a.vela\"; import \"b.vela\"; fn value()->Int{return 42;} fn main()->Unit effects{io}{print(value());}", a: "pub fn value()->Int{return 1;}", b: "pub fn value()->Int{return 2;}", code: 0, expected: "42\n", diagnostic: ""));
+    list_push(cases, ModuleCase(name: "cycle", main: "import \"a.vela\"; fn main()->Unit effects{io}{print(even(6));}", a: "import \"b.vela\"; pub fn even(n:Int)->Bool{if n==0{return true;}return odd(n-1);}", b: "import \"a.vela\"; pub fn odd(n:Int)->Bool{if n==0{return false;}return even(n-1);}", code: 0, expected: "true\n", diagnostic: ""));
+    list_push(cases, ModuleCase(name: "nominal", main: "import \"a.vela\" as a; import \"b.vela\" as b; fn take(x:a::Item)->Int{return x.n;} fn main()->Int{return take(b::Item(n:1));}", a: "pub struct Item{n:Int}", b: "pub struct Item{n:Int}", code: 1, expected: "", diagnostic: "E201"));
+    list_push(cases, ModuleCase(name: "generic", main: "import \"a.vela\" as a; fn main()->Unit effects{io}{let x=a::Box<Int>(value:a::identity(42)); print(x.value);}", a: "pub struct Box<T>{value:T} fn private_id<T>(x:T)->T{return x;} pub fn identity<T>(x:T)->T{return private_id(x);}", b: "", code: 0, expected: "42\n", diagnostic: ""));
+    list_push(cases, ModuleCase(name: "enum", main: "import \"a.vela\" as a; fn main()->Unit effects{io}{let x=a::Value<Int>::Some(42); print(match x { a::Value::Some(n)=>n, a::Value::None=>0 });}", a: "pub enum Value<T>{Some(T),None}", b: "", code: 0, expected: "42\n", diagnostic: ""));
+    list_push(cases, ModuleCase(name: "public_leak", main: "import \"a.vela\"; fn main()->Unit{}", a: "struct Secret{n:Int} pub fn leak()->Secret{return Secret(n:1);}", b: "", code: 1, expected: "", diagnostic: "E224"));
+    list_push(cases, ModuleCase(name: "alias_conflict", main: "import \"a.vela\" as a; fn a()->Int{return 1;} fn main()->Unit{}", a: "", b: "", code: 1, expected: "", diagnostic: "E222"));
+    list_push(cases, ModuleCase(name: "late_import", main: "fn main()->Unit{} import \"a.vela\";", a: "", b: "", code: 1, expected: "", diagnostic: "E221"));
+    list_push(cases, ModuleCase(name: "duplicate_alias", main: "import \"a.vela\" as a; import \"b.vela\" as a; fn main()->Unit{}", a: "", b: "", code: 1, expected: "", diagnostic: "E222"));
+    list_push(cases, ModuleCase(name: "missing", main: "import \"absent.vela\"; fn main()->Unit{}", a: "", b: "", code: 1, expected: "", diagnostic: "E221"));
+    list_push(cases, ModuleCase(name: "value_cycle", main: "import \"a.vela\"; fn main()->Unit{}", a: "import \"b.vela\"; pub struct A{b:B}", b: "import \"a.vela\"; pub struct B{a:A}", code: 1, expected: "", diagnostic: "E204"));
+    list_push(cases, ModuleCase(name: "local_shadow", main: "import \"a.vela\"; fn main()->Int{let twice=1;return twice(1);}", a: "pub fn twice(n:Int)->Int{return n*2;}", b: "", code: 1, expected: "", diagnostic: "E201"));
+    list_push(cases, ModuleCase(name: "reserved", main: "import \"a.vela\"; fn main()->Unit{}", a: "pub fn print(n:Int)->Int{return n;}", b: "", code: 1, expected: "", diagnostic: "E202"));
+    list_push(cases, ModuleCase(name: "nested_type", main: "import \"a.vela\" as a; fn sum(xs:List<a::Box<Int>>)->Int effects{state}{return list_get(xs,0).n;} fn main()->Unit effects{state,io}{let xs=list_new<a::Box<Int>>();list_push(xs,a::Box<Int>(n:42));print(sum(xs));}", a: "pub struct Box<T>{n:T}", b: "", code: 0, expected: "42\n", diagnostic: ""));
+    list_push(cases, ModuleCase(name: "duplicate_import", main: "import \"a.vela\"; import \"./a.vela\"; fn main()->Unit effects{io}{print(answer());}", a: "pub fn answer()->Int{return 42;}", b: "", code: 0, expected: "42\n", diagnostic: ""));
+    let dir = s.dir + "/modules Юникод";
+    list_push(cases, ModuleCase(name: "file_boundary", main: "import \"a.vela\"; import \"b.vela\"; fn main()->Unit{}", a: "pub struct X{", b: "field:Int}", code: 1, expected: "", diagnostic: "E100"));
+    list_push(cases, ModuleCase(name: "entry_main", main: "import \"a.vela\";", a: "pub fn main()->Unit{}", b: "", code: 1, expected: "", diagnostic: "E207"));
+    list_push(cases, ModuleCase(name: "no_reexport", main: "import \"a.vela\"; fn main()->Int{return answer();}", a: "import \"b.vela\";", b: "pub fn answer()->Int{return 42;}", code: 1, expected: "", diagnostic: "E203"));
+    list_push(cases, ModuleCase(name: "no_root_leak", main: "import \"a.vela\"; fn secret()->Int{return 42;} fn main()->Int{return use();}", a: "pub fn use()->Int{return secret();}", b: "", code: 1, expected: "", diagnostic: "E203"));
+    list_push(cases, ModuleCase(name: "no_root_type_leak", main: "import \"a.vela\"; struct Secret{n:Int} fn main()->Unit{}", a: "fn use(x:Secret)->Int{return x.n;}", b: "", code: 1, expected: "", diagnostic: "E200"));
+    done(make_dir(dir));
+    let input = dir + "/main.vela";
+    let a = dir + "/a.vela";
+    let b = dir + "/b.vela";
+    let exe = dir + "/app.exe";
+    for test in cases {
+        done(write_file(input, test.main));
+        done(write_file(a, test.a));
+        done(write_file(b, test.b));
+        for mode in 0 .. 2 {
+            if mode == 1 {
+                let files = list_new<String>();
+                list_push(files, input);
+                list_push(files, a);
+                list_push(files, b);
+                for file in files {
+                    let fmt = invoke(s, compiler_command(s, "fmt", file), 15000);
+                    if fmt.code == 0 {
+                        done(write_file(file, fmt.out));
+                    }
+                    // A late import is a syntax-level graph rejection; fmt may reject it too.
+                    s = record(s, "module_fmt_" + test.name, fmt.code == 0 || ((test.name == "late_import" || test.name == "file_boundary") && fmt.code == 1), fmt.out + fmt.err);
+                }
+            }
+            let check = compiler_command(s, "check", input);
+            strings_push(check, "--json");
+            let outcome = invoke(s, check, 15000);
+            s = record(s, "module_check_" + test.name, outcome.code == test.code && outcome.err == ""&& (test.diagnostic == ""|| contains(outcome.out, "\"code\":\"" + test.diagnostic + "\"")), outcome.out + outcome.err);
+            if test.code == 0 && outcome.code == 0 {
+                let built = build(s, input, exe);
+                s = record(s, "module_build_" + test.name, built.code == 0, built.out + built.err);
+                if built.code == 0 {
+                    let ran = invoke(s, command(exe), 15000);
+                    s = record(s, "module_run_" + test.name, ran.code == 0 && replace(ran.out, "\r\n", "\n") == test.expected && ran.err == "", ran.out + ran.err);
+                }
+            }
+        }
+    }
+    done(write_file(input, "import \"a.vela\"; fn main()->Int{return answer();}"));
+    done(write_file(a, "// 😀\n\npub fn answer()->Int { return true; }\n"));
+    let check = compiler_command(s, "check", input);
+    strings_push(check, "--json");
+    let failure = invoke(s, check, 15000);
+    s = record(s, "module_source_location", failure.code == 1 && contains(failure.out, "a.vela") && contains(failure.out, "\"line\":3") && contains(failure.out, "\"code\":\"E201\""), failure.out + failure.err);
+    done(write_file(a, "pub fn answer()->Int{return 42;}"));
+    let emit = compiler_command(s, "emit-c", input);
+    strings_push(emit, "-o");
+    strings_push(emit, a);
+    let protected = invoke(s, emit, 15000);
+    s = record(s, "module_source_protection", protected.code == 2 && value(read_file(a)) == "pub fn answer()->Int{return 42;}", protected.out + protected.err);
+    done(write_file(a, "// 😀\n\npub fn answer()->Int{return 1/0;}\n"));
+    let built = build(s, input, exe);
+    s = record(s, "module_runtime_build", built.code == 0, built.out + built.err);
+    if built.code == 0 {
+        let ran = invoke(s, command(exe), 15000);
+        s = record(s, "module_runtime_location", ran.code == 70 && contains(ran.err, "a.vela:3:") && contains(ran.err, "division by zero"), ran.out + ran.err);
+    }
+    return module_limit_checks(s);
+}
+pub fn module_limit_checks(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let dir = s.dir + "/module-limits";
+    done(make_dir(dir));
+    let main = dir + "/main.vela";
+    let imports = strings_new();
+    for i in 0 .. 256 {
+        let name = "m" + to_string(i) + ".vela";
+        done(write_file(dir + "/" + name, ""));
+        strings_push(imports, "import \"" + name + "\";\n");
+    }
+    done(write_file(main, strings_join(imports, "") + "fn main()->Unit{}"));
+    let check = compiler_command(s, "check", main);
+    strings_push(check, "--json");
+    let count = invoke(s, check, 30000);
+    s = record(s, "module_file_limit", count.code == 1 && contains(count.out, "Module graph limit exceeded"), count.out + count.err);
+    done(write_file(main, "import \"m0.vela\"; fn main()->Unit{}"));
+    for i in 0 .. 128 {
+        done(write_file(dir + "/m" + to_string(i) + ".vela", "import \"m" + to_string(i + 1) + ".vela\";"));
+    }
+    let depth = invoke(s, check, 30000);
+    s = record(s, "module_depth_limit", depth.code == 1 && contains(depth.out, "Module graph limit exceeded"), depth.out + depth.err);
+    var large = "x";
+    for i in 0 .. 24 {
+        large = large + large;
+    }
+    done(write_file(main, "//" + large));
+    let bytes = invoke(s, check, 30000);
+    s = record(s, "module_byte_limit", bytes.code == 1 && contains(bytes.out, "Module graph exceeds 16 MiB"), bytes.out + bytes.err);
+    return s;
+}

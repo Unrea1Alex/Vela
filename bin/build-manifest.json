@@ -1,0 +1,54 @@
+﻿{
+    "version":  "0.5.0",
+    "compiler":  "native Vela",
+    "examples":  [
+                     {
+                         "name":  "collections",
+                         "bytes":  152064,
+                         "sha256":  "5f433a307fca77e4becf1abd8237b9dc94aa43214e97431ffa655be20255274a",
+                         "output":  "root node\nleaf\ncount=2\nmissing\n"
+                     },
+                     {
+                         "name":  "factorial",
+                         "bytes":  145408,
+                         "sha256":  "46eeaf5b15d6dfaa744b1dcca238ca0950b89f643057edafa9824c84647a7a97",
+                         "output":  "3628800\n"
+                     },
+                     {
+                         "name":  "gcd",
+                         "bytes":  145920,
+                         "sha256":  "bf8ed9dec79d0df4e052d985106d3b7c8b81f07cdbb2b9f9144c09b61ce65367",
+                         "output":  "6\n"
+                     },
+                     {
+                         "name":  "hello",
+                         "bytes":  143872,
+                         "sha256":  "b0725c4a457de988d2f6b4fb70fd88c932e6173d44c6ebaf288b0e2df3ebbf72",
+                         "output":  "Hello from Vela!\n42\n"
+                     },
+                     {
+                         "name":  "pipeline",
+                         "bytes":  153088,
+                         "sha256":  "0c5e1e396d52bb16431a27572c9f2b7e5fc2a72423d2c7197b0f269455634c8a",
+                         "output":  "total=10\ninvalid input rejected\n"
+                     },
+                     {
+                         "name":  "result",
+                         "bytes":  141824,
+                         "sha256":  "2a5b39c44881262e6d8a13e7902ed3c4ddd97d25baa016fdc395eb184e9f80ec",
+                         "output":  "42\n"
+                     },
+                     {
+                         "name":  "sum",
+                         "bytes":  144896,
+                         "sha256":  "a2ce6980dd566d6660b0fc442fb72e4af4e8fd2cde97ef2d3e3ba60b3fc5252e",
+                         "output":  "37\n"
+                     },
+                     {
+                         "name":  "word_count",
+                         "bytes":  165376,
+                         "sha256":  "124e80cfbeb116dd70fd960ff1ad9358b13123842ec4f9d9258fe6c3d277f399",
+                         "output":  "Bytes: 30\nLines: 2\nWords: 5\n"
+                     }
+                 ]
+}

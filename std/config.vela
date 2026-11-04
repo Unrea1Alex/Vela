@@ -1,0 +1,144 @@
+import "json.vela" as json;
+import "text.vela" as text;
+pub struct Config {
+    members: List<json::Member>
+}
+pub enum Error {
+    Json(json::Error),
+    RootType,
+    Missing(String),
+    WrongType(String),
+    Unknown(String),
+    Duplicate(String),
+    InvalidText(String)
+}
+pub fn from_value(value: json::Value) -> Result<Config, Error> effects { state } {
+    match value {
+        json::Value::Object(members) => {
+            let seen = dict_new<String, Bool>();
+            for member in members {
+                if text::invalid_offset(member.name) >= 0 {
+                    return Result<Config, Error>::Err(Error::InvalidText(member.name));
+                }
+                if dict_has(seen, member.name) {
+                    return Result<Config, Error>::Err(Error::Duplicate(member.name));
+                }
+                dict_set(seen, member.name, true);
+            }
+            return Result<Config, Error>::Ok(Config(members: members));
+        }
+        json::Value::Null => {}
+        json::Value::Boolean(_) => {}
+        json::Value::Integer(_) => {}
+        json::Value::Number(_) => {}
+        json::Value::StringValue(_) => {}
+        json::Value::Array(_) => {}
+    }
+    return Result<Config, Error>::Err(Error::RootType);
+}
+pub fn parse(data: String) -> Result<Config, Error> effects { state } {
+    match json::parse(data) {
+        Result::Ok(value) => {
+            return from_value(value);
+        }
+        Result::Err(error) => {
+            return Result<Config, Error>::Err(Error::Json(error));
+        }
+    }
+}
+pub fn find(config: Config, name: String) -> Result < Option < json::Value >, Error > effects { state } {
+    let valid = from_value(json::Value::Object(config.members))?;
+    for member in valid.members {
+        if member.name == name {
+            return Result < Option < json::Value >, Error >::Ok(Option < json::Value >::Some(member.value));
+        }
+    }
+    return Result < Option < json::Value >, Error >::Ok(Option < json::Value >::None);
+}
+pub fn required(config: Config, name: String) -> Result < json::Value, Error > effects { state } {
+    match find(config, name)? {
+        Option::Some(value) => {
+            return Result < json::Value, Error >::Ok(value);
+        }
+        Option::None => {
+            return Result < json::Value, Error >::Err(Error::Missing(name));
+        }
+    }
+}
+pub fn string(config: Config, name: String) -> Result<String, Error> effects { state } {
+    match required(config, name)? {
+        json::Value::StringValue(s) => {
+            if text::invalid_offset(s) >= 0 {
+                return Result<String, Error>::Err(Error::InvalidText(name));
+            }
+            return Result<String, Error>::Ok(s);
+        }
+        json::Value::Null => {}
+        json::Value::Boolean(_) => {}
+        json::Value::Integer(_) => {}
+        json::Value::Number(_) => {}
+        json::Value::Object(_) => {}
+        json::Value::Array(_) => {}
+    }
+    return Result<String, Error>::Err(Error::WrongType(name));
+}
+pub fn integer(config: Config, name: String) -> Result<Int, Error> effects { state } {
+    match required(config, name)? {
+        json::Value::Integer(n) => {
+            return Result<Int, Error>::Ok(n);
+        }
+        json::Value::Null => {}
+        json::Value::Boolean(_) => {}
+        json::Value::StringValue(_) => {}
+        json::Value::Number(_) => {}
+        json::Value::Object(_) => {}
+        json::Value::Array(_) => {}
+    }
+    return Result<Int, Error>::Err(Error::WrongType(name));
+}
+pub fn boolean(config: Config, name: String) -> Result<Bool, Error> effects { state } {
+    match required(config, name)? {
+        json::Value::Boolean(b) => {
+            return Result<Bool, Error>::Ok(b);
+        }
+        json::Value::Null => {}
+        json::Value::Integer(_) => {}
+        json::Value::StringValue(_) => {}
+        json::Value::Number(_) => {}
+        json::Value::Object(_) => {}
+        json::Value::Array(_) => {}
+    }
+    return Result<Bool, Error>::Err(Error::WrongType(name));
+}
+pub fn number(config: Config, name: String) -> Result<Float64, Error> effects { state } {
+    match required(config, name)? {
+        json::Value::Number(n) => {
+            if !float_is_finite(n) {
+                return Result<Float64, Error>::Err(Error::WrongType(name));
+            }
+            return Result<Float64, Error>::Ok(n);
+        }
+        json::Value::Null => {}
+        json::Value::Integer(_) => {}
+        json::Value::StringValue(_) => {}
+        json::Value::Boolean(_) => {}
+        json::Value::Object(_) => {}
+        json::Value::Array(_) => {}
+    }
+    return Result<Float64, Error>::Err(Error::WrongType(name));
+}
+pub fn allow_only(config: Config, names: List<String>) -> Result<Bool, Error> effects { state } {
+    let valid = from_value(json::Value::Object(config.members))?;
+    for member in valid.members {
+        var allowed = false;
+        for name in names {
+            if name == member.name {
+                allowed = true;
+            }
+        }
+        if !allowed {
+            return Result<Bool, Error>::Err(Error::Unknown(member.name));
+        }
+    }
+    return Result<Bool, Error>::Ok(true);
+}

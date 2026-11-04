@@ -1,0 +1,40 @@
+enum Counts { Value(Int, Int, Int) }
+
+fn count(input: String) -> Counts {
+    var lines = 0;
+    var words = 0;
+    var in_word = false;
+    var index = 0;
+    while index < str_len(input) {
+        let byte = str_byte(input, index);
+        let space = byte == 32 || byte >= 9 && byte <= 13;
+        if byte == 10 { lines = lines + 1; }
+        if !space && !in_word { words = words + 1; }
+        in_word = !space;
+        index = index + 1;
+    }
+    if str_len(input) > 0 && str_byte(input, str_len(input) - 1) != 10 { lines = lines + 1; }
+    return Counts::Value(str_len(input), lines, words);
+}
+
+fn main() -> Int effects { args, io } {
+    if arg_count() != 1 { print("Usage: word_count <file>"); return 2; }
+    match arg(0) {
+        StringResult::Ok(path) => {
+            match read_file(path) {
+                StringResult::Ok(content) => {
+                    match count(content) {
+                        Counts::Value(bytes, lines, words) => {
+                            print(str_concat("Bytes: ", int_to_string(bytes)));
+                            print(str_concat("Lines: ", int_to_string(lines)));
+                            print(str_concat("Words: ", int_to_string(words)));
+                        }
+                    }
+                    return 0;
+                }
+                StringResult::Err(message) => { eprint(message); return 2; }
+            }
+        }
+        StringResult::Err(message) => { eprint(message); return 2; }
+    }
+}

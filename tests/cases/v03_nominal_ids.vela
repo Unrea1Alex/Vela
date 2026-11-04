@@ -1,0 +1,6 @@
+type NodeId = distinct Int; type Label = distinct String; type Flag = distinct Bool;
+fn main() -> Unit effects { io } {
+ let id = NodeId(42); print(id); print(id.value); print(id == NodeId(42));
+ let label = Label("Привет"); print(label); print(label == Label("Привет")); print(label != Label("other"));
+ print("id=" + to_string(id) + "; flag=" + to_string(Flag(false)));
+}

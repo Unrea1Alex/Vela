@@ -1,0 +1,6 @@
+// Expected: E216. IntResult::Err must be handled too.
+fn main() -> Int effects { args } {
+    match arg_int(0) {
+        IntResult::Ok(value) => { return 0; }
+    }
+}

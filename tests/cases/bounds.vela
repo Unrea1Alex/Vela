@@ -1,0 +1,1 @@
+fn main() -> Unit effects { state } { let x = str_byte("x", -1); }

@@ -1,0 +1,1 @@
+test "wrong assertion type" { assert_true(1, "wrong"); }

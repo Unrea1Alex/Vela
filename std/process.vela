@@ -1,0 +1,88 @@
+import "text.vela" as text;
+import "path.vela" as path;
+pub enum Error {
+    InvalidArgument(Int),
+    InvalidPath(path::Error),
+    InvalidTimeout,
+    OutputAlias,
+    Launch(String),
+    TimedOut
+}
+pub struct Completed {
+    code: Int
+}
+fn os_string(value: String) -> Bool {
+    if text::invalid_offset(value) >= 0 {
+        return false;
+    }
+    for i in 0 .. str_len(value) {
+        if str_byte(value, i) == 0 {
+            return false;
+        }
+    }
+    return true;
+}
+fn absolute(value: path::Path) -> Result<String, Error> effects { io } {
+    match path::checked(value.value) {
+        Result::Ok(_) => {}
+        Result::Err(error) => {
+            return Result<String, Error>::Err(Error::InvalidPath(error));
+        }
+    }
+    match absolute_path(value.value) {
+        StringResult::Ok(s) => {
+            return Result<String, Error>::Ok(s);
+        }
+        StringResult::Err(message) => {
+            return Result<String, Error>::Err(Error::Launch(message));
+        }
+    }
+}
+fn identity(value: String) -> Result<String, Error> effects { io } {
+    match file_identity(value) {
+        StringResult::Ok(s) => {
+            return Result<String, Error>::Ok(s);
+        }
+        StringResult::Err(message) => {
+            return Result<String, Error>::Err(Error::Launch(message));
+        }
+    }
+}
+pub fn run(argv: List<String>, cwd: path::Path, stdout: path::Path, stderr: path::Path, timeout_ms: Int) -> Result<Completed, Error> effects { state, io, process } {
+    if list_len(argv) == 0 || list_get(argv, 0) == "" {
+        return Result<Completed, Error>::Err(Error::InvalidArgument(0));
+    }
+    if timeout_ms < 1 || timeout_ms > 2147483647 {
+        return Result<Completed, Error>::Err(Error::InvalidTimeout);
+    }
+    let args = strings_new();
+    for i in 0 .. list_len(argv) {
+        let value = list_get(argv, i);
+        if !os_string(value) {
+            return Result<Completed, Error>::Err(Error::InvalidArgument(i));
+        }
+        strings_push(args, value);
+    }
+    let directory = absolute(cwd)?;
+    let out = absolute(stdout)?;
+    let err = absolute(stderr)?;
+    if out == err {
+        return Result<Completed, Error>::Err(Error::OutputAlias);
+    }
+    let out_id = identity(out)?;
+    let err_id = identity(err)?;
+    if out_id != ""&& out_id == err_id {
+        return Result<Completed, Error>::Err(Error::OutputAlias);
+    }
+    match process_run_at(args, directory, out, err, timeout_ms) {
+        ProcessResult::Exited(code) => {
+            return Result<Completed, Error>::Ok(Completed(code: code));
+        }
+        ProcessResult::TimedOut => {
+            return Result<Completed, Error>::Err(Error::TimedOut);
+        }
+        ProcessResult::Err(message) => {
+            return Result<Completed, Error>::Err(Error::Launch(message));
+        }
+    }
+}

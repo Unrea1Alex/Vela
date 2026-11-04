@@ -1,0 +1,155 @@
+// Native development driver: bundle -> three compiler stages -> fixed point -> tests -> install.
+fn from_string(r: StringResult) -> Result<String, String> {
+    return match r {
+        StringResult::Ok(s) => Result<String, String>::Ok(s), StringResult::Err(e) => Result<String, String>::Err(e)
+    };
+}
+fn from_write(r: WriteResult) -> Result<Bool, String> {
+    return match r {
+        WriteResult::Ok => Result<Bool, String>::Ok(true), WriteResult::Err(e) => Result<Bool, String>::Err(e)
+    };
+}
+fn require_result<T>(r: Result<T, String>, fallback: T) -> T effects { io, process } {
+    match r {
+        Result::Ok(value) => {
+            return value;
+        }
+        Result::Err(e) => {
+            eprint(e);
+            exit(2);
+            return fallback;
+        }
+    }
+}
+fn value(r: StringResult) -> String effects { io, process } {
+    return require_result(from_string(r), "");
+}
+fn done(r: WriteResult) -> Unit effects { io, process } {
+    let success = require_result(from_write(r), false);
+}
+fn command(exe: String) -> StringList effects { state } {
+    let a = strings_new();
+    strings_push(a, exe);
+    return a;
+}
+fn run(args: StringList, log: String, timeout: Int) -> Unit effects { state, io, process } {
+    let code = process_run_files(args, log + ".out", log + ".err", timeout);
+    if code != 0 {
+        eprint(f"Command failed ({code:d}): {strings_join(args, " "):s}");
+        eprint(value(read_file(log + ".out")));
+        eprint(value(read_file(log + ".err")));
+        exit(1);
+    }
+}
+fn copy_result(from: String, to: String) -> Result<Bool, String> effects { io } {
+    let content = from_string(read_file(from))?;
+    let written = from_write(write_file(to + ".pending", content))?;
+    return from_write(replace_file(to + ".pending", to));
+}
+fn copy(from: String, to: String) -> Unit effects { io, process } {
+    let success = require_result(copy_result(from, to), false);
+}
+fn build(compiler: String, source_path: String, destination: String, log: String) -> Unit effects { state, io, process } {
+    let a = command(compiler);
+    strings_push(a, "build");
+    strings_push(a, source_path);
+    strings_push(a, "-o");
+    strings_push(a, destination);
+    run(a, log, 180000);
+}
+fn main() -> Int effects { args, state, io, process } {
+    var action = "verify";
+    if arg_count() > 0 {
+        action = value(arg(0));
+    }
+    if action != "verify" && action != "bootstrap" && action != "test" && action != "bundle" {
+        eprint("Usage: vela-dev [verify|bootstrap|test|bundle] [project root]");
+        return 2;
+    }
+    var root =".";
+    if arg_count() > 1 {
+        root = value(arg(1));
+    }
+    root = value(absolute_path(root));
+    let out = root + "/build/native";
+    let bin = root + "/bin";
+    let compiler = bin + "/velac.exe";
+    done(make_dir(root + "/build"));
+    done(make_dir(out));
+    done(make_dir(bin));
+    if action == "test" {
+        build(compiler, root + "/tools/test.vela", out + "/vela-test.exe", out + "/test-build");
+        let a = command(out + "/vela-test.exe");
+        strings_push(a, compiler);
+        strings_push(a, root);
+        let code = process_run(a);
+        return code;
+    }
+    print("Building the source bundler with Vela");
+    build(compiler, root + "/tools/bundle.vela", out + "/vela-bundle.exe", out + "/bundle-build");
+    let bundle = command(out + "/vela-bundle.exe");
+    strings_push(bundle, root);
+    run(bundle, out + "/bundle", 30000);
+    if action == "bundle" {
+        copy(out + "/vela-bundle.exe", bin + "/vela-bundle.exe");
+        print("Source bundle updated");
+        return 0;
+    }
+    let bundle_path = root + "/selfhost/compiler.vela";
+    let source_path = root + "/selfhost/vela.project";
+    copy(bundle_path, out + "/compiler.vela");
+    print("Building transition/recovery compiler from autonomous bundle");
+    build(compiler, bundle_path, out + "/seed.exe", out + "/seed-build");
+    var previous = out + "/seed.exe";
+    for stage in 1 ..= 3 {
+        let prefix = out + "/stage" + to_string(stage);
+        print(f"Building compiler stage {stage:d}");
+        let emit = command(previous);
+        strings_push(emit, "emit-c");
+        strings_push(emit, source_path);
+        strings_push(emit, "-o");
+        strings_push(emit, prefix + ".c");
+        run(emit, prefix + "-emit", 30000);
+        build(previous, source_path, prefix + ".exe", prefix + "-build");
+        previous = prefix + ".exe";
+    }
+    if value(read_file(out + "/stage2.c")) != value(read_file(out + "/stage3.c")) {
+        eprint("Bootstrap failed: stage 2 and stage 3 emitted different C");
+        return 1;
+    }
+    print("Bootstrap fixed point verified (byte-for-byte C)");
+    build(previous, root + "/tools/test.vela", out + "/vela-test.exe", out + "/test-build");
+    build(previous, root + "/tools/dev.vela", out + "/vela-dev.exe", out + "/dev-build");
+    build(previous, root + "/tools/bundle.vela", out + "/vela-bundle-final.exe", out + "/bundle-final-build");
+    // Check the bundler built by the new compiler produces the same source bytes.
+    let rebundle = command(out + "/vela-bundle-final.exe");
+    strings_push(rebundle, root);
+    strings_push(rebundle, out + "/rebundled.vela");
+    run(rebundle, out + "/rebundle", 30000);
+    if value(read_file(out + "/rebundled.vela")) != value(read_file(bundle_path)) {
+        eprint("Bundler fixed point failed");
+        return 1;
+    }
+    if action == "verify" {
+        print("Running the native test suite");
+        let tests = command(out + "/vela-test.exe");
+        strings_push(tests, previous);
+        strings_push(tests, root);
+        let status = process_run(tests);
+        if status != 0 {
+            return status;
+        }
+    }
+    copy(previous, bin + "/velac.exe");
+    copy(out + "/vela-test.exe", bin + "/vela-test.exe");
+    copy(out + "/vela-bundle-final.exe", bin + "/vela-bundle.exe");
+    copy(out + "/vela-dev.exe", bin + "/vela-dev.next.exe");
+    let report = f"{{\"schema_version\":1,\"version\":\"0.7.0\",\"orchestrator\":\"Vela\",\"fixed_point\":true,\"bundler_fixed_point\":true,\"source_bytes\":{str_len(value(read_file(source_path))):d},\"tests_run\":{action == "verify":b}}}\n";
+    done(write_file(out + "/bootstrap.json", report));
+    done(write_file(root + "/docs/bootstrap-evidence.json", report));
+    if action == "verify" {
+        copy(out + "/tests.json", root + "/docs/test-evidence.json");
+    }
+    print("Installed Vela 0.7.0. No Python was used.");
+    return 0;
+}

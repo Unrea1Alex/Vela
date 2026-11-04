@@ -1,0 +1,3 @@
+fn error(r:Result<Int,String>)->Bool { return match r {Result::Ok(_)=>false,Result::Err(e)=>e=="bad"}; }
+fn work()->Result<Int,String> ensures error(result); {let n=Result<Bool,String>::Err("bad")?; return Result<Int,String>::Ok(1);}
+fn main()->Unit effects {io}{print(match work(){Result::Ok(n)=>to_string(n),Result::Err(e)=>e});}

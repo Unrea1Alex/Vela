@@ -1,0 +1,1 @@
+fn main()->Unit effects {io}{for i in 0..3 {if i==1 {continue;} for j in 0..3 {if j==1 {break;} print(i*10+j);} } }

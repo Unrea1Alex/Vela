@@ -1,0 +1,429 @@
+import "model.vela";
+import "core.vela";
+import "source.vela";
+import "lexer.vela";
+import "parser.vela";
+import "modules.vela";
+import "projects.vela";
+import "project_cli.vela";
+import "types.vela";
+import "semantic.vela";
+import "errors.vela";
+import "emitter.vela";
+import "formatter.vela";
+pub fn io_value(r: StringResult) -> String effects { io, process } {
+    return io_result(from_string(r), "");
+}
+pub fn io_done(r: WriteResult) -> Unit effects { io, process } {
+    let success = io_result(from_write(r), false);
+}
+pub fn ignored_write(result_value: WriteResult) -> Unit {
+    match result_value {
+        WriteResult::Ok => {}
+        WriteResult::Err(_) => {}
+    }
+}
+pub fn symbol_index(c: Context) -> String effects { state, io, process } {
+    let enums = strings_new();
+    let records = strings_new();
+    let distincts = strings_new();
+    var i = 0;
+    while i < list_len(c.type_order) {
+        let id = list_get(c.type_order, i);
+        let t = type_info(c, id);
+        if t.kind == 77 {
+            strings_push(distincts, "{\"name\":" + json_string(t.name) + ",\"base\":" + json_string(type_name(c, t.base)) + "}");
+        } else if t.kind == 76 {
+            let fields = strings_new();
+            var j = 0;
+            while j < list_len(t.fields) {
+                let field = symbol_info(c, list_get(t.fields, j));
+                strings_push(fields, "{\"name\":" + json_string(field.name) + ",\"type\":" + json_string(type_name(c, field.type_id)) + "}");
+                j = j + 1;
+            }
+            strings_push(records, "{\"name\":" + json_string(t.name) + ",\"fields\":[" + strings_join(fields,",") + "]}");
+        } else {
+            let variants = strings_new();
+            var j = 0;
+            while j < list_len(t.variants) {
+                let v = symbol_info(c, list_get(t.variants, j));
+                let fields = strings_new();
+                var k = 0;
+                while k < list_len(v.parameters) {
+                    strings_push(fields, json_string(type_name(c, symbol_info(c, list_get(v.parameters, k)).type_id)));
+                    k = k + 1;
+                }
+                strings_push(variants, "{\"name\":" + json_string(v.name) + ",\"fields\":[" + strings_join(fields,",") + "]}");
+                j = j + 1;
+            }
+            strings_push(enums, "{\"name\":" + json_string(t.name) + ",\"variants\":[" + strings_join(variants,",") + "]}");
+        }
+        i = i + 1;
+    }
+    let functions = strings_new();
+    let tests = strings_new();
+    i = 0;
+    while i < list_len(c.functions) {
+        let f = list_get(c.functions, i);
+        let sig = symbol_info(c, f.symbol);
+        var test_name = "";
+        for declaration in c.bound_functions {
+            if declaration.name == sig.name {
+                test_name = declaration.test_name;
+            }
+        }
+        if test_name != "" {
+            strings_push(tests, "{\"name\":" + json_string(test_name) + ",\"source\":" + json_string(filename_at(c, f.span.start)) + ",\"module_id\":" + to_string(source_unit_at(c, f.span.start)) + ",\"span\":" + span_json(c, f.span) + ",\"effects\":" + effect_json(sig.effect_mask) + "}");
+            i = i + 1;
+            continue;
+        }
+        let params = strings_new();
+        var j = 0;
+        while j < list_len(f.parameters) {
+            let b = symbol_info(c, list_get(f.parameters, j));
+            strings_push(params, "{\"name\":" + json_string(b.name) + ",\"type\":" + json_string(type_name(c, b.type_id)) + "}");
+            j = j + 1;
+        }
+        strings_push(functions, "{\"source\":" + json_string(filename_at(c, f.span.start)) + ",\"module_id\":" + to_string(source_unit_at(c, f.span.start)) + ",\"name\":" + json_string(sig.name) + ",\"parameters\":[" + strings_join(params,",") + "],\"returns\":" + json_string(type_name(c, sig.type_id)) + ",\"effects\":" + effect_json(sig.effect_mask) + ",\"line\":" + num(line_at(c, f.span.start)) + ",\"contracts\":{\"verification\":\"runtime\",\"requires\":" + num(list_len(f.preconditions)) + ",\"ensures\":" + num(list_len(f.postconditions)) + "}}");
+        i = i + 1;
+    }
+    for sig_id in c.signatures {
+        let sig = symbol_info(c, sig_id);
+        if sig.foreign_library != "" {
+            let params = strings_new();
+            for id in sig.parameters {
+                let parameter = symbol_info(c, id);
+                strings_push(params, "{\"name\":" + json_string(parameter.name) + ",\"type\":" + json_string(type_name(c, parameter.type_id)) + "}");
+            }
+            strings_push(functions, "{\"source\":" + json_string(filename_at(c, sig.span.start)) + ",\"module_id\":" + to_string(source_unit_at(c, sig.span.start)) + ",\"name\":" + json_string(sig.name) + ",\"parameters\":[" + strings_join(params, ",") + "],\"returns\":" + json_string(type_name(c, sig.type_id)) + ",\"effects\":" + effect_json(sig.effect_mask) + ",\"line\":" + num(line_at(c, sig.span.start)) + ",\"foreign\":{\"library\":" + json_string(sig.foreign_library) + ",\"symbol\":" + json_string(sig.foreign_name) + "}}");
+        }
+    }
+    let modules = strings_new();
+    for i in 0 .. list_len(c.source_units) {
+        let unit = list_get(c.source_units, i);
+        strings_push(modules, "{\"id\":" + to_string(i) + ",\"source\":" + json_string(unit.name) + "}");
+    }
+    return "{\"schema_version\":1,\"modules\":[" + strings_join(modules,",") + "],\"source\":" + json_string(c.source_name) + ",\"enums\":[" + strings_join(enums,",") + "],\"structs\":[" + strings_join(records,",") + "],\"distinct_types\":[" + strings_join(distincts,",") + "],\"functions\":[" + strings_join(functions,",") + "],\"tests\":[" + strings_join(tests,",") + "]}";
+}
+pub fn parent_path(path: String) -> String {
+    var i = str_len(path);
+    while i > 0 {
+        i = i - 1;
+        let ch = str_byte(path, i);
+        if ch == 47 || ch == 92 {
+            return str_slice(path, 0, i + 1);
+        }
+    }
+    return".";
+}
+pub fn path_key(path: String) -> String effects { state } {
+    if platform() != "windows" {
+        return path;
+    }
+    let chars = strings_new();
+    var i = 0;
+    while i < str_len(path) {
+        var b = str_byte(path, i);
+        if b >= 65 && b <= 90 {
+            b = b + 32;
+        }
+        if b == 47 {
+            b = 92;
+        }
+        strings_push(chars, str_from_byte(b));
+        i = i + 1;
+    }
+    return strings_join(chars, "");
+}
+pub fn compile_native(cfile: String, executable: String, object_file: String) -> Int effects { state, process } {
+    var cc = env("VELA_CC");
+    var kind = env("VELA_CC_KIND");
+    if cc == "" {
+        if platform() == "windows" {
+            cc = "cl.exe";
+        } else {
+            cc = "cc";
+        }
+    }
+    if kind == "" {
+        if platform() == "windows" {
+            kind = "msvc";
+        } else {
+            kind = "cc";
+        }
+    }
+    let args = strings_new();
+    strings_push(args, cc);
+    if kind == "msvc" {
+        strings_push(args, "/nologo");
+        strings_push(args, "/TC");
+        strings_push(args, "/std:c11");
+        strings_push(args, "/utf-8");
+        strings_push(args, "/O2");
+        strings_push(args, "/fp:strict");
+        strings_push(args, "/W3");
+        strings_push(args, "/wd4102");
+        strings_push(args, "/MT");
+        strings_push(args, cat("/Fo", object_file));
+        strings_push(args, cat("/Fe", executable));
+        strings_push(args, cfile);
+        strings_push(args, "/link");
+        strings_push(args, "/INCREMENTAL:NO");
+    } else {
+        strings_push(args, "-std=c11");
+        strings_push(args, "-O2");
+        strings_push(args, "-ffp-contract=off");
+        strings_push(args, cfile);
+        strings_push(args, "-o");
+        strings_push(args, executable);
+        strings_push(args, "-lm");
+    }
+    return process_run_to_stderr(args);
+}
+pub fn write_atomic_result(path: String, code: String) -> Result<Bool, String> effects { state, io } {
+    let absolute = from_string(absolute_path(path))?;
+    let dir = from_string(temp_dir(parent_path(absolute)))?;
+    let temp_path = dir + "/program.c";
+    var saved = from_write(write_file(temp_path, code));
+    match saved {
+        Result::Ok(_) => {
+            saved = from_write(replace_file(temp_path, absolute));
+        }
+        Result::Err(_) => {}
+    }
+    ignored_write(remove_file(temp_path));
+    ignored_write(remove_dir(dir));
+    return saved;
+}
+pub fn write_atomic(path: String, code: String) -> Unit effects { state, io, process } {
+    let success = io_result(write_atomic_result(path, code), false);
+}
+pub fn build_or_run(code: String, output_path: String, arguments: StringList, running: Bool) -> Int effects { state, io, process } {
+    return build_or_run_native(code, output_path, arguments, running, list_new<NativeDependency>());
+}
+pub fn build_or_run_native(code: String, output_path: String, arguments: StringList, running: Bool, natives: List<NativeDependency>) -> Int effects { state, io, process } {
+    var parent = "";
+    if !running {
+        parent = parent_path(output_path);
+    }
+    let dir = io_value(temp_dir(parent));
+    let cfile = cat(dir, "/program.c");
+    let exe = cat(dir, "/program.exe");
+    let obj = cat(dir, "/program.obj");
+    io_done(write_file(cfile, code));
+    var status = compile_native(cfile, exe, obj);
+    if status != 0 {
+        status = 2;
+    }
+    if status == 0 {
+        var destination = parent_path(output_path);
+        if running { destination = dir; }
+        match stage_native(natives, destination) {
+            Result::Ok(_) => {}
+            Result::Err(message) => { eprint(message); status = 2; }
+        }
+    }
+    if status == 0 {
+        if running {
+            let args = strings_new();
+            strings_push(args, exe);
+            var i = 0;
+            while i < strings_len(arguments) {
+                strings_push(args, strings_get(arguments, i));
+                i = i + 1;
+            }
+            status = process_run(args);
+        } else {
+            match replace_file(exe, output_path) {
+                WriteResult::Ok => {}
+                WriteResult::Err(message) => {
+                    eprint(message);
+                    status = 2;
+                }
+            }
+        }
+    }
+    ignored_write(remove_file(cfile));
+    ignored_write(remove_file(obj));
+    ignored_write(remove_file(exe));
+    if running {
+        for native in natives { ignored_write(remove_file(dir + "/" + native.name)); }
+    }
+    ignored_write(remove_dir(dir));
+    if status < 0 || status > 255 {
+        eprint("velac: cannot run compiler or program; configure VELA_CC and its environment");
+        return 2;
+    }
+    return status;
+}
+pub fn main() -> Int effects { args, state, io, process } {
+    if arg_count() == 1 {
+        let option = io_value(arg(0));
+        if option == "--version" {
+            print("Vela 0.7.0 (self-hosted)");
+            return 0;
+        }
+    }
+    if arg_count() < 2 {
+        eprint("Usage: vela check|symbols|emit-c|build|run|test|fmt|lock SOURCE_OR_PROJECT [-o OUTPUT] [--json] [--check|--write] [-- ARGS]");
+        return 2;
+    }
+    let command = io_value(arg(0));
+    let input = io_value(arg(1));
+    var output_path = "";
+    var source_name = "";
+    var json_mode = false;
+    let arguments = strings_new();
+    var index = 2;
+    var rest = false;
+    var format_check = false;
+    var format_write = false;
+    while index < arg_count() {
+        let option = io_value(arg(index));
+        if rest {
+            strings_push(arguments, option);
+        } else if option == "--" {
+            rest = true;
+        } else if option == "--json" {
+            json_mode = true;
+        } else if command == "fmt" && option == "--check" {
+            format_check = true;
+        } else if command == "fmt" && option == "--write" {
+            format_write = true;
+        } else if option == "-o" || option == "--output" || option == "--source-name" {
+            index = index + 1;
+            let value = io_value(arg(index));
+            if option == "--source-name" {
+                source_name = value;
+            } else {
+                output_path = value;
+            }
+        } else if command == "run" {
+            rest = true;
+            strings_push(arguments, option);
+        } else {
+            eprint(cat("Unknown option: ", option));
+            return 2;
+        }
+        index = index + 1;
+    }
+    if command != "check" && command != "symbols" && command != "emit-c" && command != "build" && command != "run" && command != "fmt" && command != "lock" && command != "test" {
+        eprint("Unknown compiler command.");
+        return 2;
+    }
+    if command == "fmt" && (output_path != ""|| (format_check && format_write) || strings_len(arguments) > 0) {
+        eprint("Usage: velac fmt SOURCE [--check|--write]");
+        return 2;
+    }
+    let p = project_load(io_value(absolute_path(input)), json_mode);
+    if command == "lock" {
+        return project_write_lock(p, json_mode);
+    }
+    project_verify_lock(p, json_mode);
+    if command == "test" {
+        return project_test(p, json_mode);
+    }
+    if command == "fmt" && p.manifest != "" {
+        return project_format(p, format_check, format_write, json_mode);
+    }
+    let input_path = p.entry;
+    if source_name == "" {
+        source_name = input_path;
+    }
+    if output_path != "" {
+        output_path = io_value(absolute_path(output_path));
+        if p.manifest != "" {
+            let target_id = io_value(file_identity(output_path));
+            let protected = list_new<String>();
+            list_push(protected, p.manifest);
+            list_push(protected, p.manifest + ".lock");
+            for test in p.tests {
+                list_push(protected, test);
+            }
+            for dep in p.dependencies {
+                let graph = project_module_context(dep.path, dep.path, load_source(dep.path, json_mode), json_mode, p.dependencies);
+                for unit in graph.source_units {
+                    list_push(protected, unit.path);
+                }
+            }
+            for native in p.natives { list_push(protected, native.path); }
+            for path in protected {
+                if path_key(output_path) == path_key(path) || target_id != ""&& target_id == io_value(file_identity(path)) {
+                    eprint("Output must not overwrite project metadata.");
+                    return 2;
+                }
+            }
+        }
+        let input_identity = io_value(file_identity(input_path));
+        let output_identity = io_value(file_identity(output_path));
+        if path_key(output_path) == path_key(input_path) || (input_identity != ""&& input_identity == output_identity) {
+            eprint("Output must not overwrite source.");
+            return 2;
+        }
+    }
+    let code = load_source(input_path, json_mode);
+    var c = make_context(code, source_name, json_mode);
+    if command != "fmt" {
+        c = project_module_context(input_path, source_name, code, json_mode, p.dependencies);
+    }
+    if output_path != "" {
+        let output_identity = io_value(file_identity(output_path));
+        for unit in c.source_units {
+            if path_key(output_path) == path_key(unit.path) || (output_identity != ""&& output_identity == unit.identity) {
+                eprint("Output must not overwrite source.");
+                return 2;
+            }
+        }
+    }
+    if command == "fmt" {
+        lex(c);
+        parse_module(c);
+    } else {
+        parse_program(c);
+    }
+    if command == "fmt" {
+        let formatted = format_source(c);
+        if format_check {
+            if io_value(read_file(input_path)) == formatted {
+                return 0;
+            }
+            eprint("Needs formatting: " + input);
+            return 1;
+        }
+        if format_write {
+            if io_value(read_file(input_path)) != formatted {
+                write_atomic(input_path, formatted);
+            }
+            return 0;
+        }
+        write_stdout(formatted);
+        return 0;
+    }
+    analyze(c);
+    if command == "check" {
+        if json_mode {
+            print(cat(cat("{\"schema_version\":1,\"ok\":true,\"diagnostics\":[],\"source\":", json_string(source_name)), "}"));
+        } else {
+            print(cat("OK: ", input));
+        }
+        return 0;
+    }
+    if command == "symbols" {
+        print(symbol_index(c));
+        return 0;
+    }
+    let generated = generate(c);
+    if command == "emit-c" {
+        if output_path == "" {
+            print(generated);
+        } else {
+            write_atomic(output_path, generated);
+        }
+        return 0;
+    }
+    if command == "build" && output_path == "" {
+        eprint("build requires -o OUTPUT");
+        return 2;
+    }
+    return build_or_run_native(generated, output_path, arguments, command == "run", p.natives);
+}

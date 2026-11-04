@@ -1,0 +1,1 @@
+fn f()->Option<Bool> ensures result?; {return Option<Bool>::Some(true);} fn main()->Unit{}

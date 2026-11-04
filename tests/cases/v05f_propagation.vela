@@ -1,0 +1,3 @@
+fn later()->Int effects {io}{print("wrong");return 1;}
+fn work()->Option<String> effects {io}{return Option<String>::Some(f"{Option<Int>::None?:d}{later():d}");}
+fn main()->Unit effects {io}{print(match work(){Option::Some(s)=>s,Option::None=>"none"});}

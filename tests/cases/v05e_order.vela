@@ -1,0 +1,5 @@
+fn bad()->Result<Int,String> effects {io} {print(1);return Result<Int,String>::Err("bad");}
+fn later()->Int effects {io} {print(2);return 2;}
+fn sum(a:Int,b:Int)->Int{return a+b;}
+fn work()->Result<Int,String> effects {io} {let n=sum(bad()?,later());return Result<Int,String>::Ok(n);}
+fn main()->Unit effects {io} {print(match work(){Result::Ok(n)=>to_string(n),Result::Err(e)=>e});}

@@ -1,0 +1,116 @@
+{
+  "date": "2026-11-04",
+  "platform": "Windows x64 / MSVC",
+  "stages": [
+    {
+      "id": "0.5.1",
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 439,
+      "failed": 0,
+      "skipped": 0,
+      "bootstrap": {
+        "schema_version": 1,
+        "version": "0.4.0",
+        "orchestrator": "Vela",
+        "fixed_point": true,
+        "bundler_fixed_point": true,
+        "source_bytes": 152515,
+        "tests_run": true
+      },
+      "log": "build/stage05/051-verify.log"
+    },
+    {
+      "id": "0.5.2",
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 498,
+      "failed": 0,
+      "skipped": 0,
+      "bootstrap": {
+        "schema_version": 1,
+        "version": "0.4.0",
+        "orchestrator": "Vela",
+        "fixed_point": true,
+        "bundler_fixed_point": true,
+        "source_bytes": 162623,
+        "tests_run": true
+      },
+      "log": "build/stage05/052-verify.log"
+    },
+    {
+      "id": "0.5.3",
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 539,
+      "failed": 0,
+      "skipped": 0,
+      "bootstrap": {
+        "schema_version": 1,
+        "version": "0.4.0",
+        "orchestrator": "Vela",
+        "fixed_point": true,
+        "bundler_fixed_point": true,
+        "source_bytes": 170487,
+        "tests_run": true
+      },
+      "log": "build/stage05/053-verify.log"
+    },
+    {
+      "id": "0.5.4",
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 582,
+      "failed": 0,
+      "skipped": 0,
+      "bootstrap": {
+        "schema_version": 1,
+        "version": "0.4.0",
+        "orchestrator": "Vela",
+        "fixed_point": true,
+        "bundler_fixed_point": true,
+        "source_bytes": 175862,
+        "tests_run": true
+      },
+      "log": "build/stage05/054-verify.log"
+    },
+    {
+      "id": "0.5.5",
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 626,
+      "failed": 0,
+      "skipped": 0,
+      "bootstrap": {
+        "schema_version": 1,
+        "version": "0.5.0",
+        "orchestrator": "Vela",
+        "fixed_point": true,
+        "bundler_fixed_point": true,
+        "source_bytes": 183280,
+        "tests_run": true
+      },
+      "log": "build/stage05/055-verify.log"
+    }
+  ],
+  "release": {
+    "stage1_tests": 626,
+    "stage3_tests": 626,
+    "failed": 0,
+    "skipped": 0,
+    "source_bytes": 184874,
+    "source_sha256": "c037fdc1b4c1a0407dfd4fbab70cc20a33d6e99beafefb417066ab55394060c3",
+    "stage2_c_sha256": "b522c8b6d399096bcb377557c32ab096f86a7f1fe5b3b7d68e36cb26ca11d3d4",
+    "stage3_c_sha256": "b522c8b6d399096bcb377557c32ab096f86a7f1fe5b3b7d68e36cb26ca11d3d4",
+    "bundler_fixed_point": true,
+    "examples": 8,
+    "package_tests": 626,
+    "package_python_absent": true
+  },
+  "unverified": [
+    "Linux",
+    "macOS",
+    "GCC",
+    "Clang"
+  ]
+}

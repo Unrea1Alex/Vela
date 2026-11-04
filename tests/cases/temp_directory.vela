@@ -1,0 +1,8 @@
+fn main() -> Unit effects { io } {
+            match temp_dir("") {
+                StringResult::Ok(path) => {
+                    match remove_dir(path) { WriteResult::Ok => { print("removed"); } WriteResult::Err(message) => { print(message); } }
+                }
+                StringResult::Err(message) => { print(message); }
+            }
+        }

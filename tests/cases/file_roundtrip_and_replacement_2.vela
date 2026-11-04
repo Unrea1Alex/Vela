@@ -1,0 +1,12 @@
+fn done(r: WriteResult) -> Unit effects { io, process } {
+                match r { WriteResult::Ok => {} WriteResult::Err(message) => { eprint(message); exit(9); } }
+            }
+            fn main() -> Unit effects { io, process } {
+                done(write_file("@TMP@\\a.txt", "a\0Привет")); done(write_file("@TMP@\\b.txt", "old"));
+                done(replace_file("@TMP@\\a.txt", "@TMP@\\b.txt"));
+                match read_file("@TMP@\\b.txt") {
+                    StringResult::Ok(value) => { print(value == "a\0Привет"); }
+                    StringResult::Err(message) => { eprint(message); exit(8); }
+                }
+                done(remove_file("@TMP@\\b.txt"));
+            }

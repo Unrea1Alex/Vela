@@ -1,0 +1,1 @@
+fn side()->Int effects {io}{print(1);return 1;} fn main()->Unit{let s=f"{side():d}";}

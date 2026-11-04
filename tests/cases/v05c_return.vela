@@ -1,0 +1,1 @@
+fn work()->Int {for i in 0..3{return i+7;}return 99;} fn main()->Unit effects {io}{print(work());}

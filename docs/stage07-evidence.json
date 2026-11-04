@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "version": "0.7.0",
+  "status": "verified",
+  "platform": {
+    "os": "Windows x64 10.0.26300",
+    "compiler": "MSVC 19.44.35222",
+    "sdk": "10.0.26100.0",
+    "node": "24.17.0",
+    "mcp_sdk": "2.4.0"
+  },
+  "native": {
+    "working": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 974,
+      "failed": 0,
+      "skipped": 0
+    },
+    "clean": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 974,
+      "failed": 0,
+      "skipped": 0
+    },
+    "compiler_generations": 3,
+    "compiler_fixed_point": true,
+    "bundler_fixed_point": true,
+    "c_recovery_fixed_point": true,
+    "clean_path_without_python_or_node": true,
+    "compiler_sha256": "b4a8f64ada2925b3410c8aed84447cea0a45d8df5fa3f4693633eb862e62b199",
+    "logs": [
+      "build/stage07/078-verify.log",
+      "build/stage07/078-clean-verify.log",
+      "build/stage07/078-recovery.log"
+    ]
+  },
+  "stages": [
+    {
+      "id": "0.6.9",
+      "compiler_build": true,
+      "docs_skill_setup": true,
+      "skill_disk_read": false
+    },
+    {
+      "id": "0.7.1",
+      "compiler_build": true,
+      "passed": 905,
+      "locale_test": true
+    },
+    {
+      "id": "0.7.2",
+      "compiler_build": true,
+      "passed": 916,
+      "stdlib_modules": 8,
+      "application": "config-report"
+    },
+    {
+      "id": "0.7.3",
+      "compiler_build": true,
+      "passed": 939,
+      "runner_checks": 11
+    },
+    {
+      "id": "0.7.4",
+      "compiler_build": true,
+      "contract": "FFI ABI 1"
+    },
+    {
+      "id": "0.7.5",
+      "compiler_build": true,
+      "passed": 974,
+      "ffi_checks": 33
+    },
+    {
+      "id": "0.7.6",
+      "compiler_build": true,
+      "http_cases": 10,
+      "gui_actual_interaction": true,
+      "gui_evidence": "build/stage07/076-gui.png"
+    },
+    {
+      "id": "0.7.7",
+      "compiler_build": true,
+      "contract": "MCP-EXECUTION"
+    },
+    {
+      "id": "0.7.8",
+      "compiler_build": true,
+      "passed": 974
+    }
+  ],
+  "mcp": {
+    "aggregate_suites": 3,
+    "sequential": 1000,
+    "cancellations": 25,
+    "stress": {
+      "baseline": {
+        "WorkingSet64": 80396288,
+        "HandleCount": 218
+      },
+      "final": {
+        "WorkingSet64": 107986944,
+        "HandleCount": 218
+      }
+    },
+    "analysis_tools": 5,
+    "execution_tools": 3,
+    "sdk_checks": [
+      "eight native MCP tools",
+      "execution enabled after OS startup probe",
+      "isolated MSVC build issues artifact",
+      "Unicode output and no inherited secret",
+      "source unchanged",
+      "forged artifact rejected",
+      "invalid argv 6",
+      "invalid argv 7",
+      "invalid argv 8",
+      "invalid code rejected with native diagnostic",
+      "path escape rejected",
+      "native tests continue after failure",
+      "unsaved source build",
+      "application nonzero exit is run result",
+      "overlay is private",
+      "stale snapshot rejected",
+      "native bytes require host allowlist",
+      "hardlinked snapshot rejected",
+      "loop build",
+      "execution concurrency limit",
+      "wall time limit",
+      "server recovers after cancellation",
+      "transport stdout contains only MCP",
+      "MCP disconnect releases execution cache"
+    ],
+    "os_checks": [
+      "startup access, socket, build/run/test probes",
+      "--memory",
+      "--memory bounded capture",
+      "--process-limit",
+      "--process-limit bounded capture",
+      "--breakaway",
+      "--breakaway bounded capture",
+      "--flood",
+      "--flood bounded capture",
+      "--disk",
+      "--disk bounded capture",
+      "--files",
+      "--files bounded capture",
+      "--tree",
+      "--tree bounded capture",
+      "child preserves LPAC/job",
+      "timeout kills descendant",
+      "explicit cancellation",
+      "cancel kills descendant",
+      "disconnect cancels job",
+      "disconnect kills descendant",
+      "supervisor death fails closed and recovers profile",
+      "supervisor death kills descendant",
+      "toolchain bytes unchanged",
+      "forced Node death kills descendants",
+      "forced Node death removes snapshot and lease"
+    ],
+    "fault_checks": [
+      "changed artifact bytes rejected",
+      "expired artifact rejected",
+      "artifact count bound",
+      "invalid UTF8 stdout uses hex",
+      "snapshot race rejected",
+      "cancelled build publishes nothing",
+      "authorized native DLL is pinned and staged",
+      "toolchain mutation disables execution",
+      "failed backend keeps analysis only"
+    ],
+    "cold_agent_report": "execution-onboarding-evidence.json",
+    "cold_agent_passed": true,
+    "skill_disk_read": false,
+    "skill_activation": "Client reported automatically supplied instructions; explicit disk access denied by client policy.",
+    "packaged_execution": {
+      "schema_version": 1,
+      "tools": 8,
+      "compiler_id": "b4a8f64ada2925b3410c8aed84447cea0a45d8df5fa3f4693633eb862e62b199",
+      "execution_toolchain_id": "6b03b0ba6eb9e14eac1ca3b2965fd79e999f3372099e7e7797c6a11eed4b4085",
+      "tests": 3,
+      "stdout": "count=3 total=10.5 mean=3.5\r\n",
+      "passed": true
+    }
+  },
+  "limitations": [
+    "Windows x64/MSVC only; no Linux/macOS gate.",
+    "Disk/tree bounds are monitored, not hard filesystem quotas.",
+    "OS console hosts can increase job accounting beyond ActiveProcessLimit; complete job cleanup remains required.",
+    "MCP execution has no network or interactive GUI; optional native DLLs require host hash allowlist.",
+    "GUI and network remain bounded synchronous Windows prototypes; no remote TLS/async/callbacks.",
+    "Process-region memory remains; GC/resource scopes are planned for 0.8.",
+    "Direct SKILL.md disk read was denied in fresh Codex client; not claimed successful.",
+    "Library-only symbols without main/test produce E207; documented importing-app workaround, planned 0.9.2."
+  ],
+  "next": "0.8.1"
+}

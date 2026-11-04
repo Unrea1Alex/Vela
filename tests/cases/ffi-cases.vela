@@ -1,0 +1,105 @@
+import "../../tools/test.vela";
+pub fn ffi_library(s: Suite, name: String, abi: Int) -> Outcome effects { state, io, process } {
+    let args = command(env("VELA_CC"));
+    for flag in split("/nologo|/std:c11|/LD|/MT|/O2|/fp:strict", 124) { strings_push(args, flag); }
+    strings_push(args, "/DFIXTURE_ABI=" + to_string(abi));
+    strings_push(args, "/Fo" + s.dir + "/" + name + ".obj");
+    strings_push(args, "/Fe" + s.dir + "/" + name + ".dll");
+    strings_push(args, s.root + "/tests/ffi/adapter.c");
+    strings_push(args, "/link");
+    strings_push(args, "/IMPLIB:" + s.dir + "/" + name + ".lib");
+    return invoke(s, args, 30000);
+}
+pub fn ffi_program(s: Suite, source: String) -> Outcome effects { state, io, process } {
+    let file = s.dir + "/ffi-error.vela";
+    let exe = s.dir + "/ffi-error.exe";
+    done(write_file(file, source));
+    let built = build(s, file, exe);
+    if built.code != 0 { return built; }
+    return invoke(s, command(exe), 10000);
+}
+pub fn ffi_runtime_case(suite: Suite, name: String, source: String, message: String) -> Suite effects { state, io, process } {
+    let actual = ffi_program(suite, source);
+    return record(suite, name, actual.code == 70 && contains(actual.err, "ffi-error.vela:") && contains(actual.err, message), actual.out + actual.err);
+}
+pub fn ffi_checks(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let native = ffi_library(s, "fixture", 1);
+    s = record(s, "ffi_native_adapter", native.code == 0, native.out + native.err);
+    let exe = s.dir + "/ffi.exe";
+    let built = build(s, s.root + "/tests/ffi/main.vela", exe);
+    let ran = invoke(s, command(exe), 10000);
+    s = record(s, "ffi_abi_behavior", built.code == 0 && ran.code == 0 && ran.out == "ffi ABI 1 passed\n", built.err + ran.out + ran.err);
+    let other = ffi_library(s, "other", 1);
+    let wrong = ffi_library(s, "wrong", 2);
+    s = record(s, "ffi_aux_adapters", other.code == 0 && wrong.code == 0, other.out + wrong.out);
+    let effect_decl = " effects {state,process}";
+    s = ffi_runtime_case(s, "ffi_missing_library", "extern \"absent.dll\" fn missing()->Int" + effect_decl + "; fn main()->Int" + effect_decl + "{return missing();}", "cannot load foreign library");
+    s = ffi_runtime_case(s, "ffi_missing_symbol", "extern \"fixture.dll\" fn missing()->Int" + effect_decl + "; fn main()->Int" + effect_decl + "{return missing();}", "missing foreign symbol");
+    s = ffi_runtime_case(s, "ffi_wrong_abi", "extern \"wrong.dll\" fn echo64(x:Int)->Int" + effect_decl + "; fn main()->Int" + effect_decl + "{return echo64(0);}", "ABI version mismatch");
+    s = ffi_runtime_case(s, "ffi_bool_validation", "extern \"fixture.dll\" fn invalid_bool()->Bool" + effect_decl + "; fn main()->Unit" + effect_decl + "{let b=invalid_bool();}", "foreign Bool must be 0 or 1");
+    let handle = "extern \"fixture.dll\" fn resource(x:Int)->ForeignHandle" + effect_decl + "; ";
+    let consume = "fn resource_value(x:ForeignHandle)->Int" + effect_decl + "; ";
+    s = ffi_runtime_case(s, "ffi_closed_alias", handle + "extern \"fixture.dll\" " + consume + "fn main()->Int effects{state,process,io}{let h=resource(1);let alias=h;let closed=ffi_close(h,\"release_resource\");return resource_value(alias);}", "foreign handle is closed");
+    s = ffi_runtime_case(s, "ffi_wrong_owner", handle + "extern \"other.dll\" " + consume + "fn main()->Int" + effect_decl + "{return resource_value(resource(1));}", "belongs to another library");
+    let preflight = ffi_program(s, "fn main()->Unit effects{state,process}{for name in names(){match ffi_load(name){WriteResult::Err(_)=>{} WriteResult::Ok=>{assert_true(false,\"must fail\");}}}} fn names()->List<String> effects{state}{let a=list_new<String>();list_push(a,\"absent.dll\");list_push(a,\"wrong.dll\");list_push(a,\"../fixture.dll\");list_push(a,\"fixture.dll\\0\");return a;}");
+    s = record(s, "ffi_recoverable_preflight", preflight.code == 0, preflight.out + preflight.err);
+    let close_errors = ffi_program(s, handle + "fn main()->Unit effects{state,process,io}{let h=resource(1);match ffi_close(h,\"absent\"){WriteResult::Err(_)=>{} WriteResult::Ok=>{assert_true(false,\"missing destructor\");}} match ffi_close(h,\"../bad\"){WriteResult::Err(_)=>{} WriteResult::Ok=>{assert_true(false,\"invalid destructor\");}} match ffi_close(h,\"release_resource\"){WriteResult::Ok=>{} WriteResult::Err(e)=>{assert_true(false,e);}}}");
+    s = record(s, "ffi_close_error_retains_handle", close_errors.code == 0, close_errors.out + close_errors.err);
+    let rejected = split("extern \"../bad.dll\" fn f()->Int effects{state,process};|extern \"fixture.dll\" fn f<T>(x:T)->Int effects{state,process};|extern \"fixture.dll\" fn f()->String effects{state,process};|extern \"fixture.dll\" fn f(x:List<Int>)->Int effects{state,process};|extern \"fixture.dll\" fn f()->Int;|extern \"fixture.dll\" fn f(x:Unit)->Unit effects{state,process};|extern \"fixture.dll\" fn f(x:Int,x:Int)->Int effects{state,process};|extern \"fixture.dll\" fn f()->Int effects{state,process} requires true;|struct R{x:Int} extern \"fixture.dll\" fn f(x:R)->Int effects{state,process};|type D=distinct Int; extern \"fixture.dll\" fn f(x:D)->Int effects{state,process};|extern \"fixture.dll\" fn main()->Int effects{state,process};|extern \"fixture.dll\" fn f()->Int effects{state,unknown};", 124);
+    for i in 0 .. list_len(rejected) {
+        let source = list_get(rejected, i) + " fn main()->Unit{}";
+        let file = s.dir + "/ffi-reject.vela";
+        done(write_file(file, source));
+        let checked = invoke(s, compiler_command(s, "check", file), 10000);
+        let diagnostic = "E228";
+        var expected = diagnostic;
+        if i == list_len(rejected) - 1 { expected = "E206"; }
+        s = record(s, "ffi_signature_rejection_" + to_string(i), checked.code == 1 && contains(checked.err, expected), checked.out + checked.err);
+    }
+    let pure = s.dir + "/ffi-reject.vela";
+    done(write_file(pure, "extern \"fixture.dll\" fn echo64(x:Int)->Int effects{state,process};fn main()->Int{return echo64(1);}"));
+    let effect = invoke(s, compiler_command(s, "check", pure), 10000);
+    s = record(s, "ffi_call_effects", effect.code == 1 && contains(effect.err, "E209"), effect.out + effect.err);
+    done(write_file(pure, "fn main()->Unit{match int32_from_int(1){Int32Result::Ok(x)=>{let y=x+x;} Int32Result::Err(_)=>{}}}"));
+    let carrier = invoke(s, compiler_command(s, "check", pure), 10000);
+    s = record(s, "ffi_carrier_no_arithmetic", carrier.code == 1 && contains(carrier.err, "E201"), carrier.out + carrier.err);
+    done(write_file(s.dir + "/ffi-module.vela", "pub extern \"fixture.dll\" fn echo64(x:Int)->Int effects{state,process};"));
+    let imported = ffi_program(s, "import \"ffi-module.vela\" as c;fn main()->Unit effects{state,process}{assert_true(c::echo64(17)==17,\"module symbol spelling\");}");
+    s = record(s, "ffi_imported_symbol", imported.code == 0, imported.out + imported.err);
+    let formatted = invoke(s, compiler_command(s, "fmt", s.root + "/tests/ffi/main.vela"), 10000);
+    let formatted_run = ffi_program(s, formatted.out);
+    s = record(s, "ffi_formatted_behavior", formatted.code == 0 && formatted_run.code == 0 && formatted_run.out == "ffi ABI 1 passed\n", formatted.err + formatted_run.err);
+    // Explicit native inputs are locked and staged; caller cwd is irrelevant to loading.
+    let project = s.dir + "/ffi.vproj";
+    match remove_file(project + ".lock") { WriteResult::Ok => {} WriteResult::Err(_) => {} }
+    let program = value(read_file(s.root + "/tests/ffi/main.vela"));
+    done(write_file(s.dir + "/ffi-project.vela", program));
+    done(write_file(project, "vela-project|1\nname|ffi\nentry|ffi-project.vela\ntest|ffi-project.vela\nnative|fixture.dll|fixture.dll\n"));
+    let unlocked = invoke(s, compiler_command(s, "check", project), 10000);
+    let locked = invoke(s, compiler_command(s, "lock", project), 10000);
+    let project_run = invoke(s, compiler_command(s, "run", project), 30000);
+    s = record(s, "ffi_native_lock_and_run", unlocked.code == 1 && contains(unlocked.err, "E226") && locked.code == 0 && project_run.code == 0 && project_run.out == "ffi ABI 1 passed\n", unlocked.err + locked.err + project_run.out + project_run.err);
+    let project_test = compiler_command(s, "test", project);
+    strings_push(project_test, "--json");
+    let tested = invoke(s, project_test, 30000);
+    s = record(s, "ffi_native_test_staging", tested.code == 0 && contains(tested.out, "\"passed\":1") && contains(tested.out, "\"artifact_dir\":\"\""), tested.out + tested.err);
+    let original = value(read_file(s.dir + "/fixture.dll"));
+    done(write_file(s.dir + "/fixture.dll", original + "changed"));
+    let stale = invoke(s, compiler_command(s, "check", project), 10000);
+    done(write_file(s.dir + "/fixture.dll", original));
+    s = record(s, "ffi_native_digest_lock", stale.code == 1 && contains(stale.err, "E226"), stale.out + stale.err);
+    let destination = value(temp_dir(s.dir));
+    let target = destination + "/app.exe";
+    let published = build(s, project, target);
+    let output = invoke(s, command(target), 10000);
+    s = record(s, "ffi_native_build_staging", published.code == 0 && output.code == 0 && value(read_file(destination + "/fixture.dll")) == original, published.err + output.err);
+    let original_exe = value(read_file(target));
+    done(write_file(destination + "/fixture.dll", "preserve"));
+    let conflict = build(s, project, target);
+    s = record(s, "ffi_native_conflict_preserves_outputs", conflict.code == 2 && value(read_file(target)) == original_exe && value(read_file(destination + "/fixture.dll")) == "preserve", conflict.err);
+    let input_output = build(s, project, s.dir + "/fixture.dll");
+    s = record(s, "ffi_native_input_preserved", input_output.code == 2 && value(read_file(s.dir + "/fixture.dll")) == original && value(read_file(s.dir + "/ffi-project.vela")) == program, input_output.err);
+    done(remove_file(destination + "/fixture.dll")); done(remove_file(target)); done(remove_dir(destination));
+    return s;
+}

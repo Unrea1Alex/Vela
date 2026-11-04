@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-04",
+  "version": "0.7.0",
+  "scope": "GitHub source publication preflight",
+  "status": "verified",
+  "repository": "https://github.com/Unrea1Alex/Vela",
+  "license": "MIT",
+  "platform": "Windows x64 / MSVC",
+  "bootstrap_tools_sha256": {
+    "bin/velac.exe": "b4a8f64ada2925b3410c8aed84447cea0a45d8df5fa3f4693633eb862e62b199",
+    "bin/vela-dev.exe": "7d2071e88ab589ab67ceb5aa964c51f9ba8388ccb03d791517247af7492526ea",
+    "bin/vela-bundle.exe": "6d1d00a82dd6276bada51780386ace87db6e7696ecc902c644d00ca499254a75",
+    "bin/vela-test.exe": "d6d8aa2d0e2162a89159d90ebfc536998630d059d3c2a0a56b7d927f2b26454e"
+  },
+  "source_export": {
+    "method": "git checkout-index into an isolated directory; no ignored build products copied",
+    "tracked_files": 782,
+    "excluded": [
+      "build",
+      "work",
+      "dist",
+      "node_modules",
+      ".codex",
+      "machine-specific launchers",
+      "application binaries"
+    ],
+    "secret_pattern_findings": [],
+    "scan_limit": "Pattern scan, not a proof that every possible secret is absent"
+  },
+  "documentation": {
+    "local_links_checked": 226,
+    "missing_links": [],
+    "readme_example_stdout": "1: root",
+    "matching_mcp_fingerprints": 23
+  },
+  "quickstart": {
+    "compiler_version": "Vela 0.7.0 (self-hosted)",
+    "pipeline_check": "passed",
+    "pipeline_stdout": [
+      "total=10",
+      "invalid input rejected"
+    ],
+    "factorial_10": "3628800",
+    "measurelab_build": "passed",
+    "measurelab_tests": {
+      "passed": 12,
+      "failed": 0
+    },
+    "measurelab_report_matches_reference": true
+  },
+  "compiler_rebuilt": false,
+  "full_native_verify_rerun": false,
+  "reason": "Publication and documentation only; compiler/runtime/library bytes unchanged. Release native 974/974 results remain in VALIDATION-0.7.md.",
+  "release_archives_changed": false
+}

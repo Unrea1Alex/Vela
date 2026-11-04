@@ -1,0 +1,1 @@
+fn main() -> Unit effects { state } { ints_set(ints_new(), 0, 1); }

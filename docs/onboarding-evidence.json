@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "workspace": "G:\\Vela\\work\\onboarding-tM5pUw",
+  "exit": 0,
+  "native_mcp_calls": [
+    {
+      "server": "vela",
+      "tool": "vela_get_context",
+      "status": "completed"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_check",
+      "status": "completed"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_symbols",
+      "status": "completed"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_format",
+      "status": "completed"
+    }
+  ],
+  "skill_path": "G:\\Vela\\work\\onboarding-tM5pUw\\.agents\\skills\\vela-app\\SKILL.md",
+  "skill_read": false,
+  "notes": "Read the supplied skill text; filesystem reading was blocked by policy. Native vela_check accepted this exact unsaved main.vela with no diagnostics. Inspected symbols and proposed formatting; retained original formatting. No corrections or workspace writes. Execution was not performed; expected output is 5 followed by a newline.",
+  "passed": false,
+  "native_mcp_passed": true,
+  "independent_execution": {
+    "exit": 0,
+    "expected": "5\n",
+    "stdout": "5\n",
+    "passed": true
+  },
+  "skill_discovery": "client reported using automatically supplied skill text; installed path verified by setup test; separate shell file read blocked by client policy"
+}

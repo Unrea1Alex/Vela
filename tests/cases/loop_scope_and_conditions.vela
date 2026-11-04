@@ -1,0 +1,10 @@
+fn main() -> Unit effects { io } {
+            var n = 3;
+            while n > 0 {
+                let copy = n;
+                if n == 2 { let copy = 20; print(copy); }
+                print(copy);
+                n = n - 1;
+            }
+            print(n);
+        }

@@ -1,0 +1,1 @@
+fn f<T>(x:T)->Unit effects {state} {f(list_new<T>());} fn main()->Unit effects {state} {f(1);}

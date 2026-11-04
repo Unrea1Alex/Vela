@@ -1,0 +1,15 @@
+{
+  "version": "0.5.0",
+  "date": "2026-11-04",
+  "archive": "dist/vela-0.5.0-windows-x64.zip",
+  "bytes": 1675176,
+  "sha256": "25df3bec6d499e7079e28683f030e0d034c46af932aa16e723674e99cb658a68",
+  "artifacts_verified": 583,
+  "hash_mismatches": 0,
+  "compiler_version": "Vela 0.5.0 (self-hosted)",
+  "self_source_checked": true,
+  "pipeline_output": "total=10\ninvalid input rejected\n",
+  "generic_symbols_checked": true,
+  "python_files": 0,
+  "extraction_root": "G:\\Vela\\work\\native-archive-check-0.5.0-20261104"
+}

@@ -1,0 +1,8 @@
+fn done(r: WriteResult) -> Unit effects { io, process } { match r { WriteResult::Ok => {} WriteResult::Err(e) => { eprint(e); exit(9); } } }
+fn main() -> Unit effects { io, process } {
+    done(write_file("@TMP@/a.txt", "a\0Привет")); done(write_file("@TMP@/b.txt", "old"));
+    done(replace_file("@TMP@/a.txt", "@TMP@/b.txt"));
+    match read_file("@TMP@/b.txt") { StringResult::Ok(s) => { print(s == "a\0Привет"); } StringResult::Err(_) => { exit(8); } }
+    done(remove_file("@TMP@/b.txt"));
+    match read_file("@TMP@/a.txt") { StringResult::Ok(_) => { exit(7); } StringResult::Err(_) => { print("removed"); } }
+}

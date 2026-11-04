@@ -1,0 +1,4 @@
+fn main() -> Unit effects { state, process, io } {
+            let a = strings_new(); strings_push(a, "vela-no-such-executable-82931");
+            print(process_run(a) != 0);
+        }

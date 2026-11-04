@@ -1,0 +1,133 @@
+import "core.vela";
+import "errors.vela";
+import "driver.vela";
+pub fn utf8_width(byte: Int) -> Int {
+    if byte < 128 {
+        return 1;
+    }
+    if byte >= 194 && byte <= 223 {
+        return 2;
+    }
+    if byte >= 224 && byte <= 239 {
+        return 3;
+    }
+    if byte >= 240 && byte <= 244 {
+        return 4;
+    }
+    return 0;
+}
+pub fn utf8_valid(s: String) -> Bool {
+    var i = 0;
+    while i < str_len(s) {
+        let b = str_byte(s, i);
+        let width = utf8_width(b);
+        if width == 0 || i + width > str_len(s) {
+            return false;
+        }
+        var j = 1;
+        while j < width {
+            let tail = str_byte(s, i + j);
+            if tail < 128 || tail > 191 {
+                return false;
+            }
+            j = j + 1;
+        }
+        if width >= 3 {
+            let second = str_byte(s, i + 1);
+            if b == 224 && second < 160 || b == 237 && second > 159 || b == 240 && second < 144 || b == 244 && second > 143 {
+                return false;
+            }
+        }
+        i = i + width;
+    }
+    return true;
+}
+pub fn codepoint(s: String, i: Int) -> Int {
+    let b = str_byte(s, i);
+    let width = utf8_width(b);
+    if width == 1 {
+        return b;
+    }
+    var value = b % 32;
+    if width == 3 {
+        value = b % 16;
+    }
+    if width == 4 {
+        value = b % 8;
+    }
+    var j = 1;
+    while j < width {
+        value = value * 64 + str_byte(s, i + j) % 64;
+        j = j + 1;
+    }
+    return value;
+}
+pub fn whitespace(s: String, i: Int) -> Bool {
+    let cp = codepoint(s, i);
+    return cp >= 9 && cp <= 13 || cp >= 28 && cp <= 32 || cp == 133 || cp == 160 || cp == 5760 || cp >= 8192 && cp <= 8202 || cp == 8232 || cp == 8233 || cp == 8239 || cp == 8287 || cp == 12288;
+}
+pub fn normalized(s: String) -> String effects { state, io, process } {
+    if !utf8_valid(s) {
+        eprint("velac: E900: source is not valid UTF-8");
+        exit(2);
+    }
+    let parts = strings_new();
+    var start = 0;
+    if str_len(s) >= 3 && str_byte(s, 0) == 239 && str_byte(s, 1) == 187 && str_byte(s, 2) == 191 {
+        start = 3;
+    }
+    var i = start;
+    while i < str_len(s) {
+        if str_byte(s, i) == 13 {
+            strings_push(parts, str_slice(s, start, i));
+            strings_push(parts, "\n");
+            i = i + 1;
+            if i < str_len(s) && str_byte(s, i) == 10 {
+                i = i + 1;
+            }
+            start = i;
+        } else {
+            i = i + 1;
+        }
+    }
+    strings_push(parts, str_slice(s, start, i));
+    return strings_join(parts, "");
+}
+pub fn source_error(message: String, json_mode: Bool) -> Unit effects { state, io, process } {
+    if json_mode {
+        print(cat(cat("{\"schema_version\":1,\"ok\":false,\"diagnostics\":[{\"code\":\"E900\",\"severity\":\"error\",\"message\":", json_string(message)), "}]}"));
+    } else {
+        eprint(cat("velac: E900: ", message));
+    }
+    exit(2);
+}
+pub fn source_text_result(path: String) -> Result<String, String> effects { state, io, process } {
+    let boundary = env("VELA_SOURCE_ROOT");
+    if boundary != "" {
+        let root = path_key(io_value(absolute_path(boundary)));
+        let absolute = path_key(io_value(absolute_path(path)));
+        var prefix = root + "/";
+        if platform() == "windows" {
+            prefix = root + "\\";
+        }
+        if str_len(absolute) <= str_len(prefix) || str_slice(absolute, 0, str_len(prefix)) != prefix {
+            return Result<String, String>::Err("Source path escapes VELA_SOURCE_ROOT.");
+        }
+    }
+    let code = from_string(read_file(path))?;
+    if !utf8_valid(code) {
+        return Result<String, String>::Err("Source is not valid UTF-8.");
+    }
+    return Result<String, String>::Ok(normalized(code));
+}
+pub fn load_source(path: String, json_mode: Bool) -> String effects { state, io, process } {
+    match source_text_result(path) {
+        Result::Ok(code) => {
+            return code;
+        }
+        Result::Err(message) => {
+            source_error(message, json_mode);
+            return "";
+        }
+    }
+}
