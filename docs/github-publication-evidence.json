@@ -52,5 +52,15 @@
   "compiler_rebuilt": false,
   "full_native_verify_rerun": false,
   "reason": "Publication and documentation only; compiler/runtime/library bytes unchanged. Release native 974/974 results remain in VALIDATION-0.7.md.",
-  "release_archives_changed": false
+  "release_archives_changed": false,
+  "remote_verification": {
+    "visibility": "PUBLIC",
+    "default_branch": "main",
+    "initial_commit": "10d0ee356a322ae31877db185f146357185fa188",
+    "remote_commit_matches_local": true,
+    "license_detected": "MIT",
+    "topics": 10,
+    "readme_present": true,
+    "browser_readme_verified": true
+  }
 }
