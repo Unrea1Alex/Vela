@@ -1,6 +1,9 @@
 # Generics, callable types and effect parameters
 
 Status: accepted for the 0.5 generic subset; callable extension planned for 0.10.
+The callable implementation is now roadmap 0.10.5 (formerly 0.10.1).
+[RFC 0004](0004-abstractions-effects.md) adds planned encapsulation, methods and
+interfaces before dependent libraries/GUI; none are enabled by this RFC update.
 
 Use nominal monomorphization to keep checked HIR concrete and reuse the C backend.
 Argument-local inference keeps failures local and deterministic. Initial bounds

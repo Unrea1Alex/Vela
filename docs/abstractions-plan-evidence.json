@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-05",
+  "scope": "OOP, abstractions and effects roadmap update only",
+  "status": "verified",
+  "implementation_started": false,
+  "current_compiler": "0.7.0",
+  "next_item": "0.8.1",
+  "roadmap": {
+    "items": 66,
+    "completed_statuses_unchanged": true,
+    "planned_0_10": [
+      "0.10.1",
+      "0.10.2",
+      "0.10.3",
+      "0.10.4",
+      "0.10.5",
+      "0.10.6",
+      "0.10.7",
+      "0.10.8",
+      "0.10.9",
+      "0.10.10",
+      "0.10.11"
+    ],
+    "renumbering": {
+      "0.10.1": "0.10.5",
+      "0.10.2": "0.10.7",
+      "0.10.3": "0.10.8",
+      "0.10.4": "0.10.9",
+      "0.10.5": "0.10.10",
+      "0.10.6": "0.10.11"
+    },
+    "old_0_10_commitments_preserved": true,
+    "acceptance_criteria": 11,
+    "forward_dependencies_checked": [
+      [
+        "0.8.6",
+        "0.10.1"
+      ],
+      [
+        "0.9.9",
+        "0.10.1"
+      ],
+      [
+        "0.10.1",
+        "0.10.2"
+      ],
+      [
+        "0.10.2",
+        "0.10.3"
+      ],
+      [
+        "0.10.3",
+        "0.10.4"
+      ],
+      [
+        "0.10.4",
+        "0.10.5"
+      ],
+      [
+        "0.10.5",
+        "0.10.6"
+      ],
+      [
+        "0.10.6",
+        "0.10.7"
+      ],
+      [
+        "0.10.7",
+        "0.10.8"
+      ],
+      [
+        "0.10.8",
+        "0.10.9"
+      ],
+      [
+        "0.10.9",
+        "0.10.10"
+      ],
+      [
+        "0.10.10",
+        "0.10.11"
+      ],
+      [
+        "0.10.11",
+        "0.11.1"
+      ],
+      [
+        "0.11.1",
+        "0.11.2"
+      ]
+    ]
+  },
+  "documentation": {
+    "markdown_files": 55,
+    "local_links": 237,
+    "missing": [],
+    "numbered_crossrefs_updated": [
+      "docs/contracts/GUI.md",
+      "docs/contracts/NATIVE-RESOURCES.md",
+      "docs/rfcs/0002-generics-callables.md"
+    ]
+  },
+  "compatibility": {
+    "matching_fingerprints": 23,
+    "repinned": false,
+    "frozen_archives_unchanged": 3
+  },
+  "validation_limits": {
+    "compiler_rebuilt": false,
+    "native_verify_rerun": false,
+    "mcp_client_rerun": false,
+    "reason": "Only planning documents and future milestone cross-references changed; current semantics, help pins and binaries remain unchanged."
+  }
+}

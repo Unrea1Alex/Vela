@@ -7,7 +7,8 @@ Evidence: build/stage07/076-gui.png, 076-gui-tree.txt, 076-gui-exit.txt.
 The initial count 4 reflected user interaction before the automated check.
 Source: [adapter](../../prototypes/windows/gui.c),
 [Vela application](../../prototypes/windows/gui.vela).
-This is not the GUI framework/callback milestone 0.10.5.
+This is not the GUI framework milestone 0.10.10 (formerly 0.10.5;
+see the 2026-11-05 roadmap renumbering). Callbacks are planned in 0.10.9.
 
 Requirements: native window lifecycle, Unicode text, application-owned state,
 typed events, main-thread affinity, bounded queues, explicit close and no Vela

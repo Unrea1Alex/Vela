@@ -53,7 +53,7 @@ cover exact bytes/UTF-8/line endings, limits, diagnostic source locations, lock
 changes, MCP snapshots and locating resources independently of the caller's cwd.
 No resource mechanism is implemented by documenting these alternatives.
 
-Ownership/rooting is handled by 0.8.4–0.8.5, callbacks by 0.10.4. The current
+Ownership/rooting is handled by 0.8.4–0.8.5, callbacks by 0.10.9 (formerly 0.10.4). The current
 no-unload policy stays in force; 0.8.5 must explicitly retain it or specify a safe
 transition, rather than silently enabling unload because GC exists.
 
@@ -66,4 +66,4 @@ The implemented DLL subset passed the 0.7.5 focused/native gate and final
 Unicode paths, duplicate destinations, traversal, deterministic distribution and
 a packaged resource read with independently specified output after relocation.
 0.8.4–0.8.5 cover handle lifetime/rooting and the explicit unload decision;
-0.10.4 covers callback lifetime/cancellation. Record unimplemented scope explicitly.
+0.10.9 covers callback lifetime/cancellation. Record unimplemented scope explicitly.
