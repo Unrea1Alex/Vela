@@ -1,0 +1,2 @@
+fn print() -> Int { return 42; }
+fn main() -> Int { return print(); }

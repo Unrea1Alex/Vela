@@ -1,0 +1,187 @@
+import "../../../std/json_stream.vela" as stream;
+fn must<T, E>(value: Result<T, E>) -> T {
+    match value {
+        Result::Ok(v) => {
+            return v;
+        }
+        Result::Err(_) => {
+            assert_true(false, "JSON stream operation");
+        }
+    }
+    return must(value);
+}
+fn valid(data: String, limits: stream::Limits) -> Bool effects { state } {
+    match stream::create(data, limits) {
+        Result::Err(_) => {
+            return false;
+        }
+        Result::Ok(reader) => {
+            return match stream::skip_value(reader) {
+                Result::Ok(_) => true,
+                Result::Err(_) => false
+            };
+        }
+    }
+}
+fn failure(data: String, limits: stream::Limits) -> stream::Error effects { state } {
+    match stream::create(data, limits) {
+        Result::Err(error) => {
+            return error;
+        }
+        Result::Ok(reader) => {
+            match stream::finish(reader) {
+                Result::Err(error) => {
+                    return error;
+                }
+                Result::Ok(_) => {}
+            }
+        }
+    }
+    assert_true(false, "expected malformed JSON");
+    return failure(data, limits);
+}
+fn numeric(data: String) -> stream::Number effects { state } {
+    let reader = must(stream::create(data, stream::default_limits()));
+    match must(stream::next(reader)) {
+        Option::Some(found) => {
+            match found.event {
+                stream::Event::NumberLiteral(n) => {
+                    let complete = must(stream::finish(reader));
+                    return n;
+                }
+                stream::Event::ObjectStart => {}
+                stream::Event::ObjectEnd => {}
+                stream::Event::ArrayStart => {}
+                stream::Event::ArrayEnd => {}
+                stream::Event::Key(_) => {}
+                stream::Event::StringValue(_) => {}
+                stream::Event::Boolean(_) => {}
+                stream::Event::Null => {}
+            }
+        }
+        Option::None => {}
+    }
+    assert_true(false, "expected number");
+    return numeric(data);
+}
+fn main() -> Unit effects { state, io } {
+    let limits = stream::default_limits();
+    assert_true(valid("{\"ignored\":[1e9999,999999999999999999999999999999999999],\"ok\":true}",
+        limits), "skipped huge numbers");
+    assert_true(valid(" \r\n{\"x\": [null, false, {}, [], \"\\uD83D\\uDE00\"]}\t", limits),
+        "grammar and surrogate pair");
+    let malformed = list_new<String>();
+    list_push(malformed, "{\"ignored\":\"\\x\"}");
+    list_push(malformed, "{\"ignored\":\"\\uDEAD\"}");
+    list_push(malformed, "{\"ignored\":\"\\uD800x\"}");
+    list_push(malformed, "{\"ignored\":[0,]}");
+    list_push(malformed, "{\"ignored\":{\"x\":1,}}");
+    list_push(malformed, "{\"ignored\":truex}");
+    list_push(malformed, "{\"ignored\":1e}");
+    list_push(malformed, "{\"ignored\":01}");
+    list_push(malformed, "{\"ignored\":null} false");
+    list_push(malformed, "[}");
+    list_push(malformed, "");
+    list_push(malformed, "[1");
+    list_push(malformed, "{\"a\":0,\"\\u0061\":1}");
+    for data in malformed {
+        assert_true(!valid(data, limits), "malformed skipped value rejected");
+    }
+    let leading = failure("{\"x\":01}", limits);
+    assert_true(leading.offset == 6 && leading.path == "$[\"x\"]" && leading.kind
+        == stream::ErrorKind::Syntax, "exact offset/path");
+    let duplicate = failure("{\"a\":0,\"a\":1}", limits);
+    assert_true(duplicate.offset == 7 && duplicate.path == "$[\"a\"]", "duplicate key location");
+    let encoding = failure("{\"x\":\"" + str_from_byte(255) + "\"}", limits);
+    assert_true(encoding.offset == 6 && encoding.path == "$" && encoding.kind
+        == stream::ErrorKind::Encoding, "UTF-8 offset");
+    assert_true(failure("[true]", stream::Limits(bytes: 5, depth: 1, nodes: 2)).kind
+        == stream::ErrorKind::ByteLimit, "byte bound");
+    assert_true(failure("[true]", stream::Limits(bytes: 6, depth: 0, nodes: 2)).kind
+        == stream::ErrorKind::DepthLimit, "depth bound");
+    assert_true(failure("[true]", stream::Limits(bytes: 6, depth: 1, nodes: 1)).kind
+        == stream::ErrorKind::NodeLimit, "node bound");
+    assert_true(failure("0", stream::Limits(bytes: 1, depth: 4097, nodes: 1)).kind
+        == stream::ErrorKind::InvalidLimits, "invalid limits");
+    let integer = numeric("-9223372036854775808");
+    assert_true(stream::is_integer(integer) && must(stream::integer(integer))
+        == -9223372036854775808, "Int minimum");
+    assert_true(match stream::integer(numeric("9223372036854775808")) {
+        Result::Err(e) => e.kind == stream::ErrorKind::Range,
+        Result::Ok(_) => false
+    }, "Int overflow");
+    let decimal = numeric("1.0");
+    assert_true(!stream::is_integer(decimal) && stream::spelling(decimal) == "1.0" && must(
+        stream::floating(decimal)) == 1.0, "Float category and spelling");
+    assert_true(match stream::integer(decimal) {
+        Result::Err(e) => e.kind == stream::ErrorKind::Type,
+        Result::Ok(_) => false
+    }, "decimal is not integer literal");
+    assert_true(match stream::integer(numeric("1e0")) {
+        Result::Err(e) => e.kind == stream::ErrorKind::Type,
+        Result::Ok(_) => false
+    }, "exponent is not integer literal");
+    let huge = numeric("1e9999");
+    assert_true(match stream::floating(huge) {
+        Result::Err(e) => e.kind == stream::ErrorKind::Range,
+        Result::Ok(_) => false
+    }, "Float range only on conversion");
+    for i in 0 .. 100 {
+        let garbage = "unrelated allocation " + to_string(i);
+    }
+    assert_true(stream::spelling(huge) == "1e9999", "number retains input after reader lifetime");
+    assert_true(stream::spelling(numeric("-0")) == "-0" && must(stream::integer(numeric("-0")))
+        == 0, "negative zero spelling");
+    let located = must(stream::create("{\"a.b\":[1.0]}", limits));
+    let object_start = must(stream::next(located));
+    let key = must(stream::next(located));
+    let array_start = must(stream::next(located));
+    assert_true(match stream::read_integer(located) {
+        Result::Err(e) => e.offset == 8 && e.path == "$[\"a.b\"][0]" && e.kind
+            == stream::ErrorKind::Type,
+        Result::Ok(_) => false
+    }, "nested conversion path");
+    let located_finish = must(stream::finish(located));
+    let reader = must(stream::create("[0,1]", limits));
+    let alias = reader;
+    let start = must(stream::next(reader));
+    assert_true(must(stream::read_integer(alias)) == 0 && must(stream::read_integer(reader)) == 1,
+        "shared reader progress");
+    let complete = must(stream::finish(reader));
+    let again = must(stream::finish(alias));
+    assert_true(match must(stream::next(reader)) {
+        Option::None => true,
+        Option::Some(_) => false
+    }, "finished reader");
+    let wrong = must(stream::create("true", limits));
+    assert_true(match stream::read_integer(wrong) {
+        Result::Err(e) => e.kind == stream::ErrorKind::Type && e.offset == 0,
+        Result::Ok(_) => false
+    }, "bool not integer");
+    var nested = "null";
+    for i in 0 .. 4096 {
+        nested = "[" + nested + "]";
+    }
+    assert_true(valid(nested, limits), "4096 levels without recursive descent");
+    assert_true(failure(nested, stream::Limits(bytes: 16777216, depth: 4095, nodes: 1000000)).kind
+        == stream::ErrorKind::DepthLimit, "deep boundary");
+    let broken = must(stream::create("[0,]", limits));
+    let first = failure("[0,]", limits);
+    match stream::finish(broken) {
+        Result::Err(e) => {
+            assert_true(e.offset == first.offset, "first error");
+        }
+        Result::Ok(_) => {
+            assert_true(false, "invalid accepted");
+        }
+    }
+    match stream::next(broken) {
+        Result::Err(e) => {
+            assert_true(e.offset == first.offset && e.path == first.path, "sticky syntax error");
+        }
+        Result::Ok(_) => {
+            assert_true(false, "error lost");
+        }
+    }
+    print("JSON stream checks passed");
+}

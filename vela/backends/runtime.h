@@ -274,6 +274,7 @@ static int v_exit_code(int64_t value, const char *f, int l, int c) {
 #include <sys/stat.h>
 #include <signal.h>
 #include <time.h>
+#include <dirent.h>
 #endif
 
 typedef void (*v_gc_visit)(const void *);
@@ -1342,6 +1343,28 @@ static v_foreign_library *v_foreign_libraries;
 static v_foreign_handle *v_foreign_roots;
 static v_foreign_library v_stream_owner;
 static size_t v_stream_count;
+static v_foreign_library v_directory_owner;
+static size_t v_directory_count;
+typedef struct {
+#ifdef _WIN32
+    HANDLE handle;
+    unsigned char buffer[65536];
+    size_t offset;
+    int buffered;
+#else
+    DIR *handle;
+#endif
+    int done;
+} v_directory;
+static int v_directory_dispose(v_directory *directory) {
+#ifdef _WIN32
+    int failed = !CloseHandle(directory->handle);
+#else
+    int failed = closedir(directory->handle) != 0;
+#endif
+    free(directory);
+    return failed;
+}
 static v_foreign_library v_process_owner;
 static v_foreign_library v_fiber_owner;
 #ifdef _WIN32
@@ -1455,7 +1478,7 @@ static v_callback_result v_ffi_callback_register(v_foreign_handle *owner, void (
     (void)f; (void)l; (void)c;
 #if defined(_WIN32) && defined(_M_X64)
     v_callback_entry *entry;
-    if (!owner || !owner->pointer || owner->closed || owner->owner == &v_stream_owner || owner->owner == &v_process_owner || owner->owner == &v_fiber_owner) {
+    if (!owner || !owner->pointer || owner->closed || owner->owner == &v_stream_owner || owner->owner == &v_directory_owner || owner->owner == &v_process_owner || owner->owner == &v_fiber_owner) {
         result.error = v_text("callback requires a live DLL resource", 37);
         return result;
     }
@@ -1507,6 +1530,7 @@ static void v_foreign_shutdown(void) {
     v_foreign_handle *handle;
     for (handle = v_foreign_roots; handle; handle = handle->retained_next) {
         if (handle->owner == &v_stream_owner) fclose((FILE *)handle->pointer);
+        else if (handle->owner == &v_directory_owner) v_directory_dispose((v_directory *)handle->pointer);
 #ifdef _WIN32
         else if (handle->owner == &v_process_owner) v_process_shutdown((v_child_process *)handle->pointer);
         else if (handle->owner == &v_fiber_owner && handle->pointer != v_active_fiber)
@@ -1604,6 +1628,7 @@ static int v_foreign_unroot(v_foreign_handle *h) {
 static v_io_result v_ffi_retain(v_foreign_handle *h, const char *f, int l, int c) {
     (void)f; (void)l; (void)c;
     if (!h || !h->pointer || h->closed) return v_io_error("retain requires a live foreign handle");
+    if (h->owner == &v_directory_owner) return v_io_error("directory handles have explicit ownership");
     if (h->owner == &v_stream_owner) return v_io_error("stream handles have explicit stream ownership");
     if (h->owner == &v_process_owner) return v_io_error("process handles have explicit process ownership");
     if (h->owner == &v_fiber_owner) return v_io_error("fiber handles have explicit task ownership");
@@ -1614,6 +1639,7 @@ static v_io_result v_ffi_retain(v_foreign_handle *h, const char *f, int l, int c
 static v_io_result v_ffi_release(v_foreign_handle *h, const char *f, int l, int c) {
     (void)f; (void)l; (void)c;
     if (!h || !h->pointer || h->closed) return v_io_error("release requires a live foreign handle");
+    if (h->owner == &v_directory_owner) return v_io_error("directory handles have explicit ownership");
     if (h->owner == &v_stream_owner) return v_io_error("stream handles have explicit stream ownership");
     if (h->owner == &v_process_owner) return v_io_error("process handles have explicit process ownership");
     if (h->owner == &v_fiber_owner) return v_io_error("fiber handles have explicit task ownership");
@@ -1625,6 +1651,7 @@ static v_io_result v_ffi_close(v_foreign_handle *h, v_string name, const char *f
     size_t i;
     if (!h || !h->pointer) return v_io(1,v_text("",0));
     if (h->closed) return v_io_error("foreign handle already closed");
+    if (h->owner == &v_directory_owner) return v_io_error("directory handles require directory_close");
     if (h->owner == &v_stream_owner) return v_io_error("stream handles require stream_close");
     if (h->owner == &v_process_owner) return v_io_error("process handles require process_close");
     if (h->owner == &v_fiber_owner) return v_io_error("fiber handles require fiber_close");
@@ -1672,6 +1699,131 @@ static v_stream_result v_stream_open(v_string path, int64_t limit, const char *f
     v_foreign_roots = result.handle;
     ++v_stream_count;
     return result;
+}
+/* OS enumeration and storage only. Envelope decoding and traversal are Vela. */
+static v_stream_result v_directory_open(v_string path, const char *f, int l, int c) {
+    v_stream_result result = {2, NULL, v_text("cannot open directory", 21)};
+    v_directory *directory;
+    if (!path.length || memchr(path.data, 0, path.length)) return result;
+#ifdef _WIN32
+    while (path.length > 1 && (path.data[path.length - 1] == '/' || path.data[path.length - 1] == '\\')
+        && !(path.length == 3 && path.data[1] == ':')) --path.length;
+#else
+    while (path.length > 1 && path.data[path.length - 1] == '/') --path.length;
+#endif
+    if (v_directory_count >= 128) { result.kind = 1; return result; }
+    directory = (v_directory *)calloc(1, sizeof(*directory));
+    if (!directory) { result.error = v_text("directory storage exhausted", 27); return result; }
+#ifdef _WIN32
+    {
+        BY_HANDLE_FILE_INFORMATION info;
+        directory->handle = CreateFileW(v_wide(path,f,l,c), FILE_LIST_DIRECTORY,
+            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING,
+            FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+        if (directory->handle == INVALID_HANDLE_VALUE) { free(directory); return result; }
+        if (!GetFileInformationByHandle(directory->handle, &info) ||
+            !(info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ||
+            (info.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) {
+            v_directory_dispose(directory); return result;
+        }
+    }
+#else
+    {
+        int fd = open(v_c_string(path,f,l,c), O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+        if (fd < 0) { free(directory); return result; }
+        directory->handle = fdopendir(fd);
+        if (!directory->handle) { close(fd); free(directory); return result; }
+    }
+#endif
+    result.kind = 0;
+    result.handle = v_foreign_wrap(directory, &v_directory_owner, f,l,c);
+    result.handle->retained_next = v_foreign_roots;
+    v_foreign_roots = result.handle;
+    ++v_directory_count;
+    return result;
+}
+static v_bounded_read v_directory_next(v_foreign_handle *h, const char *f, int l, int c) {
+    v_bounded_read result = {2, v_text("invalid or closed directory", 27)};
+    v_directory *directory;
+    char prefix[128], kind;
+    size_t length;
+    int count;
+    int64_t size, modified;
+    char *output;
+    if (!h || h->owner != &v_directory_owner || h->closed) return result;
+    directory = (v_directory *)h->pointer;
+    if (directory->done) { result.kind = 0; result.value = v_text("",0); return result; }
+    for (;;) {
+#ifdef _WIN32
+        FILE_ID_BOTH_DIR_INFO *info;
+        int name_bytes;
+        ULARGE_INTEGER ticks;
+        if (!directory->buffered) {
+            if (!GetFileInformationByHandleEx(directory->handle, FileIdBothDirectoryInfo,
+                directory->buffer, sizeof(directory->buffer))) {
+                if (GetLastError() == ERROR_NO_MORE_FILES) {
+                    directory->done = 1; result.kind = 0; result.value = v_text("",0); return result;
+                }
+                result.value = v_text("cannot read directory", 21); return result;
+            }
+            directory->offset = 0;
+        }
+        info = (FILE_ID_BOTH_DIR_INFO *)(directory->buffer + directory->offset);
+        directory->buffered = info->NextEntryOffset != 0;
+        directory->offset += info->NextEntryOffset;
+        if ((info->FileNameLength == 2 && info->FileName[0] == L'.') ||
+            (info->FileNameLength == 4 && info->FileName[0] == L'.' && info->FileName[1] == L'.')) continue;
+        name_bytes = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, info->FileName,
+            (int)(info->FileNameLength / sizeof(wchar_t)), NULL, 0, NULL, NULL);
+        if (name_bytes <= 0) { result.value = v_text("invalid directory name UTF-16", 28); return result; }
+        length = (size_t)name_bytes;
+        kind = (info->FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) ? 'l' :
+            (info->FileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? 'd' :
+            (info->FileAttributes & FILE_ATTRIBUTE_DEVICE) ? 'o' : 'f';
+        size = kind == 'f' ? info->EndOfFile.QuadPart : 0;
+        ticks.QuadPart = (uint64_t)info->LastWriteTime.QuadPart;
+        modified = (int64_t)(ticks.QuadPart / UINT64_C(10000000)) - INT64_C(11644473600);
+#else
+        struct dirent *entry;
+        struct stat info;
+        errno = 0;
+        entry = readdir(directory->handle);
+        if (!entry) {
+            if (errno) { result.value = v_text("cannot read directory",21); return result; }
+            directory->done = 1; result.kind = 0; result.value = v_text("",0); return result;
+        }
+        if (!strcmp(entry->d_name,".") || !strcmp(entry->d_name,"..")) continue;
+        if (fstatat(dirfd(directory->handle),entry->d_name,&info,AT_SYMLINK_NOFOLLOW)) {
+            result.value = v_text("cannot query directory entry metadata",37); return result;
+        }
+        length = strlen(entry->d_name);
+        kind = S_ISLNK(info.st_mode) ? 'l' : S_ISDIR(info.st_mode) ? 'd' : S_ISREG(info.st_mode) ? 'f' : 'o';
+        size = kind == 'f' ? (int64_t)info.st_size : 0;
+        modified = (int64_t)info.st_mtime;
+#endif
+        if (size < 0) { result.value = v_text("directory size outside Int range",32); return result; }
+        count = snprintf(prefix,sizeof(prefix),"%c\t%" PRId64 "\t%" PRId64 "\t",kind,size,modified);
+        if (count < 0 || (size_t)count >= sizeof(prefix)) return result;
+        output = (char *)v_allocate(v_size_add((size_t)count,length,f,l,c),f,l,c);
+        memcpy(output,prefix,(size_t)count);
+#ifdef _WIN32
+        if (!WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, info->FileName,
+            (int)(info->FileNameLength / sizeof(wchar_t)),output + count,name_bytes,NULL,NULL)) return result;
+#else
+        memcpy(output + count,entry->d_name,length);
+#endif
+        result.kind = 0; result.value = v_owned_text(output,(size_t)count + length); return result;
+    }
+}
+static v_io_result v_directory_close(v_foreign_handle *h, const char *f, int l, int c) {
+    int failed;
+    (void)f; (void)l; (void)c;
+    if (!h || h->owner != &v_directory_owner || h->closed) return v_io_error("invalid or closed directory");
+    failed = v_directory_dispose((v_directory *)h->pointer);
+    h->closed = 1;
+    (void)v_foreign_unroot(h);
+    --v_directory_count;
+    return failed ? v_io_error("cannot close directory") : v_io(1,v_text("",0));
 }
 static v_bounded_read v_stream_next(v_foreign_handle *h, int64_t limit, const char *f, int l, int c) {
     v_bounded_read result = {2, v_text("invalid or closed stream", 24)};

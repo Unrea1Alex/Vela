@@ -72,7 +72,8 @@ pub opaque struct Exchange {
 }
 pub opaque struct Curl {
     executable: path::Path,
-    ca_file: Option<path::Path>
+    ca_file: Option<path::Path>,
+    transfer_deadline: Bool
 }
 pub opaque struct Scripted {
     result_value: Result<Response, Error>
@@ -293,7 +294,13 @@ pub fn curl(executable: path::Path, ca_file: Option<path::Path>) -> Result<Curl,
         }
         Option::None => {}
     }
-    return Result<Curl, Error>::Ok(Curl(executable: executable, ca_file: ca_file));
+    return Result<Curl, Error>::Ok(Curl(executable: executable, ca_file: ca_file,
+        transfer_deadline: false));
+}
+pub fn curl_transfer(executable: path::Path, ca_file: Option<path::Path>) -> Result<Curl, Error> {
+    var transport = curl(executable, ca_file)?;
+    transport.transfer_deadline = true;
+    return Result<Curl, Error>::Ok(transport);
 }
 pub fn scripted(result_value: Result<Response, Error>) -> Scripted {
     return Scripted(result_value: result_value);
@@ -435,9 +442,15 @@ impl Transport for Curl {
                         }
                     }
                 }
+                var supervisor_ms = request.timeout_ms;
+                if self.transfer_deadline {
+                    // curl's --max-time is still the exact request timeout. Only
+                    // helper startup/drain gets overhead; the 1.0 factory is unchanged.
+                    supervisor_ms = supervisor_ms + 1000;
+                }
                 match process::schedule(scheduler, arguments(self, request, files), path::Path(
                     value: base), path::Path(value: files.status), path::Path(value: files.errors),
-                    request.timeout_ms) {
+                    supervisor_ms) {
                     Result::Ok(task) => {
                         let head = match request.method {
                             Method::Head => true,

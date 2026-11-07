@@ -3,7 +3,8 @@ import path from 'node:path';
 const root=path.resolve(process.argv[2]??'../..');
 const files=['README.md','README.ru.md','AGENTS.md','bin/README.md','integrations/mcp/README.md',
  'integrations/agent/vela-app/SKILL.md','apps/route-audit/README.md','apps/source-lens/README.md','apps/gui-notes/README.md',
- 'apps/pulse-deck/README.md','apps/pulse-deck/CONTRACT.md','apps/pulse-deck/REVIEW.md'];
+ 'apps/pulse-deck/README.md','apps/pulse-deck/CONTRACT.md','apps/pulse-deck/REVIEW.md',
+ 'apps/tree-index/README.md','apps/log-summary/README.md','apps/http-collector/README.md'];
 async function walk(dir){for(const e of await fs.readdir(path.join(root,dir),{withFileTypes:true})){
  const rel=path.join(dir,e.name);if(e.isDirectory())await walk(rel);else if(e.name.endsWith('.md'))files.push(rel);
 }}

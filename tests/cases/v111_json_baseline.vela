@@ -1,0 +1,17 @@
+import "../../../std/json.vela" as json;
+fn main() -> Unit effects { state, io } {
+    print(match json::parse("{\"ignored\":1e9999}") {
+        Result::Ok(_) => false, Result::Err(_) => true
+    });
+    print(match json::parse("{\"ignored\":1e2}") {
+        Result::Ok(_) => true, Result::Err(_) => false
+    });
+    var nested = "0";
+    for i in 0 .. 129 { nested = "[" + nested + "]"; }
+    print(match json::parse(nested) {
+        Result::Ok(_) => false, Result::Err(_) => true
+    });
+    print(match json::parse("[0]") {
+        Result::Ok(_) => true, Result::Err(_) => false
+    });
+}

@@ -1,0 +1,1539 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-07",
+  "scope": "Roadmap-only standard-library expansion/modernization and independent compiler audits in 1.2–1.4",
+  "status": "documentation-verified",
+  "implementation_started": false,
+  "old_ids_preserved": true,
+  "new_stages": [
+    {
+      "id": "1.2.1a",
+      "title": "контракт расширения и модернизации стандартной библиотеки.",
+      "status": "planned",
+      "kind": "stdlib-and-application-migration",
+      "dependencies": [
+        "1.2.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.4a",
+      "title": "общие операции Result и Option.",
+      "status": "planned",
+      "kind": "stdlib-and-application-migration",
+      "dependencies": [
+        "1.2.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.5a",
+      "title": "алгоритмы коллекций с типизированными callback.",
+      "status": "planned",
+      "kind": "stdlib-and-application-migration",
+      "dependencies": [
+        "1.2.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.5b",
+      "title": "типизированное множество Set.",
+      "status": "planned",
+      "kind": "stdlib-and-application-migration",
+      "dependencies": [
+        "1.2.5a"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.5c",
+      "title": "явная библиотечная ячейка Cell.",
+      "status": "planned",
+      "kind": "stdlib-and-application-migration",
+      "dependencies": [
+        "1.2.5b"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.6a",
+      "title": "общие Reader/Writer, буферизация и ошибки потоков.",
+      "status": "planned",
+      "kind": "stdlib-and-application-migration",
+      "dependencies": [
+        "1.2.6"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.8a",
+      "title": "аудит компилятора: инвентаризация и исходная проверка.",
+      "status": "planned",
+      "kind": "compiler-audit",
+      "dependencies": [
+        "1.2.8"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.8b",
+      "title": "аудит компилятора: frontend и типизированные границы фаз.",
+      "status": "planned",
+      "kind": "compiler-audit",
+      "dependencies": [
+        "1.2.8a"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.1a",
+      "title": "закрытые проверенные Text и Path.",
+      "status": "planned",
+      "kind": "stdlib-and-application-migration",
+      "dependencies": [
+        "1.3.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.1b",
+      "title": "проверенная конфигурация без повторной полной валидации.",
+      "status": "planned",
+      "kind": "stdlib-and-application-migration",
+      "dependencies": [
+        "1.3.1a"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.4a",
+      "title": "модернизация общего механизма JSON.",
+      "status": "planned",
+      "kind": "stdlib-and-application-migration",
+      "dependencies": [
+        "1.3.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.4b",
+      "title": "модернизация файловых операций, потоков и cleanup.",
+      "status": "planned",
+      "kind": "stdlib-and-application-migration",
+      "dependencies": [
+        "1.3.4a"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.4c",
+      "title": "аудит компилятора: эффекты, GC и время жизни ресурсов.",
+      "status": "planned",
+      "kind": "compiler-audit",
+      "dependencies": [
+        "1.3.4b"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.4d",
+      "title": "аудит компилятора: lowering и C backend.",
+      "status": "planned",
+      "kind": "compiler-audit",
+      "dependencies": [
+        "1.3.4c"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.5a",
+      "title": "аудит компилятора: затраты, кэш и build-зависимости.",
+      "status": "planned",
+      "kind": "compiler-audit",
+      "dependencies": [
+        "1.3.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.4.4a",
+      "title": "миграция поддерживаемых приложений на новую std.",
+      "status": "planned",
+      "kind": "stdlib-and-application-migration",
+      "dependencies": [
+        "1.4.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.4.4b",
+      "title": "завершение аудита компилятора и bootstrap-переход.",
+      "status": "planned",
+      "kind": "compiler-audit",
+      "dependencies": [
+        "1.4.4a"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    }
+  ],
+  "stage_counts": {
+    "new": 17,
+    "stdlib_and_migration": 11,
+    "compiler_audit": 6,
+    "all_1_2_to_1_4": 38,
+    "all_post_1_0": 81
+  },
+  "validation": {
+    "checks": [
+      {
+        "name": "17-ordered-new-letter-stages",
+        "passed": true
+      },
+      {
+        "name": "81-planned-or-active-post-1.0-stages",
+        "passed": true
+      },
+      {
+        "name": "numeric-then-letter-order",
+        "passed": true
+      },
+      {
+        "name": "38-stages-in-1.2-1.4",
+        "passed": true
+      },
+      {
+        "name": "1.2.1:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.1.6"
+        ]
+      },
+      {
+        "name": "1.2.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.1:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.1a:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.1"
+        ]
+      },
+      {
+        "name": "1.2.1a:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.1a:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.2:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.1a"
+        ]
+      },
+      {
+        "name": "1.2.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.2:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.3:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.2"
+        ]
+      },
+      {
+        "name": "1.2.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.3:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.4:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.3"
+        ]
+      },
+      {
+        "name": "1.2.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.4:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.4a:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.4"
+        ]
+      },
+      {
+        "name": "1.2.4a:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.4a:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.5:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.4a"
+        ]
+      },
+      {
+        "name": "1.2.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.5:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.5a:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.5"
+        ]
+      },
+      {
+        "name": "1.2.5a:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.5a:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.5b:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.5a"
+        ]
+      },
+      {
+        "name": "1.2.5b:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.5b:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.5c:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.5b"
+        ]
+      },
+      {
+        "name": "1.2.5c:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.5c:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.6:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.5c",
+          "1.1.4"
+        ]
+      },
+      {
+        "name": "1.2.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.6:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.6a:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.6"
+        ]
+      },
+      {
+        "name": "1.2.6a:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.6a:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.7:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.6a"
+        ]
+      },
+      {
+        "name": "1.2.7:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.7:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.8:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.7"
+        ]
+      },
+      {
+        "name": "1.2.8:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.8:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.8a:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.8"
+        ]
+      },
+      {
+        "name": "1.2.8a:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.8a:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.8b:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.8a"
+        ]
+      },
+      {
+        "name": "1.2.8b:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.8b:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.9:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.8b"
+        ]
+      },
+      {
+        "name": "1.2.9:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.9:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.1:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.2.9"
+        ]
+      },
+      {
+        "name": "1.3.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.1:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.1a:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.1"
+        ]
+      },
+      {
+        "name": "1.3.1a:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.1a:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.1b:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.1a"
+        ]
+      },
+      {
+        "name": "1.3.1b:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.1b:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.2:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.1b",
+          "1.1.5"
+        ]
+      },
+      {
+        "name": "1.3.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.2:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.3:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.2"
+        ]
+      },
+      {
+        "name": "1.3.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.3:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.4:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.3"
+        ]
+      },
+      {
+        "name": "1.3.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.4:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.4a:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.4"
+        ]
+      },
+      {
+        "name": "1.3.4a:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.4a:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.4b:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.4a"
+        ]
+      },
+      {
+        "name": "1.3.4b:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.4b:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.4c:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.4b"
+        ]
+      },
+      {
+        "name": "1.3.4c:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.4c:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.4d:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.4c"
+        ]
+      },
+      {
+        "name": "1.3.4d:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.4d:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.5:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.4d"
+        ]
+      },
+      {
+        "name": "1.3.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.5:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.5a:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.5"
+        ]
+      },
+      {
+        "name": "1.3.5a:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.5a:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.6:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.5a"
+        ]
+      },
+      {
+        "name": "1.3.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.6:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.1:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.3.6"
+        ]
+      },
+      {
+        "name": "1.4.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.1:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.2:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.4.1"
+        ]
+      },
+      {
+        "name": "1.4.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.2:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.3:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.4.2"
+        ]
+      },
+      {
+        "name": "1.4.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.3:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.4:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.4.3"
+        ]
+      },
+      {
+        "name": "1.4.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.4:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.4a:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.4.4"
+        ]
+      },
+      {
+        "name": "1.4.4a:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.4a:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.4b:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.4.4a"
+        ]
+      },
+      {
+        "name": "1.4.4b:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.4b:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.5:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.4.4b"
+        ]
+      },
+      {
+        "name": "1.4.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.5:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.6:dependency-order",
+        "passed": true,
+        "detail": [
+          "1.4.5"
+        ]
+      },
+      {
+        "name": "1.4.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.6:compiler-gate",
+        "passed": true
+      },
+      {
+        "name": "all-earlier-checkbox-lines-preserved",
+        "passed": true,
+        "detail": {
+          "count": 149
+        }
+      },
+      {
+        "name": "1.2.1:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.2.2:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.2.3:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.2.4:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.2.5:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.2.6:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.2.7:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.2.8:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.2.9:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.3.1:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.3.2:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.3.3:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.3.4:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.3.5:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.3.6:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.4.1:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.4.2:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.4.3:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.4.4:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.4.5:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.4.6:original-acceptance-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.1-stage-contracts-unchanged",
+        "passed": true
+      },
+      {
+        "name": "VelaBench-protocol-unchanged",
+        "passed": true
+      },
+      {
+        "name": "1.5-1.10-program-unchanged",
+        "passed": true
+      },
+      {
+        "name": "every-suffixed-item-has-separate-build-and-verify",
+        "passed": true
+      },
+      {
+        "name": "six-separate-compiler-audits",
+        "passed": true
+      },
+      {
+        "name": "gate-docs-include-letter-audit-stages",
+        "passed": true
+      },
+      {
+        "name": "final-benchmark-before-1.5",
+        "passed": true
+      },
+      {
+        "name": "coverage:result_option",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:collections",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:cell",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:streams",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:validated_types",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:json",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:errors",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:compiler_frontend",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:compiler_runtime",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:compiler_backend",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:compiler_build",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:migration",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "old-sorts-migrate-compatibly",
+        "passed": true
+      },
+      {
+        "name": "future-ownership-and-parallel-pipelines-not-claimed",
+        "passed": true
+      },
+      {
+        "name": "no-blank-inside-journal",
+        "passed": true
+      },
+      {
+        "name": "planning-not-implementation",
+        "passed": true
+      },
+      {
+        "name": "pre-existing-source-docs-inputs-preserved",
+        "passed": true,
+        "detail": {
+          "count": 120,
+          "changed": []
+        }
+      },
+      {
+        "name": "manifested-stable-fingerprints",
+        "passed": true,
+        "detail": {
+          "count": 84,
+          "mismatches": []
+        }
+      },
+      {
+        "name": "git-diff-check",
+        "passed": true
+      },
+      {
+        "name": "local-markdown-links",
+        "passed": true,
+        "detail": {
+          "checked": 194,
+          "missing": []
+        }
+      }
+    ],
+    "protected_paths": [
+      {
+        "file": "selfhost/README.md",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/artifacts.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/callables.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/compiler.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/control.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/core.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/driver.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/dynamic.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/embedded.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/emitter.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/errors.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/formatter.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/generics.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/incremental.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/interfaces.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/intrinsics.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/lexer.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/model.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/modules.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/parser.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/project_cli.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/projects.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/query.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/semantic.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/source.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/sources.list",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/suspension.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/types.vela",
+        "unchanged": true
+      },
+      {
+        "file": "selfhost/vela.project",
+        "unchanged": true
+      },
+      {
+        "file": "std/async_io.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/cli.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/collections.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/config.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/event_loop.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/fs.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/gui.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/http.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/http_server.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/json.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/lines.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/path.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/process.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/replay.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/result.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/services.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/task_group.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/tasks.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/testing.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/text.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tools/build-batch.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tools/bundle.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tools/dev.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tools/float-platform.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tools/lsp.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tools/prototypes.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tools/test.vela",
+        "unchanged": true
+      },
+      {
+        "file": "vela/__init__.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/__main__.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/backends/__init__.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/backends/c.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/backends/runtime.h",
+        "unchanged": true
+      },
+      {
+        "file": "vela/builtins.def",
+        "unchanged": true
+      },
+      {
+        "file": "vela/checker.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/cli.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/compiler.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/driver.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/ffi.h",
+        "unchanged": true
+      },
+      {
+        "file": "vela/ir.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/lexer.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/parser.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/source.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/syntax.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/toolchain.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/typesys.py",
+        "unchanged": true
+      },
+      {
+        "file": "README.md",
+        "unchanged": true
+      },
+      {
+        "file": "README.ru.md",
+        "unchanged": true
+      },
+      {
+        "file": "bin/vela-bundle.exe",
+        "unchanged": false
+      },
+      {
+        "file": "bin/vela-dev.exe",
+        "unchanged": false
+      },
+      {
+        "file": "bin/vela-lsp.exe",
+        "unchanged": false
+      },
+      {
+        "file": "bin/vela-test.exe",
+        "unchanged": false
+      },
+      {
+        "file": "bin/velac.exe",
+        "unchanged": false
+      },
+      {
+        "file": "docs/ARCHITECTURE.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/BUILTINS.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/CHANGELOG.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/PROJECTS.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/TOOLING.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/contracts/BUILD-PROTOCOL.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/mcp-evidence.json",
+        "unchanged": true
+      },
+      {
+        "file": "docs/rfcs/0002-generics-callables.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/stable-1.0.json",
+        "unchanged": true
+      },
+      {
+        "file": "examples/factorial.vela",
+        "unchanged": true
+      },
+      {
+        "file": "examples/sum.vela",
+        "unchanged": true
+      },
+      {
+        "file": "integrations/agent/vela-app/SKILL.md",
+        "unchanged": true
+      },
+      {
+        "file": "integrations/mcp/README.md",
+        "unchanged": true
+      },
+      {
+        "file": "integrations/mcp/compatibility.json",
+        "unchanged": true
+      },
+      {
+        "file": "pyproject.toml",
+        "unchanged": true
+      },
+      {
+        "file": "scripts/bootstrap.py",
+        "unchanged": true
+      },
+      {
+        "file": "scripts/build_examples.py",
+        "unchanged": true
+      },
+      {
+        "file": "scripts/verify_selfhost.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/README.md",
+        "unchanged": true
+      },
+      {
+        "file": "tests/__init__.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/cases.tsv",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/example_factorial.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/example_factorial_2.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/example_sum.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/invalid_argument_is_handled.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/no_argument_is_handled.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/support.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/test_bootstrap.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/test_extensions.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/test_frontend.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/test_native.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela-python.cmd",
+        "unchanged": true
+      },
+      {
+        "file": "docs/CLEANUP-1.0.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/cleanup-evidence.json",
+        "unchanged": true
+      },
+      {
+        "file": "docs/contracts/LIBRARY-1.1.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/post-1.4-plan-evidence.json",
+        "unchanged": true
+      },
+      {
+        "file": "docs/stage1111-evidence.json",
+        "unchanged": true
+      },
+      {
+        "file": "docs/velabench-plan-evidence.json",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/v111_json_baseline.args",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/v111_json_baseline.out",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/v111_json_baseline.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/v111_supervisor_baseline.args",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/v111_supervisor_baseline.out",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/v111_supervisor_baseline.vela",
+        "unchanged": true
+      }
+    ],
+    "out_of_scope_status_changes": [
+      " M docs/test-evidence.json"
+    ],
+    "not_run": [
+      "compiler rebuild/native verify: this edits the plan, not an implementation/audit stage; each future numeric or lettered stage requires rebuild and verify",
+      "new std behavior, compiler audits and application migrations: planned only",
+      "VelaBench: unchanged final acceptance in 1.4.6",
+      "full stable inventory gate: unrelated extra LIBRARY-1.1.md already present in baseline; only manifested fingerprints checked here",
+      "MCP live client/GUI: no delivered behavior changed"
+    ],
+    "concurrent_binary_changes": [
+      {
+        "file": "bin/vela-bundle.exe",
+        "unchanged": false
+      },
+      {
+        "file": "bin/vela-dev.exe",
+        "unchanged": false
+      },
+      {
+        "file": "bin/vela-lsp.exe",
+        "unchanged": false
+      },
+      {
+        "file": "bin/vela-test.exe",
+        "unchanged": false
+      },
+      {
+        "file": "bin/velac.exe",
+        "unchanged": false
+      }
+    ],
+    "concurrent_work_note": "The ongoing 1.1 build changed the five compiler/tool binaries and docs/test-evidence.json during this planning task. These artifacts were not written or reverted by the roadmap update; their hash differences are retained separately from source/document preservation checks.",
+    "passed": 167,
+    "failed": 0
+  }
+}

@@ -135,8 +135,9 @@ configuration's workspace selection, reconnect and inspect vela_get_context.
 A fingerprint mismatch is intentional even when version strings agree.
 Do not edit hashes to force compatibility. scripts/pin.mjs is a release-maintainer
 operation after native/docs verification, not an end-user repair command.
-For the released 0.11.0 use matching native and MCP archives. The working tree
-targets the 1.0.0-dev series; it is not a new release archive. Setup also delivers
+For released 1.0.0 use matching native and MCP archives. Source-tree maintenance
+can change documentation fingerprints without changing the compiler version;
+use the matching manifest from that checkout. Setup also delivers
 `task_group.vela`, `async_io.vela` and `gui.vela`, alongside `event_loop.vela`,
 `tasks.vela` and the extended HTTP modules. The development skill and native help
 describe awaitable operations, GUI ownership and payloadless enum equality.
@@ -152,3 +153,5 @@ Malformed JSON returns a JSON-RPC parse error. Bad UTF-8 or oversized protocol
 lines close the connection. Language errors remain native structured diagnostics.
 Timeout, cancellation, limits and toolchain failures have separate status values.
 Cancellation and disconnect terminate owned analysis children and remove snapshots.
+
+The 1.1 SDK setup also installs directory and json_stream with the matching fingerprints. Use bounded directory traversal and selective JSON reading from these modules; applications need no SDK fork. See the native STDLIB help for ownership, limits and complete examples.

@@ -1,0 +1,42 @@
+import "../../std/directory.vela" as directory;
+import "../../std/path.vela" as path;
+fn string(value: StringResult) -> String { return match value { StringResult::Ok(v) => v, StringResult::Err(_) => "" }; }
+fn main() -> Int effects { args, state, io } {
+    if arg_count() != 2 { return 2; }
+    let base = string(arg(0)); let rejected = string(arg(1));
+    match directory::walk(path::Path(value: base), directory::Limits(depth: 32, entries: 100)) {
+        Result::Err(_) => { return 5; }
+        Result::Ok(found) => {
+            var links = 0;
+            for item in found {
+                if item.entry.kind == directory::Kind::Link { links = links + 1; }
+                assert_true(item.depth == 1, "links are never descended");
+            }
+            assert_true(links > 0, "walk reports links");
+        }
+    }
+    match directory::entries(path::Path(value: base)) {
+        Result::Err(e) => { eprint(e.operation + ": " + e.path + ": " + e.reason); return 3; }
+        Result::Ok(found) => {
+            var links = 0;
+            for entry in found { if entry.kind == directory::Kind::Link { links = links + 1; } }
+            assert_true(links > 0, "links reported without following");
+        }
+    }
+    assert_true(match directory::open(path::Path(value: rejected)) { Result::Err(_) => true, Result::Ok(_) => false }, "link root rejected");
+    assert_true(match directory::open(path::Path(value: rejected + "/")) { Result::Err(_) => true, Result::Ok(_) => false }, "trailing slash link root rejected");
+    let scan = match directory::open(path::Path(value: base)) {
+        Result::Ok(v) => Option<directory::Scan>::Some(v), Result::Err(_) => Option<directory::Scan>::None
+    };
+    match scan {
+        Option::Some(v) => {
+            let removed = remove_file(base + "/removed");
+            // Concurrent deletion may have already been buffered by the OS.
+            let observed = directory::next(v);
+            assert_true(match directory::close(v) { Result::Ok(_) => true, Result::Err(_) => false }, "close after deletion");
+        }
+        Option::None => { return 4; }
+    }
+    print("directory platform checks passed");
+    return 0;
+}

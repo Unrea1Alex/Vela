@@ -2,7 +2,7 @@
 
 Implemented and verified: 886/886 at 0.6.4, 887/887 at the 0.6 release gate.
 `vela` and compatibility alias `velac` run the same native
-compiler. Python prototype is explicitly `vela-python`. Native tools require
+compiler. The historical Python 0.2 entry point was removed from the current source tree; it is outside the stable native CLI. Native tools require
 neither Python nor Node. Input is a source file or explicit manifest; directory
 discovery is not implicit. `--version` reports compiler release; an executable
 SHA-256 identifies an exact build (version text alone is insufficient).

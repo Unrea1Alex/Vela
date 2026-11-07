@@ -1,0 +1,1370 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-07",
+  "scope": "Planned application-development program after 1.4; documentation only",
+  "status": "documentation-verified-with-external-gate-failure",
+  "implementation_started": false,
+  "current_compiler": "1.0.0",
+  "next_item": "1.1.1",
+  "versions": {
+    "1.5": 6,
+    "1.6": 6,
+    "1.7": 6,
+    "1.8": 6,
+    "1.9": 6,
+    "1.10": 7
+  },
+  "stages": [
+    {
+      "id": "1.5.1",
+      "title": "контракты данных, сервисов и прикладной приёмки.",
+      "status": "planned",
+      "dependencies": [
+        "1.4.6"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.5.2",
+      "title": "время, длительности и точные десятичные значения.",
+      "status": "planned",
+      "dependencies": [
+        "1.5.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.5.3",
+      "title": "SQLite, соединения и транзакции.",
+      "status": "planned",
+      "dependencies": [
+        "1.5.2"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.5.4",
+      "title": "типизированные запросы и миграции схем.",
+      "status": "planned",
+      "dependencies": [
+        "1.5.3"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.5.5",
+      "title": "серверный API, конфигурация и эксплуатация.",
+      "status": "planned",
+      "dependencies": [
+        "1.5.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.5.6",
+      "title": "прикладная база данных и поставка 1.5.0.",
+      "status": "planned",
+      "dependencies": [
+        "1.5.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.6.1",
+      "title": "контракты ограничений значений и владения ресурсами.",
+      "status": "planned",
+      "dependencies": [
+        "1.5.6"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.6.2",
+      "title": "проверенные значения и единицы измерения.",
+      "status": "planned",
+      "dependencies": [
+        "1.6.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.6.3",
+      "title": "состояния и единственный владелец новых ресурсов.",
+      "status": "planned",
+      "dependencies": [
+        "1.6.2"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.6.4",
+      "title": "тестирование свойств, генераторы и уменьшение примера.",
+      "status": "planned",
+      "dependencies": [
+        "1.6.3"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.6.5",
+      "title": "управляемое время, расписание и моделирование сбоев.",
+      "status": "planned",
+      "dependencies": [
+        "1.6.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.6.6",
+      "title": "приёмка гарантий и поставка 1.6.0.",
+      "status": "planned",
+      "dependencies": [
+        "1.6.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.7.1",
+      "title": "контракты потоков, каналов и изолированных workers.",
+      "status": "planned",
+      "dependencies": [
+        "1.6.6"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.7.2",
+      "title": "составные ограниченные потоки.",
+      "status": "planned",
+      "dependencies": [
+        "1.7.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.7.3",
+      "title": "нативные workers и типизированные каналы.",
+      "status": "planned",
+      "dependencies": [
+        "1.7.2"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.7.4",
+      "title": "параллельные потоки и управление нагрузкой.",
+      "status": "planned",
+      "dependencies": [
+        "1.7.3"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.7.5",
+      "title": "приложение DataPipe.",
+      "status": "planned",
+      "dependencies": [
+        "1.7.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.7.6",
+      "title": "приёмка потоков и поставка 1.7.0.",
+      "status": "planned",
+      "dependencies": [
+        "1.7.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.8.1",
+      "title": "контракт сохранённого выполнения и внешних действий.",
+      "status": "planned",
+      "dependencies": [
+        "1.7.6"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.8.2",
+      "title": "дисковая история и воспроизведение.",
+      "status": "planned",
+      "dependencies": [
+        "1.8.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.8.3",
+      "title": "выполнение workflow, повторы и отмена.",
+      "status": "planned",
+      "dependencies": [
+        "1.8.2"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.8.4",
+      "title": "восстановление и миграция процессов.",
+      "status": "planned",
+      "dependencies": [
+        "1.8.3"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.8.5",
+      "title": "приложение JobQueue.",
+      "status": "planned",
+      "dependencies": [
+        "1.8.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.8.6",
+      "title": "приёмка восстановления и поставка 1.8.0.",
+      "status": "planned",
+      "dependencies": [
+        "1.8.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.9.1",
+      "title": "контракты пакетов, registry и native-зависимостей.",
+      "status": "planned",
+      "dependencies": [
+        "1.8.6"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.9.2",
+      "title": "воспроизводимые пакеты и registry.",
+      "status": "planned",
+      "dependencies": [
+        "1.9.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.9.3",
+      "title": "подключение C-библиотек и генерация обвязки.",
+      "status": "planned",
+      "dependencies": [
+        "1.9.2"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.9.4",
+      "title": "типизированные клиенты из описаний API.",
+      "status": "planned",
+      "dependencies": [
+        "1.9.3"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.9.5",
+      "title": "единая рабочая матрица Windows/Linux.",
+      "status": "planned",
+      "dependencies": [
+        "1.9.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.9.6",
+      "title": "интеграционное приложение и поставка 1.9.0.",
+      "status": "planned",
+      "dependencies": [
+        "1.9.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.10.1",
+      "title": "контракт анализа последствий изменения.",
+      "status": "planned",
+      "dependencies": [
+        "1.9.6"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.10.2",
+      "title": "последствия, согласованные правки и миграции.",
+      "status": "planned",
+      "dependencies": [
+        "1.10.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.10.3",
+      "title": "контракт состояния и переносимых GUI-компонентов.",
+      "status": "planned",
+      "dependencies": [
+        "1.10.2"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.10.4",
+      "title": "GUI-компоненты и привязка данных.",
+      "status": "planned",
+      "dependencies": [
+        "1.10.3"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.10.5",
+      "title": "приложение DocBase с поиском и интерфейсом.",
+      "status": "planned",
+      "dependencies": [
+        "1.10.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.10.6",
+      "title": "независимая передача трёх приложений между агентами.",
+      "status": "planned",
+      "dependencies": [
+        "1.10.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.10.7",
+      "title": "совокупная приёмка и поставка 1.10.0.",
+      "status": "planned",
+      "dependencies": [
+        "1.10.6"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    }
+  ],
+  "application_criteria": [
+    {
+      "id": "D1",
+      "acceptance": "Хранение/CRUD и импорт Unicode-путей, пустого/повторного/некорректного документа; транзакция оставляет согласованную БД, данные переживают restart."
+    },
+    {
+      "id": "D2",
+      "acceptance": "Миграция двух заранее подготовленных старых схем, отказ в середине, повторный запуск и восстановление копии; проверка всех строк/полей по независимому oracle."
+    },
+    {
+      "id": "D3",
+      "acceptance": "Поиск по корпусу 10 000 документов, обновление/удаление индекса, фильтры и устойчивый порядок; ожидаемые ID вычислены независимо от приложения."
+    },
+    {
+      "id": "D4",
+      "acceptance": "Реальный GUI Windows/Linux: поиск/выбор/редактирование, keyboard/Unicode, индикация фоновой работы и ошибки; состояние после действий соответствует БД."
+    },
+    {
+      "id": "D5",
+      "acceptance": "Индексация, отмена и закрытие окна под нагрузкой; UI heartbeat p95 ≤100 ms на фиксированной машине, нет обращения к закрытому владельцу/оставшихся workers."
+    },
+    {
+      "id": "D6",
+      "acceptance": "Установка/перенос без compiler/SDK, работа offline, явные config/log paths и восстановление данных; package manifest соответствует фактическим зависимостям."
+    },
+    {
+      "id": "J1",
+      "acceptance": "API submit/status/cancel, параметры/ошибки/лимиты, параллельная очередь; принятые задания учитываются в БД, API не обещает преждевременное выполнение."
+    },
+    {
+      "id": "J2",
+      "acceptance": "Ограничение активных jobs, backpressure, retry/backoff/budgets и отмена; журнал независимого исполнителя подтверждает реальные попытки и соблюдение лимита."
+    },
+    {
+      "id": "J3",
+      "acceptance": "Не менее 100 crash/restart по фиксированному набору границ переходов; committed результат сохранён, pending/uncertain восстановлены по контракту."
+    },
+    {
+      "id": "J4",
+      "acceptance": "Повторный запрос с idempotency key и окно потери подтверждения; идемпотентный sink применяет действие один раз, прочие действия получают честный uncertain/manual outcome."
+    },
+    {
+      "id": "J5",
+      "acceptance": "Обновление схемы БД/истории и активного workflow, несовместимая версия, отказ/restore; версия и назначение записанных событий сохранены."
+    },
+    {
+      "id": "J6",
+      "acceptance": "Не менее 30 минут нагрузки с отказами БД/сети, лимитами и graceful shutdown; переносимые пакеты обеих ОС, наблюдаемые логи/ресурсы и независимые client/server проверки."
+    },
+    {
+      "id": "P1",
+      "acceptance": "Не менее 10 GiB NDJSON фиксированного seed; точные записи/агрегаты совпадают с независимым потоковым oracle, вход целиком в память не читается."
+    },
+    {
+      "id": "P2",
+      "acceptance": "Малые chunks/UTF-8 границы, плохая последняя строка, Int overflow, большой элемент и высокая кардинальность; атомарный output либо явная документированная частичность."
+    },
+    {
+      "id": "P3",
+      "acceptance": "Одинаковый результат у 1/N workers; ordered режим сохраняет порядок, unordered — полное мультимножество элементов без потерь/дубликатов."
+    },
+    {
+      "id": "P4",
+      "acceptance": "Медленный sink, очередь по count/bytes, остановка/ошибка worker и отмена; backpressure достигает источника, живые буферы ограничены."
+    },
+    {
+      "id": "P5",
+      "acceptance": "Зафиксированный bounded-cardinality вход: Windows — peak job private commit всего дерева ≤256 MiB; Linux — весь запуск в отдельной cgroup v2 с memory.max=256 MiB и memory.swap.max=0, успешно завершён без OOM, записан memory.peak (включает page cache). Генератор входа и oracle работают вне измеряемой группы. Эти разные OS-метрики не отождествляются; unavailable не заменяется нулём."
+    },
+    {
+      "id": "P6",
+      "acceptance": "На заранее выбранной CPU-нагрузке медианное ускорение 4 workers ≥1.5× относительно 1, минимум 10 перемежающихся запусков после warmup; корректность каждого вывода, пакетный перенос и штатное завершение подтверждены."
+    }
+  ],
+  "agent_acceptance": {
+    "stage": "1.10.6",
+    "minimum_sessions": 9,
+    "roles": [
+      "create",
+      "extend",
+      "repair"
+    ],
+    "fresh_context_per_role": true,
+    "independent_oracles": true,
+    "preserve_failures": true,
+    "final_packaged_gate": "1.10.7"
+  },
+  "validation": {
+    "checks": [
+      {
+        "name": "37-new-ordered-unchecked-stages",
+        "passed": true
+      },
+      {
+        "name": "1.5.1:ordered-dependency",
+        "passed": true,
+        "detail": "1.4.6"
+      },
+      {
+        "name": "1.5.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.5.1:gate",
+        "passed": true
+      },
+      {
+        "name": "1.5.2:ordered-dependency",
+        "passed": true,
+        "detail": "1.5.1"
+      },
+      {
+        "name": "1.5.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.5.2:gate",
+        "passed": true
+      },
+      {
+        "name": "1.5.3:ordered-dependency",
+        "passed": true,
+        "detail": "1.5.2"
+      },
+      {
+        "name": "1.5.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.5.3:gate",
+        "passed": true
+      },
+      {
+        "name": "1.5.4:ordered-dependency",
+        "passed": true,
+        "detail": "1.5.3"
+      },
+      {
+        "name": "1.5.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.5.4:gate",
+        "passed": true
+      },
+      {
+        "name": "1.5.5:ordered-dependency",
+        "passed": true,
+        "detail": "1.5.4"
+      },
+      {
+        "name": "1.5.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.5.5:gate",
+        "passed": true
+      },
+      {
+        "name": "1.5.6:ordered-dependency",
+        "passed": true,
+        "detail": "1.5.5"
+      },
+      {
+        "name": "1.5.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.5.6:gate",
+        "passed": true
+      },
+      {
+        "name": "1.6.1:ordered-dependency",
+        "passed": true,
+        "detail": "1.5.6"
+      },
+      {
+        "name": "1.6.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.6.1:gate",
+        "passed": true
+      },
+      {
+        "name": "1.6.2:ordered-dependency",
+        "passed": true,
+        "detail": "1.6.1"
+      },
+      {
+        "name": "1.6.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.6.2:gate",
+        "passed": true
+      },
+      {
+        "name": "1.6.3:ordered-dependency",
+        "passed": true,
+        "detail": "1.6.2"
+      },
+      {
+        "name": "1.6.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.6.3:gate",
+        "passed": true
+      },
+      {
+        "name": "1.6.4:ordered-dependency",
+        "passed": true,
+        "detail": "1.6.3"
+      },
+      {
+        "name": "1.6.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.6.4:gate",
+        "passed": true
+      },
+      {
+        "name": "1.6.5:ordered-dependency",
+        "passed": true,
+        "detail": "1.6.4"
+      },
+      {
+        "name": "1.6.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.6.5:gate",
+        "passed": true
+      },
+      {
+        "name": "1.6.6:ordered-dependency",
+        "passed": true,
+        "detail": "1.6.5"
+      },
+      {
+        "name": "1.6.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.6.6:gate",
+        "passed": true
+      },
+      {
+        "name": "1.7.1:ordered-dependency",
+        "passed": true,
+        "detail": "1.6.6"
+      },
+      {
+        "name": "1.7.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.7.1:gate",
+        "passed": true
+      },
+      {
+        "name": "1.7.2:ordered-dependency",
+        "passed": true,
+        "detail": "1.7.1"
+      },
+      {
+        "name": "1.7.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.7.2:gate",
+        "passed": true
+      },
+      {
+        "name": "1.7.3:ordered-dependency",
+        "passed": true,
+        "detail": "1.7.2"
+      },
+      {
+        "name": "1.7.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.7.3:gate",
+        "passed": true
+      },
+      {
+        "name": "1.7.4:ordered-dependency",
+        "passed": true,
+        "detail": "1.7.3"
+      },
+      {
+        "name": "1.7.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.7.4:gate",
+        "passed": true
+      },
+      {
+        "name": "1.7.5:ordered-dependency",
+        "passed": true,
+        "detail": "1.7.4"
+      },
+      {
+        "name": "1.7.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.7.5:gate",
+        "passed": true
+      },
+      {
+        "name": "1.7.6:ordered-dependency",
+        "passed": true,
+        "detail": "1.7.5"
+      },
+      {
+        "name": "1.7.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.7.6:gate",
+        "passed": true
+      },
+      {
+        "name": "1.8.1:ordered-dependency",
+        "passed": true,
+        "detail": "1.7.6"
+      },
+      {
+        "name": "1.8.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.8.1:gate",
+        "passed": true
+      },
+      {
+        "name": "1.8.2:ordered-dependency",
+        "passed": true,
+        "detail": "1.8.1"
+      },
+      {
+        "name": "1.8.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.8.2:gate",
+        "passed": true
+      },
+      {
+        "name": "1.8.3:ordered-dependency",
+        "passed": true,
+        "detail": "1.8.2"
+      },
+      {
+        "name": "1.8.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.8.3:gate",
+        "passed": true
+      },
+      {
+        "name": "1.8.4:ordered-dependency",
+        "passed": true,
+        "detail": "1.8.3"
+      },
+      {
+        "name": "1.8.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.8.4:gate",
+        "passed": true
+      },
+      {
+        "name": "1.8.5:ordered-dependency",
+        "passed": true,
+        "detail": "1.8.4"
+      },
+      {
+        "name": "1.8.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.8.5:gate",
+        "passed": true
+      },
+      {
+        "name": "1.8.6:ordered-dependency",
+        "passed": true,
+        "detail": "1.8.5"
+      },
+      {
+        "name": "1.8.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.8.6:gate",
+        "passed": true
+      },
+      {
+        "name": "1.9.1:ordered-dependency",
+        "passed": true,
+        "detail": "1.8.6"
+      },
+      {
+        "name": "1.9.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.9.1:gate",
+        "passed": true
+      },
+      {
+        "name": "1.9.2:ordered-dependency",
+        "passed": true,
+        "detail": "1.9.1"
+      },
+      {
+        "name": "1.9.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.9.2:gate",
+        "passed": true
+      },
+      {
+        "name": "1.9.3:ordered-dependency",
+        "passed": true,
+        "detail": "1.9.2"
+      },
+      {
+        "name": "1.9.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.9.3:gate",
+        "passed": true
+      },
+      {
+        "name": "1.9.4:ordered-dependency",
+        "passed": true,
+        "detail": "1.9.3"
+      },
+      {
+        "name": "1.9.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.9.4:gate",
+        "passed": true
+      },
+      {
+        "name": "1.9.5:ordered-dependency",
+        "passed": true,
+        "detail": "1.9.4"
+      },
+      {
+        "name": "1.9.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.9.5:gate",
+        "passed": true
+      },
+      {
+        "name": "1.9.6:ordered-dependency",
+        "passed": true,
+        "detail": "1.9.5"
+      },
+      {
+        "name": "1.9.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.9.6:gate",
+        "passed": true
+      },
+      {
+        "name": "1.10.1:ordered-dependency",
+        "passed": true,
+        "detail": "1.9.6"
+      },
+      {
+        "name": "1.10.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.10.1:gate",
+        "passed": true
+      },
+      {
+        "name": "1.10.2:ordered-dependency",
+        "passed": true,
+        "detail": "1.10.1"
+      },
+      {
+        "name": "1.10.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.10.2:gate",
+        "passed": true
+      },
+      {
+        "name": "1.10.3:ordered-dependency",
+        "passed": true,
+        "detail": "1.10.2"
+      },
+      {
+        "name": "1.10.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.10.3:gate",
+        "passed": true
+      },
+      {
+        "name": "1.10.4:ordered-dependency",
+        "passed": true,
+        "detail": "1.10.3"
+      },
+      {
+        "name": "1.10.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.10.4:gate",
+        "passed": true
+      },
+      {
+        "name": "1.10.5:ordered-dependency",
+        "passed": true,
+        "detail": "1.10.4"
+      },
+      {
+        "name": "1.10.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.10.5:gate",
+        "passed": true
+      },
+      {
+        "name": "1.10.6:ordered-dependency",
+        "passed": true,
+        "detail": "1.10.5"
+      },
+      {
+        "name": "1.10.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.10.6:gate",
+        "passed": true
+      },
+      {
+        "name": "1.10.7:ordered-dependency",
+        "passed": true,
+        "detail": "1.10.6"
+      },
+      {
+        "name": "1.10.7:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.10.7:gate",
+        "passed": true
+      },
+      {
+        "name": "all-earlier-checkboxes-preserved",
+        "passed": true,
+        "detail": {
+          "count": 112,
+          "observed_external_annotation": "1.1.1 in progress with contract/evidence links; checkbox still open"
+        }
+      },
+      {
+        "name": "complete-1.1-1.4-stage-and-benchmark-commitments-preserved",
+        "passed": true
+      },
+      {
+        "name": "active-release-and-next-item-unchanged",
+        "passed": true
+      },
+      {
+        "name": "native-verify-required-after-every-stage",
+        "passed": true
+      },
+      {
+        "name": "handoff-stage-also-rebuilds-after-sessions",
+        "passed": true
+      },
+      {
+        "name": "planning-is-not-implementation",
+        "passed": true
+      },
+      {
+        "name": "existing-http-commitment-preserved",
+        "passed": true
+      },
+      {
+        "name": "benchmark-still-precedes-1.5",
+        "passed": true
+      },
+      {
+        "name": "direction-coverage:storage",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "direction-coverage:types",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "direction-coverage:testing",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "direction-coverage:streams",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "direction-coverage:workflow",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "direction-coverage:ecosystem",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "direction-coverage:impact",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "direction-coverage:gui",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "direction-coverage:compatibility",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "18-distinct-application-criteria",
+        "passed": true
+      },
+      {
+        "name": "applications-required-in-final-gate",
+        "passed": true
+      },
+      {
+        "name": "minimum-nine-independent-handoffs",
+        "passed": true
+      },
+      {
+        "name": "handoff-metrics-and-artifacts",
+        "passed": true
+      },
+      {
+        "name": "measurable-budgets-and-independent-oracles",
+        "passed": true
+      },
+      {
+        "name": "platform-acceptance-is-staged",
+        "passed": true
+      },
+      {
+        "name": "sql-representation-before-live-roundtrip",
+        "passed": true
+      },
+      {
+        "name": "journal-table-contiguous",
+        "passed": true
+      },
+      {
+        "name": "pre-existing-work-and-compiler-inputs-preserved",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "command:git -c core.whitespace=cr-at-eol diff --check -- docs/ROADMAP.md AGENTS.md",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "all-84-manifested-stable-files-match",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "local-markdown-links",
+        "passed": true,
+        "detail": {
+          "checked": 192,
+          "missing": []
+        }
+      }
+    ],
+    "protected_paths": [
+      {
+        "file": "README.md",
+        "unchanged": true
+      },
+      {
+        "file": "README.ru.md",
+        "unchanged": true
+      },
+      {
+        "file": "bin/vela-bundle.exe",
+        "unchanged": true
+      },
+      {
+        "file": "bin/vela-dev.exe",
+        "unchanged": true
+      },
+      {
+        "file": "bin/vela-lsp.exe",
+        "unchanged": true
+      },
+      {
+        "file": "bin/vela-test.exe",
+        "unchanged": true
+      },
+      {
+        "file": "bin/velac.exe",
+        "unchanged": true
+      },
+      {
+        "file": "docs/ARCHITECTURE.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/BUILTINS.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/CHANGELOG.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/PROJECTS.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/TOOLING.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/contracts/BUILD-PROTOCOL.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/mcp-evidence.json",
+        "unchanged": true
+      },
+      {
+        "file": "docs/rfcs/0002-generics-callables.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/stable-1.0.json",
+        "unchanged": true
+      },
+      {
+        "file": "examples/factorial.vela",
+        "unchanged": true
+      },
+      {
+        "file": "examples/sum.vela",
+        "unchanged": true
+      },
+      {
+        "file": "integrations/agent/vela-app/SKILL.md",
+        "unchanged": true
+      },
+      {
+        "file": "integrations/mcp/README.md",
+        "unchanged": true
+      },
+      {
+        "file": "integrations/mcp/compatibility.json",
+        "unchanged": true
+      },
+      {
+        "file": "pyproject.toml",
+        "unchanged": true
+      },
+      {
+        "file": "scripts/bootstrap.py",
+        "unchanged": true
+      },
+      {
+        "file": "scripts/build_examples.py",
+        "unchanged": true
+      },
+      {
+        "file": "scripts/verify_selfhost.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/README.md",
+        "unchanged": true
+      },
+      {
+        "file": "tests/__init__.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/example_factorial.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/example_factorial_2.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/example_sum.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/invalid_argument_is_handled.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/no_argument_is_handled.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/support.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/test_bootstrap.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/test_extensions.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/test_frontend.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/test_native.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela-python.cmd",
+        "unchanged": true
+      },
+      {
+        "file": "vela/__init__.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/__main__.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/backends/__init__.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/backends/c.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/checker.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/cli.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/compiler.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/driver.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/ir.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/lexer.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/parser.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/source.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/syntax.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/toolchain.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/typesys.py",
+        "unchanged": true
+      },
+      {
+        "file": "docs/CLEANUP-1.0.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/cleanup-evidence.json",
+        "unchanged": true
+      },
+      {
+        "file": "docs/velabench-plan-evidence.json",
+        "unchanged": true
+      },
+      {
+        "file": "vela/builtins.def",
+        "unchanged": true
+      },
+      {
+        "file": "vela/backends/runtime.h",
+        "unchanged": true
+      },
+      {
+        "file": "vela/ffi.h",
+        "unchanged": true
+      },
+      {
+        "file": "docs/LANGUAGE.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/STDLIB.md",
+        "unchanged": true
+      },
+      {
+        "file": "std/http.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/json.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/fs.vela",
+        "unchanged": true
+      }
+    ],
+    "commands": [
+      {
+        "command": ".\\scripts\\check-stable.ps1",
+        "exit_code": 1,
+        "output": "Exception: G:\\Vela\\scripts\\check-stable.ps1:22\r\nLine |\r\n  22 |  … unt -ne $required.Count) { throw 'Stable surface inventory differs' }\r\n     |                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n     | Stable surface inventory differs\r\n"
+      },
+      {
+        "command": "git -c core.whitespace=cr-at-eol diff --check -- docs/ROADMAP.md AGENTS.md",
+        "exit_code": 0,
+        "output": ""
+      }
+    ],
+    "not_run": [
+      "compiler rebuild/native verify: editing the plan does not execute a stage; rebuild and verify required after every future stage",
+      "DocBase/JobQueue/DataPipe and independent agent handoffs: future acceptance, not implemented",
+      "VelaBench rerun: still planned as 1.4.6",
+      "live MCP/GUI: no shipped behavior changed"
+    ],
+    "external_checks": [
+      {
+        "command": ".\\scripts\\check-stable.ps1",
+        "exit_code": 1,
+        "output": "Exception: G:\\Vela\\scripts\\check-stable.ps1:22\r\nLine |\r\n  22 |  … unt -ne $required.Count) { throw 'Stable surface inventory differs' }\r\n     |                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n     | Stable surface inventory differs\r\n"
+      }
+    ],
+    "external_check_failures": 1,
+    "stable_inventory": {
+      "manifested": 84,
+      "actual": 85,
+      "all_manifested_hashes_match": true,
+      "additional_files": [
+        "docs/contracts/LIBRARY-1.1.md"
+      ]
+    },
+    "out_of_scope_changes_since_checkpoint": [
+      " M tests/cases/cases.tsv",
+      "?? docs/contracts/LIBRARY-1.1.md",
+      "?? docs/stage1111-evidence.json",
+      "?? tests/cases/v111_json_baseline.out",
+      "?? tests/cases/v111_json_baseline.vela",
+      "?? tests/cases/v111_supervisor_baseline.out",
+      "?? tests/cases/v111_supervisor_baseline.vela",
+      "?? tests/library11/"
+    ],
+    "out_of_scope_roadmap_annotation": "В работе: [контракт](contracts/LIBRARY-1.1.md), [фиксация пилота](stage1111-evidence.json).",
+    "external_check_note": "The full stable gate result is retained separately from documentation acceptance. An extra 1.1 contract appeared in the worktree during this planning task; no manifest or concurrent implementation files were changed by this task.",
+    "passed": 141,
+    "failed": 0
+  }
+}

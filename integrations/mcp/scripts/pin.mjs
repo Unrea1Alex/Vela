@@ -11,8 +11,8 @@ for(const file of ['bin/velac.exe','vela/builtins.def','vela/backends/runtime.h'
  'docs/AGENT-QUICKSTART.md','docs/LANGUAGE.md','docs/PROJECTS.md','docs/COMPATIBILITY.md','docs/MIGRATING-1.0.md','docs/CHANGELOG.md','docs/stable-1.0.json','docs/contracts/STABLE-1.0.md',
  'docs/contracts/MODULES.md','docs/MEMORY.md','examples/agent-idioms/main.vela','docs/contracts/NUMBERS.md',
  'docs/STDLIB.md','docs/TOOLING.md','docs/contracts/TESTING.md','docs/contracts/FFI.md','vela/ffi.h',
- ...['SEMANTIC-QUERIES','REFACTORING','LSP','FORMATTER','TEXT-LITERALS-RESOURCES','MCP-OUTPUT-ARTIFACTS','MCP-PROTOCOL','MCP-EXECUTION','ENCAPSULATION','METHODS','INTERFACES','CALLABLES-EFFECTS','SERVICES','REPLAY','CALLBACKS','GUI-APPLICATION','GUI-LIBRARY','EVENT-LOOP','ASYNC-CANCELLATION','TASK-GROUPS','NETWORK-TLS','HTTP-API','ENUM-EQUALITY','GUI-NETWORK','INCREMENTAL-BUILD','DEBUGGING','PACKAGING','PLATFORM-SUPPORT'].map(name=>'docs/contracts/'+name+'.md'),
- ...['text','path','collections','json','cli','config','fs','process','testing','result','lines','services','replay','event_loop','tasks','task_group','async_io','gui','http','http_server'].map(name=>'std/'+name+'.vela')]){
+ ...['LIBRARY-1.1','SEMANTIC-QUERIES','REFACTORING','LSP','FORMATTER','TEXT-LITERALS-RESOURCES','MCP-OUTPUT-ARTIFACTS','MCP-PROTOCOL','MCP-EXECUTION','ENCAPSULATION','METHODS','INTERFACES','CALLABLES-EFFECTS','SERVICES','REPLAY','CALLBACKS','GUI-APPLICATION','GUI-LIBRARY','EVENT-LOOP','ASYNC-CANCELLATION','TASK-GROUPS','NETWORK-TLS','HTTP-API','ENUM-EQUALITY','GUI-NETWORK','INCREMENTAL-BUILD','DEBUGGING','PACKAGING','PLATFORM-SUPPORT'].map(name=>'docs/contracts/'+name+'.md'),
+ ...['json_stream','directory','text','path','collections','json','cli','config','fs','process','testing','result','lines','services','replay','event_loop','tasks','task_group','async_io','gui','http','http_server'].map(name=>'std/'+name+'.vela')]){
  files[file]=createHash('sha256').update(await readFile(path.join(root,file))).digest('hex');
 }
 await writeFile(new URL('../compatibility.json',import.meta.url),JSON.stringify({

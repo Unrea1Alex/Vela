@@ -1,0 +1,149 @@
+import "../../std/http.vela" as http;
+import "../../std/event_loop.vela" as loop;
+import "../../std/process.vela" as process;
+import "../../std/path.vela" as path;
+import "../../std/directory.vela" as directory;
+fn must<T, E>(value: Result<T, E>) -> T {
+    match value {
+        Result::Ok(v) => {
+            return v;
+        }
+        Result::Err(_) => {
+            assert_true(false, "deadline probe setup");
+        }
+    }
+    return must(value);
+}
+fn argument(index: Int) -> String effects { args } {
+    return match arg(index) {
+        StringResult::Ok(value) => value,
+        StringResult::Err(_) => ""
+    };
+}
+fn clock() -> Int effects { io } {
+    return match monotonic_millis() {
+        IntResult::Ok(value) => value,
+        IntResult::Err(_) => 0
+    };
+}
+fn label(error: http::Error) -> String {
+    return match error {
+        http::Error::TimedOut => "timeout",
+        http::Error::Cancelled => "cancelled",
+        http::Error::Storage(_) => "storage",
+        http::Error::InvalidEndpoint => "other",
+        http::Error::InvalidLimit => "other",
+        http::Error::InvalidTransport => "other",
+        http::Error::InvalidHeaders => "other",
+        http::Error::InvalidBody => "other",
+        http::Error::Schedule(_) => "other",
+        http::Error::Connect(_) => "other",
+        http::Error::Tls(_) => "other",
+        http::Error::Transfer(_) => "other",
+        http::Error::Protocol => "other",
+        http::Error::Limit => "other",
+        http::Error::Pending => "other",
+        http::Error::Closed => "other"
+    };
+}
+fn main() -> Int effects { args, io, state, process } {
+    if arg_count() != 4 {
+        return 2;
+    }
+    let mode = argument(0);
+    let executable = path::Path(value: argument(1));
+    let url = argument(2);
+    let root = path::Path(value: argument(3));
+    var configured = http::curl_transfer(executable, Option<path::Path>::None);
+    if mode == "legacy" {
+        configured = http::curl(executable, Option<path::Path>::None);
+    }
+    let transport = dyn http::Transport(must(configured));
+    var timeout = 50;
+    if mode == "cancel" {
+        timeout = 1000;
+    }
+    let request = must(http::from_url(url, timeout, 128));
+    let scheduler = must(loop::create<process::Completed>(0));
+    let exchange = must(transport.start(scheduler, request, root));
+    let first = must(loop::tick(scheduler, 0));
+    var now = 50;
+    let started = clock();
+    if mode == "cancel" {
+        let slept = host_sleep(300);
+        let cancelled = http::cancel(exchange);
+        assert_true(cancelled, "cancellation requested");
+        now = 1;
+    } else if mode == "hang" {
+        while http::pending(exchange) && clock() - started < 2500 {
+            let turn = must(loop::tick(scheduler, clock() - started));
+            let slept = host_sleep(1);
+        }
+        assert_true(!http::pending(exchange) && clock() - started < 2000,
+            "bounded helper supervisor/drain");
+    } else {
+        let slept = host_sleep(200);
+        if mode == "legacy" || mode == "transfer" || mode == "cleanup" {
+            let entries = must(directory::entries(root));
+            assert_true(list_len(entries) == 1, "one private directory");
+            let private = list_get(entries, 0).path.value;
+            assert_true(match read_file(private + "/status") {
+                StringResult::Ok(value) => value == "200",
+                StringResult::Err(_) => false
+            }, "real transfer completed before supervisor poll");
+            assert_true(match read_file(private + "/body") {
+                StringResult::Ok(value) => value == "ok",
+                StringResult::Err(_) => false
+            }, "full body completed");
+        }
+    }
+    for i in 0 .. 3000 {
+        if !http::pending(exchange) {
+            break;
+        }
+        let turn = must(loop::tick(scheduler, now));
+        now = now + 1;
+        let slept = host_sleep(1);
+    }
+    assert_true(!http::pending(exchange), "terminal after drain");
+    var observed = "pending";
+    match http::poll(exchange) {
+        Result::Err(error) => {
+            observed = label(error);
+        }
+        Result::Ok(found) => {
+            match found {
+                Option::None => {}
+                Option::Some(response) => {
+                    assert_true(response.status == 200 && response.body.data == "ok",
+                        "complete response");
+                    observed = "response";
+                }
+            }
+        }
+    }
+    if mode == "legacy" || mode == "headers" || mode == "body" || mode == "hang" {
+        assert_true(observed == "timeout", "timeout category");
+    }
+    if mode == "transfer" || mode == "cleanup" {
+        assert_true(observed == "response", "completed transfer is retained");
+    }
+    if mode == "cancel" {
+        assert_true(observed == "cancelled", "cancel differs from timeout");
+    }
+    if mode == "cleanup" {
+        let entries = must(directory::entries(root));
+        let private = list_get(entries, 0).path.value;
+        let written = write_file(private + "/unowned-test-file", "owned by the probe");
+        assert_true(match http::release(exchange) {
+            Result::Err(error) => label(error) == "storage",
+            Result::Ok(_) => false
+        }, "cleanup failure is observable Storage");
+        let removed = remove_file(private + "/unowned-test-file");
+    }
+    let released = must(http::release(exchange));
+    let repeated = must(http::release(exchange));
+    assert_true(list_len(must(directory::entries(root))) == 0, "no owned files left");
+    print(mode + "=" + observed);
+    return 0;
+}

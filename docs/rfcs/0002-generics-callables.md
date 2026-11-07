@@ -1,5 +1,10 @@
 # Generics, callable types and effect parameters
 
+Historical design note from the 0.5–0.10.1 planning stages. Statements about planned
+syntax below describe that period. The implemented 1.0 behavior is specified by
+[generics](../contracts/GENERICS.md), [callables/effects](../contracts/CALLABLES-EFFECTS.md)
+and the [stable API index](../contracts/STABLE-1.0.md).
+
 Status: accepted for the implemented 0.5 generic subset; callable design is
 specified by the 0.10.1 contract, implementation remains planned for 0.10.5.
 The callable implementation is now roadmap 0.10.5 (formerly 0.10.1).
@@ -26,5 +31,6 @@ dispatch support is claimed by this design. Existing effect names/masks stay sta
 
 Migration uses a compiler bridge: implement generic support in the old source
 subset, verify it, then use generics in authored compiler/tools and verify again.
-The historical Python compiler need not implement 0.5 syntax; catalog readers must
-still agree on the shared catalog format. Runtime remains storage/OS only.
+During that migration, the historical Python compiler read the same catalog for
+its 0.2 subset. That frontend has since been removed from the current tree;
+the native catalog reader and bundler retain the shared format. Runtime remains storage/OS only.

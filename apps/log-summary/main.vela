@@ -1,0 +1,274 @@
+import "../../std/json_stream.vela" as stream;
+import "../../std/json.vela" as json;
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+import "../../std/text.vela" as text;
+import "../../std/collections.vela" as collections;
+struct Options {
+    input: String,
+    output: String,
+    minimum: Int,
+    maximum: Int,
+    repeat: Int
+}
+struct Record {
+    service: String,
+    level: Int,
+    value: Int
+}
+struct Group {
+    count: Int,
+    sum: Int,
+    minimum: Int,
+    maximum: Int
+}
+fn argument(index: Int) -> String effects { args } {
+    return match arg(index) {
+        StringResult::Ok(value) => value,
+        StringResult::Err(_) => ""
+    };
+}
+fn integer(value: String) -> Int {
+    return match parse_int(value) {
+        IntResult::Ok(n) => n,
+        IntResult::Err(_) => -1
+    };
+}
+fn options() -> Result<Options, String> effects { args } {
+    if arg_count() < 2 {
+        return Result<Options, String>::Err(
+            "usage: INPUT OUTPUT [--min-level N] [--max-level N] [--repeat N]");
+    }
+    var minimum = 0;
+    var maximum = 5;
+    var repeat = 1;
+    var at = 2;
+    while at < arg_count() {
+        if at + 1 >= arg_count() {
+            return Result<Options, String>::Err("missing option value");
+        }
+        let option = argument(at);
+        let value = integer(argument(at + 1));
+        if option == "--min-level" {
+            if value < 0 || value > 5 {
+                return Result<Options, String>::Err("invalid minimum level");
+            }
+            minimum = value;
+        } else if option == "--max-level" {
+            if value < 0 || value > 5 {
+                return Result<Options, String>::Err("invalid maximum level");
+            }
+            maximum = value;
+        } else if option == "--repeat" {
+            if value < 1 || value > 1000 {
+                return Result<Options, String>::Err("invalid repetition count");
+            }
+            repeat = value;
+        } else {
+            return Result<Options, String>::Err("unknown option");
+        }
+        at = at + 2;
+    }
+    if minimum > maximum {
+        return Result<Options, String>::Err("minimum exceeds maximum");
+    }
+    return Result<Options, String>::Ok(Options(input: argument(0), output: argument(1),
+        minimum: minimum, maximum: maximum, repeat: repeat));
+}
+fn parsed<T>(value: Result<T, stream::Error>) -> Result<T, String> {
+    return match value {
+        Result::Ok(found) => Result<T, String>::Ok(found),
+        Result::Err(error) => Result<T, String>::Err(stream::describe(error))
+    };
+}
+fn next(reader: stream::Reader) -> Result<stream::Token, String> effects { state } {
+    match parsed(stream::next(reader))? {
+        Option::Some(found) => {
+            return Result<stream::Token, String>::Ok(found);
+        }
+        Option::None => {
+            return Result<stream::Token, String>::Err("unexpected end of record");
+        }
+    }
+}
+fn object_start(event: stream::Event) -> Bool {
+    return match event {
+        stream::Event::ObjectStart => true,
+        stream::Event::ObjectEnd => false,
+        stream::Event::ArrayStart => false,
+        stream::Event::ArrayEnd => false,
+        stream::Event::Key(_) => false,
+        stream::Event::StringValue(_) => false,
+        stream::Event::NumberLiteral(_) => false,
+        stream::Event::Boolean(_) => false,
+        stream::Event::Null => false
+    };
+}
+fn member(reader: stream::Reader) -> Result<Option<String>, String> effects { state } {
+    let found = next(reader)?;
+    match found.event {
+        stream::Event::Key(name) => {
+            return Result<Option<String>, String>::Ok(Option<String>::Some(name));
+        }
+        stream::Event::ObjectEnd => {
+            return Result<Option<String>, String>::Ok(Option<String>::None);
+        }
+        stream::Event::ObjectStart => {}
+        stream::Event::ArrayStart => {}
+        stream::Event::ArrayEnd => {}
+        stream::Event::StringValue(_) => {}
+        stream::Event::NumberLiteral(_) => {}
+        stream::Event::Boolean(_) => {}
+        stream::Event::Null => {}
+    }
+    return Result<Option<String>, String>::Err(found.path + ": expected object member");
+}
+fn record(data: String) -> Result<Record, String> effects { state } {
+    let reader = parsed(stream::create(data, stream::Limits(bytes: 4096, depth: 4096,
+        nodes: 8192)))?;
+    if !object_start(next(reader)?.event) {
+        return Result<Record, String>::Err("expected record object");
+    }
+    var service = "";
+    var level = 0;
+    var value = 0;
+    var have_service = false;
+    var have_level = false;
+    var have_value = false;
+    var ended = false;
+    while !ended {
+        match member(reader)? {
+            Option::None => {
+                ended = true;
+            }
+            Option::Some(name) => {
+                if name == "service" {
+                    service = parsed(stream::read_string(reader))?;
+                    have_service = true;
+                } else if name == "level" {
+                    level = parsed(stream::read_integer(reader))?;
+                    have_level = true;
+                } else if name == "value" {
+                    value = parsed(stream::read_integer(reader))?;
+                    have_value = true;
+                } else {
+                    let skipped = parsed(stream::skip_value(reader))?;
+                }
+            }
+        }
+    }
+    let complete = parsed(stream::finish(reader))?;
+    if !have_service || !have_level || !have_value {
+        return Result<Record, String>::Err("missing required field");
+    }
+    if level < 0 || level > 5 || value < -1000000 || value > 1000000 {
+        return Result<Record, String>::Err("record field out of range");
+    }
+    return Result<Record, String>::Ok(Record(service: service, level: level, value: value));
+}
+fn blank(line: String) -> Bool {
+    for i in 0 .. str_len(line) {
+        let byte = str_byte(line, i);
+        if byte != 32 && byte != 9 && byte != 13 {
+            return false;
+        }
+    }
+    return true;
+}
+fn quote(value: String) -> Result<String, String> effects { state } {
+    return match json::stringify(json::Value::StringValue(value)) {
+        Result::Ok(data) => Result<String, String>::Ok(data),
+        Result::Err(_) => Result<String, String>::Err("cannot encode service")
+    };
+}
+fn iteration(config: Options) -> Result<String, String> effects { io, state } {
+    var content = text::Text(data: "");
+    match fs::read_text(path::Path(value: config.input), 1048576) {
+        Result::Err(_) => {
+            return Result<String, String>::Err("cannot read UTF-8 input");
+        }
+        Result::Ok(data) => {
+            content = data;
+        }
+    }
+    let lines = match text::split(content, text::Text(data: "\n")) {
+        Result::Ok(parts) => Result<List<text::Text>, String>::Ok(parts),
+        Result::Err(_) => Result<List<text::Text>, String>::Err("invalid input text")
+    };
+    let groups = dict_new<String, Group>();
+    let names = list_new<String>();
+    var count = 0;
+    var sum = 0;
+    for line in lines? {
+        if blank(line.data) {
+            continue;
+        }
+        let item = record(line.data)?;
+        // Every record is fully validated before either filter applies.
+        if item.level < config.minimum || item.level > config.maximum {
+            continue;
+        }
+        count = count + 1;
+        sum = sum + item.value;
+        var group = Group(count: 0, sum: 0, minimum: item.value, maximum: item.value);
+        if dict_has(groups, item.service) {
+            group = dict_get(groups, item.service);
+        } else {
+            list_push(names, item.service);
+        }
+        group.count = group.count + 1;
+        group.sum = group.sum + item.value;
+        if item.value < group.minimum {
+            group.minimum = item.value;
+        }
+        if item.value > group.maximum {
+            group.maximum = item.value;
+        }
+        dict_set(groups, item.service, group);
+    }
+    let parts = strings_new();
+    strings_push(parts, "{\"count\":" + to_string(count) + ",\"sum\":" + to_string(sum)
+        + ",\"services\":[");
+    var first = true;
+    for name in collections::sort_strings(names) {
+        let group = dict_get(groups, name);
+        if !first {
+            strings_push(parts, ",");
+        }
+        first = false;
+        strings_push(parts, "{\"name\":" + quote(name)? + ",\"count\":" + to_string(group.count)
+            + ",\"sum\":" + to_string(group.sum) + ",\"min\":" + to_string(group.minimum)
+            + ",\"max\":" + to_string(group.maximum) + "}");
+    }
+    strings_push(parts, "]}");
+    return Result<String, String>::Ok(strings_join(parts, ""));
+}
+fn run(config: Options) -> Result<Bool, String> effects { io, state } {
+    var output = "";
+    for i in 0 .. config.repeat {
+        output = iteration(config)?;
+    }
+    return match fs::write_atomic(path::Path(value: config.output), text::Bytes(data: output)) {
+        Result::Ok(value) => Result<Bool, String>::Ok(value),
+        Result::Err(_) => Result<Bool, String>::Err("cannot publish output")
+    };
+}
+fn main() -> Int effects { args, state, io } {
+    match options() {
+        Result::Err(message) => {
+            eprint(message);
+            return 2;
+        }
+        Result::Ok(config) => {
+            match run(config) {
+                Result::Ok(_) => {
+                    return 0;
+                }
+                Result::Err(message) => {
+                    eprint(message);
+                    return 1;
+                }
+            }
+        }
+    }
+}

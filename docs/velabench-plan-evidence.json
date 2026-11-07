@@ -1,0 +1,1104 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-07",
+  "scope": "VelaBench-informed roadmap 1.1–1.4 only",
+  "status": "verified",
+  "implementation_started": false,
+  "current_compiler": "1.0.0",
+  "next_item": "1.1.1",
+  "stages": [
+    {
+      "id": "1.1.1",
+      "title": "контракты и воспроизводимые регрессии пилота.",
+      "status": "planned",
+      "dependencies": [
+        "1.0.0"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.1.2",
+      "title": "нативное перечисление и метаданные каталога.",
+      "status": "planned",
+      "dependencies": [
+        "1.1.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.1.3",
+      "title": "рекурсивный обход и законченный индексатор.",
+      "status": "planned",
+      "dependencies": [
+        "1.1.2"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.1.4",
+      "title": "потоковый JSON и проверяемый пропуск значений.",
+      "status": "planned",
+      "dependencies": [
+        "1.1.3"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.1.5",
+      "title": "HTTP deadline, отмена и завершение помощника.",
+      "status": "planned",
+      "dependencies": [
+        "1.1.4",
+        "1.1.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.1.6",
+      "title": "приёмка и поставка библиотеки 1.1.0.",
+      "status": "planned",
+      "dependencies": [
+        "1.1.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.1",
+      "title": "компактный вход в язык и один источник справки.",
+      "status": "planned",
+      "dependencies": [
+        "1.1.6"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.2",
+      "title": "точный поиск возможностей и символов в MCP.",
+      "status": "planned",
+      "dependencies": [
+        "1.2.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.3",
+      "title": "генератор минимального проекта.",
+      "status": "planned",
+      "dependencies": [
+        "1.2.2"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.4",
+      "title": "типизированные аргументы CLI и справка.",
+      "status": "planned",
+      "dependencies": [
+        "1.2.3"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.5",
+      "title": "общая сортировка по компаратору.",
+      "status": "planned",
+      "dependencies": [
+        "1.2.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.6",
+      "title": "декодирование JSON по описанию структуры.",
+      "status": "planned",
+      "dependencies": [
+        "1.2.5",
+        "1.1.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.7",
+      "title": "ограниченная параллельная обработка списка.",
+      "status": "planned",
+      "dependencies": [
+        "1.2.6"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.8",
+      "title": "диагностические объяснения и проверяемые исправления.",
+      "status": "planned",
+      "dependencies": [
+        "1.2.7"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.2.9",
+      "title": "приёмка агентного опыта и поставка 1.2.0.",
+      "status": "planned",
+      "dependencies": [
+        "1.2.8"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.1",
+      "title": "профиль и заранее определённые бюджеты.",
+      "status": "planned",
+      "dependencies": [
+        "1.2.9"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.2",
+      "title": "контракт постоянного HTTP-транспорта.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.1",
+        "1.1.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.3",
+      "title": "постоянный HTTP-клиент и пул.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.2"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.4",
+      "title": "оптимизация обработки данных по профилю.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.3",
+        "1.3.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.5",
+      "title": "частичная семантическая перепроверка модулей.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.6",
+      "title": "приёмка производительности и поставка 1.3.0.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.4.1",
+      "title": "контракты aliases и вывода конструкторов.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.6"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.4.2",
+      "title": "прозрачные псевдонимы типов.",
+      "status": "planned",
+      "dependencies": [
+        "1.4.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.4.3",
+      "title": "локальный вывод параметров конструкторов.",
+      "status": "planned",
+      "dependencies": [
+        "1.4.2",
+        "1.4.1"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.4.4",
+      "title": "прикладные рецепты и согласованность всех инструментов.",
+      "status": "planned",
+      "dependencies": [
+        "1.4.3"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.4.5",
+      "title": "фиксация кандидата и среды итогового эксперимента.",
+      "status": "planned",
+      "dependencies": [
+        "1.4.4"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.4.6",
+      "title": "повторный VelaBench и завершение 1.4.0.",
+      "status": "planned",
+      "dependencies": [
+        "1.4.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    }
+  ],
+  "benchmark_baseline": {
+    "location": "G:/VelaBench",
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "medium",
+    "initial_attempts": 27,
+    "maintenance_continuations": 27,
+    "accepted_per_phase": {
+      "vela": 6,
+      "rust": 9,
+      "go": 9
+    },
+    "attempts_per_language_per_phase": 9,
+    "functional_checks": {
+      "passed": 1608,
+      "total": 1683,
+      "failures": 75,
+      "all_failure_task": "index-vela"
+    },
+    "runtime_launches": 5826,
+    "sdk_caveat": "All three Vela log apps adapted JSON parsing; http-vela-1 patched its vendored HTTP supervisor. Historical results are not proof of stock-SDK success.",
+    "files_sha256": {
+      "pilot.json": "651ef54d8bcbdef526db6811109de157b091a1318a614adc756cc1ca86254afd",
+      "tasks/logs.md": "43cae3537e59d38a00165fb9346273bef82907b5053c0cb0041ea58c0563b81e",
+      "tasks/index.md": "f25499ca07992b0b968cb8fd665f1d6c7cc5c4ae56ca616011bf067b6fcdfe06",
+      "tasks/http.md": "e8be25d552a47f6559f58ef1aa9861c1d8995c7f269c43359a16447dceac41a1",
+      "tasks/logs-change.md": "182015474e1e74fa2353260ead13cfcddffe2cea15ffc090450c38007e5909c7",
+      "tasks/index-change.md": "a85fb845c4c39ce0e40ad538b148607f9da1b2a1f83301201a0e4c522a9c6994",
+      "tasks/http-change.md": "b30d9dd98c8cf01633c595a8c7a5a4940c52c1b6998899450308e9341e7838ac",
+      "results/contracts-freeze.json": "ab066575fc7feb4907822be79149136a113f90a1173db69d8e21cd1eb1473498",
+      "results/maintenance-freeze.json": "5cf4ab1fdf20d53d15a67896e1b6164b9c2f43d919d92855caf58a36f4d0b1d2",
+      "results/metrics.csv": "28e604661aa647a14a2d8447abbef9e342b522773419a1ddc8de9508098f8749",
+      "results/summary.json": "f70a72a65137151567a1262bebaffe68f598a75847dede4500d8b8dbb622f166",
+      "results/findings.json": "5fe7d92c10f2f8ef7d415d925e9233c099bad67886001a4e9f194bec655e9f2a",
+      "results/completion.json": "789c6d72023e4dbf1d811b28cde6d7e601c0afa51bd0d1ebfd04ad19f5318b7b",
+      "results/runtime-protocol.json": "88d0c7c5f8edbf3693b1f80303ec117fb4fe0b7f5dce292e29ffc6e81369f1cc"
+    }
+  },
+  "validation": {
+    "checks": [
+      {
+        "name": "27-ordered-unchecked-stages",
+        "passed": true
+      },
+      {
+        "name": "1.1.1:dependencies",
+        "passed": true,
+        "detail": [
+          "1.0.0"
+        ]
+      },
+      {
+        "name": "1.1.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.1.1:gate",
+        "passed": true
+      },
+      {
+        "name": "1.1.2:dependencies",
+        "passed": true,
+        "detail": [
+          "1.1.1"
+        ]
+      },
+      {
+        "name": "1.1.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.1.2:gate",
+        "passed": true
+      },
+      {
+        "name": "1.1.3:dependencies",
+        "passed": true,
+        "detail": [
+          "1.1.2"
+        ]
+      },
+      {
+        "name": "1.1.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.1.3:gate",
+        "passed": true
+      },
+      {
+        "name": "1.1.4:dependencies",
+        "passed": true,
+        "detail": [
+          "1.1.3"
+        ]
+      },
+      {
+        "name": "1.1.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.1.4:gate",
+        "passed": true
+      },
+      {
+        "name": "1.1.5:dependencies",
+        "passed": true,
+        "detail": [
+          "1.1.4",
+          "1.1.1"
+        ]
+      },
+      {
+        "name": "1.1.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.1.5:gate",
+        "passed": true
+      },
+      {
+        "name": "1.1.6:dependencies",
+        "passed": true,
+        "detail": [
+          "1.1.5"
+        ]
+      },
+      {
+        "name": "1.1.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.1.6:gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.1:dependencies",
+        "passed": true,
+        "detail": [
+          "1.1.6"
+        ]
+      },
+      {
+        "name": "1.2.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.1:gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.2:dependencies",
+        "passed": true,
+        "detail": [
+          "1.2.1"
+        ]
+      },
+      {
+        "name": "1.2.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.2:gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.3:dependencies",
+        "passed": true,
+        "detail": [
+          "1.2.2"
+        ]
+      },
+      {
+        "name": "1.2.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.3:gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.4:dependencies",
+        "passed": true,
+        "detail": [
+          "1.2.3"
+        ]
+      },
+      {
+        "name": "1.2.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.4:gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.5:dependencies",
+        "passed": true,
+        "detail": [
+          "1.2.4"
+        ]
+      },
+      {
+        "name": "1.2.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.5:gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.6:dependencies",
+        "passed": true,
+        "detail": [
+          "1.2.5",
+          "1.1.4"
+        ]
+      },
+      {
+        "name": "1.2.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.6:gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.7:dependencies",
+        "passed": true,
+        "detail": [
+          "1.2.6"
+        ]
+      },
+      {
+        "name": "1.2.7:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.7:gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.8:dependencies",
+        "passed": true,
+        "detail": [
+          "1.2.7"
+        ]
+      },
+      {
+        "name": "1.2.8:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.8:gate",
+        "passed": true
+      },
+      {
+        "name": "1.2.9:dependencies",
+        "passed": true,
+        "detail": [
+          "1.2.8"
+        ]
+      },
+      {
+        "name": "1.2.9:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.2.9:gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.1:dependencies",
+        "passed": true,
+        "detail": [
+          "1.2.9"
+        ]
+      },
+      {
+        "name": "1.3.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.1:gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.2:dependencies",
+        "passed": true,
+        "detail": [
+          "1.3.1",
+          "1.1.5"
+        ]
+      },
+      {
+        "name": "1.3.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.2:gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.3:dependencies",
+        "passed": true,
+        "detail": [
+          "1.3.2"
+        ]
+      },
+      {
+        "name": "1.3.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.3:gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.4:dependencies",
+        "passed": true,
+        "detail": [
+          "1.3.3",
+          "1.3.1"
+        ]
+      },
+      {
+        "name": "1.3.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.4:gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.5:dependencies",
+        "passed": true,
+        "detail": [
+          "1.3.4"
+        ]
+      },
+      {
+        "name": "1.3.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.5:gate",
+        "passed": true
+      },
+      {
+        "name": "1.3.6:dependencies",
+        "passed": true,
+        "detail": [
+          "1.3.5"
+        ]
+      },
+      {
+        "name": "1.3.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.6:gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.1:dependencies",
+        "passed": true,
+        "detail": [
+          "1.3.6"
+        ]
+      },
+      {
+        "name": "1.4.1:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.1:gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.2:dependencies",
+        "passed": true,
+        "detail": [
+          "1.4.1"
+        ]
+      },
+      {
+        "name": "1.4.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.2:gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.3:dependencies",
+        "passed": true,
+        "detail": [
+          "1.4.2",
+          "1.4.1"
+        ]
+      },
+      {
+        "name": "1.4.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.3:gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.4:dependencies",
+        "passed": true,
+        "detail": [
+          "1.4.3"
+        ]
+      },
+      {
+        "name": "1.4.4:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.4:gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.5:dependencies",
+        "passed": true,
+        "detail": [
+          "1.4.4"
+        ]
+      },
+      {
+        "name": "1.4.5:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.5:gate",
+        "passed": true
+      },
+      {
+        "name": "1.4.6:dependencies",
+        "passed": true,
+        "detail": [
+          "1.4.5"
+        ]
+      },
+      {
+        "name": "1.4.6:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.4.6:gate",
+        "passed": true
+      },
+      {
+        "name": "all-historical-checkbox-lines-preserved",
+        "passed": true,
+        "detail": {
+          "previous": 85
+        }
+      },
+      {
+        "name": "active-release-1.0.0-and-next-1.1.1",
+        "passed": true
+      },
+      {
+        "name": "every-stage-native-verify",
+        "passed": true
+      },
+      {
+        "name": "planning-not-implementation",
+        "passed": true
+      },
+      {
+        "name": "http-existing-commitment-preserved",
+        "passed": true
+      },
+      {
+        "name": "coverage:filesystem",
+        "passed": true,
+        "detail": [
+          "нативное перечисление",
+          "рекурсивный обход"
+        ]
+      },
+      {
+        "name": "coverage:json",
+        "passed": true,
+        "detail": [
+          "потоковый JSON",
+          "проверяемый пропуск",
+          "описанию структуры"
+        ]
+      },
+      {
+        "name": "coverage:http",
+        "passed": true,
+        "detail": [
+          "HTTP deadline",
+          "постоянного HTTP-транспорта",
+          "постоянный HTTP-клиент"
+        ]
+      },
+      {
+        "name": "coverage:agent",
+        "passed": true,
+        "detail": [
+          "компактный вход",
+          "точный поиск",
+          "генератор минимального проекта"
+        ]
+      },
+      {
+        "name": "coverage:library",
+        "passed": true,
+        "detail": [
+          "типизированные аргументы",
+          "сортировка по компаратору",
+          "параллельная обработка"
+        ]
+      },
+      {
+        "name": "coverage:repairs",
+        "passed": true,
+        "detail": [
+          "проверяемые исправления",
+          "устаревшая revision"
+        ]
+      },
+      {
+        "name": "coverage:performance",
+        "passed": true,
+        "detail": [
+          "профиль и заранее",
+          "оптимизация обработки",
+          "частичная семантическая"
+        ]
+      },
+      {
+        "name": "coverage:language",
+        "passed": true,
+        "detail": [
+          "прозрачные псевдонимы",
+          "локальный вывод параметров"
+        ]
+      },
+      {
+        "name": "coverage:benchmark",
+        "passed": true,
+        "detail": [
+          "27 попыток",
+          "27 продолжений",
+          "9/9 исходных и 9/9 изменённых",
+          "неуспешные попытки",
+          "200 повторов",
+          "cold/warm/edit",
+          "cached input",
+          "HTML/CSV/JSON"
+        ]
+      },
+      {
+        "name": "pre-existing-work-and-compiler-inputs-unchanged",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "local-markdown-links",
+        "passed": true,
+        "detail": {
+          "checked": 188,
+          "missing": []
+        }
+      }
+    ],
+    "protected_paths": [
+      {
+        "file": "README.md",
+        "unchanged": true
+      },
+      {
+        "file": "README.ru.md",
+        "unchanged": true
+      },
+      {
+        "file": "bin/vela-bundle.exe",
+        "unchanged": true
+      },
+      {
+        "file": "bin/vela-dev.exe",
+        "unchanged": true
+      },
+      {
+        "file": "bin/vela-lsp.exe",
+        "unchanged": true
+      },
+      {
+        "file": "bin/vela-test.exe",
+        "unchanged": true
+      },
+      {
+        "file": "bin/velac.exe",
+        "unchanged": true
+      },
+      {
+        "file": "docs/ARCHITECTURE.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/BUILTINS.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/CHANGELOG.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/PROJECTS.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/TOOLING.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/contracts/BUILD-PROTOCOL.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/mcp-evidence.json",
+        "unchanged": true
+      },
+      {
+        "file": "docs/rfcs/0002-generics-callables.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/stable-1.0.json",
+        "unchanged": true
+      },
+      {
+        "file": "examples/factorial.vela",
+        "unchanged": true
+      },
+      {
+        "file": "examples/sum.vela",
+        "unchanged": true
+      },
+      {
+        "file": "integrations/agent/vela-app/SKILL.md",
+        "unchanged": true
+      },
+      {
+        "file": "integrations/mcp/README.md",
+        "unchanged": true
+      },
+      {
+        "file": "integrations/mcp/compatibility.json",
+        "unchanged": true
+      },
+      {
+        "file": "pyproject.toml",
+        "unchanged": true
+      },
+      {
+        "file": "scripts/bootstrap.py",
+        "unchanged": true
+      },
+      {
+        "file": "scripts/build_examples.py",
+        "unchanged": true
+      },
+      {
+        "file": "scripts/verify_selfhost.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/README.md",
+        "unchanged": true
+      },
+      {
+        "file": "tests/__init__.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/example_factorial.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/example_factorial_2.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/example_sum.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/invalid_argument_is_handled.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/cases/no_argument_is_handled.vela",
+        "unchanged": true
+      },
+      {
+        "file": "tests/support.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/test_bootstrap.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/test_extensions.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/test_frontend.py",
+        "unchanged": true
+      },
+      {
+        "file": "tests/test_native.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela-python.cmd",
+        "unchanged": true
+      },
+      {
+        "file": "vela/__init__.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/__main__.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/backends/__init__.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/backends/c.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/checker.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/cli.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/compiler.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/driver.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/ir.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/lexer.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/parser.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/source.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/syntax.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/toolchain.py",
+        "unchanged": true
+      },
+      {
+        "file": "vela/typesys.py",
+        "unchanged": true
+      },
+      {
+        "file": "docs/CLEANUP-1.0.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/cleanup-evidence.json",
+        "unchanged": true
+      },
+      {
+        "file": "vela/builtins.def",
+        "unchanged": true
+      },
+      {
+        "file": "vela/backends/runtime.h",
+        "unchanged": true
+      },
+      {
+        "file": "vela/ffi.h",
+        "unchanged": true
+      },
+      {
+        "file": "docs/LANGUAGE.md",
+        "unchanged": true
+      },
+      {
+        "file": "docs/STDLIB.md",
+        "unchanged": true
+      },
+      {
+        "file": "std/http.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/json.vela",
+        "unchanged": true
+      },
+      {
+        "file": "std/fs.vela",
+        "unchanged": true
+      }
+    ],
+    "not_run": [
+      "compiler rebuild/native verify: planning-only change; mandatory at each future stage",
+      "MCP live client/browser: no delivered behavior changed",
+      "VelaBench rerun: planned as final stage 1.4.6"
+    ],
+    "passed": 98,
+    "failed": 0,
+    "stable_contract": {
+      "status": "passed",
+      "files": 84,
+      "command": "scripts/check-stable.ps1",
+      "record_mode": false
+    },
+    "whitespace_diff_check": {
+      "status": "passed",
+      "command": "git -c core.whitespace=cr-at-eol diff --check -- docs/ROADMAP.md AGENTS.md"
+    }
+  }
+}

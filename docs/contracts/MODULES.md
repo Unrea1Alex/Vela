@@ -42,7 +42,12 @@ unaliased imports, then the builtin prelude. Multiple imported declarations of
 the same name are an ambiguity error even if their signatures match. Repeated
 imports of the same file/declaration do not duplicate that declaration. Local
 bindings retain their existing shadowing rules; a shadowed function is not callable.
-Builtin names remain reserved for top-level declarations in every module.
+The 1.0 builtin names remain reserved for top-level declarations in every module.
+From 1.1, newly introduced builtin functions are fallbacks: own declarations and
+visible imports keep precedence, preserving valid 1.0 programs. The catalog's
+since column controls this rule; existing ambiguity/privacy rules stay unchanged.
+The root module's internal disambiguation prefix is hidden from public symbol
+names and displayed types. [Compatibility contract](LIBRARY-1.1.md).
 Qualified access never bypasses privacy. Qualified types work in nested generic
 arguments, constructors and enum match patterns. Each declaration has an identity
 in its owning module; equal spelling in different modules does not unify types.

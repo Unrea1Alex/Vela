@@ -1,5 +1,11 @@
 # HTTP API boundary — 1.0.1d
 
+Compatible 1.1 opt-in: `curl_transfer(executable, ca_file)` returns the same opaque
+Curl/Transport API with a complete-transfer timeout and a separate bounded helper
+supervisor. `curl` retains the original combined launch/transfer deadline.
+No enum, required record field, effect or public FFI ABI changes. See
+[deadlines and validation](LIBRARY-1.1.md).
+
 Accepted implementation scope before code. This extends the existing bounded
 Windows curl/process client and IPv4-loopback server; TLS and cancellation retain
 the [network contract](NETWORK-TLS.md) and [task scopes](TASK-GROUPS.md).

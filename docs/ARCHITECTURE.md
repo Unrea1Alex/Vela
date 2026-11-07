@@ -145,8 +145,7 @@ GC visitor из проверенных типов полей. У runtime сох�
 `vela/builtins.def` задаёт prelude-enum, имена функций, параметры типов,
 аргументы, результаты, эффекты, классификацию ABI и версию появления.
 Нативный сборщик встраивает файл без генерации алгоритмов. `types.vela` читает
-каталог, а `intrinsics.vela` выбирает по ABI способ понижения. Исторический
-Python frontend читает тот же файл для своего подмножества 0.2.
+каталог, а `intrinsics.vela` выбирает по ABI способ понижения.
 
 Добавление обычной runtime-функции с поддерживаемым ABI требует одной строки
 каталога и реализации в runtime. Новый вид intrinsic требует дополнительно
@@ -173,8 +172,11 @@ or signature inference. Native companions are staged by the Vela project driver.
 Запуск процессов передаёт список аргументов без shell. Для тестов добавлены
 раздельный вывод в файлы и тайм-аут; на Windows дочернее дерево ограничено job object.
 
-Python остаётся необязательным frontend 0.2 и дополнительной исторической
-проверкой. Обычный цикл 0.3 не требует Python, pip или Python-пакетов.
+Исторический frontend 0.2 на Python и его отдельные тесты удалены из текущего
+дерева; они доступны в истории Git. Сборка, проверка и C recovery используют
+нативные инструменты без Python, pip или Python-пакетов. Каталог `vela/` сохраняет
+каталог встроенных функций и C-заголовки runtime/FFI.
+
 ## Managed heap lowering
 
 The 0.8 C backend derives trace visitors from checked type and layout records.
@@ -197,3 +199,13 @@ The GUI layer (1.0.1c) keeps form configuration, event queue ownership and the
 public Window API in Vela. One ABI 1 adapter owns Win32 objects, Unicode
 conversion, message delivery and DPI layout. It does not run application policy.
 All three GUI examples share this boundary; see [GUI contract](contracts/GUI-LIBRARY.md).
+
+Directories (1.1): the builtin catalog declares three OS/storage primitives. Runtime returns a metadata envelope without traversal or language parsing; std/directory.vela validates/decode fields, attaches paths, owns Scan close state and bounds collection in ordinary Vela. No parser/checker/IR/backend boundary changes. [Contract](contracts/LIBRARY-1.1.md).
+
+Recursive traversal (1.1.3) is an iterative Vela work list over directory entries. It enforces depth/entry budgets and closes a parent scan before processing children. The OS layer performs neither recursion nor sorting. tree-index composes this with existing Bytes, ordinal string comparison and atomic publication; no SDK fork is used.
+
+JSON pull parsing (1.1.4) is ordinary Vela in std/json_stream.vela. An explicit frame/state machine validates events and skipped values. Number lexing preserves spelling; Int/Float conversion is a separate requested operation. Compiler syntax, checked IR, backend and OS runtime boundaries are unchanged. The legacy json module's public variants and semantics remain intact.
+
+HTTP deadlines (1.1.5): an opt-in factory on opaque Curl selects separate transfer/helper budgets in Vela. The original factory preserves 1.0 behavior; both share argument construction and response/cleanup policy. Curl enforces the exact full-transfer timeout; the process supervisor owns bounded startup/drain overhead. No compiler/runtime/FFI boundary changes.
+
+Prelude compatibility (1.1.5): install_prelude derives Symbol.prelude_fallback from the catalog since column. Module binding assigns a distinct internal identity to root declarations sharing a post-1.0 builtin name; imports already have distinct identities. Lookup still checks own/imported declarations before prelude, checked IR uses the selected symbol, and public symbol/type displays hide the root disambiguation prefix. Existing 1.0 reservations and backend/source-location boundaries remain unchanged. This bounded compiler fix was pulled into 1.1.5 after an archived-1.0 compatibility probe reproduced E202; later compiler audits remain planned.

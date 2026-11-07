@@ -121,7 +121,11 @@ fn main() -> Int effects { args, io, process, state } {
         request = must(http::with_headers(request, headers), "request headers");
         list_set(headers, 0, http::Header(name: "X-Fixture", value: "mutated"));
     }
-    let transport = dyn http::Transport(must(http::curl(path::Path(value: argument(0)), ca),
+    var configured = http::curl(path::Path(value: argument(0)), ca);
+    if env("VELA_HTTP_TRANSFER_DEADLINE") == "1" {
+        configured = http::curl_transfer(path::Path(value: argument(0)), ca);
+    }
+    let transport = dyn http::Transport(must(configured,
         "configure curl"));
     if arg_count() == 10 && argument(9) == "closed" {
         let closed = must(loop::shutdown(scheduler), "close scheduler");

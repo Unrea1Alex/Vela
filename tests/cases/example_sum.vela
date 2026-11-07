@@ -1,5 +1,5 @@
 // Sum any number of signed 64-bit integer arguments.
-// python -m vela run examples/sum.vela -- 12 -5 30
+// .\vela.cmd run examples/sum.vela -- 12 -5 30
 fn main() -> Int effects { io, args } {
     if arg_count() == 0 {
         print("Usage: sum <integer> [integer ...]");

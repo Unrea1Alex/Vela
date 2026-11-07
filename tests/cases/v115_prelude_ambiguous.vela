@@ -1,0 +1,3 @@
+import "prelude-fallback-owner.vela";
+import "prelude-fallback-other.vela";
+fn main() -> Int { return directory_open(); }

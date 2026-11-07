@@ -1,0 +1,1067 @@
+{
+  "schema_version": 1,
+  "stage": "1.1.6",
+  "version": "1.1.0",
+  "date": "2026-11-07",
+  "status": "verified",
+  "contract": "contracts/LIBRARY-1.1.md",
+  "verify": {
+    "command": ".\\vela-dev.cmd verify",
+    "result": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 1240,
+      "failed": 0,
+      "skipped": 0
+    },
+    "compiler_fixed_point": true,
+    "bundler_fixed_point": true,
+    "log": "build/stage11/1.1.6-verify.log"
+  },
+  "recovery": {
+    "source_seed_compares_with_stage3": true,
+    "source_log": "build/stage11/1.1.6-recovery.log",
+    "clean_result": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 1240,
+      "failed": 0,
+      "skipped": 0
+    },
+    "clean_compiler_fixed_point": true,
+    "clean_bundler_fixed_point": true,
+    "clean_log": "build/stage11/1.1.6-clean-recovery.log",
+    "source_and_clean_c": "Different embedded absolute source paths are expected across trees; emitted C bytes match between generations within each tree"
+  },
+  "applications": {
+    "index": {
+      "passed": 26,
+      "failed": 0,
+      "total": 26,
+      "checks": [
+        {
+          "name": "mixed-tree",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 55.036799999999985
+        },
+        {
+          "name": "directory-query",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.96350000000001
+        },
+        {
+          "name": "case-sensitive-query",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.852400000000017
+        },
+        {
+          "name": "unicode-query",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 27.8896
+        },
+        {
+          "name": "unmatched-query",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.457000000000022
+        },
+        {
+          "name": "empty-query",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.249900000000025
+        },
+        {
+          "name": "empty-tree",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.208500000000015
+        },
+        {
+          "name": "many-files",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 28.658399999999972
+        },
+        {
+          "name": "missing-root",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 20.55589999999995
+        },
+        {
+          "name": "file-root",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.161699999999996
+        },
+        {
+          "name": "missing-query-value",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 20.954000000000008
+        },
+        {
+          "name": "unknown-option",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.622299999999996
+        },
+        {
+          "name": "maintenance-text-suffix",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.496800000000007
+        },
+        {
+          "name": "maintenance-uppercase-suffix",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.655500000000018
+        },
+        {
+          "name": "maintenance-literal-without-dot",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.434500000000014
+        },
+        {
+          "name": "maintenance-empty-suffix",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.65549999999996
+        },
+        {
+          "name": "maintenance-query-and-suffix",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.397599999999898
+        },
+        {
+          "name": "maintenance-unicode-and-suffix",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.91840000000002
+        },
+        {
+          "name": "maintenance-unmatched-suffix",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.365200000000073
+        },
+        {
+          "name": "maintenance-missing-suffix",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.851200000000063
+        },
+        {
+          "name": "maintenance-repeat-two",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 25.122600000000034
+        },
+        {
+          "name": "maintenance-repeat-three",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.522000000000048
+        },
+        {
+          "name": "maintenance-repeat-zero",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.147399999999948
+        },
+        {
+          "name": "maintenance-repeat-high",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.144900000000007
+        },
+        {
+          "name": "maintenance-repeat-fraction",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.192099999999982
+        },
+        {
+          "name": "maintenance-repeat-missing",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.646099999999933
+        }
+      ],
+      "fixtures_summary": {
+        "baseline": {
+          "suite_version": "pilot-1",
+          "task": "index",
+          "root": "G:\\Vela\\build\\stage11\\release-trial\\outside\\index\\fixtures-baseline-index-4DRdbu",
+          "cases": 12,
+          "valid_cases": 8,
+          "invalid_cases": 4
+        },
+        "maintenance": {
+          "suite_version": "pilot-1",
+          "maintenance_version": "pilot-maintenance-2-repeat",
+          "task": "index",
+          "root": "G:\\Vela\\build\\stage11\\release-trial\\outside\\index\\fixtures-maintenance-index-CfJYkd",
+          "cases": 14,
+          "valid_cases": 9,
+          "invalid_cases": 5
+        }
+      }
+    },
+    "logs": {
+      "passed": 46,
+      "failed": 0,
+      "total": 46,
+      "checks": [
+        {
+          "name": "sample-default",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 54.4537
+        },
+        {
+          "name": "sample-filter",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.414299999999983
+        },
+        {
+          "name": "empty",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.945300000000003
+        },
+        {
+          "name": "blank-lines",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.4606
+        },
+        {
+          "name": "no-kept-records",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.136899999999997
+        },
+        {
+          "name": "unicode-escapes-crlf",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.217899999999986
+        },
+        {
+          "name": "signed64-sums",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 131.1623
+        },
+        {
+          "name": "deterministic-mixed",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 47.184699999999964
+        },
+        {
+          "name": "invalid-json",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.196399999999983
+        },
+        {
+          "name": "trailing-garbage",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.559300000000007
+        },
+        {
+          "name": "array-record",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 27.896100000000047
+        },
+        {
+          "name": "null-record",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 25.769999999999982
+        },
+        {
+          "name": "missing-service",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.43139999999994
+        },
+        {
+          "name": "service-number",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 20.84809999999993
+        },
+        {
+          "name": "missing-level",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.55899999999997
+        },
+        {
+          "name": "level-string",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.009199999999964
+        },
+        {
+          "name": "level-bool",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.476699999999937
+        },
+        {
+          "name": "level-range",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.35540000000003
+        },
+        {
+          "name": "value-range",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 31.31910000000005
+        },
+        {
+          "name": "level-decimal-literal",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.42369999999994
+        },
+        {
+          "name": "value-exponent-literal",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.872999999999934
+        },
+        {
+          "name": "value-fraction",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.408000000000015
+        },
+        {
+          "name": "value-null",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 20.879599999999982
+        },
+        {
+          "name": "missing-value",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.09030000000007
+        },
+        {
+          "name": "value-string",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.63280000000009
+        },
+        {
+          "name": "late-invalid",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.74019999999996
+        },
+        {
+          "name": "filtered-invalid",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.38740000000007
+        },
+        {
+          "name": "bad-cli-level",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 20.425200000000018
+        },
+        {
+          "name": "unknown-option",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.24969999999996
+        },
+        {
+          "name": "missing-option-value",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.381700000000023
+        },
+        {
+          "name": "maintenance-max-only",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.414499999999975
+        },
+        {
+          "name": "maintenance-bounded-range",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 25.092100000000073
+        },
+        {
+          "name": "maintenance-same-endpoints",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 25.869500000000016
+        },
+        {
+          "name": "maintenance-maximum-zero",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.270700000000033
+        },
+        {
+          "name": "maintenance-explicit-full-range",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 29.547199999999975
+        },
+        {
+          "name": "maintenance-reversed-range",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.564600000000155
+        },
+        {
+          "name": "maintenance-maximum-out-of-range",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.576299999999947
+        },
+        {
+          "name": "maintenance-maximum-negative",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.415100000000166
+        },
+        {
+          "name": "maintenance-maximum-missing",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.222300000000132
+        },
+        {
+          "name": "maintenance-excluded-invalid",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.794700000000148
+        },
+        {
+          "name": "maintenance-repeat-two",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 25.3753999999999
+        },
+        {
+          "name": "maintenance-repeat-three",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.894600000000082
+        },
+        {
+          "name": "maintenance-repeat-zero",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.86299999999983
+        },
+        {
+          "name": "maintenance-repeat-high",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.566699999999855
+        },
+        {
+          "name": "maintenance-repeat-fraction",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.434600000000046
+        },
+        {
+          "name": "maintenance-repeat-missing",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.97259999999983
+        }
+      ],
+      "fixtures_summary": {
+        "baseline": {
+          "suite_version": "pilot-1",
+          "task": "logs",
+          "root": "G:\\Vela\\build\\stage11\\release-trial\\outside\\logs\\fixtures-baseline-logs-FyX6gX",
+          "cases": 30,
+          "valid_cases": 8,
+          "invalid_cases": 22
+        },
+        "maintenance": {
+          "suite_version": "pilot-1",
+          "maintenance_version": "pilot-maintenance-2-repeat",
+          "task": "logs",
+          "root": "G:\\Vela\\build\\stage11\\release-trial\\outside\\logs\\fixtures-maintenance-logs-zdDSWu",
+          "cases": 16,
+          "valid_cases": 7,
+          "invalid_cases": 9
+        }
+      }
+    },
+    "http": {
+      "passed": 44,
+      "failed": 0,
+      "total": 44,
+      "checks": [
+        {
+          "name": "empty-list",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 58.4855
+        },
+        {
+          "name": "status-and-byte-counts",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 186.49020000000002
+        },
+        {
+          "name": "preserve-input-order",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 223.478
+        },
+        {
+          "name": "bounded-concurrency",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 883.0208
+        },
+        {
+          "name": "serial-concurrency",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 292.5473999999999
+        },
+        {
+          "name": "duplicate-urls",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 152.24970000000008
+        },
+        {
+          "name": "timeout",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 150.95209999999997
+        },
+        {
+          "name": "body-timeout",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 151.3761999999997
+        },
+        {
+          "name": "dropped-connection",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 90.26209999999992
+        },
+        {
+          "name": "queue-time-not-timeout",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 575.0010000000002
+        },
+        {
+          "name": "invalid-json",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.988600000000133
+        },
+        {
+          "name": "not-object",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.15480000000025
+        },
+        {
+          "name": "missing-urls",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.05729999999994
+        },
+        {
+          "name": "urls-not-array",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.192199999999957
+        },
+        {
+          "name": "url-not-string",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 20.86850000000004
+        },
+        {
+          "name": "missing-concurrency",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.562400000000252
+        },
+        {
+          "name": "concurrency-zero",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.485699999999724
+        },
+        {
+          "name": "concurrency-nine",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 20.69900000000007
+        },
+        {
+          "name": "concurrency-fraction",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.02890000000025
+        },
+        {
+          "name": "concurrency-decimal-literal",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.223700000000008
+        },
+        {
+          "name": "timeout-exponent-literal",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.160499999999956
+        },
+        {
+          "name": "concurrency-bool",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 26.430399999999736
+        },
+        {
+          "name": "missing-timeout",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.60279999999966
+        },
+        {
+          "name": "timeout-low",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.89569999999958
+        },
+        {
+          "name": "timeout-high",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.141799999999876
+        },
+        {
+          "name": "timeout-string",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 20.958599999999933
+        },
+        {
+          "name": "timeout-null",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.581499999999778
+        },
+        {
+          "name": "late-invalid-url",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 23.01319999999987
+        },
+        {
+          "name": "extra-argument",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.415500000000065
+        },
+        {
+          "name": "maintenance-flag-empty",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 26.367999999999938
+        },
+        {
+          "name": "maintenance-flag-all-success",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 148.13600000000042
+        },
+        {
+          "name": "maintenance-flag-http-error",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 103.0625
+        },
+        {
+          "name": "maintenance-flag-server-error",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 72.23679999999968
+        },
+        {
+          "name": "maintenance-flag-network-error",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 102.74299999999994
+        },
+        {
+          "name": "maintenance-flag-timeout",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 149.67169999999987
+        },
+        {
+          "name": "maintenance-no-flag-http-error",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 79.7172999999998
+        },
+        {
+          "name": "maintenance-flag-takes-no-value",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.925900000000183
+        },
+        {
+          "name": "maintenance-repeat-two",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 167.29169999999976
+        },
+        {
+          "name": "maintenance-repeat-three",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 230.29010000000017
+        },
+        {
+          "name": "maintenance-repeat-earlier-failure",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 166.33830000000034
+        },
+        {
+          "name": "maintenance-repeat-zero",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.891599999999926
+        },
+        {
+          "name": "maintenance-repeat-high",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.53139999999985
+        },
+        {
+          "name": "maintenance-repeat-fraction",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.45799999999963
+        },
+        {
+          "name": "maintenance-repeat-missing",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.19499999999971
+        }
+      ],
+      "fixtures_summary": {
+        "baseline": {
+          "suite_version": "pilot-1",
+          "task": "http",
+          "root": "G:\\Vela\\build\\stage11\\release-trial\\outside\\http\\fixtures-baseline-http-K1IR3P",
+          "cases": 29,
+          "valid_cases": 10,
+          "invalid_cases": 19
+        },
+        "maintenance": {
+          "suite_version": "pilot-1",
+          "maintenance_version": "pilot-maintenance-2-repeat",
+          "task": "http",
+          "root": "G:\\Vela\\build\\stage11\\release-trial\\outside\\http\\fixtures-maintenance-http-i1uaLN",
+          "cases": 15,
+          "valid_cases": 10,
+          "invalid_cases": 5
+        }
+      }
+    }
+  },
+  "independent_agents": "stage1116-agent-evidence.json: three fresh independent agents, each 12/12 initial and 26/26 maintenance; no oracle feedback; supplied SDK pins and all vendored modules unchanged",
+  "mcp": {
+    "execution": {
+      "passed": 29,
+      "report": {
+        "schema_version": 1,
+        "platform": "win32",
+        "release": "10.0.26300",
+        "checks": [
+          "eleven native MCP tools",
+          "execution enabled after OS startup probe",
+          "isolated compiler accepts opaque structs and methods",
+          "isolated method call prints the expected value",
+          "isolated MSVC build issues artifact",
+          "Unicode output and no inherited secret",
+          "source unchanged",
+          "forged artifact rejected",
+          "invalid argv 8",
+          "invalid argv 9",
+          "invalid argv 10",
+          "invalid code rejected with native diagnostic",
+          "path escape rejected",
+          "native tests continue after failure",
+          "unsaved source build",
+          "application nonzero exit is run result",
+          "overlay is private",
+          "stale snapshot rejected",
+          "native bytes require host allowlist",
+          "isolated directory and JSON build",
+          "new directory handles preserve LPAC boundary and JSON skip",
+          "outside directory bytes unchanged",
+          "hardlinked snapshot rejected",
+          "loop build",
+          "execution concurrency limit",
+          "wall time limit",
+          "server recovers after cancellation",
+          "transport stdout contains only MCP",
+          "MCP disconnect releases execution cache"
+        ]
+      }
+    },
+    "isolation": {
+      "passed": 26,
+      "report": {
+        "schema_version": 1,
+        "checks": [
+          "startup access, socket, build/run/test probes",
+          "--memory",
+          "--memory bounded capture",
+          "--process-limit",
+          "--process-limit bounded capture",
+          "--breakaway",
+          "--breakaway bounded capture",
+          "--flood",
+          "--flood bounded capture",
+          "--disk",
+          "--disk bounded capture",
+          "--files",
+          "--files bounded capture",
+          "--tree",
+          "--tree bounded capture",
+          "child preserves LPAC/job",
+          "timeout kills descendant",
+          "explicit cancellation",
+          "cancel kills descendant",
+          "disconnect cancels job",
+          "disconnect kills descendant",
+          "supervisor death fails closed and recovers profile",
+          "supervisor death kills descendant",
+          "toolchain bytes unchanged",
+          "forced Node death kills descendants",
+          "forced Node death removes snapshot and lease"
+        ]
+      }
+    },
+    "faults": {
+      "passed": 11,
+      "report": {
+        "schema_version": 1,
+        "checks": [
+          "changed artifact bytes rejected",
+          "expired artifact rejected",
+          "artifact count bound",
+          "invalid UTF8 stdout uses hex",
+          "isolated canonical roundtrip builds",
+          "restricted canonical paths reopen the same objects",
+          "snapshot race rejected",
+          "cancelled build publishes nothing",
+          "authorized native DLL is pinned and staged",
+          "toolchain mutation disables execution",
+          "failed backend keeps analysis only"
+        ]
+      }
+    },
+    "outputs": {
+      "passed": 22,
+      "report": {
+        "schema_version": 1,
+        "checks": [
+          "fresh SDK session discovers output tool",
+          "provenance",
+          "chunked bytes and SHA-256",
+          "no implicit write",
+          "executable ID cannot read a generated file",
+          "forged output ID",
+          "output ID cannot execute",
+          "out of range",
+          "unsafe name ../result.html",
+          "unsafe name a.html:stream",
+          "unsafe name NUL.html",
+          "unsafe name a.exe",
+          "reject missing",
+          "reject extra",
+          "reject directory",
+          "byte bound",
+          "nonzero does not export",
+          "timeout does not export",
+          "cancelled run releases job and export slot",
+          "hardlink rejection",
+          "junction rejection",
+          "expiry removes bytes"
+        ]
+      }
+    },
+    "sdk": {
+      "groups": 5,
+      "failed": 0,
+      "skipped": 0,
+      "sequential_requests": 1000,
+      "cancellations": 25,
+      "log": "build/stage11/1.1.6-mcp-sdk-final.log"
+    },
+    "packaged_setup": {
+      "passed": 1,
+      "failed": 0,
+      "real_handshake": true,
+      "relocated_unicode_native": true,
+      "log": "build/stage11/1.1.6-mcp-package-setup.log"
+    }
+  },
+  "lsp": [
+    {
+      "requests": 200,
+      "elapsed_ms": 3736,
+      "baseline": {
+        "WorkingSet64": 8007680,
+        "HandleCount": 114
+      },
+      "final": {
+        "WorkingSet64": 8220672,
+        "HandleCount": 114
+      },
+      "utf16": true,
+      "stale_versions": true,
+      "parity": true,
+      "unchanged": true,
+      "methods": false,
+      "interfaces": false
+    },
+    {
+      "requests": 200,
+      "elapsed_ms": 3628,
+      "baseline": {
+        "WorkingSet64": 7806976,
+        "HandleCount": 108
+      },
+      "final": {
+        "WorkingSet64": 7888896,
+        "HandleCount": 108
+      },
+      "utf16": true,
+      "stale_versions": true,
+      "parity": true,
+      "unchanged": true,
+      "methods": true,
+      "interfaces": false
+    },
+    {
+      "requests": 200,
+      "elapsed_ms": 3262,
+      "baseline": {
+        "WorkingSet64": 7852032,
+        "HandleCount": 108
+      },
+      "final": {
+        "WorkingSet64": 8179712,
+        "HandleCount": 108
+      },
+      "utf16": true,
+      "stale_versions": true,
+      "parity": true,
+      "unchanged": true,
+      "methods": false,
+      "interfaces": true
+    }
+  ],
+  "gc": {
+    "compilations": [
+      200,
+      1600
+    ],
+    "peak_managed_bytes": [
+      1157430,
+      1157430
+    ],
+    "log": "build/stage11/1.1.6-gc.log"
+  },
+  "compatibility": {
+    "old_client": {
+      "source_archive": "dist/vela-1.0.0-windows-x64.zip",
+      "project": "apps/measurelab",
+      "lock_unchanged": true,
+      "lock_sha256": "32c55c143a7ce3398b7d7008b7e5728d6b023b678ee128b9942631e82038cdf5",
+      "old_ffi_header": "fbf5d9e639bc3dd272171d3cb27109c13f9c67ca4763d4f842cda54b9d7b7cc7",
+      "ffi_abi": 1,
+      "status": "passed"
+    },
+    "old_project_named_tests": 12,
+    "old_project_report_run": true,
+    "historical_pilot": {
+      "checked_files": 1260,
+      "unchanged": true
+    }
+  },
+  "delivery": {
+    "windows": "All ZIP entries size/SHA-256 checked; Unicode relocation with stripped PATH; FieldDesk/PulseDeck and all three 1.1 app suites passed",
+    "linux": {
+      "file": "vela-1.1.0-linux-x64-musl.tar.gz",
+      "bytes": 3745229,
+      "sha256": "075c4abcd27233f4d84c38dc50846c47e61b43ced59fdc8f676ed40c2c32b6ca",
+      "c_recovery": true,
+      "compiler_fixed_point": true,
+      "resource_lock_and_stale_rejection": true,
+      "named_test": true,
+      "unicode_relocation": true,
+      "unpacked_checksums": true,
+      "binary_index_and_selective_json": true,
+      "log": "build/stage11/1.1.6-linux-package.log"
+    },
+    "compiler_sha256": "7fe0c19a4d1346450433e84f5d1a83934494631e2e99f738c60ea30603b66315",
+    "recovery_c_sha256": "ecaa9e47187caa89926be45c3240266171de277c6ea9fda6e7b733143499b131",
+    "final_archive_receipt": "dist/RELEASE-1.1.0.json",
+    "checksums": "dist/SHA256SUMS-1.1.0.txt",
+    "publication": "Local artifacts only; no GitHub upload/tag/commit requested"
+  },
+  "harness_corrections": [
+    "Initial additional MCP library probe used invalid Vela match-expression blocks and list_count; corrected to statement matches/list_len, native check passed, entire execution gate rerun to 29/29. No product change.",
+    "First fault gate lacked fixture.dll in the new evidence directory. Rerun with explicit archived-1.0-header fixture via VELA_TEST_FFI_FIXTURE passed 11/11."
+  ],
+  "unperformed": [
+    "Full independent VelaBench remains planned in 1.4.6.",
+    "JSON depth4096 every-operation forced GC was stopped for runtime; normal GC depth4096 and separate depth64 forced-GC stress passed.",
+    "Linux GUI/HTTP/DLL/fibers/process adapters are not claimed; fresh Windows OS/other architectures and physical-monitor GUI transitions were not repeated."
+  ],
+  "next": "1.2.1"
+}

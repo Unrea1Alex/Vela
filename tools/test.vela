@@ -717,6 +717,8 @@ pub fn main() -> Int effects { args, state, io, process } {
     done(write_file(dir + "/interface-owner.vela", value(read_file(root + "/tests/cases/interface-owner.vela"))));
     done(write_file(dir + "/enum-equality-owner.vela", value(read_file(root + "/tests/cases/enum-equality-owner.vela"))));
     done(write_file(dir + "/enum-equality-other.vela", value(read_file(root + "/tests/cases/enum-equality-other.vela"))));
+    done(write_file(dir + "/prelude-fallback-owner.vela", value(read_file(root + "/tests/cases/prelude-fallback-owner.vela"))));
+    done(write_file(dir + "/prelude-fallback-other.vela", value(read_file(root + "/tests/cases/prelude-fallback-other.vela"))));
     let names = dict_new<String, Bool>();
     let rows = split(replace(value(read_file(root + "/tests/cases/cases.tsv")), "\r\n", "\n"), 10);
     var i = 0;

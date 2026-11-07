@@ -1,0 +1,63 @@
+import "../../../std/directory.vela" as directory;
+import "../../../std/path.vela" as path;
+fn must<T, E>(value: Result<T, E>) -> T {
+    match value { Result::Ok(v) => { return v; } Result::Err(_) => { assert_true(false, "directory operation"); } }
+    return must(value);
+}
+fn string(value: StringResult) -> String {
+    return match value { StringResult::Ok(v) => v, StringResult::Err(_) => "" };
+}
+fn main() -> Unit effects { state, io } {
+    let base = string(temp_dir("@TMP@"));
+    let root = path::Path(value: base);
+    assert_true(match directory::open(path::Path(value: "")) { Result::Err(e) => e.path == "" && e.reason == "empty path", Result::Ok(_) => false }, "empty path diagnostic");
+    assert_true(match directory::open(path::Path(value: "bad\0path")) { Result::Err(e) => e.reason == "NUL in path", Result::Ok(_) => false }, "NUL path diagnostic");
+    let empty = must(directory::entries(root));
+    assert_true(list_len(empty) == 0, "empty directory");
+    let a = write_file(base + "/.hidden", "a\nb");
+    let b = write_file(base + "/Данные 🌿", "");
+    let c = make_dir(base + "/nested");
+    let entries = must(directory::entries(root));
+    assert_true(list_len(entries) == 3, "three entries including dotfile");
+    assert_true(match directory::entries_bounded(root, 2) { Result::Err(e) => e.reason == "entry limit exceeded", Result::Ok(_) => false }, "bounded collection closes on limit");
+    assert_true(match directory::entries_bounded(root, -1) { Result::Err(_) => true, Result::Ok(_) => false }, "invalid collection limit");
+    let seen = dict_new<String, Bool>();
+    for entry in entries {
+        dict_set(seen, entry.name, true);
+        assert_true(entry.path.value == base + "/" + entry.name, "joined path");
+        assert_true(entry.modified_seconds > 0, "mtime");
+        if entry.name == ".hidden" { assert_true(entry.kind == directory::Kind::File && entry.bytes == 3, "regular file size"); }
+        if entry.name == "nested" { assert_true(entry.kind == directory::Kind::Directory && entry.bytes == 0, "directory metadata"); }
+    }
+    assert_true(dict_has(seen, "Данные 🌿"), "Unicode");
+    assert_true(match directory::open(path::Path(value: base + "/absent")) { Result::Err(_) => true, Result::Ok(_) => false }, "missing");
+    assert_true(match directory::open(path::Path(value: base + "/.hidden")) { Result::Err(_) => true, Result::Ok(_) => false }, "file root");
+    let scan = must(directory::open(root));
+    let first = must(directory::next(scan));
+    let closed = must(directory::close(scan));
+    let twice = must(directory::close(scan));
+    assert_true(match directory::next(scan) { Result::Err(e) => e.operation == "next" && e.path == base, Result::Ok(_) => false }, "early close and alias state");
+    // More than the maximum simultaneously open count; each pass must release.
+    for i in 0 .. 300 { let again = must(directory::entries(root)); assert_true(list_len(again) == 3, "handle reclamation"); }
+    let handles = list_new<ForeignHandle>();
+    for i in 0 .. 128 {
+        match directory_open(base) { StreamResult::Ok(h) => { list_push(handles, h); } StreamResult::Err(_) => { assert_true(false, "open capacity"); } StreamResult::Limit => { assert_true(false, "early limit"); } }
+    }
+    assert_true(match directory_open(base) { StreamResult::Limit => true, StreamResult::Ok(_) => false, StreamResult::Err(_) => false }, "handle limit");
+    for handle in handles {
+        assert_true(match directory_close(handle) { WriteResult::Ok => true, WriteResult::Err(_) => false }, "close raw handle");
+        assert_true(match directory_next(handle) { ReadResult::Err(_) => true, ReadResult::Ok(_) => false, ReadResult::Limit => false }, "closed raw handle");
+    }
+    match stream_open(base + "/.hidden", 100) {
+        StreamResult::Ok(h) => {
+            assert_true(match directory_close(h) { WriteResult::Err(_) => true, WriteResult::Ok => false }, "wrong owner close");
+            assert_true(match directory_next(h) { ReadResult::Err(_) => true, ReadResult::Ok(_) => false, ReadResult::Limit => false }, "wrong owner read");
+            let closed_stream = stream_close(h);
+        }
+        StreamResult::Err(_) => { assert_true(false, "stream setup"); }
+        StreamResult::Limit => { assert_true(false, "stream limit"); }
+    }
+    let d = remove_file(base + "/.hidden"); let e = remove_file(base + "/Данные 🌿");
+    let f = remove_dir(base + "/nested"); let g = remove_dir(base);
+    print("directory checks passed");
+}

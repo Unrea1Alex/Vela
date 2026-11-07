@@ -390,3 +390,16 @@ v101e_enum_dict|check|1|E201|
 v101e_enum_record|check|1|E201|
 v101e_enum_list|check|1|E201|
 v1040_canonical|run|0||
+v111_json_baseline|run|0||
+v111_supervisor_baseline|run|0||
+v112_directory|run|0||
+v112_directory_effect|check|1|E209|
+v113_walk|run|0||
+v114_json_stream|run|0||
+v114_json_stream_effect|check|1|E209|
+v115_http_transfer_api|run|0||
+v115_prelude_local|run|0||
+v115_prelude_import|run|0||
+v115_prelude_type|run|0||
+v115_prelude_legacy_reserved|check|1|E202|
+v115_prelude_ambiguous|check|1|E222|

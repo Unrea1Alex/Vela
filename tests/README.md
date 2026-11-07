@@ -27,7 +27,7 @@ must be idempotent and retain the same execution/rejection expectations.
 The native runner also checks mixed/invalid compiler IDs, structured/human
 diagnostics, Unicode coordinates, formatter modes, source preservation and
 idempotence of all authored compiler modules. Frozen 0.5.0 release total: 626 checks.
-Current workspace after the TimeLog application review: 688 checks, including
+Historical workspace after the TimeLog application review: 688 checks, including
 58 application checks and four generic-return formatter regressions.
 
 The `v05g_*`, `v05e_*`, `v05c_*` and `v05f_*` fixtures cover generic inference,
@@ -44,8 +44,13 @@ Failure files are retained in a unique directory under `build/native/`; the
 machine-readable report is `build/native/tests.json`. The dev driver installs
 new binaries only after successful fixed points and, for verify, successful tests.
 
-The `test_*.py` files remain an optional historical 0.2 reference suite. They do
-not cover 0.3–0.5 syntax and are not invoked by native verify. To run the reference:
-`VELA_REQUIRE_NATIVE=1 python -m unittest discover -s tests -v` in an environment
-with Python and a C toolchain. They still check both builtin-catalog compatibility
-and the original language behavior; the native suite is the default gate.
+The historical Python 0.2 suite and compatibility wrappers were removed from the
+current tree; they remain in Git history. The native suite covers the migrated
+fixtures and builtin catalog. The 1.0 release gate passed 1214 checks without
+failures or skips; see [release acceptance](../docs/VALIDATION-1.0.md). Run
+`vela-dev.cmd verify` for the current aggregate result. The 1.1 native suite
+passes 1240 checks, including directory ownership/effects, iterative traversal,
+selective JSON validation, HTTP API compatibility and post-1.0 prelude fallback.
+Optional independent application/OS/GC harnesses are in `library11/`; their
+commands, measured results and platform limits are recorded in the
+[1.1 acceptance](../docs/VALIDATION-1.1.md) and stage evidence.

@@ -23,8 +23,8 @@ dep|math|../math/lib.vela
 `vela fmt vela.project --check` проверяет собственные файлы, `--write` форматирует.
 Plain `.vela` файлы продолжают работать без манифеста.
 
-`vela.cmd` и `velac.cmd` запускают один native compiler; `vela-python.cmd` —
-исторический прототип 0.2. Для сборки требуется C11 toolchain; Windows wrappers
+`vela.cmd` и `velac.cmd` запускают один native compiler. Исторический прототип
+0.2 и его Python entry point удалены из текущего дерева. Для сборки требуется C11 toolchain; Windows wrappers
 находят MSVC. Python, Node.js и MCP не нужны. Обычная самосборка:
 `vela-dev.cmd verify`; compiler entry — `selfhost/vela.project`.
 `sources.list` используется bundler только для автономного recovery bundle.

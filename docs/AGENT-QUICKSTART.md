@@ -1,4 +1,4 @@
-# Write an application with Vela 0.11
+# Write an application with Vela 1.1
 
 In Vela 0.10 and later, use `pub opaque struct` when only the defining
 module should construct or access the fields. Export factories and operations
@@ -240,3 +240,13 @@ For older applications follow [migration](MIGRATING-1.0.md) and the
 MCP with matching packages; never edit fingerprints to bypass a mismatch.
 Match-expression arms contain expressions, not statement blocks. Use a match
 statement for a branch that returns from the function or performs several statements.
+
+For directory work with the 1.1 SDK, import directory.vela explicitly. Use directory::entries_bounded(path::Path(value: root), limit) or open/next/close. Entries include name/path/kind/bytes/modified_seconds; order is unspecified. Never infer file content encoding from names: read binary input with fs::read_bytes. Check Result and close incremental scans on early exits. See [standard modules](STDLIB.md).
+
+For recursive indexing use directory::walk(root, directory::Limits(depth: 1024, entries: 1000000)). It returns WalkEntry(entry, relative, depth) and closes parent scans before children. Links are returned but never descended. Sort paths with collections::sort_strings when producing stable output. The working [tree-index](../apps/tree-index/README.md) shows Bytes reads, filters, repetition and atomic publication.
+
+For NDJSON or selectively read JSON in the 1.1 SDK, use json_stream::create with explicit Limits and next/read_string/read_integer/skip_value. Unknown fields still need skip_value; finish validates the remainder and trailing data. Number spellings are preserved, so integer rejects 1.0/1e0 and overflow. Legacy json::parse retains its previous range/depth limits. See [log-summary](../apps/log-summary/README.md). Match must enumerate every Event variant; underscore discards payloads only. if/while are statements.
+
+For 1.1 complete-body HTTP deadlines use http::curl_transfer(executable, ca_file). Start an exchange after acquiring a concurrency slot. Curl still gets the exact Request timeout; only the helper supervisor gets an extra bounded 1000 ms for startup/drain. Existing http::curl retains its 1.0 combined budget. Tick until terminal after cancel, then check release; Storage on cleanup may be resolved and release retried. See [http-collector](../apps/http-collector/README.md).
+
+Post-1.0 builtin additions are fallbacks: your existing function/type declarations keep their names, including directory_open/directory_next/directory_close. Import directory.vela to use its primitives from their defining module even when your own module has such a name. Existing 1.0 reserved builtin names stay reserved.

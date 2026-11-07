@@ -1,0 +1,38 @@
+import "../../../std/event_loop.vela" as loop;
+import "../../../std/process.vela" as process;
+import "../../../std/path.vela" as path;
+fn must<T, E>(value: Result<T, E>) -> T { match value { Result::Ok(v) => { return v; } Result::Err(_) => { assert_true(false, "baseline setup"); } } return must(value); }
+fn string(value: StringResult) -> String { return match value { StringResult::Ok(v) => v, StringResult::Err(_) => "" }; }
+fn check(timeout: Int, base: String) -> Bool effects { state, io, process } {
+    let scheduler = must(loop::create<process::Completed>(0));
+    let args = list_new<String>();
+    let exe = string(executable_path());
+    list_push(args, exe); list_push(args, "child");
+    let task = must(process::schedule(scheduler, args, path::Path(value: base),
+        path::Path(value: base + "/status"), path::Path(value: base + "/errors"), timeout));
+    let first = loop::tick(scheduler, 0);
+    let wait = host_sleep(150);
+    assert_true(str_len(string(read_file(base + "/status"))) >= 3 && str_slice(string(read_file(base + "/status")), 0, 3) == "200", "child response completed before supervisor poll");
+    // The child has already produced a complete response before polling. At
+    // the shared deadline the supervisor discards completion before polling.
+    let second = loop::tick(scheduler, 50);
+    return match loop::outcome(task) {
+        Option::Some(outcome) => match outcome {
+            loop::Outcome::TimedOut => true,
+            loop::Outcome::Done(_) => false,
+            loop::Outcome::Failed(_) => false,
+            loop::Outcome::Cancelled => false
+        },
+        Option::None => false
+    };
+}
+fn main() -> Unit effects { args, state, io, process } {
+    if arg_count() > 0 { print("200"); return; }
+    if platform() != "windows" { print(true); print(true); return; }
+    let root = string(absolute_path("."));
+    let base = string(temp_dir(root));
+    print(check(50, base));
+    print(!check(1000, base));
+    let a = remove_file(base + "/status"); let b = remove_file(base + "/errors");
+    let c = remove_dir(base);
+}

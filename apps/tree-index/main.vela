@@ -1,0 +1,95 @@
+import "../../std/directory.vela" as directory;
+import "../../std/path.vela" as path;
+import "../../std/fs.vela" as fs;
+import "../../std/text.vela" as text;
+import "../../std/collections.vela" as collections;
+import "../../std/json.vela" as json;
+struct Options { root: String, output: String, query: String, suffix: String, repeat: Int }
+fn argument(index: Int) -> String effects { args } {
+    return match arg(index) { StringResult::Ok(value) => value, StringResult::Err(_) => "" };
+}
+fn integer(value: String) -> Int {
+    return match parse_int(value) { IntResult::Ok(n) => n, IntResult::Err(_) => -1 };
+}
+fn options() -> Result<Options, String> effects { args } {
+    if arg_count() < 2 { return Result<Options, String>::Err("usage: ROOT OUTPUT [--query TEXT] [--extension SUFFIX] [--repeat N]"); }
+    var query = ""; var suffix = ""; var repeat = 1; var at = 2;
+    while at < arg_count() {
+        let option = argument(at);
+        if at + 1 >= arg_count() { return Result<Options, String>::Err("missing option value"); }
+        let value = argument(at + 1);
+        if option == "--query" { query = value; }
+        else if option == "--extension" { suffix = value; }
+        else if option == "--repeat" {
+            repeat = integer(value);
+            if repeat < 1 || repeat > 1000 { return Result<Options, String>::Err("repeat must be 1..1000"); }
+        } else { return Result<Options, String>::Err("unknown option"); }
+        at = at + 2;
+    }
+    return Result<Options, String>::Ok(Options(root: argument(0), output: argument(1), query: query, suffix: suffix, repeat: repeat));
+}
+fn contains(value: String, query: String) -> Bool {
+    if str_len(query) > str_len(value) { return false; }
+    for i in 0 .. str_len(value) - str_len(query) + 1 {
+        if str_slice(value, i, i + str_len(query)) == query { return true; }
+    }
+    return false;
+}
+fn suffix(value: String, ending: String) -> Bool {
+    return str_len(ending) <= str_len(value) && str_slice(value, str_len(value) - str_len(ending), str_len(value)) == ending;
+}
+fn quote(value: String) -> Result<String, String> effects { state } {
+    return match json::stringify(json::Value::StringValue(value)) {
+        Result::Ok(data) => Result<String, String>::Ok(data),
+        Result::Err(_) => Result<String, String>::Err("cannot encode path")
+    };
+}
+fn iteration(config: Options) -> Result<String, String> effects { state, io } {
+    let walked = match directory::walk(path::Path(value: config.root), directory::Limits(depth: 1024, entries: 1000000)) {
+        Result::Ok(found) => Result<List<directory::WalkEntry>, String>::Ok(found),
+        Result::Err(e) => Result<List<directory::WalkEntry>, String>::Err(e.operation + ": " + e.path + ": " + e.reason)
+    };
+    let paths = list_new<String>(); let records = dict_new<String, String>();
+    var total_bytes = 0; var total_lines = 0;
+    for item in walked? {
+        if item.entry.kind != directory::Kind::File { continue; }
+        if !contains(item.relative, config.query) || !suffix(item.relative, config.suffix) { continue; }
+        var data = "";
+        match fs::read_bytes(item.entry.path, 1048576) {
+            Result::Err(_) => { return Result<String, String>::Err("cannot read: " + item.entry.path.value); }
+            Result::Ok(bytes) => { data = bytes.data; }
+        }
+        let size = str_len(data);
+        if size > 16777216 - total_bytes { return Result<String, String>::Err("16 MiB selected input limit"); }
+        var lines = 0;
+        for i in 0 .. size { if str_byte(data, i) == 10 { lines = lines + 1; } }
+        if size > 0 && str_byte(data, size - 1) != 10 { lines = lines + 1; }
+        total_bytes = total_bytes + size; total_lines = total_lines + lines;
+        list_push(paths, item.relative);
+        dict_set(records, item.relative, "{\"path\":" + quote(item.relative)? + ",\"bytes\":" + to_string(size) + ",\"lines\":" + to_string(lines) + "}");
+    }
+    let parts = strings_new(); strings_push(parts, "{\"files\":[");
+    var first = true;
+    for relative in collections::sort_strings(paths) {
+        if !first { strings_push(parts, ","); }
+        first = false; strings_push(parts, dict_get(records, relative));
+    }
+    strings_push(parts, "],\"total_bytes\":" + to_string(total_bytes) + ",\"total_lines\":" + to_string(total_lines) + "}");
+    return Result<String, String>::Ok(strings_join(parts, ""));
+}
+fn run(config: Options) -> Result<Bool, String> effects { state, io } {
+    var output = "";
+    for i in 0 .. config.repeat { output = iteration(config)?; }
+    return match fs::write_atomic(path::Path(value: config.output), text::Bytes(data: output)) {
+        Result::Ok(value) => Result<Bool, String>::Ok(value),
+        Result::Err(_) => Result<Bool, String>::Err("cannot publish output")
+    };
+}
+fn main() -> Int effects { args, state, io } {
+    match options() {
+        Result::Err(message) => { eprint(message); return 2; }
+        Result::Ok(config) => {
+            match run(config) { Result::Ok(_) => { return 0; } Result::Err(message) => { eprint(message); return 1; } }
+        }
+    }
+}

@@ -1,0 +1,900 @@
+{
+  "schema_version": 1,
+  "stage": "1.1.6",
+  "version": "1.1.0",
+  "status": "verified",
+  "independence": "Fresh fork_turns:none agents, own workspace + supplied SDK docs/std/catalog/skill; no sibling/parent solution history or private oracle access. Initial artifacts evaluated before original maintenance task handoff. No oracle results supplied to agents.",
+  "compiler_sha256": "7fe0c19a4d1346450433e84f5d1a83934494631e2e99f738c60ea30603b66315",
+  "task_sha256": "f25499ca07992b0b968cb8fd665f1d6c7cc5c4ae56ca616011bf067b6fcdfe06",
+  "maintenance_task_sha256": "a85fb845c4c39ce0e40ad538b148607f9da1b2a1f83301201a0e4c522a9c6994",
+  "sdk_pins_unchanged": true,
+  "agents": [
+    {
+      "agent": "/root/index_acceptance_1",
+      "workspace": "build/stage11/independent/agent1",
+      "initial": {
+        "passed": 12,
+        "failed": 0,
+        "total": 12,
+        "checks": [
+          {
+            "name": "mixed-tree",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 26.445999999999998
+          },
+          {
+            "name": "directory-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.033299999999983
+          },
+          {
+            "name": "case-sensitive-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 24.21690000000001
+          },
+          {
+            "name": "unicode-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.444199999999995
+          },
+          {
+            "name": "unmatched-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.4598
+          },
+          {
+            "name": "empty-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.59359999999998
+          },
+          {
+            "name": "empty-tree",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.353099999999984
+          },
+          {
+            "name": "many-files",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 27.392899999999997
+          },
+          {
+            "name": "missing-root",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 20.739800000000002
+          },
+          {
+            "name": "file-root",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.25540000000001
+          },
+          {
+            "name": "missing-query-value",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.287199999999984
+          },
+          {
+            "name": "unknown-option",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 20.342499999999973
+          }
+        ],
+        "fixtures_summary": {
+          "suite_version": "pilot-1",
+          "task": "index",
+          "root": "G:\\Vela\\build\\stage11\\cohort-oracles\\agent1-initial\\fixtures-baseline-index-zzeqLS",
+          "cases": 12,
+          "valid_cases": 8,
+          "invalid_cases": 4
+        }
+      },
+      "maintenance": {
+        "passed": 26,
+        "failed": 0,
+        "total": 26,
+        "checks": [
+          {
+            "name": "mixed-tree",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 28.329399999999993
+          },
+          {
+            "name": "directory-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 28.065300000000008
+          },
+          {
+            "name": "case-sensitive-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 24.4144
+          },
+          {
+            "name": "unicode-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 24.9366
+          },
+          {
+            "name": "unmatched-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 25.101699999999965
+          },
+          {
+            "name": "empty-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.302200000000028
+          },
+          {
+            "name": "empty-tree",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 28.565099999999973
+          },
+          {
+            "name": "many-files",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 30.125699999999995
+          },
+          {
+            "name": "missing-root",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.126899999999978
+          },
+          {
+            "name": "file-root",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 24.633699999999976
+          },
+          {
+            "name": "missing-query-value",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.766099999999994
+          },
+          {
+            "name": "unknown-option",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.55340000000001
+          },
+          {
+            "name": "maintenance-text-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.389200000000017
+          },
+          {
+            "name": "maintenance-uppercase-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 25.75619999999998
+          },
+          {
+            "name": "maintenance-literal-without-dot",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 28.98419999999993
+          },
+          {
+            "name": "maintenance-empty-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 25.02890000000002
+          },
+          {
+            "name": "maintenance-query-and-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 24.16210000000001
+          },
+          {
+            "name": "maintenance-unicode-and-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 24.05619999999999
+          },
+          {
+            "name": "maintenance-unmatched-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 24.774099999999976
+          },
+          {
+            "name": "maintenance-missing-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.227600000000052
+          },
+          {
+            "name": "maintenance-repeat-two",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 49.75890000000004
+          },
+          {
+            "name": "maintenance-repeat-three",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 24.88639999999998
+          },
+          {
+            "name": "maintenance-repeat-zero",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.152099999999905
+          },
+          {
+            "name": "maintenance-repeat-high",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 27.129599999999982
+          },
+          {
+            "name": "maintenance-repeat-fraction",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 31.67420000000004
+          },
+          {
+            "name": "maintenance-repeat-missing",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.478399999999965
+          }
+        ],
+        "fixtures_summary": {
+          "baseline": {
+            "suite_version": "pilot-1",
+            "task": "index",
+            "root": "G:\\Vela\\build\\stage11\\cohort-oracles\\agent1-maintenance\\fixtures-baseline-index-XJiSaF",
+            "cases": 12,
+            "valid_cases": 8,
+            "invalid_cases": 4
+          },
+          "maintenance": {
+            "suite_version": "pilot-1",
+            "maintenance_version": "pilot-maintenance-2-repeat",
+            "task": "index",
+            "root": "G:\\Vela\\build\\stage11\\cohort-oracles\\agent1-maintenance\\fixtures-maintenance-index-wEOUqO",
+            "cases": 14,
+            "valid_cases": 9,
+            "invalid_cases": 5
+          }
+        }
+      },
+      "initial_artifacts": {
+        "agent": "/root/index_acceptance_1",
+        "phase": "initial",
+        "source_sha256": {
+          "build.ps1": "053ab17a26714911dadcf190c1bccfe5cf6a38c342ce54db877d31c955a11b39",
+          "main.vela": "cb60227904d04d3ff73d940b527301561b39279587eb21bdf4f0da9fb570a2c1",
+          "self-test.ps1": "28757a213e4b0698f635b002178e83678c0b778db503d8c76f2f25eaef3e865e"
+        },
+        "binary_sha256": "688d90d3f50c0e41af9bbb18479bd1647402c6b18b6798319611f986a1348b87"
+      },
+      "maintenance_artifacts": {
+        "agent": "/root/index_acceptance_1",
+        "phase": "maintenance",
+        "source_sha256": {
+          "build.ps1": "053ab17a26714911dadcf190c1bccfe5cf6a38c342ce54db877d31c955a11b39",
+          "main.vela": "007db1c0226d62e0787f185f43d88a4e420ed6cb6f4cfdf540b7e6e7d3b2aa19",
+          "maintenance-self-test.ps1": "972c6b5bfad3f695f4bb285cbcffa70cfad9fd4e5e829e616ae73c795dfefb2b",
+          "self-test.ps1": "28757a213e4b0698f635b002178e83678c0b778db503d8c76f2f25eaef3e865e"
+        },
+        "binary_sha256": "61bfd2d43768cc6d02f2bdac23619af636a6cd1315e022aecbb5733cd9006fdb"
+      },
+      "unchanged_vendored_modules": 22,
+      "transport": "Native SDK CLI fallback; Vela MCP tools not exposed in independent sessions"
+    },
+    {
+      "agent": "/root/index_acceptance_2",
+      "workspace": "build/stage11/independent/agent2",
+      "initial": {
+        "passed": 12,
+        "failed": 0,
+        "total": 12,
+        "checks": [
+          {
+            "name": "mixed-tree",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 25.804000000000002
+          },
+          {
+            "name": "directory-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.4953
+          },
+          {
+            "name": "case-sensitive-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.601100000000002
+          },
+          {
+            "name": "unicode-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.748500000000007
+          },
+          {
+            "name": "unmatched-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.46610000000001
+          },
+          {
+            "name": "empty-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.563000000000017
+          },
+          {
+            "name": "empty-tree",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.57159999999999
+          },
+          {
+            "name": "many-files",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 29.329799999999977
+          },
+          {
+            "name": "missing-root",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.341300000000047
+          },
+          {
+            "name": "file-root",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 25.401900000000012
+          },
+          {
+            "name": "missing-query-value",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 20.98920000000004
+          },
+          {
+            "name": "unknown-option",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 19.593199999999968
+          }
+        ],
+        "fixtures_summary": {
+          "suite_version": "pilot-1",
+          "task": "index",
+          "root": "G:\\Vela\\build\\stage11\\cohort-oracles\\agent2-initial\\fixtures-baseline-index-AygmVu",
+          "cases": 12,
+          "valid_cases": 8,
+          "invalid_cases": 4
+        }
+      },
+      "maintenance": {
+        "passed": 26,
+        "failed": 0,
+        "total": 26,
+        "checks": [
+          {
+            "name": "mixed-tree",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 42.04150000000001
+          },
+          {
+            "name": "directory-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 32.355699999999985
+          },
+          {
+            "name": "case-sensitive-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 36.80699999999999
+          },
+          {
+            "name": "unicode-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 36.1259
+          },
+          {
+            "name": "unmatched-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 30.24309999999997
+          },
+          {
+            "name": "empty-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 24.20999999999998
+          },
+          {
+            "name": "empty-tree",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 31.315200000000004
+          },
+          {
+            "name": "many-files",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 42.848299999999995
+          },
+          {
+            "name": "missing-root",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 31.367200000000025
+          },
+          {
+            "name": "file-root",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.811500000000024
+          },
+          {
+            "name": "missing-query-value",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 28.334999999999923
+          },
+          {
+            "name": "unknown-option",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.329200000000014
+          },
+          {
+            "name": "maintenance-text-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 29.927800000000047
+          },
+          {
+            "name": "maintenance-uppercase-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 44.42269999999996
+          },
+          {
+            "name": "maintenance-literal-without-dot",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 26.451000000000022
+          },
+          {
+            "name": "maintenance-empty-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 27.06790000000001
+          },
+          {
+            "name": "maintenance-query-and-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 24.227300000000014
+          },
+          {
+            "name": "maintenance-unicode-and-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 28.529600000000073
+          },
+          {
+            "name": "maintenance-unmatched-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 25.037900000000036
+          },
+          {
+            "name": "maintenance-missing-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.52170000000001
+          },
+          {
+            "name": "maintenance-repeat-two",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 27.374300000000062
+          },
+          {
+            "name": "maintenance-repeat-three",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 51.070100000000025
+          },
+          {
+            "name": "maintenance-repeat-zero",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 77.88429999999994
+          },
+          {
+            "name": "maintenance-repeat-high",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 211.10899999999992
+          },
+          {
+            "name": "maintenance-repeat-fraction",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 72.9565
+          },
+          {
+            "name": "maintenance-repeat-missing",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 123.83030000000008
+          }
+        ],
+        "fixtures_summary": {
+          "baseline": {
+            "suite_version": "pilot-1",
+            "task": "index",
+            "root": "G:\\Vela\\build\\stage11\\cohort-oracles\\agent2-maintenance\\fixtures-baseline-index-5ItCMJ",
+            "cases": 12,
+            "valid_cases": 8,
+            "invalid_cases": 4
+          },
+          "maintenance": {
+            "suite_version": "pilot-1",
+            "maintenance_version": "pilot-maintenance-2-repeat",
+            "task": "index",
+            "root": "G:\\Vela\\build\\stage11\\cohort-oracles\\agent2-maintenance\\fixtures-maintenance-index-Z7Yabm",
+            "cases": 14,
+            "valid_cases": 9,
+            "invalid_cases": 5
+          }
+        }
+      },
+      "initial_artifacts": {
+        "agent": "/root/index_acceptance_2",
+        "phase": "initial",
+        "source_sha256": {
+          "build.ps1": "6293c1c48017a6474280ec1b787b9f396d0e897a16ab61ae79e5fcc17e44e4f8",
+          "main.vela": "4c6ff486eb473988c073ba6303701cbb55e25a384f54f1c202394204c0f5a2a5",
+          "self-test.ps1": "54dab31be831ad6efdd93b87ebd33ebeb84beca7295b8844144d98cb2cc8d028"
+        },
+        "binary_sha256": "f409f2bee577a3d5f07d5a4b88cead1fb582af63f28cd5b7741595c2d63a731e"
+      },
+      "maintenance_artifacts": {
+        "agent": "/root/index_acceptance_2",
+        "phase": "maintenance",
+        "source_sha256": {
+          "build.ps1": "6293c1c48017a6474280ec1b787b9f396d0e897a16ab61ae79e5fcc17e44e4f8",
+          "main.vela": "59c19bd3c08ec7bd807f107eaa4afb7327cc3fe304cdc4203ea88c635d75e37e",
+          "maintenance-self-test.ps1": "5064a0b5b50c1ab3d245c82fbe4d30fa641288a70128ba30a8142667574295d5",
+          "self-test.ps1": "54dab31be831ad6efdd93b87ebd33ebeb84beca7295b8844144d98cb2cc8d028"
+        },
+        "binary_sha256": "4761ac414ada6388ebf85a548c121d5f5324c239fa702ae0f63c8f1d3e170ee2"
+      },
+      "unchanged_vendored_modules": 22,
+      "transport": "Native SDK CLI fallback; Vela MCP tools not exposed in independent sessions"
+    },
+    {
+      "agent": "/root/index_acceptance_3",
+      "workspace": "build/stage11/independent/agent3",
+      "initial": {
+        "passed": 12,
+        "failed": 0,
+        "total": 12,
+        "checks": [
+          {
+            "name": "mixed-tree",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 25.331800000000015
+          },
+          {
+            "name": "directory-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.262
+          },
+          {
+            "name": "case-sensitive-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.789999999999992
+          },
+          {
+            "name": "unicode-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.795800000000014
+          },
+          {
+            "name": "unmatched-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.028899999999993
+          },
+          {
+            "name": "empty-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.99539999999999
+          },
+          {
+            "name": "empty-tree",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.562900000000013
+          },
+          {
+            "name": "many-files",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 27.727300000000014
+          },
+          {
+            "name": "missing-root",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 20.575300000000027
+          },
+          {
+            "name": "file-root",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.837199999999996
+          },
+          {
+            "name": "missing-query-value",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.161900000000003
+          },
+          {
+            "name": "unknown-option",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 20.943399999999997
+          }
+        ],
+        "fixtures_summary": {
+          "suite_version": "pilot-1",
+          "task": "index",
+          "root": "G:\\Vela\\build\\stage11\\cohort-oracles\\agent3-initial\\fixtures-baseline-index-gYKGRu",
+          "cases": 12,
+          "valid_cases": 8,
+          "invalid_cases": 4
+        }
+      },
+      "maintenance": {
+        "passed": 26,
+        "failed": 0,
+        "total": 26,
+        "checks": [
+          {
+            "name": "mixed-tree",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 31.635199999999998
+          },
+          {
+            "name": "directory-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.3981
+          },
+          {
+            "name": "case-sensitive-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 26.567399999999992
+          },
+          {
+            "name": "unicode-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.367400000000004
+          },
+          {
+            "name": "unmatched-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.889700000000005
+          },
+          {
+            "name": "empty-query",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.930800000000033
+          },
+          {
+            "name": "empty-tree",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.67610000000002
+          },
+          {
+            "name": "many-files",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 29.32510000000002
+          },
+          {
+            "name": "missing-root",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.00010000000003
+          },
+          {
+            "name": "file-root",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.80770000000001
+          },
+          {
+            "name": "missing-query-value",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 20.914600000000007
+          },
+          {
+            "name": "unknown-option",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 19.888300000000015
+          },
+          {
+            "name": "maintenance-text-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.747500000000002
+          },
+          {
+            "name": "maintenance-uppercase-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.580300000000022
+          },
+          {
+            "name": "maintenance-literal-without-dot",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.336599999999976
+          },
+          {
+            "name": "maintenance-empty-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.068799999999953
+          },
+          {
+            "name": "maintenance-query-and-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 20.827000000000055
+          },
+          {
+            "name": "maintenance-unicode-and-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.575500000000034
+          },
+          {
+            "name": "maintenance-unmatched-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 23.090700000000083
+          },
+          {
+            "name": "maintenance-missing-suffix",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.12939999999992
+          },
+          {
+            "name": "maintenance-repeat-two",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 22.989000000000033
+          },
+          {
+            "name": "maintenance-repeat-three",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 24.941100000000006
+          },
+          {
+            "name": "maintenance-repeat-zero",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 31.259000000000015
+          },
+          {
+            "name": "maintenance-repeat-high",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.64440000000002
+          },
+          {
+            "name": "maintenance-repeat-fraction",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 21.601599999999962
+          },
+          {
+            "name": "maintenance-repeat-missing",
+            "passed": true,
+            "detail": "ok",
+            "elapsed_ms": 24.582399999999893
+          }
+        ],
+        "fixtures_summary": {
+          "baseline": {
+            "suite_version": "pilot-1",
+            "task": "index",
+            "root": "G:\\Vela\\build\\stage11\\cohort-oracles\\agent3-maintenance\\fixtures-baseline-index-ktrQes",
+            "cases": 12,
+            "valid_cases": 8,
+            "invalid_cases": 4
+          },
+          "maintenance": {
+            "suite_version": "pilot-1",
+            "maintenance_version": "pilot-maintenance-2-repeat",
+            "task": "index",
+            "root": "G:\\Vela\\build\\stage11\\cohort-oracles\\agent3-maintenance\\fixtures-maintenance-index-tx0cYt",
+            "cases": 14,
+            "valid_cases": 9,
+            "invalid_cases": 5
+          }
+        }
+      },
+      "initial_artifacts": {
+        "agent": "/root/index_acceptance_3",
+        "phase": "initial",
+        "source_sha256": {
+          "build.ps1": "7c99c8d9cacbd44f7842e8a5eef45e897fd7f99bd5c65af362fbbabc27ed56ce",
+          "main.vela": "93af1b112781e80c77c4cfab971a53d4d33a007a163af56f74e0c20342eba1c7",
+          "selftest.ps1": "0e6033e345b2831435759c8bbfe61aeaa205683abd0c7fa063d4eaab83cade20"
+        },
+        "binary_sha256": "0a1394d706a65b8786632146211540f51623b9d3f1ab0bacb2fb5d86207f58d5"
+      },
+      "maintenance_artifacts": {
+        "agent": "/root/index_acceptance_3",
+        "phase": "maintenance",
+        "source_sha256": {
+          "build.ps1": "7c99c8d9cacbd44f7842e8a5eef45e897fd7f99bd5c65af362fbbabc27ed56ce",
+          "main.vela": "b5cc5c675a590f6f67ab6bbc74665ceda6b60266d6914ffb6143d0666b43a689",
+          "selftest.ps1": "9e6646f51f5ad1c67930425c7be597593a2d544b485572de80791e3b8b85ef0e"
+        },
+        "binary_sha256": "dda57ebaf499888c9dc2d4e1cbcc4a00e60c416224cab48483d7c2074859ca4d"
+      },
+      "unchanged_vendored_modules": 22,
+      "transport": "Native SDK CLI fallback; Vela MCP tools not exposed in independent sessions"
+    }
+  ]
+}

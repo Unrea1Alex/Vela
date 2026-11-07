@@ -1,0 +1,9 @@
+import "../../../std/http.vela" as http;
+import "../../../std/path.vela" as path;
+fn main() -> Unit effects { io } {
+    assert_true(match http::curl_transfer(path::Path(value: "/curl"), Option<path::Path>::None) { Result::Ok(_) => true, Result::Err(_) => false }, "transfer factory");
+    assert_true(match http::curl(path::Path(value: "/curl"), Option<path::Path>::None) { Result::Ok(_) => true, Result::Err(_) => false }, "legacy factory");
+    assert_true(match http::curl_transfer(path::Path(value: "relative"), Option<path::Path>::None) { Result::Err(_) => true, Result::Ok(_) => false }, "relative executable rejected");
+    assert_true(match http::curl_transfer(path::Path(value: "/curl"), Option<path::Path>::Some(path::Path(value: "relative"))) { Result::Err(_) => true, Result::Ok(_) => false }, "relative CA rejected");
+    print("HTTP transfer API passed");
+}

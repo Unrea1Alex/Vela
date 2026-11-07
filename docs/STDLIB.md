@@ -30,11 +30,13 @@ MCP snapshots require dependencies to be inside the configured workspace.
 | text | Bytes/Text records; checked/decode/encode/slice/codepoint/invalid_offset; trim/split/html/pad_zero |
 | path | Path; checked/absolute/parent/join |
 | fs | read_bytes/read_text/write_atomic/write_text_atomic |
+| directory (1.1) | Kind/Entry/Error/Scan; open/next/close, entries/entries_bounded; Limits/WalkEntry/walk; Windows/Linux no-follow metadata |
 | process | run(argv, cwd, stdout, stderr, timeout_ms); schedule with a cooperative loop on Windows from 0.11.0-dev.1 |
 | event_loop | create/submit/tick/cancel/outcome/shutdown for explicit continuations from 0.11.0-dev.1 |
 | tasks | submit typed async callables on Windows and wait_for a loop task from 0.11.0-dev.2 |
 | collections | copy/reverse/sort_ints/sort_floats/sort_strings/compare |
 | json | Value/Member/Error; parse/stringify; typed cursor access; parse_with_limits and as_bool from dev.7 |
+| json_stream (1.1) | Reader/Limits/Event/Token/Number/Error; create/next/skip_value/finish/read_string/read_integer; spelling/is_integer/integer/floating |
 | cli | Spec/Arguments/Error; parse/current |
 | config | Config/Error; parse/from_value/find/required/string/integer/number/boolean/allow_only |
 | testing | Case<I,O>; equal/close/is_ok/is_err; для test-деклараций и обычного Vela-кода |
@@ -48,6 +50,13 @@ avoid collisions. Collection operations require state; file operations io;
 process.run requires state/io/process; cli.current additionally args. Check the
 authored module signatures before calling unfamiliar APIs.
 
+`directory::walk(root, directory::Limits(depth: 1024, entries: 1000000))`
+returns entries with relative `/` paths and explicit depths. Root is depth zero;
+all encountered entries count, including directories and links. The traversal
+uses a Vela work list, closes each parent scan before opening children, and never
+follows links. OS order is unspecified; sort the result when order matters.
+For a complete Bytes/atomic-output example, see [tree-index](../apps/tree-index/README.md).
+
 `result::map_error(value, transform)` passes an Ok payload through unchanged
 and calls the typed transform once on Err. The function signature propagates
 the transform's effects. `result::explain(value, message)` replaces any Err
@@ -57,6 +66,20 @@ original cause or source path.
 `json::parse_with_limits` distinguishes byte, depth and node exhaustion.
 `json::as_bool` preserves the cursor path on a type mismatch. The original
 parse function keeps its default limits and Error type.
+For selective parsing with large ignored numbers or deeper JSON, use the opt-in
+`json_stream` module. It reads a bounded UTF-8 buffer without constructing Value
+trees, validates skipped structures/escapes/duplicates, and preserves number
+spellings. `integer` accepts only an integer literal in Int range; `1.0` and `1e0`
+are different lexical categories. `floating` converts only on request and reports
+range errors. `Limits(bytes, depth, nodes)` allows at most 16 MiB /4096 /1000000.
+Offsets are zero-based UTF-8 bytes; paths use `$["key"][index]`.
+
+Consume events through `next`, or `skip_value` for one whole value. Call `finish`
+when stopping early to validate the remainder and reject trailing data. Reader
+aliases share progress, syntax errors are sticky, and conversion errors leave
+the stream valid. No file handle is owned by this in-memory reader. The existing
+json API retains its depth/numeric behavior. See the [1.1 contract](contracts/LIBRARY-1.1.md)
+and the working [log-summary](../apps/log-summary/README.md).
 Use [the service contract](contracts/SERVICES.md) for bounds, file stream
 ownership and injected services.
 `replay` records the request and typed response from an explicit service
@@ -109,7 +132,9 @@ Get/Head/Post/Put/Delete and immutable `text::Bytes` (upload <=1 MiB).
 InvalidHeaders and InvalidBody are new Error variants; update exhaustive matches.
 Start it with an explicit
 `dyn http::Transport`, tick the process event loop, and poll the exchange.
-Use `http::curl` with an absolute path to a trusted curl 8.4+ executable,
+Use `http::curl_transfer` in 1.1 with an absolute path to a trusted curl 8.4+ executable
+for a complete-transfer timeout and separately bounded helper startup/drain.
+`http::curl` retains the 1.0 combined launch/transfer deadline. Configure either,
 or `http::scripted` for a test. Check the status separately from transport
 errors. Cancel and drive the loop while `http::pending` is true.
 `http::release` removes output and upload files after drain.

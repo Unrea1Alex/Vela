@@ -1,6 +1,6 @@
 # Интерфейс для инструментов
 
-Активный интерфейс — `velac.cmd` / `bin/velac.exe`. Нативный компилятор поддерживает `check --json`, `symbols`, `emit-c`, `build`, `run` без Python. Служебный параметр `--source-name NAME` задаёт имя виртуального исходника независимо от временного пути. `python -m vela` — исторический frontend подмножества 0.2; его сообщения и кодирование JSON могут отличаться.
+Активный интерфейс — `vela.cmd` / `velac.cmd` / `bin/velac.exe`. Нативный компилятор поддерживает `check --json`, `symbols`, `emit-c`, `build`, `run` без Python. Служебный параметр `--source-name NAME` задаёт имя виртуального исходника независимо от временного пути. Исторический Python frontend 0.2, его API и обёртки удалены из текущего дерева; для интеграции используйте документированные CLI/LSP/MCP протоколы.
 
 ## Подсветка в VS Code
 
@@ -139,19 +139,6 @@ E201 сообщает `expected_type`/`actual_type`; E209 — `callee`, `require
 проверенными функциями и не включены в массив functions. ID C-символов не служат
 публичными идентификаторами индекса. Диагностика внутри интерполяции указывает
 на исходное выражение, включая Unicode code-point координаты.
-
-## Исторический Python API (только подмножество 0.2)
-
-```python
-from vela.compiler import analyze, compile_c
-from vela.source import Source, Diagnostic
-
-source = Source("example.vela", "fn main() -> Int { return 0; }")
-program = analyze(source)  # immutable checked IR
-c_text = compile_c(source)  # standalone C11 text
-```
-
-При некорректной программе выбрасывается `Diagnostic`. Для вывода используйте `error.render(source)` или `error.to_dict(source)`. API не запускает компилятор и не читает пользовательские файлы; генератор C загружает поставляемый ресурс runtime из пакета. `vela.driver.build(source, output_path)` выполняет отдельный шаг нативной сборки.
 
 ## Повторная проверка и пакетная сборка
 

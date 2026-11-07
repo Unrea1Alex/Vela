@@ -21,8 +21,8 @@ enum|Result|T;E|Ok:T;Err:E||||0.5
 - `returns`: тип результата функции.
 - `effects`: эффекты через `;`; пусто означает чистую функцию.
 - `ABI`: способ понижения вызова.
-- `since`: версия появления; исторический Python frontend читает функции 0.2
-  и негeneric enum. Generic enum считываются из того же формата нативным frontend.
+- `since`: версия появления декларации. Нативный frontend читает функции,
+  обычные и generic enum из этого единого формата.
 
 Option/Result не меняют сигнатур старых функций: `read_file` по-прежнему возвращает
 StringResult, `write_file` — WriteResult, `parse_int` — IntResult. Для использования
@@ -47,7 +47,7 @@ StringResult, `write_file` — WriteResult, `parse_int` — IntResult. Для и
 | `list_*` / `dict_*` | Типизированные intrinsic-операции с размерами и копиями значений |
 
 Нативный сборщик проверяет форму строк, дубликаты, эффекты и известные ABI.
-Нативный compiler читает встроенную копию файла; Python читает packaged resource.
+Нативный compiler читает встроенную копию файла; bundler встраивает её из `vela/builtins.def`.
 Изменение файла начинает действовать в следующем поколении компилятора после
 `vela-dev.cmd verify`. Готовый `velac.exe` не зависит от внешнего файла каталога.
 
@@ -101,3 +101,7 @@ StringResult, `write_file` — WriteResult, `parse_int` — IntResult. Для и
 stdin through LF (included) or exactly `limit` bytes. Its maximum is 4 MiB;
 a partial read or a limit ends a protocol stream. See the
 [stdin contract](contracts/LSP.md).
+
+Directory primitives (1.1): directory_open(String) -> StreamResult, directory_next(ForeignHandle) -> ReadResult, directory_close(ForeignHandle) -> WriteResult; all require io/state. They reuse the existing result variants and ABI classes. See [ownership, metadata envelope and bounds](contracts/LIBRARY-1.1.md).
+
+From 1.1 the existing since column also identifies post-1.0 function additions (minor >=1.1) as prelude fallbacks. They do not reserve previously valid user declaration names; local/visible imported declarations keep precedence. 1.0 reservations are unchanged. The eight-column format, signatures, effects and ABI source remain solely in this catalog; there is no parallel builtin-name allowlist.

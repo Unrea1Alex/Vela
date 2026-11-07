@@ -1,4 +1,4 @@
-// Build: python -m vela build examples/factorial.vela -o bin/factorial.exe
+// Build: .\vela.cmd build examples/factorial.vela -o bin/factorial.exe
 // Run:   bin/factorial.exe 10
 fn factorial(n: Int) -> Int
     requires n >= 0 && n <= 20;

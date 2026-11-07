@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-07",
+  "scope": "Roadmap decision for 1.3.2–1.3.3: in-process libcurl multi client transport",
+  "status": "documentation-verified",
+  "implementation_started": false,
+  "selected_backend": "libcurl multi",
+  "legacy_cli_policy": "Explicit 1.x compatibility only; never an implicit fallback for the new transport",
+  "stages": [
+    {
+      "id": "1.3.2",
+      "status": "planned",
+      "scope": "Contract, prototype and acceptance matrix",
+      "dependencies": [
+        "1.3.1b",
+        "1.1.5"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    },
+    {
+      "id": "1.3.3",
+      "status": "planned",
+      "scope": "Implementation, application migration and packaged acceptance",
+      "dependencies": [
+        "1.3.2"
+      ],
+      "compiler_rebuild_and_verify_required": true
+    }
+  ],
+  "validation": {
+    "checks": [
+      {
+        "name": "all-81-post-1.0-ids-and-statuses-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.3.2-dependencies-preserved",
+        "passed": true
+      },
+      {
+        "name": "1.3.3-dependency-preserved",
+        "passed": true
+      },
+      {
+        "name": "libcurl-selected-not-candidate",
+        "passed": true
+      },
+      {
+        "name": "1.3.2:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.2:explicit-rebuild-and-verify",
+        "passed": true
+      },
+      {
+        "name": "1.3.2:planned",
+        "passed": true
+      },
+      {
+        "name": "1.3.3:acceptance",
+        "passed": true
+      },
+      {
+        "name": "1.3.3:explicit-rebuild-and-verify",
+        "passed": true
+      },
+      {
+        "name": "1.3.3:planned",
+        "passed": true
+      },
+      {
+        "name": "coverage:native_transport",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:pooling",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:cancellation",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:deadlines",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:integration",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:packaging",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "coverage:behavior",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "1.3.4-still-depends-on-1.3.3",
+        "passed": true
+      },
+      {
+        "name": "final-VelaBench-protocol-unchanged",
+        "passed": true
+      },
+      {
+        "name": "later-program-unchanged",
+        "passed": true
+      },
+      {
+        "name": "AGENTS-unchanged",
+        "passed": true
+      },
+      {
+        "name": "planning-not-implementation",
+        "passed": true
+      },
+      {
+        "name": "journal-row-contiguous",
+        "passed": true
+      },
+      {
+        "name": "git-diff-check",
+        "passed": true
+      },
+      {
+        "name": "local-markdown-links",
+        "passed": true,
+        "detail": {
+          "checked": 202,
+          "missing": []
+        }
+      }
+    ],
+    "out_of_scope_status_changes": [],
+    "not_run": [
+      "compiler rebuild/native verify: this edit records a future implementation decision; mandatory after both future stages",
+      "live libcurl/HTTP/TLS/cancellation/performance/package acceptance: future 1.3.2–1.3.3 work",
+      "VelaBench rerun: preserved in 1.4.6"
+    ],
+    "passed": 25,
+    "failed": 0
+  }
+}

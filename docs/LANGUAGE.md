@@ -1,7 +1,12 @@
-# Язык Vela 1.0
+# Язык Vela 1.1
 
 Контракт 1.0 зафиксирован в [индексе стабильных API](contracts/STABLE-1.0.md).
 Исторические номера ниже указывают, когда возможность появилась.
+
+Библиотечное расширение 1.1 добавляет directory_open/directory_next/directory_close
+с эффектами io/state и отдельным владением OS handle. Нового синтаксиса,
+вариантов прежних enum и изменений арифметики нет. Метаданные и ошибки
+типизированы в std/directory.vela; [контракт 1.1](contracts/LIBRARY-1.1.md).
 
 Сборки 0.11 добавляют библиотечный цикл с явными продолжениями
 и встроенный монотонный источник времени `monotonic_millis() -> IntResult`
@@ -595,3 +600,9 @@ No syntax or suspension-safety exemption is added: posting captures callbacks,
 and the host invokes them only after the fiber yields. Language task outcomes
 are withheld until owned child operations have stopped and cleaned up.
 See [TASK-GROUPS](contracts/TASK-GROUPS.md) for ownership and cancellation.
+
+Библиотека 1.1 предоставляет отдельный std/json_stream.vela: Reader с явным state, события без Value-дерева, проверяемый skip_value и отдельное преобразование Number в Int/Float64. Нового синтаксиса и неявного числового приведения нет; старые json::Value/Error и границы parse не меняются. [Контракт](contracts/LIBRARY-1.1.md).
+
+HTTP 1.1 добавляет чистую фабрику http::curl_transfer с прежними Result<Curl,Error> и Transport. Она отделяет полный transfer timeout от ограниченного бюджета помощника; http::curl сохраняет контракт 1.0. Новых эффектов, синтаксиса и вариантов прежних enum нет.
+
+Совместимость prelude в 1.1: builtin-функции с since >=1.1 из каталога являются fallback и не резервируют имена прежних пользовательских объявлений. Свои объявления и видимые импорты имеют прежний приоритет; резервации builtin 1.0 сохраняются. Внутреннее имя корневого объявления разделяется с builtin до semantic analysis, без изменения spans, порядка вычислений и публичного отображения имён.

@@ -17,9 +17,16 @@ disabled. The response keeps the status, raw headers and binary body
 separate. A 404 or 302 is a response. A TLS, connection, partial transfer,
 timeout or limit failure has its own error.
 
-Each request owns a private directory for its outputs and optional upload. The supervisor
-deadline covers launch and transfer, and the worker uses the same budget
-for curl's internal timeout. Cancellation finishes only after Job drain.
+Each request owns a private directory for its outputs and optional upload.
+`http::curl` preserves the 1.0 contract: the supervisor deadline covers launch
+and transfer, and the worker uses the same budget for curl's internal timeout.
+For new transfer-deadline applications, 1.1 adds the opt-in `http::curl_transfer`
+factory. Curl receives exactly the original request timeout for the complete body;
+the helper supervisor receives timeout+1000 ms (at most 121000 ms) for startup/drain.
+Acquire an application concurrency slot before calling Transport.start: queued
+application work is outside this transfer budget. This separate helper allowance
+does not grant more HTTP transfer time. A timeout never returns a partial body.
+Cancellation finishes only after Job drain.
 The caller may observe pending work, take a bounded response after drain
 and release the private files explicitly. Body limit is 1 to 1,048,576
 bytes and returned raw headers are limited to 32,768 bytes. Curl's
@@ -28,6 +35,11 @@ in the supported versions. HEAD has no body and may describe a larger representa
 Raw header/output budgets are checked after transfer, not disk quotas.
 Parsing or moving the response into GUI state
 is a separate host operation and uses the file API.
+Release reports Storage when owned-file/directory cleanup fails; resolve the
+cause and retry release on the same exchange. It never removes unowned files.
+Both factories retain TLS, headers, body limits and cancellation policy. The
+[library 1.1 contract](LIBRARY-1.1.md) records the compatibility rationale and
+real-transfer/supervisor/cleanup acceptance matrix.
 
 Focused acceptance covers binary and Unicode bodies, HTTP status,
 partial and oversized responses, a successful trusted TLS connection,

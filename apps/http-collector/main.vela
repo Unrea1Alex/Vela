@@ -1,0 +1,437 @@
+import "../../std/http.vela" as http;
+import "../../std/json_stream.vela" as stream;
+import "../../std/json.vela" as json;
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+import "../../std/text.vela" as text;
+import "../../std/event_loop.vela" as loop;
+import "../../std/process.vela" as process;
+struct Options {
+    input: String,
+    output: String,
+    fail: Bool,
+    repeat: Int
+}
+struct Config {
+    urls: List<String>,
+    requests: List<http::Request>,
+    concurrency: Int
+}
+struct Running {
+    index: Int,
+    exchange: http::Exchange
+}
+struct Collected {
+    output: String,
+    failed: Bool
+}
+fn argument(index: Int) -> String effects { args } {
+    return match arg(index) {
+        StringResult::Ok(value) => value,
+        StringResult::Err(_) => ""
+    };
+}
+fn options() -> Result<Options, String> effects { args } {
+    if arg_count() < 2 {
+        return Result<Options, String>::Err("usage: CONFIG OUTPUT [--fail-on-error] [--repeat N]");
+    }
+    var fail = false;
+    var repeat = 1;
+    var at = 2;
+    while at < arg_count() {
+        let option = argument(at);
+        if option == "--fail-on-error" {
+            fail = true;
+            at = at + 1;
+        } else if option == "--repeat" {
+            if at + 1 >= arg_count() {
+                return Result<Options, String>::Err("missing repetition count");
+            }
+            repeat = match parse_int(argument(at + 1)) {
+                IntResult::Ok(n) => n,
+                IntResult::Err(_) => 0
+            };
+            if repeat < 1 || repeat > 1000 {
+                return Result<Options, String>::Err("invalid repetition count");
+            }
+            at = at + 2;
+        } else {
+            return Result<Options, String>::Err("unknown option");
+        }
+    }
+    return Result<Options, String>::Ok(Options(input: argument(0), output: argument(1), fail: fail,
+        repeat: repeat));
+}
+fn parsed<T>(value: Result<T, stream::Error>) -> Result<T, String> {
+    return match value {
+        Result::Ok(found) => Result<T, String>::Ok(found),
+        Result::Err(error) => Result<T, String>::Err(stream::describe(error))
+    };
+}
+fn next(reader: stream::Reader) -> Result<stream::Token, String> effects { state } {
+    match parsed(stream::next(reader))? {
+        Option::Some(found) => {
+            return Result<stream::Token, String>::Ok(found);
+        }
+        Option::None => {
+            return Result<stream::Token, String>::Err("unexpected end of configuration");
+        }
+    }
+}
+fn tag(event: stream::Event) -> Int {
+    return match event {
+        stream::Event::ObjectStart => 0,
+        stream::Event::ObjectEnd => 1,
+        stream::Event::ArrayStart => 2,
+        stream::Event::ArrayEnd => 3,
+        stream::Event::Key(_) => 4,
+        stream::Event::StringValue(_) => 5,
+        stream::Event::NumberLiteral(_) => 6,
+        stream::Event::Boolean(_) => 7,
+        stream::Event::Null => 8
+    };
+}
+fn member(reader: stream::Reader) -> Result<Option<String>, String> effects { state } {
+    let found = next(reader)?;
+    match found.event {
+        stream::Event::Key(name) => {
+            return Result<Option<String>, String>::Ok(Option<String>::Some(name));
+        }
+        stream::Event::ObjectEnd => {
+            return Result<Option<String>, String>::Ok(Option<String>::None);
+        }
+        stream::Event::ObjectStart => {}
+        stream::Event::ArrayStart => {}
+        stream::Event::ArrayEnd => {}
+        stream::Event::StringValue(_) => {}
+        stream::Event::NumberLiteral(_) => {}
+        stream::Event::Boolean(_) => {}
+        stream::Event::Null => {}
+    }
+    return Result<Option<String>, String>::Err("expected configuration member");
+}
+fn urls(reader: stream::Reader) -> Result<List<String>, String> effects { state } {
+    if tag(next(reader)?.event) != 2 {
+        return Result<List<String>, String>::Err("expected urls array");
+    }
+    let values = list_new<String>();
+    while true {
+        let found = next(reader)?;
+        match found.event {
+            stream::Event::StringValue(value) => {
+                if list_len(values) >= 128 {
+                    return Result<List<String>, String>::Err("128 URL limit");
+                }
+                list_push(values, value);
+                continue;
+            }
+            stream::Event::ArrayEnd => {
+                return Result<List<String>, String>::Ok(values);
+            }
+            stream::Event::ObjectStart => {}
+            stream::Event::ObjectEnd => {}
+            stream::Event::ArrayStart => {}
+            stream::Event::Key(_) => {}
+            stream::Event::NumberLiteral(_) => {}
+            stream::Event::Boolean(_) => {}
+            stream::Event::Null => {}
+        }
+        return Result<List<String>, String>::Err("expected URL string");
+    }
+    return Result<List<String>, String>::Err("unfinished urls");
+}
+fn config(file: String) -> Result<Config, String> effects { state, io } {
+    var data = "";
+    match fs::read_text(path::Path(value: file), 1048576) {
+        Result::Ok(value) => {
+            data = value.data;
+        }
+        Result::Err(_) => {
+            return Result<Config, String>::Err("cannot read UTF-8 configuration");
+        }
+    }
+    let reader = parsed(stream::create(data, stream::Limits(bytes: 1048576, depth: 4096,
+        nodes: 1000000)))?;
+    if tag(next(reader)?.event) != 0 {
+        return Result<Config, String>::Err("expected configuration object");
+    }
+    var values = list_new<String>();
+    var concurrency = 0;
+    var timeout = 0;
+    var have_urls = false;
+    var have_concurrency = false;
+    var have_timeout = false;
+    var ended = false;
+    while !ended {
+        match member(reader)? {
+            Option::None => {
+                ended = true;
+            }
+            Option::Some(name) => {
+                if name == "urls" {
+                    values = urls(reader)?;
+                    have_urls = true;
+                } else if name == "concurrency" {
+                    concurrency = parsed(stream::read_integer(reader))?;
+                    have_concurrency = true;
+                } else if name == "timeout_ms" {
+                    timeout = parsed(stream::read_integer(reader))?;
+                    have_timeout = true;
+                } else {
+                    let skipped = parsed(stream::skip_value(reader))?;
+                }
+            }
+        }
+    }
+    let complete = parsed(stream::finish(reader))?;
+    if !have_urls || !have_concurrency || !have_timeout || concurrency < 1 || concurrency > 8
+        || timeout < 50 || timeout > 5000 {
+        return Result<Config, String>::Err("invalid configuration fields");
+    }
+    let requests = list_new<http::Request>();
+    for url in values {
+        if str_len(url) < 7 || str_slice(url, 0, 7) != "http://" {
+            return Result<Config, String>::Err("plain HTTP URL required");
+        }
+        match http::from_url(url, timeout, 1048576) {
+            Result::Ok(request) => {
+                list_push(requests, request);
+            }
+            Result::Err(_) => {
+                return Result<Config, String>::Err("invalid URL");
+            }
+        }
+    }
+    return Result<Config, String>::Ok(Config(urls: values, requests: requests,
+        concurrency: concurrency));
+}
+fn clock() -> Int effects { io } {
+    match monotonic_millis() {
+        IntResult::Ok(value) => {
+            return value;
+        }
+        IntResult::Err(message) => {
+            assert_true(false, message);
+        }
+    }
+    return 0;
+}
+fn quote(value: String) -> String effects { state } {
+    return match json::stringify(json::Value::StringValue(value)) {
+        Result::Ok(data) => data,
+        Result::Err(_) => "null"
+    };
+}
+fn error_label(error: http::Error) -> String {
+    return match error {
+        http::Error::TimedOut => "timeout",
+        http::Error::Storage(_) => "storage",
+        http::Error::InvalidEndpoint => "network",
+        http::Error::InvalidLimit => "network",
+        http::Error::InvalidTransport => "network",
+        http::Error::InvalidHeaders => "network",
+        http::Error::InvalidBody => "network",
+        http::Error::Schedule(_) => "network",
+        http::Error::Connect(_) => "network",
+        http::Error::Tls(_) => "network",
+        http::Error::Transfer(_) => "network",
+        http::Error::Protocol => "network",
+        http::Error::Limit => "network",
+        http::Error::Cancelled => "network",
+        http::Error::Pending => "network",
+        http::Error::Closed => "network"
+    };
+}
+fn stop_all(scheduler: loop::Loop<process::Completed>,
+    running: List<Running>) -> Bool effects { state, io, process } {
+    for item in running {
+        let cancelled = http::cancel(item.exchange);
+    }
+    let started = clock();
+    var pending = true;
+    while pending && clock() - started < 2000 {
+        let turn = loop::tick(scheduler, clock());
+        pending = false;
+        for item in running {
+            if http::pending(item.exchange) {
+                pending = true;
+            }
+        }
+        if pending {
+            let slept = host_sleep(1);
+        }
+    }
+    var cleaned = !pending;
+    for item in running {
+        match http::release(item.exchange) {
+            Result::Err(_) => {
+                cleaned = false;
+            }
+            Result::Ok(_) => {}
+        }
+    }
+    return cleaned;
+}
+fn perform(values: Config, directory: path::Path,
+    transport: dyn http::Transport) -> Result<Collected, String> effects { state, io, process } {
+    let created = match loop::create<process::Completed>(clock()) {
+        Result::Ok(value) => Result<loop::Loop<process::Completed>, String>::Ok(value),
+        Result::Err(_) => Result<loop::Loop<process::Completed>, String>::Err(
+            "cannot create scheduler")
+    };
+    let scheduler = created?;
+    let running = list_new<Running>();
+    let rows = list_new<String>();
+    for url in values.urls {
+        list_push(rows, "");
+    }
+    var next_index = 0;
+    var completed = 0;
+    var failed = false;
+    var fatal = "";
+    while completed < list_len(values.urls) && fatal == "" {
+        while next_index < list_len(values.urls) && list_len(running) < values.concurrency {
+            // Acquire a slot before creating an exchange/starting its transfer timer.
+            match transport.start(scheduler, list_get(values.requests, next_index), directory) {
+                Result::Err(_) => {
+                    fatal = "cannot start HTTP exchange";
+                    break;
+                }
+                Result::Ok(exchange) => {
+                    list_push(running, Running(index: next_index, exchange: exchange));
+                    next_index = next_index + 1;
+                }
+            }
+        }
+        let turn = loop::tick(scheduler, clock());
+        var at = 0;
+        while at < list_len(running) && fatal == "" {
+            let item = list_get(running, at);
+            var terminal = false;
+            var row = "";
+            match http::poll(item.exchange) {
+                Result::Ok(found) => {
+                    match found {
+                        Option::None => {}
+                        Option::Some(response) => {
+                            terminal = true;
+                            if response.status >= 400 {
+                                failed = true;
+                            }
+                            row = "{\"url\":" + quote(list_get(values.urls, item.index))
+                                + ",\"status\":" + to_string(response.status) + ",\"bytes\":"
+                                + to_string(str_len(response.body.data)) + ",\"error\":null}";
+                        }
+                    }
+                }
+                Result::Err(error) => {
+                    terminal = true;
+                    failed = true;
+                    let label = error_label(error);
+                    if label == "storage" {
+                        fatal = "HTTP helper storage/launch failure";
+                    }
+                    row = "{\"url\":" + quote(list_get(values.urls, item.index))
+                        + ",\"status\":0,\"bytes\":0,\"error\":" + quote(label) + "}";
+                }
+            }
+            if terminal {
+                match http::release(item.exchange) {
+                    Result::Ok(_) => {}
+                    Result::Err(_) => {
+                        fatal = "HTTP cleanup failure";
+                        break;
+                    }
+                }
+                list_set(rows, item.index, row);
+                completed = completed + 1;
+                list_set(running, at, list_get(running, list_len(running) - 1));
+                list_truncate(running, list_len(running) - 1);
+            } else {
+                at = at + 1;
+            }
+        }
+        if fatal == "" && completed < list_len(values.urls) {
+            let slept = host_sleep(1);
+        }
+    }
+    if fatal != "" {
+        let cleaned = stop_all(scheduler, running);
+        return Result<Collected, String>::Err(fatal);
+    }
+    let parts = strings_new();
+    for row in rows {
+        strings_push(parts, row);
+    }
+    return Result<Collected, String>::Ok(Collected(output: "{\"results\":[" + strings_join(parts,
+        ",") + "]}", failed: failed));
+}
+fn iteration(options: Options) -> Result<Collected, String> effects { state, io, process } {
+    let values = config(options.input)?;
+    let configured = http::curl_transfer(path::Path(value: env("SystemRoot")
+        + "\\System32\\curl.exe"), Option<path::Path>::None);
+    let transport = match configured {
+        Result::Ok(value) => Result<http::Curl, String>::Ok(value),
+        Result::Err(_) => Result<http::Curl, String>::Err("trusted Windows curl 8.4+ is required")
+    };
+    let ready = transport?;
+    let absolute = match absolute_path(options.output) {
+        StringResult::Ok(value) => value,
+        StringResult::Err(_) => ""
+    };
+    let parent = match path::parent(path::Path(value: absolute)) {
+        Result::Ok(value) => Result<path::Path, String>::Ok(value),
+        Result::Err(_) => Result<path::Path, String>::Err("invalid output path")
+    };
+    let directory = match temp_dir(parent?.value) {
+        StringResult::Ok(value) => Result<String, String>::Ok(value),
+        StringResult::Err(_) => Result<String, String>::Err("cannot create HTTP work directory")
+    };
+    let work = directory?;
+    let collected = perform(values, path::Path(value: work), dyn http::Transport(ready));
+    match remove_dir(work) {
+        WriteResult::Err(_) => {
+            return Result<Collected, String>::Err("cannot remove HTTP work directory");
+        }
+        WriteResult::Ok => {}
+    }
+    return collected;
+}
+fn run(options: Options) -> Result<Bool, String> effects { state, io, process } {
+    var output = "";
+    var failed = false;
+    for i in 0 .. options.repeat {
+        let value = iteration(options)?;
+        output = value.output;
+        failed = failed || value.failed;
+    }
+    match fs::write_atomic(path::Path(value: options.output), text::Bytes(data: output)) {
+        Result::Err(_) => {
+            return Result<Bool, String>::Err("cannot publish output");
+        }
+        Result::Ok(_) => {}
+    }
+    return Result<Bool, String>::Ok(options.fail && failed);
+}
+fn main() -> Int effects { args, state, io, process } {
+    match options() {
+        Result::Err(message) => {
+            eprint(message);
+            return 2;
+        }
+        Result::Ok(value) => {
+            match run(value) {
+                Result::Err(message) => {
+                    eprint(message);
+                    return 2;
+                }
+                Result::Ok(failed) => {
+                    if failed {
+                        return 1;
+                    }
+                    return 0;
+                }
+            }
+        }
+    }
+}

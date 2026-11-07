@@ -57,6 +57,34 @@ try{
  await fs.writeFile(path.join(workspace,'evil.bin'),'untrusted');
  check('native bytes require host allowlist',(await call('vela_build',{path:'bad.vproj'})).status==='invalid_input');
  await fs.rm(path.join(workspace,'bad.vproj'));await fs.rm(path.join(workspace,'evil.bin'));
+ // Exercise the new OS handle primitive in the actual LPAC runtime, including
+ // denial outside the snapshot. Checking source alone would miss access drift.
+ const libraryFiles=['directory','path','text','json_stream'];
+ const privateDirectory=path.join(work,'host-private');await fs.mkdir(privateDirectory);
+ await fs.writeFile(path.join(privateDirectory,'secret.txt'),'outside snapshot');
+ try {
+  for(const name of libraryFiles)await fs.copyFile(path.join(root,'std',name+'.vela'),path.join(workspace,name+'.vela'));
+  const text=String.raw`import "directory.vela" as d; import "path.vela" as p; import "json_stream.vela" as j;
+fn main()->Int effects{args,io,state}{
+ match j::create("{\"ignored\":1e9999}",j::Limits(bytes:128,depth:16,nodes:16)){
+  Result::Err(_)=>{return 2;}
+  Result::Ok(reader)=>{
+   match j::skip_value(reader){Result::Ok(v)=>{assert_true(v,"value");} Result::Err(_)=>{return 3;}}
+   match j::finish(reader){Result::Ok(_)=>{} Result::Err(_)=>{return 4;}}
+  }
+ }
+ match d::entries_bounded(p::Path(value:"."),64){Result::Ok(entries)=>{assert_true(list_len(entries)>0,"snapshot enumerated");} Result::Err(_)=>{return 5;}}
+ let denied=match arg(0){StringResult::Ok(v)=>v,StringResult::Err(_)=>""};
+ match d::open(p::Path(value:denied)){Result::Err(_)=>{} Result::Ok(scan)=>{let closed=d::close(scan);return 7;}}
+ print("library 1.1 isolated");return 0;
+}`;
+  const library=await call('vela_build',{path:'library11.vela',text});
+  console.log('library11 build',JSON.stringify(library));
+  check('isolated directory and JSON build',library.status==='ok');
+  const executed=await call('vela_run',{artifact_id:library.data.artifact_id,args:[privateDirectory]});
+  check('new directory handles preserve LPAC boundary and JSON skip',executed.status==='ok'&&executed.data.exit_code===0&&executed.data.stdout.trim()==='library 1.1 isolated');
+  check('outside directory bytes unchanged',await fs.readFile(path.join(privateDirectory,'secret.txt'),'utf8')==='outside snapshot');
+ } finally {for(const name of libraryFiles)await fs.rm(path.join(workspace,name+'.vela'),{force:true});}
  await fs.link(path.join(workspace,'main.vela'),path.join(workspace,'alias.vela'));
  check('hardlinked snapshot rejected',(await call('vela_build',{path:'main.vela'})).status==='invalid_input');await fs.rm(path.join(workspace,'alias.vela'));
  const loop=await call('vela_build',{path:'loop.vela',text:'fn main()->Unit{while true{}}'});

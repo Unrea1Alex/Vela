@@ -1,0 +1,16 @@
+import "../../../std/directory.vela" as directory;
+import "../../../std/path.vela" as path;
+fn directory_open() -> Int { return 42; }
+fn directory_next(value: Int) -> Int { return value + 1; }
+fn directory_close() -> String { return "closed"; }
+fn main() -> Unit effects { io, state } {
+    let callable = directory_open;
+    print(callable()); print(directory_next(42)); print(directory_close());
+    var base = "";
+    match temp_dir("@TMP@") { StringResult::Ok(value) => { base = value; } StringResult::Err(_) => { assert_true(false, "temp directory"); } }
+    match directory::entries_bounded(path::Path(value: base), 0) {
+        Result::Ok(found) => { assert_true(list_len(found) == 0, "builtin remains available inside imported SDK module"); }
+        Result::Err(_) => { assert_true(false, "SDK primitive shadowed across modules"); }
+    }
+    let removed = remove_dir(base);
+}

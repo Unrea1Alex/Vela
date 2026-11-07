@@ -1,0 +1,160 @@
+import "path.vela" as path;
+import "text.vela" as text;
+pub enum Kind { File, Directory, Link, Other }
+pub struct Entry {
+    name: String,
+    path: path::Path,
+    kind: Kind,
+    bytes: Int,
+    modified_seconds: Int
+}
+pub struct Error { path: String, operation: String, reason: String }
+pub opaque struct Scan {
+    handle: ForeignHandle,
+    path: path::Path,
+    closed: List<Bool>
+}
+fn error<T>(location: String, operation: String, reason: String) -> Result<T, Error> {
+    return Result<T, Error>::Err(Error(path: location, operation: operation, reason: reason));
+}
+pub fn open(location: path::Path) -> Result<Scan, Error> effects { io, state } {
+    match path::checked(location.value) {
+        Result::Err(reason) => {
+            let message = match reason {
+                path::Error::Empty => "empty path",
+                path::Error::Nul => "NUL in path",
+                path::Error::Encoding(offset) => "invalid UTF-8 path at byte " + to_string(offset)
+            };
+            return error<Scan>(location.value, "open", message);
+        }
+        Result::Ok(_) => {}
+    }
+    match directory_open(location.value) {
+        StreamResult::Err(reason) => { return error<Scan>(location.value, "open", reason); }
+        StreamResult::Limit => { return error<Scan>(location.value, "open", "128 open directory limit"); }
+        StreamResult::Ok(handle) => {
+            let closed = list_new<Bool>(); list_push(closed, false);
+            return Result<Scan, Error>::Ok(Scan(handle: handle, path: location, closed: closed));
+        }
+    }
+}
+pub fn close(scan: Scan) -> Result<Bool, Error> effects { io, state } {
+    if list_get(scan.closed, 0) { return Result<Bool, Error>::Ok(true); }
+    let status = directory_close(scan.handle);
+    list_set(scan.closed, 0, true);
+    return match status {
+        WriteResult::Ok => Result<Bool, Error>::Ok(true),
+        WriteResult::Err(reason) => error<Bool>(scan.path.value, "close", reason)
+    };
+}
+fn integer(value: String) -> Int {
+    return match parse_int(value) { IntResult::Ok(n) => n, IntResult::Err(_) => -1 };
+}
+fn decode(scan: Scan, value: String) -> Result<Entry, Error> {
+    var first = -1; var second = -1; var third = -1;
+    for i in 0 .. str_len(value) {
+        if str_byte(value, i) == 9 {
+            if first < 0 { first = i; }
+            else if second < 0 { second = i; }
+            else { third = i; break; }
+        }
+    }
+    if first != 1 || second <= first + 1 || third <= second + 1 || third + 1 >= str_len(value) {
+        return error<Entry>(scan.path.value, "next", "invalid OS metadata envelope");
+    }
+    let name = str_slice(value, third + 1, str_len(value));
+    if text::invalid_offset(name) >= 0 {
+        return error<Entry>(scan.path.value, "next", "directory name is not UTF-8");
+    }
+    var kind = Kind::Other;
+    let tag = str_byte(value, 0);
+    if tag == 102 { kind = Kind::File; }
+    else if tag == 100 { kind = Kind::Directory; }
+    else if tag == 108 { kind = Kind::Link; }
+    else if tag != 111 { return error<Entry>(scan.path.value, "next", "unknown file kind"); }
+    let bytes = integer(str_slice(value, first + 1, second));
+    var modified = 0;
+    match parse_int(str_slice(value, second + 1, third)) {
+        IntResult::Ok(n) => { modified = n; }
+        IntResult::Err(reason) => { return error<Entry>(scan.path.value, "next", reason); }
+    }
+    if bytes < 0 { return error<Entry>(scan.path.value, "next", "invalid byte size"); }
+    match path::join(scan.path, path::Path(value: name)) {
+        Result::Err(_) => { return error<Entry>(scan.path.value, "next", "invalid entry path"); }
+        Result::Ok(joined) => {
+            return Result<Entry, Error>::Ok(Entry(name: name, path: joined, kind: kind,
+                bytes: bytes, modified_seconds: modified));
+        }
+    }
+}
+pub fn next(scan: Scan) -> Result<Option<Entry>, Error> effects { io, state } {
+    if list_get(scan.closed, 0) { return error<Option<Entry>>(scan.path.value, "next", "closed directory"); }
+    match directory_next(scan.handle) {
+        ReadResult::Err(reason) => { return error<Option<Entry>>(scan.path.value, "next", reason); }
+        ReadResult::Limit => { return error<Option<Entry>>(scan.path.value, "next", "metadata limit"); }
+        ReadResult::Ok(value) => {
+            if value == "" { return Result<Option<Entry>, Error>::Ok(Option<Entry>::None); }
+            let entry = decode(scan, value)?;
+            return Result<Option<Entry>, Error>::Ok(Option<Entry>::Some(entry));
+        }
+    }
+}
+// Collecting closes on EOF and on a read failure. A close failure takes priority;
+// the failing operation/path remain available in the Error.
+pub fn entries_bounded(location: path::Path, limit: Int) -> Result<List<Entry>, Error> effects { io, state } {
+    if limit < 0 || limit > 1000000 { return error<List<Entry>>(location.value, "entries", "invalid entry limit"); }
+    let scan = open(location)?;
+    let collected = list_new<Entry>();
+    while true {
+        match next(scan) {
+            Result::Err(reason) => { let closed = close(scan)?; return Result<List<Entry>, Error>::Err(reason); }
+            Result::Ok(found) => {
+                match found {
+                    Option::Some(entry) => {
+                        if list_len(collected) >= limit {
+                            let closed = close(scan)?;
+                            return error<List<Entry>>(entry.path.value, "entries", "entry limit exceeded");
+                        }
+                        list_push(collected, entry);
+                    }
+                    Option::None => { let closed = close(scan)?; return Result<List<Entry>, Error>::Ok(collected); }
+                }
+            }
+        }
+    }
+    return error<List<Entry>>(location.value, "entries", "enumeration ended unexpectedly");
+}
+pub fn entries(location: path::Path) -> Result<List<Entry>, Error> effects { io, state } {
+    return entries_bounded(location, 1000000);
+}
+pub struct Limits { depth: Int, entries: Int }
+pub struct WalkEntry { entry: Entry, relative: String, depth: Int }
+struct Pending { location: path::Path, relative: String, depth: Int }
+pub fn walk(root: path::Path, limits: Limits) -> Result<List<WalkEntry>, Error> effects { io, state } {
+    if limits.depth < 0 || limits.depth > 1024 || limits.entries < 1 || limits.entries > 1000000 {
+        return error<List<WalkEntry>>(root.value, "walk", "invalid traversal limits");
+    }
+    let pending = list_new<Pending>();
+    let collected = list_new<WalkEntry>();
+    list_push(pending, Pending(location: root, relative: "", depth: 0));
+    while list_len(pending) > 0 {
+        let position = list_len(pending) - 1;
+        let current = list_get(pending, position);
+        list_truncate(pending, position);
+        // The parent scan is fully closed before any child is opened.
+        let children = entries_bounded(current.location, limits.entries - list_len(collected))?;
+        for entry in children {
+            let depth = current.depth + 1;
+            if depth > limits.depth {
+                return error<List<WalkEntry>>(entry.path.value, "walk", "depth limit exceeded");
+            }
+            var relative = entry.name;
+            if current.relative != "" { relative = current.relative + "/" + entry.name; }
+            list_push(collected, WalkEntry(entry: entry, relative: relative, depth: depth));
+            if entry.kind == Kind::Directory {
+                list_push(pending, Pending(location: entry.path, relative: relative, depth: depth));
+            }
+        }
+    }
+    return Result<List<WalkEntry>, Error>::Ok(collected);
+}

@@ -1,0 +1,4 @@
+struct directory_open { value: Int }
+fn main() -> Unit effects { io } {
+    let item = directory_open(value: 42); print(item.value);
+}

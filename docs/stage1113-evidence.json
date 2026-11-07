@@ -1,0 +1,382 @@
+{
+  "schema_version": 1,
+  "stage": "1.1.3",
+  "status": "verified",
+  "contract": "contracts/LIBRARY-1.1.md",
+  "index_windows": {
+    "passed": 26,
+    "failed": 0,
+    "total": 26,
+    "checks": [
+      {
+        "name": "mixed-tree",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 53.7688
+      },
+      {
+        "name": "directory-query",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 23.897700000000015
+      },
+      {
+        "name": "case-sensitive-query",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.62009999999998
+      },
+      {
+        "name": "unicode-query",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.69749999999999
+      },
+      {
+        "name": "unmatched-query",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.728899999999953
+      },
+      {
+        "name": "empty-query",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.28860000000003
+      },
+      {
+        "name": "empty-tree",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.22969999999998
+      },
+      {
+        "name": "many-files",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 27.97879999999998
+      },
+      {
+        "name": "missing-root",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.907399999999996
+      },
+      {
+        "name": "file-root",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.74309999999997
+      },
+      {
+        "name": "missing-query-value",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.107399999999984
+      },
+      {
+        "name": "unknown-option",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.593700000000013
+      },
+      {
+        "name": "maintenance-text-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.461299999999994
+      },
+      {
+        "name": "maintenance-uppercase-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.983299999999986
+      },
+      {
+        "name": "maintenance-literal-without-dot",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.18300000000005
+      },
+      {
+        "name": "maintenance-empty-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.82510000000002
+      },
+      {
+        "name": "maintenance-query-and-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.143299999999954
+      },
+      {
+        "name": "maintenance-unicode-and-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.42459999999994
+      },
+      {
+        "name": "maintenance-unmatched-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.507799999999975
+      },
+      {
+        "name": "maintenance-missing-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.050000000000068
+      },
+      {
+        "name": "maintenance-repeat-two",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.827499999999986
+      },
+      {
+        "name": "maintenance-repeat-three",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.802900000000022
+      },
+      {
+        "name": "maintenance-repeat-zero",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.038400000000024
+      },
+      {
+        "name": "maintenance-repeat-high",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.323600000000056
+      },
+      {
+        "name": "maintenance-repeat-fraction",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.93259999999998
+      },
+      {
+        "name": "maintenance-repeat-missing",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.325800000000072
+      }
+    ],
+    "fixtures_summary": {
+      "baseline": {
+        "suite_version": "pilot-1",
+        "task": "index",
+        "root": "G:\\Vela\\build\\stage11\\index-oracle\\fixtures-baseline-index-uH0dk6",
+        "cases": 12,
+        "valid_cases": 8,
+        "invalid_cases": 4
+      },
+      "maintenance": {
+        "suite_version": "pilot-1",
+        "maintenance_version": "pilot-maintenance-2-repeat",
+        "task": "index",
+        "root": "G:\\Vela\\build\\stage11\\index-oracle\\fixtures-maintenance-index-EWomnr",
+        "cases": 14,
+        "valid_cases": 9,
+        "invalid_cases": 5
+      }
+    }
+  },
+  "index_linux": {
+    "platform": "Linux ELF in VelaRelease100; fixtures on /mnt/g",
+    "task": "index",
+    "passed": 26,
+    "failed": 0,
+    "total": 26,
+    "checks": [
+      {
+        "name": "baseline-mixed-tree",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 644.7216999999999
+      },
+      {
+        "name": "baseline-directory-query",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 142.7459
+      },
+      {
+        "name": "baseline-case-sensitive-query",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 124.18349999999998
+      },
+      {
+        "name": "baseline-unicode-query",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 149.5635000000001
+      },
+      {
+        "name": "baseline-unmatched-query",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 139.88639999999987
+      },
+      {
+        "name": "baseline-empty-query",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 147.7308999999998
+      },
+      {
+        "name": "baseline-empty-tree",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 116.5440000000001
+      },
+      {
+        "name": "baseline-many-files",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 537.8806
+      },
+      {
+        "name": "baseline-missing-root",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 122.60930000000008
+      },
+      {
+        "name": "baseline-file-root",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 98.17329999999993
+      },
+      {
+        "name": "baseline-missing-query-value",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 101.69459999999981
+      },
+      {
+        "name": "baseline-unknown-option",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 118.73379999999997
+      },
+      {
+        "name": "maintenance-text-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 113.83170000000018
+      },
+      {
+        "name": "maintenance-uppercase-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 124.21050000000014
+      },
+      {
+        "name": "maintenance-literal-without-dot",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 117.61720000000014
+      },
+      {
+        "name": "maintenance-empty-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 119.97119999999995
+      },
+      {
+        "name": "maintenance-query-and-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 127.01270000000022
+      },
+      {
+        "name": "maintenance-unicode-and-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 109.01510000000007
+      },
+      {
+        "name": "maintenance-unmatched-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 106.01130000000012
+      },
+      {
+        "name": "maintenance-missing-suffix",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 120.74060000000009
+      },
+      {
+        "name": "maintenance-repeat-two",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 124.56470000000036
+      },
+      {
+        "name": "maintenance-repeat-three",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 136.30189999999993
+      },
+      {
+        "name": "maintenance-repeat-zero",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 98.95060000000012
+      },
+      {
+        "name": "maintenance-repeat-high",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 107.20149999999967
+      },
+      {
+        "name": "maintenance-repeat-fraction",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 119.93530000000055
+      },
+      {
+        "name": "maintenance-repeat-missing",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 101.93209999999999
+      }
+    ]
+  },
+  "repeat": {
+    "passed": true,
+    "repeat": 1000,
+    "observed_new_entry": true,
+    "observed_changed_content": true,
+    "work": "G:\\Vela\\build\\stage11\\index-repeat-ifBsnL"
+  },
+  "focused": {
+    "linux": "ext4 binary file: bytes=5 lines=2; depth 160 success /159 rejection",
+    "gc": {
+      "collections": 1551162,
+      "peak": 5692
+    },
+    "links": "Windows junction and Linux symlink not descended",
+    "log": "build/stage11/1.1.3-linux-ext4.log",
+    "native": "walk fixture and formatted fixture"
+  },
+  "platform_note": "Frozen Linux oracle runs ELF under WSL via optional Node integration harness; fixtures on /mnt/g. Additional native ext4 fixtures are separate.",
+  "next": "1.1.4",
+  "verify": {
+    "failed": 0,
+    "log": "build/stage11/1.1.3-verify.log",
+    "skipped": 0,
+    "command": ".\\vela-dev.cmd verify",
+    "compiler_fixed_point": true,
+    "bundler_fixed_point": true,
+    "passed": 1224
+  },
+  "mcp_setup": "build/stage11/1.1.3-mcp-setup.log: passed"
+}

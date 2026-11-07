@@ -1,0 +1,29 @@
+import "../../std/json_stream.vela" as stream;
+fn must<T, E>(value: Result<T, E>) -> T { match value { Result::Ok(v) => { return v; } Result::Err(_) => { assert_true(false, "JSON GC probe"); } } return must(value); }
+fn iteration(data: String) -> Unit effects { state } {
+    let reader = must(stream::create(data, stream::default_limits()));
+    let alias = reader;
+    let skipped = must(stream::skip_value(alias));
+    let complete = must(stream::finish(reader));
+}
+fn retained() -> stream::Number effects { state } {
+    let data = "1234" + to_string(56789) + "e0";
+    let reader = must(stream::create(data, stream::default_limits()));
+    match must(stream::next(reader)) {
+        Option::Some(found) => { match found.event {
+            stream::Event::NumberLiteral(n) => { return n; }
+            stream::Event::ObjectStart => {} stream::Event::ObjectEnd => {} stream::Event::ArrayStart => {} stream::Event::ArrayEnd => {}
+            stream::Event::Key(_) => {} stream::Event::StringValue(_) => {} stream::Event::Boolean(_) => {} stream::Event::Null => {}
+        } }
+        Option::None => {}
+    }
+    assert_true(false, "number retention probe"); return retained();
+}
+fn main() -> Unit effects { state, io } {
+    let number = retained();
+    var nested = "{\"unknown\":[1e9999,999999999999999999999999]}";
+    for i in 0 .. 64 { nested = "[" + nested + "]"; }
+    for i in 0 .. 16 { iteration(nested); }
+    assert_true(stream::spelling(number) == "123456789e0" && must(stream::floating(number)) == 123456789.0, "dynamic input survives reader lifetime and GC");
+    print("JSON GC stress passed");
+}

@@ -1,0 +1,463 @@
+{
+  "schema_version": 1,
+  "stage": "1.1.5",
+  "status": "verified",
+  "contract": "contracts/LIBRARY-1.1.md",
+  "compatibility": "curl preserves documented 1.0 combined deadline; opt-in curl_transfer separates exact --max-time from helper +1000ms budget",
+  "pilot": {
+    "passed": 44,
+    "failed": 0,
+    "total": 44,
+    "checks": [
+      {
+        "name": "empty-list",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 23.242399999999996
+      },
+      {
+        "name": "status-and-byte-counts",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 176.13689999999997
+      },
+      {
+        "name": "preserve-input-order",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 208.67470000000003
+      },
+      {
+        "name": "bounded-concurrency",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 855.5752
+      },
+      {
+        "name": "serial-concurrency",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 293.2552999999998
+      },
+      {
+        "name": "duplicate-urls",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 150.16229999999996
+      },
+      {
+        "name": "timeout",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 149.62570000000005
+      },
+      {
+        "name": "body-timeout",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 153.2550000000001
+      },
+      {
+        "name": "dropped-connection",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 74.90650000000005
+      },
+      {
+        "name": "queue-time-not-timeout",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 557.5081999999998
+      },
+      {
+        "name": "invalid-json",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.046100000000024
+      },
+      {
+        "name": "not-object",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.808899999999994
+      },
+      {
+        "name": "missing-urls",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.21230000000014
+      },
+      {
+        "name": "urls-not-array",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.002600000000257
+      },
+      {
+        "name": "url-not-string",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.741199999999935
+      },
+      {
+        "name": "missing-concurrency",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.79359999999997
+      },
+      {
+        "name": "concurrency-zero",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.965400000000045
+      },
+      {
+        "name": "concurrency-nine",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 18.8132999999998
+      },
+      {
+        "name": "concurrency-fraction",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.254199999999855
+      },
+      {
+        "name": "concurrency-decimal-literal",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.284400000000005
+      },
+      {
+        "name": "timeout-exponent-literal",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 24.579400000000078
+      },
+      {
+        "name": "concurrency-bool",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.53839999999991
+      },
+      {
+        "name": "missing-timeout",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.20119999999997
+      },
+      {
+        "name": "timeout-low",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.080599999999777
+      },
+      {
+        "name": "timeout-high",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.63059999999996
+      },
+      {
+        "name": "timeout-string",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.53150000000005
+      },
+      {
+        "name": "timeout-null",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.221799999999803
+      },
+      {
+        "name": "late-invalid-url",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 18.927799999999934
+      },
+      {
+        "name": "extra-argument",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 18.409999999999854
+      },
+      {
+        "name": "maintenance-flag-empty",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.27290000000039
+      },
+      {
+        "name": "maintenance-flag-all-success",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 141.8148000000001
+      },
+      {
+        "name": "maintenance-flag-http-error",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 91.28819999999996
+      },
+      {
+        "name": "maintenance-flag-server-error",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 58.653999999999996
+      },
+      {
+        "name": "maintenance-flag-network-error",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 70.92439999999988
+      },
+      {
+        "name": "maintenance-flag-timeout",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 153.4097999999999
+      },
+      {
+        "name": "maintenance-no-flag-http-error",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 62.07499999999982
+      },
+      {
+        "name": "maintenance-flag-takes-no-value",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.03859999999986
+      },
+      {
+        "name": "maintenance-repeat-two",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 126.45080000000007
+      },
+      {
+        "name": "maintenance-repeat-three",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 183.471
+      },
+      {
+        "name": "maintenance-repeat-earlier-failure",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 155.56870000000026
+      },
+      {
+        "name": "maintenance-repeat-zero",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.42159999999967
+      },
+      {
+        "name": "maintenance-repeat-high",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 19.770300000000134
+      },
+      {
+        "name": "maintenance-repeat-fraction",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.982499999999163
+      },
+      {
+        "name": "maintenance-repeat-missing",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.047899999999572
+      }
+    ],
+    "fixtures_summary": {
+      "baseline": {
+        "suite_version": "pilot-1",
+        "task": "http",
+        "root": "G:\\Vela\\build\\stage11\\http-oracle-final\\fixtures-baseline-http-j8Eli3",
+        "cases": 29,
+        "valid_cases": 10,
+        "invalid_cases": 19
+      },
+      "maintenance": {
+        "suite_version": "pilot-1",
+        "maintenance_version": "pilot-maintenance-2-repeat",
+        "task": "http",
+        "root": "G:\\Vela\\build\\stage11\\http-oracle-final\\fixtures-maintenance-http-xzqFY2",
+        "cases": 15,
+        "valid_cases": 10,
+        "invalid_cases": 5
+      }
+    }
+  },
+  "deadlines": {
+    "passed": 10,
+    "failed": 0,
+    "checks": [
+      {
+        "name": "legacy",
+        "passed": true,
+        "elapsed_ms": 281.38390000000004
+      },
+      {
+        "name": "transfer",
+        "passed": true,
+        "elapsed_ms": 254.00449999999995
+      },
+      {
+        "name": "cleanup",
+        "passed": true,
+        "elapsed_ms": 246.2119
+      },
+      {
+        "name": "headers",
+        "passed": true,
+        "elapsed_ms": 249.12369999999999
+      },
+      {
+        "name": "body",
+        "passed": true,
+        "elapsed_ms": 250.42650000000003
+      },
+      {
+        "name": "cancel",
+        "passed": true,
+        "elapsed_ms": 359.77919999999995
+      },
+      {
+        "name": "hang",
+        "passed": true,
+        "elapsed_ms": 1103.3519
+      },
+      {
+        "name": "128 URLs /concurrency 8 /50 ms",
+        "passed": true,
+        "peak": 3,
+        "elapsed_ms": 4017.4226999999996
+      },
+      {
+        "name": "/headers-app50ms",
+        "passed": true,
+        "elapsed_ms": 124.61560000000009
+      },
+      {
+        "name": "/body-app50ms",
+        "passed": true,
+        "elapsed_ms": 122.23540000000048
+      }
+    ],
+    "root": "G:\\Vela\\build\\stage11\\http-deadlines-OWhzmE",
+    "curl_version": "curl 8.22.0 (Windows) libcurl/8.22.0 Schannel zlib/1.3.2 WinIDN WinLDAP"
+  },
+  "http_tls_legacy": {
+    "schema_version": 1,
+    "version": "curl 8.22.0 (Windows) libcurl/8.22.0 Schannel zlib/1.3.2 WinIDN WinLDAP",
+    "passed": 19,
+    "checks": [
+      "binary body",
+      "empty body",
+      "HTTP 404",
+      "redirect not followed",
+      "body at limit",
+      "declared body over limit",
+      "unknown-length body over limit",
+      "truncated transfer",
+      "stalled response deadline",
+      "cancel during transfer",
+      "TLS with fixture trust",
+      "untrusted TLS certificate",
+      "TLS hostname mismatch",
+      "post binary body and immutable headers",
+      "put binary body and immutable headers",
+      "delete binary body and immutable headers",
+      "HEAD omits body despite large representation length",
+      "POST cancel releases upload staging",
+      "failed scheduling removes upload staging"
+    ]
+  },
+  "http_tls_transfer": {
+    "schema_version": 1,
+    "version": "curl 8.22.0 (Windows) libcurl/8.22.0 Schannel zlib/1.3.2 WinIDN WinLDAP",
+    "passed": 19,
+    "checks": [
+      "binary body",
+      "empty body",
+      "HTTP 404",
+      "redirect not followed",
+      "body at limit",
+      "declared body over limit",
+      "unknown-length body over limit",
+      "truncated transfer",
+      "stalled response deadline",
+      "cancel during transfer",
+      "TLS with fixture trust",
+      "untrusted TLS certificate",
+      "TLS hostname mismatch",
+      "post binary body and immutable headers",
+      "put binary body and immutable headers",
+      "delete binary body and immutable headers",
+      "HEAD omits body despite large representation length",
+      "POST cancel releases upload staging",
+      "failed scheduling removes upload staging"
+    ]
+  },
+  "server": {
+    "passed": 16,
+    "concurrent": true,
+    "binary": true,
+    "bodyBytes": 1048576,
+    "head": true,
+    "contentType": true
+  },
+  "apps": {
+    "fielddesk": 8,
+    "pulsedeck": 21,
+    "staging": "build/stage11/app-regressions",
+    "historical_sources_locks_reports": "preserved; SDK copied and app copies relocked/rebuilt for tests"
+  },
+  "native": "pure factory validation original/formatted via runner",
+  "next": "1.1.6",
+  "binding_compatibility": {
+    "focused": [
+      "local functions and callable values",
+      "type names",
+      "qualified and unqualified imports",
+      "SDK primitive lookup still works in imported directory module",
+      "legacy print declaration remains E202",
+      "ambiguous imports remain E222",
+      "symbols JSON byte-identical to archived 1.0",
+      "query definitions/references identical"
+    ],
+    "logs": [
+      "build/stage11/1.1.5-old-symbols.json",
+      "build/stage11/1.1.5-new-symbols.json",
+      "build/stage11/1.1.5-old-query.json",
+      "build/stage11/1.1.5-new-query.json"
+    ],
+    "baseline": "Archived dist/vela-1.0.0-windows-x64.zip compiler accepts probe",
+    "fix": "Catalog since>=1.1 functions are fallbacks; own/imported declarations retain priority; internal root identities are hidden in public output",
+    "regression": "New 1.1 builtins initially rejected valid 1.0 directory_open declaration (E202)"
+  },
+  "first_verify": {
+    "passed": 1230,
+    "log": "build/stage11/1.1.5-verify.log",
+    "status": "passed before additional compatibility fix; final verify required",
+    "skipped": 0,
+    "failed": 0
+  },
+  "verify": {
+    "skipped": 0,
+    "failed": 0,
+    "passed": 1240,
+    "command": ".\\vela-dev.cmd verify",
+    "bundler_fixed_point": true,
+    "compiler_fixed_point": true,
+    "log": "build/stage11/1.1.5-verify-final.log"
+  },
+  "mcp_setup": "build/stage11/1.1.5-mcp-setup.log: passed including old declaration and public symbols",
+  "binding_linux": "build/stage11/1.1.5-binding-linux.log: passed"
+}

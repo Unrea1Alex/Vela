@@ -9,15 +9,24 @@ build driver and test runner are written in Vela. The language makes types,
 side effects and error paths visible so that people and agents can reason about
 a small piece of code from its local context.
 
-**Vela 1.0.0** freezes the language, core standard library, project format,
-public FFI and tooling contracts. It includes typed async tasks, awaitable
-HTTP/process operations, a shared Windows GUI library, observable compiler
-caching and packaged resources. The compiler and a clean C-recovered build each
-passed **1214 native checks**. See the [acceptance report](docs/VALIDATION-1.0.md),
-[API contract](docs/contracts/STABLE-1.0.md), [compatibility policy](docs/COMPATIBILITY.md)
-and [migration from 0.11](docs/MIGRATING-1.0.md).
+**Vela 1.1.0** adds bounded native directory traversal on Windows /
+Linux, a selective JSON pull reader and opt-in complete-transfer HTTP deadlines.
+It includes working file-index, NDJSON-summary and HTTP-collector applications.
+The compiler and a clean C-recovered build each passed **1240 native checks**;
+three independent agents each passed 12 initial and 26 maintenance indexer checks.
+The 1.0 language/source/project/lock/FFI baseline is retained. See the
+[1.1 contract](docs/contracts/LIBRARY-1.1.md) and [acceptance](docs/VALIDATION-1.1.md)
+for platform scope and measured results. Verified local archives are
+`vela-1.1.0-windows-x64.zip`, `vela-1.1.0-linux-x64-musl.tar.gz`, and
+`vela-mcp-1.1.0.zip` under `dist/`, with `SHA256SUMS-1.1.0.txt`.
 
-## Download 1.0.0
+The [stable 1.0 API contract](docs/contracts/STABLE-1.0.md),
+[compatibility policy](docs/COMPATIBILITY.md) and
+[migration from 0.11](docs/MIGRATING-1.0.md) remain in force. Typed async tasks,
+awaitable HTTP/process operations, the shared Windows GUI library, observable
+compiler caching and packaged resources are retained.
+
+## Published 1.0.0 archives
 
 | Package | Target |
 |---|---|
@@ -178,7 +187,8 @@ GUI forms API is Windows-only; portable widgets remain future work.
 
 The [roadmap](docs/ROADMAP.md) records the next development steps and release gates.
 Use the compiler, documentation and MCP manifest from the same checkout.
-The `vela/` Python frontend is a historical 0.2 reference; active development and
-verification use the native Vela tools.
+The compiler, bootstrap and verification use native Vela tools. The historical
+Python 0.2 implementation has been removed from the current source tree; it remains
+in Git history. The `vela/` directory contains the active builtin catalog and C runtime/FFI headers.
 
 Vela is available under the [MIT license](LICENSE).

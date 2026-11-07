@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "maintenance": "remove historical Python and obsolete generated files",
+  "date": "2026-11-07",
+  "status": "verified",
+  "release_archives_replaced": false,
+  "language_or_runtime_changed": false,
+  "cleanup": {
+    "status": "deleted",
+    "targets": 365,
+    "files": 123061.0,
+    "bytes": 10170567480.0,
+    "python_files": 24,
+    "wsl_preserved": true
+  },
+  "protected": {
+    "protected_sources_unchanged": 6,
+    "release_files_unchanged": 46,
+    "wsl_disk_unchanged": true,
+    "wsl_registration_preserved": true,
+    "compiler_sha256": "44e1ebb05bc9e650024df71dec941f7dd20f057e2fa4a45961f6e008a4514b1b"
+  },
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1214,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.0.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 455833,
+    "tests_run": true
+  },
+  "c_recovery": {
+    "second_clean_native_run": false,
+    "compiled": true,
+    "emitted_c_identical": true,
+    "agent_idioms_checked": true
+  },
+  "stable": {
+    "files": 84,
+    "changed_files": [
+      "docs/BUILTINS.md",
+      "docs/PROJECTS.md",
+      "docs/TOOLING.md",
+      "docs/contracts/BUILD-PROTOCOL.md"
+    ],
+    "negative_checks": 2
+  },
+  "mcp": {
+    "cancellations": 25,
+    "sdk_groups": 5,
+    "outputs": 22,
+    "typescript_build": "passed",
+    "execution": 26,
+    "faults": 11,
+    "isolation": 26,
+    "execution_cache_files": 3219,
+    "sequential": 1000
+  },
+  "lsp": {
+    "sources_unchanged": true,
+    "requests": 600,
+    "modes": [
+      "test",
+      "methods",
+      "interfaces",
+      "callables",
+      "test-root-scope"
+    ]
+  },
+  "packaging": {
+    "stage_only": "passed",
+    "duplicate_staging_removed": true,
+    "fingerprints": "matched"
+  },
+  "skill": {
+    "frontmatter": "passed",
+    "independent_agent_workflow_rerun": false,
+    "setup_sdk": "passed"
+  },
+  "directory_sizes": [
+    {
+      "Path": "build",
+      "BeforeBytes": 5453392837.0,
+      "AfterBytes": 1367740722.0,
+      "Files": 4351
+    },
+    {
+      "Path": "work",
+      "BeforeBytes": 5075385750.0,
+      "AfterBytes": null,
+      "Files": 0
+    },
+    {
+      "Path": "apps/measurelab/build",
+      "BeforeBytes": 5779170.0,
+      "AfterBytes": null,
+      "Files": 0
+    },
+    {
+      "Path": "apps/pulse-deck/work",
+      "BeforeBytes": 26328478.0,
+      "AfterBytes": null,
+      "Files": 0
+    }
+  ],
+  "measured_temporary_directory_reduction_bytes": 9193145513.0,
+  "unperformed": [
+    "Linux rebuild",
+    "interactive GUI/DPI",
+    "fresh OS installation",
+    "external agent client workflow"
+  ],
+  "logs": "build/cleanup-1.0",
+  "documentation": {
+    "schema_version": 1,
+    "files": 100,
+    "links": 665,
+    "missing": []
+  }
+}

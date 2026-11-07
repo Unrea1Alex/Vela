@@ -1,0 +1,7 @@
+// Fault injection only: deliberately does not implement curl's transfer timeout.
+fn main() -> Unit effects { io } {
+    for i in 0 .. 10 {
+        let slept = host_sleep(1000);
+        assert_true(match slept { WriteResult::Ok => true, WriteResult::Err(_) => false }, "fault helper sleep");
+    }
+}

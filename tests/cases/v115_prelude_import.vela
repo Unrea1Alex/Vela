@@ -1,0 +1,5 @@
+import "prelude-fallback-owner.vela" as owner;
+import "prelude-fallback-owner.vela";
+fn main() -> Unit effects { io } {
+    print(owner::directory_open()); print(directory_next(2)); print(directory_close());
+}

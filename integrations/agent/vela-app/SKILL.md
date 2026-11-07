@@ -3,9 +3,11 @@ name: vela-app
 description: Write, check and fix applications in the Vela programming language using the installed native toolchain and its matching language help. Use for Vela source or project work, not compiler development.
 ---
 
-For Vela 1.0, the stable API index is `docs/contracts/STABLE-1.0.md` in the
+For Vela 1.1, the stable 1.0 baseline API index is `docs/contracts/STABLE-1.0.md` in the
 native installation. Use version-matched help and platform capabilities; public
 FFI ABI 1 is separate from internal runtime ABI 2.
+Use the native `vela`/`velac` CLI or MCP tools. The historical Python 0.2
+implementation and entry point are no longer shipped in the current source tree.
 Match-expression arms accept expressions. For early return or a block of statements,
 use a match statement rather than placing a block in a match expression.
 When updating a 0.11 app, read `docs/MIGRATING-1.0.md`: server Response now needs
@@ -159,3 +161,13 @@ then await `async_io::fetch` or `async_io::run_process`. The host drives one
 group, calls shutdown and ticks until idle. Task outcomes wait for child cleanup;
 inspect typed operation/cleanup errors. This does not permit arbitrary blocking
 calls in async bodies. Keep released 0.11 examples on their older explicit loop API.
+
+With the 1.1 SDK, use the installed directory module for enumeration. entries_bounded returns typed metadata and closes automatically; open/next/close permits incremental processing. Always close on early return. OS order is unspecified and links are reported without traversal. Binary content belongs in fs::read_bytes, not read_text.
+
+For recursive traversal use directory::walk with explicit Limits(depth, entries). WalkEntry.relative has slash separators, depth starts at one for direct children, and links are never followed. Sort output explicitly. The tree-index example re-enumerates/re-reads every repetition and publishes once with fs::write_atomic.
+
+For selective JSON/NDJSON with large ignored numbers or nesting beyond 128, use the 1.1 json_stream module. create takes Limits(bytes, depth, nodes); next exposes tokens; read_string/read_integer check requested fields; skip_value validates unknown fields without numeric conversion. finish validates any remainder/trailing data. Never ignore malformed unknown data. Number spelling/is_integer distinguishes integer literals from 1.0/1e0; integer/floating report range errors. Reader aliases share progress. Match enumerates every Event variant; underscore may discard a payload, not stand for remaining variants. if and while are statements, not expressions.
+
+For complete-transfer HTTP deadlines in 1.1 use http::curl_transfer; the older curl factory retains the 1.0 combined launch/transfer deadline. Request timeout is unchanged in curl --max-time, and the helper receives a separate bounded 1000 ms overhead allowance. Acquire a slot before Transport.start. Always drive cancellation to terminal and release; cleanup errors are Storage and can be retried after resolving the cause.
+
+New builtin functions added since 1.1 do not reserve old application declaration names. Own declarations and visible imports take precedence; use the directory module normally even if the application already has a function named directory_open. Existing 1.0 builtin-name reservations remain unchanged.

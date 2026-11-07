@@ -1,0 +1,637 @@
+import "text.vela" as text;
+pub struct Limits {
+    bytes: Int,
+    depth: Int,
+    nodes: Int
+}
+pub enum ErrorKind {
+    InvalidLimits,
+    ByteLimit,
+    DepthLimit,
+    NodeLimit,
+    Encoding,
+    Syntax,
+    Type,
+    Range
+}
+pub struct Error {
+    offset: Int,
+    path: String,
+    kind: ErrorKind,
+    message: String
+}
+pub opaque struct Number {
+    raw: String,
+    integral: Bool,
+    offset: Int,
+    path: String
+}
+pub enum Event {
+    ObjectStart,
+    ObjectEnd,
+    ArrayStart,
+    ArrayEnd,
+    Key(String),
+    StringValue(String),
+    NumberLiteral(Number),
+    Boolean(Bool),
+    Null
+}
+pub struct Token {
+    event: Event,
+    offset: Int,
+    path: String
+}
+struct Frame {
+    object: Bool,
+    state: Int,
+    index: Int,
+    segment: String,
+    member: String,
+    seen: Dict<String, Bool>
+}
+pub opaque struct Reader {
+    data: String,
+    limits: Limits,
+    cursor: List<Int>,
+    frames: List<Frame>,
+    started: List<Bool>,
+    done: List<Bool>,
+    nodes: List<Int>,
+    failure: List<Error>
+}
+pub fn default_limits() -> Limits {
+    return Limits(bytes: 16777216, depth: 4096, nodes: 1000000);
+}
+pub fn describe(error: Error) -> String {
+    return error.path + " at byte " + to_string(error.offset) + ": " + error.message;
+}
+pub fn create(data: String, limits: Limits) -> Result<Reader, Error> effects { state } {
+    if limits.bytes < 0 || limits.bytes > 16777216 || limits.depth < 0 || limits.depth > 4096
+        || limits.nodes < 1 || limits.nodes > 1000000 {
+        return Result<Reader, Error>::Err(Error(offset: 0, path: "$",
+            kind: ErrorKind::InvalidLimits, message: "invalid JSON reader limits"));
+    }
+    if str_len(data) > limits.bytes {
+        return Result<Reader, Error>::Err(Error(offset: limits.bytes, path: "$",
+            kind: ErrorKind::ByteLimit, message: "JSON byte limit exceeded"));
+    }
+    let invalid = text::invalid_offset(data);
+    if invalid >= 0 {
+        return Result<Reader, Error>::Err(Error(offset: invalid, path: "$",
+            kind: ErrorKind::Encoding, message: "invalid UTF-8"));
+    }
+    let cursor = list_new<Int>();
+    list_push(cursor, 0);
+    let started = list_new<Bool>();
+    list_push(started, false);
+    let done = list_new<Bool>();
+    list_push(done, false);
+    let nodes = list_new<Int>();
+    list_push(nodes, 0);
+    return Result<Reader, Error>::Ok(Reader(data: data, limits: limits, cursor: cursor,
+        frames: list_new<Frame>(), started: started, done: done, nodes: nodes,
+        failure: list_new<Error>()));
+}
+fn position(reader: Reader) -> Int effects { state } {
+    return list_get(reader.cursor, 0);
+}
+fn move(reader: Reader, value: Int) -> Unit effects { state } {
+    list_set(reader.cursor, 0, value);
+}
+fn peek(reader: Reader) -> Int effects { state } {
+    if position(reader) >= str_len(reader.data) {
+        return -1;
+    }
+    return str_byte(reader.data, position(reader));
+}
+fn whitespace(reader: Reader) -> Unit effects { state } {
+    while peek(reader) == 32 || peek(reader) == 9 || peek(reader) == 10 || peek(reader) == 13 {
+        move(reader, position(reader) + 1);
+    }
+}
+fn take(reader: Reader, byte: Int) -> Bool effects { state } {
+    if peek(reader) != byte {
+        return false;
+    }
+    move(reader, position(reader) + 1);
+    return true;
+}
+fn quote(value: String) -> String effects { state } {
+    let parts = strings_new();
+    strings_push(parts, "\"");
+    var start = 0;
+    let digits = "0123456789abcdef";
+    for i in 0 .. str_len(value) {
+        let byte = str_byte(value, i);
+        if byte == 34 || byte == 92 || byte < 32 {
+            strings_push(parts, str_slice(value, start, i));
+            if byte < 32 {
+                strings_push(parts, "\\u00" + str_slice(digits, byte / 16, byte / 16 + 1)
+                    + str_slice(digits, byte % 16, byte % 16 + 1));
+            } else {
+                strings_push(parts, "\\" + str_from_byte(byte));
+            }
+            start = i + 1;
+        }
+    }
+    strings_push(parts, str_slice(value, start, str_len(value)));
+    strings_push(parts, "\"");
+    return strings_join(parts, "");
+}
+fn location(reader: Reader, leaf: String) -> String effects { state } {
+    let parts = strings_new();
+    strings_push(parts, "$");
+    for frame in reader.frames {
+        strings_push(parts, frame.segment);
+    }
+    strings_push(parts, leaf);
+    return strings_join(parts, "");
+}
+fn fail<T>(reader: Reader, kind: ErrorKind, offset: Int, leaf: String, message: String) -> Result<T,
+    Error> effects { state } {
+    let error = Error(offset: offset, path: location(reader, leaf), kind: kind, message: message);
+    if list_len(reader.failure) == 0 {
+        list_push(reader.failure, error);
+    }
+    return Result<T, Error>::Err(error);
+}
+fn token(reader: Reader, event: Event, offset: Int, leaf: String,
+    paths: Bool) -> Token effects { state } {
+    var path_value = "";
+    if paths {
+        path_value = location(reader, leaf);
+    }
+    return Token(event: event, offset: offset, path: path_value);
+}
+fn hex(byte: Int) -> Int {
+    if byte >= 48 && byte <= 57 {
+        return byte - 48;
+    }
+    if byte >= 65 && byte <= 70 {
+        return byte - 65 + 10;
+    }
+    if byte >= 97 && byte <= 102 {
+        return byte - 97 + 10;
+    }
+    return -1;
+}
+fn hex4(reader: Reader, leaf: String) -> Result<Int, Error> effects { state } {
+    var value = 0;
+    for i in 0 .. 4 {
+        let digit = hex(peek(reader));
+        if digit < 0 {
+            return fail<Int>(reader, ErrorKind::Syntax, position(reader), leaf,
+                "expected four hex digits");
+        }
+        value = value * 16 + digit;
+        move(reader, position(reader) + 1);
+    }
+    return Result<Int, Error>::Ok(value);
+}
+fn string_value(reader: Reader, leaf: String) -> Result<String, Error> effects { state } {
+    if !take(reader, 34) {
+        return fail<String>(reader, ErrorKind::Syntax, position(reader), leaf, "expected string");
+    }
+    let parts = strings_new();
+    var start = position(reader);
+    while peek(reader) >= 0 {
+        let byte = peek(reader);
+        if byte == 34 {
+            strings_push(parts, str_slice(reader.data, start, position(reader)));
+            move(reader, position(reader) + 1);
+            return Result<String, Error>::Ok(strings_join(parts, ""));
+        }
+        if byte < 32 {
+            return fail<String>(reader, ErrorKind::Syntax, position(reader), leaf,
+                "unescaped control character");
+        }
+        if byte != 92 {
+            move(reader, position(reader) + 1);
+            continue;
+        }
+        strings_push(parts, str_slice(reader.data, start, position(reader)));
+        move(reader, position(reader) + 1);
+        let escape_at = position(reader);
+        let escape = peek(reader);
+        if escape < 0 {
+            return fail<String>(reader, ErrorKind::Syntax, escape_at, leaf, "incomplete escape");
+        }
+        move(reader, position(reader) + 1);
+        var piece = "";
+        if escape == 34 || escape == 92 || escape == 47 {
+            piece = str_from_byte(escape);
+        } else if escape == 98 {
+            piece = str_from_byte(8);
+        } else if escape == 102 {
+            piece = str_from_byte(12);
+        } else if escape == 110 {
+            piece = "\n";
+        } else if escape == 114 {
+            piece = "\r";
+        } else if escape == 116 {
+            piece = "\t";
+        } else if escape == 117 {
+            var cp = hex4(reader, leaf)?;
+            if cp >= 55296 && cp <= 56319 {
+                if !take(reader, 92) || !take(reader, 117) {
+                    return fail<String>(reader, ErrorKind::Syntax, position(reader), leaf,
+                        "missing low surrogate");
+                }
+                let low = hex4(reader, leaf)?;
+                if low < 56320 || low > 57343 {
+                    return fail<String>(reader, ErrorKind::Syntax, position(reader) - 4, leaf,
+                        "invalid low surrogate");
+                }
+                cp = 65536 + (cp - 55296) * 1024 + low - 56320;
+            }
+            match text::codepoint(cp) {
+                Result::Ok(value) => {
+                    piece = value.data;
+                }
+                Result::Err(_) => {
+                    return fail<String>(reader, ErrorKind::Syntax, escape_at, leaf,
+                        "invalid Unicode scalar");
+                }
+            }
+        } else {
+            return fail<String>(reader, ErrorKind::Syntax, escape_at, leaf, "invalid escape");
+        }
+        strings_push(parts, piece);
+        start = position(reader);
+    }
+    return fail<String>(reader, ErrorKind::Syntax, position(reader), leaf, "unterminated string");
+}
+fn digit(byte: Int) -> Bool {
+    return byte >= 48 && byte <= 57;
+}
+fn boundary(reader: Reader, leaf: String) -> Result<Bool, Error> effects { state } {
+    let byte = peek(reader);
+    if byte == -1 || byte == 32 || byte == 9 || byte == 10 || byte == 13 || byte == 44 || byte == 93
+        || byte == 125 {
+        return Result<Bool, Error>::Ok(true);
+    }
+    return fail<Bool>(reader, ErrorKind::Syntax, position(reader), leaf, "invalid value delimiter");
+}
+fn number(reader: Reader, leaf: String, paths: Bool) -> Result<Token, Error> effects { state } {
+    let start = position(reader);
+    let negative = take(reader, 45);
+    if take(reader, 48) {
+        if digit(peek(reader)) {
+            return fail<Token>(reader, ErrorKind::Syntax, position(reader), leaf, "leading zero");
+        }
+    } else {
+        if peek(reader) < 49 || peek(reader) > 57 {
+            return fail<Token>(reader, ErrorKind::Syntax, position(reader), leaf,
+                "expected number");
+        }
+        while digit(peek(reader)) {
+            move(reader, position(reader) + 1);
+        }
+    }
+    var integral = true;
+    if take(reader, 46) {
+        integral = false;
+        if !digit(peek(reader)) {
+            return fail<Token>(reader, ErrorKind::Syntax, position(reader), leaf,
+                "expected fraction");
+        }
+        while digit(peek(reader)) {
+            move(reader, position(reader) + 1);
+        }
+    }
+    if peek(reader) == 101 || peek(reader) == 69 {
+        integral = false;
+        move(reader, position(reader) + 1);
+        if peek(reader) == 43 || peek(reader) == 45 {
+            move(reader, position(reader) + 1);
+        }
+        if !digit(peek(reader)) {
+            return fail<Token>(reader, ErrorKind::Syntax, position(reader), leaf,
+                "expected exponent");
+        }
+        while digit(peek(reader)) {
+            move(reader, position(reader) + 1);
+        }
+    }
+    let checked = boundary(reader, leaf)?;
+    var path_value = "";
+    if paths {
+        path_value = location(reader, leaf);
+    }
+    let value = Number(raw: str_slice(reader.data, start, position(reader)), integral: integral,
+        offset: start, path: path_value);
+    return Result<Token, Error>::Ok(Token(event: Event::NumberLiteral(value), offset: start,
+        path: path_value));
+}
+fn word(reader: Reader, literal: String, leaf: String) -> Result<Bool, Error> effects { state } {
+    for i in 0 .. str_len(literal) {
+        if peek(reader) != str_byte(literal, i) {
+            return fail<Bool>(reader, ErrorKind::Syntax, position(reader), leaf, "expected "
+                + literal);
+        }
+        move(reader, position(reader) + 1);
+    }
+    return boundary(reader, leaf);
+}
+fn opening(object: Bool) -> Event {
+    if object {
+        return Event::ObjectStart;
+    }
+    return Event::ArrayStart;
+}
+fn closing_event(object: Bool) -> Event {
+    if object {
+        return Event::ObjectEnd;
+    }
+    return Event::ArrayEnd;
+}
+fn closing_byte(object: Bool) -> Int {
+    if object {
+        return 125;
+    }
+    return 93;
+}
+fn value(reader: Reader, leaf: String, paths: Bool) -> Result<Token, Error> effects { state } {
+    whitespace(reader);
+    let start = position(reader);
+    if list_len(reader.frames) > reader.limits.depth {
+        return fail<Token>(reader, ErrorKind::DepthLimit, start, leaf, "JSON depth limit exceeded");
+    }
+    if list_get(reader.nodes, 0) >= reader.limits.nodes {
+        return fail<Token>(reader, ErrorKind::NodeLimit, start, leaf, "JSON node limit exceeded");
+    }
+    list_set(reader.nodes, 0, list_get(reader.nodes, 0) + 1);
+    let byte = peek(reader);
+    if byte == 123 || byte == 91 {
+        move(reader, start + 1);
+        let event = token(reader, opening(byte == 123), start, leaf, paths);
+        list_push(reader.frames, Frame(object: byte == 123, state: 0, index: 0, segment: leaf,
+            member: "", seen: dict_new<String, Bool>()));
+        return Result<Token, Error>::Ok(event);
+    }
+    if byte == 34 {
+        let data = string_value(reader, leaf)?;
+        let checked = boundary(reader, leaf)?;
+        return Result<Token, Error>::Ok(token(reader, Event::StringValue(data), start, leaf,
+            paths));
+    }
+    if byte == 45 || digit(byte) {
+        return number(reader, leaf, paths);
+    }
+    if byte == 110 {
+        let checked = word(reader, "null", leaf)?;
+        return Result<Token, Error>::Ok(token(reader, Event::Null, start, leaf, paths));
+    }
+    if byte == 116 {
+        let checked = word(reader, "true", leaf)?;
+        return Result<Token, Error>::Ok(token(reader, Event::Boolean(true), start, leaf, paths));
+    }
+    if byte == 102 {
+        let checked = word(reader, "false", leaf)?;
+        return Result<Token, Error>::Ok(token(reader, Event::Boolean(false), start, leaf, paths));
+    }
+    return fail<Token>(reader, ErrorKind::Syntax, start, leaf, "expected JSON value");
+}
+fn end(reader: Reader, frame: Frame, paths: Bool) -> Result<Option<Token>,
+    Error> effects { state } {
+    let start = position(reader);
+    move(reader, start + 1);
+    list_truncate(reader.frames, list_len(reader.frames) - 1);
+    let checked = boundary(reader, frame.segment)?;
+    let event = closing_event(frame.object);
+    return Result<Option<Token>, Error>::Ok(Option<Token>::Some(token(reader, event, start,
+        frame.segment, paths)));
+}
+fn advance(reader: Reader, paths: Bool) -> Result<Option<Token>, Error> effects { state } {
+    if list_len(reader.failure) > 0 {
+        return Result<Option<Token>, Error>::Err(list_get(reader.failure, 0));
+    }
+    if list_get(reader.done, 0) {
+        return Result<Option<Token>, Error>::Ok(Option<Token>::None);
+    }
+    while true {
+        whitespace(reader);
+        if list_len(reader.frames) == 0 {
+            if list_get(reader.started, 0) {
+                if position(reader) != str_len(reader.data) {
+                    return fail<Option<Token>>(reader, ErrorKind::Syntax, position(reader), "",
+                        "trailing data");
+                }
+                list_set(reader.done, 0, true);
+                return Result<Option<Token>, Error>::Ok(Option<Token>::None);
+            }
+            list_set(reader.started, 0, true);
+            let found = value(reader, "", paths)?;
+            return Result<Option<Token>, Error>::Ok(Option<Token>::Some(found));
+        }
+        let index = list_len(reader.frames) - 1;
+        var frame = list_get(reader.frames, index);
+        let closing = closing_byte(frame.object);
+        if frame.state == 1 {
+            if peek(reader) == closing {
+                return end(reader, frame, paths);
+            }
+            if !take(reader, 44) {
+                return fail<Option<Token>>(reader, ErrorKind::Syntax, position(reader), "",
+                    "expected comma or closing delimiter");
+            }
+            frame.state = 2;
+            list_set(reader.frames, index, frame);
+            continue;
+        }
+        if frame.object && frame.state == 3 {
+            frame.state = 1;
+            list_set(reader.frames, index, frame);
+            let found = value(reader, frame.member, paths)?;
+            return Result<Option<Token>, Error>::Ok(Option<Token>::Some(found));
+        }
+        if frame.state == 0 && peek(reader) == closing {
+            return end(reader, frame, paths);
+        }
+        if frame.object {
+            let start = position(reader);
+            let name = string_value(reader, "")?;
+            let segment = "[" + quote(name) + "]";
+            if dict_has(frame.seen, name) {
+                return fail<Option<Token>>(reader, ErrorKind::Syntax, start, segment,
+                    "duplicate key");
+            }
+            dict_set(frame.seen, name, true);
+            whitespace(reader);
+            if !take(reader, 58) {
+                return fail<Option<Token>>(reader, ErrorKind::Syntax, position(reader), segment,
+                    "expected colon");
+            }
+            frame.state = 3;
+            frame.member = segment;
+            list_set(reader.frames, index, frame);
+            return Result<Option<Token>, Error>::Ok(Option<Token>::Some(token(reader, Event::Key(
+                name), start, segment, paths)));
+        }
+        let segment = "[" + to_string(frame.index) + "]";
+        frame.index = frame.index + 1;
+        frame.state = 1;
+        list_set(reader.frames, index, frame);
+        let found = value(reader, segment, paths)?;
+        return Result<Option<Token>, Error>::Ok(Option<Token>::Some(found));
+    }
+    return fail<Option<Token>>(reader, ErrorKind::Syntax, position(reader), "",
+        "reader stopped unexpectedly");
+}
+pub fn next(reader: Reader) -> Result<Option<Token>, Error> effects { state } {
+    return advance(reader, true);
+}
+pub fn finish(reader: Reader) -> Result<Bool, Error> effects { state } {
+    while true {
+        match advance(reader, false)? {
+            Option::Some(_) => {}
+            Option::None => {
+                return Result<Bool, Error>::Ok(true);
+            }
+        }
+    }
+    return Result<Bool, Error>::Ok(true);
+}
+fn change(event: Event) -> Int {
+    return match event {
+        Event::ObjectStart => 1,
+        Event::ArrayStart => 1,
+        Event::ObjectEnd => -1,
+        Event::ArrayEnd => -1,
+        Event::Key(_) => 0,
+        Event::StringValue(_) => 0,
+        Event::NumberLiteral(_) => 0,
+        Event::Boolean(_) => 0,
+        Event::Null => 0
+    };
+}
+pub fn skip_value(reader: Reader) -> Result<Bool, Error> effects { state } {
+    var depth = 0;
+    match advance(reader, false)? {
+        Option::None => {
+            return fail<Bool>(reader, ErrorKind::Syntax, position(reader), "",
+                "expected value to skip");
+        }
+        Option::Some(found) => {
+            match found.event {
+                Event::Key(_) => {
+                    return fail<Bool>(reader, ErrorKind::Syntax, found.offset, "",
+                        "expected value to skip");
+                }
+                Event::ObjectEnd => {
+                    return fail<Bool>(reader, ErrorKind::Syntax, found.offset, "",
+                        "expected value to skip");
+                }
+                Event::ArrayEnd => {
+                    return fail<Bool>(reader, ErrorKind::Syntax, found.offset, "",
+                        "expected value to skip");
+                }
+                Event::ObjectStart => {
+                    depth = 1;
+                }
+                Event::ArrayStart => {
+                    depth = 1;
+                }
+                Event::StringValue(_) => {}
+                Event::NumberLiteral(_) => {}
+                Event::Boolean(_) => {}
+                Event::Null => {}
+            }
+        }
+    }
+    while depth > 0 {
+        match advance(reader, false)? {
+            Option::None => {
+                return fail<Bool>(reader, ErrorKind::Syntax, position(reader), "",
+                    "unfinished value");
+            }
+            Option::Some(found) => {
+                depth = depth + change(found.event);
+            }
+        }
+    }
+    if list_len(reader.frames) == 0 {
+        return finish(reader);
+    }
+    whitespace(reader);
+    let frame = list_get(reader.frames, list_len(reader.frames) - 1);
+    let closing = closing_byte(frame.object);
+    if peek(reader) != 44 && peek(reader) != closing {
+        return fail<Bool>(reader, ErrorKind::Syntax, position(reader), "",
+            "expected comma or closing delimiter");
+    }
+    return Result<Bool, Error>::Ok(true);
+}
+pub fn spelling(value: Number) -> String {
+    return value.raw;
+}
+pub fn is_integer(value: Number) -> Bool {
+    return value.integral;
+}
+pub fn integer(value: Number) -> Result<Int, Error> {
+    if !value.integral {
+        return Result<Int, Error>::Err(Error(offset: value.offset, path: value.path,
+            kind: ErrorKind::Type, message: "expected integer literal"));
+    }
+    return match parse_int(value.raw) {
+        IntResult::Ok(n) => Result<Int, Error>::Ok(n),
+        IntResult::Err(_) => Result<Int, Error>::Err(Error(offset: value.offset, path: value.path,
+            kind: ErrorKind::Range, message: "integer outside Int range"))
+    };
+}
+pub fn floating(value: Number) -> Result<Float64, Error> {
+    return match parse_float(value.raw) {
+        FloatResult::Ok(n) => Result<Float64, Error>::Ok(n),
+        FloatResult::Err(_) => Result<Float64, Error>::Err(Error(offset: value.offset,
+            path: value.path, kind: ErrorKind::Range, message: "number outside Float64 range"))
+    };
+}
+pub fn read_string(reader: Reader) -> Result<String, Error> effects { state } {
+    match next(reader)? {
+        Option::Some(found) => {
+            match found.event {
+                Event::StringValue(data) => {
+                    return Result<String, Error>::Ok(data);
+                }
+                Event::ObjectStart => {}
+                Event::ObjectEnd => {}
+                Event::ArrayStart => {}
+                Event::ArrayEnd => {}
+                Event::Key(_) => {}
+                Event::NumberLiteral(_) => {}
+                Event::Boolean(_) => {}
+                Event::Null => {}
+            }
+            return Result<String, Error>::Err(Error(offset: found.offset, path: found.path,
+                kind: ErrorKind::Type, message: "expected string"));
+        }
+        Option::None => {}
+    }
+    return Result<String, Error>::Err(Error(offset: position(reader), path: "$",
+        kind: ErrorKind::Type, message: "expected string"));
+}
+pub fn read_integer(reader: Reader) -> Result<Int, Error> effects { state } {
+    match next(reader)? {
+        Option::Some(found) => {
+            match found.event {
+                Event::NumberLiteral(data) => {
+                    return integer(data);
+                }
+                Event::ObjectStart => {}
+                Event::ObjectEnd => {}
+                Event::ArrayStart => {}
+                Event::ArrayEnd => {}
+                Event::Key(_) => {}
+                Event::StringValue(_) => {}
+                Event::Boolean(_) => {}
+                Event::Null => {}
+            }
+            return Result<Int, Error>::Err(Error(offset: found.offset, path: found.path,
+                kind: ErrorKind::Type, message: "expected integer literal"));
+        }
+        Option::None => {}
+    }
+    return Result<Int, Error>::Err(Error(offset: position(reader), path: "$", kind: ErrorKind::Type,
+        message: "expected integer literal"));
+}

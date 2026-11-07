@@ -1,0 +1,739 @@
+{
+  "schema_version": 1,
+  "stage": "1.1.4",
+  "status": "verified",
+  "contract": "contracts/LIBRARY-1.1.md",
+  "logs_windows": {
+    "passed": 46,
+    "failed": 0,
+    "total": 46,
+    "checks": [
+      {
+        "name": "sample-default",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 50.836200000000005
+      },
+      {
+        "name": "sample-filter",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.114800000000002
+      },
+      {
+        "name": "empty",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.32899999999998
+      },
+      {
+        "name": "blank-lines",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 27.131100000000004
+      },
+      {
+        "name": "no-kept-records",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.038099999999986
+      },
+      {
+        "name": "unicode-escapes-crlf",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.29219999999998
+      },
+      {
+        "name": "signed64-sums",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 114.54230000000001
+      },
+      {
+        "name": "deterministic-mixed",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 40.648199999999974
+      },
+      {
+        "name": "invalid-json",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.344100000000026
+      },
+      {
+        "name": "trailing-garbage",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.357100000000003
+      },
+      {
+        "name": "array-record",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.378499999999974
+      },
+      {
+        "name": "null-record",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.1062
+      },
+      {
+        "name": "missing-service",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.173699999999997
+      },
+      {
+        "name": "service-number",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 23.096599999999967
+      },
+      {
+        "name": "missing-level",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.54920000000004
+      },
+      {
+        "name": "level-string",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.680099999999925
+      },
+      {
+        "name": "level-bool",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.808400000000006
+      },
+      {
+        "name": "level-range",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.066599999999994
+      },
+      {
+        "name": "value-range",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 25.85730000000001
+      },
+      {
+        "name": "level-decimal-literal",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.499399999999923
+      },
+      {
+        "name": "value-exponent-literal",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.84299999999996
+      },
+      {
+        "name": "value-fraction",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.813999999999965
+      },
+      {
+        "name": "value-null",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.189100000000053
+      },
+      {
+        "name": "missing-value",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.687900000000013
+      },
+      {
+        "name": "value-string",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.019900000000007
+      },
+      {
+        "name": "late-invalid",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.10360000000003
+      },
+      {
+        "name": "filtered-invalid",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.357999999999947
+      },
+      {
+        "name": "bad-cli-level",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.144199999999955
+      },
+      {
+        "name": "unknown-option",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.75120000000004
+      },
+      {
+        "name": "missing-option-value",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.281000000000063
+      },
+      {
+        "name": "maintenance-max-only",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.88620000000003
+      },
+      {
+        "name": "maintenance-bounded-range",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.560799999999972
+      },
+      {
+        "name": "maintenance-same-endpoints",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.35590000000002
+      },
+      {
+        "name": "maintenance-maximum-zero",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.789999999999964
+      },
+      {
+        "name": "maintenance-explicit-full-range",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 27.880300000000034
+      },
+      {
+        "name": "maintenance-reversed-range",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.632900000000063
+      },
+      {
+        "name": "maintenance-maximum-out-of-range",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.442800000000034
+      },
+      {
+        "name": "maintenance-maximum-negative",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 21.32529999999997
+      },
+      {
+        "name": "maintenance-maximum-missing",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.86889999999994
+      },
+      {
+        "name": "maintenance-excluded-invalid",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 22.0308
+      },
+      {
+        "name": "maintenance-repeat-two",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 28.96640000000002
+      },
+      {
+        "name": "maintenance-repeat-three",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 23.992499999999836
+      },
+      {
+        "name": "maintenance-repeat-zero",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.40210000000002
+      },
+      {
+        "name": "maintenance-repeat-high",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.435400000000072
+      },
+      {
+        "name": "maintenance-repeat-fraction",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.3121000000001
+      },
+      {
+        "name": "maintenance-repeat-missing",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 20.60699999999997
+      }
+    ],
+    "fixtures_summary": {
+      "baseline": {
+        "suite_version": "pilot-1",
+        "task": "logs",
+        "root": "G:\\Vela\\build\\stage11\\logs-oracle-final\\fixtures-baseline-logs-DtNfPb",
+        "cases": 30,
+        "valid_cases": 8,
+        "invalid_cases": 22
+      },
+      "maintenance": {
+        "suite_version": "pilot-1",
+        "maintenance_version": "pilot-maintenance-2-repeat",
+        "task": "logs",
+        "root": "G:\\Vela\\build\\stage11\\logs-oracle-final\\fixtures-maintenance-logs-p54nm5",
+        "cases": 16,
+        "valid_cases": 7,
+        "invalid_cases": 9
+      }
+    }
+  },
+  "logs_linux": {
+    "platform": "Linux ELF in VelaRelease100; fixtures on /mnt/g",
+    "task": "logs",
+    "passed": 46,
+    "failed": 0,
+    "total": 46,
+    "checks": [
+      {
+        "name": "baseline-sample-default",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 108.6568
+      },
+      {
+        "name": "baseline-sample-filter",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 107.17459999999997
+      },
+      {
+        "name": "baseline-empty",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 115.54429999999996
+      },
+      {
+        "name": "baseline-blank-lines",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 119.49409999999995
+      },
+      {
+        "name": "baseline-no-kept-records",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 112.96899999999994
+      },
+      {
+        "name": "baseline-unicode-escapes-crlf",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 112.27649999999994
+      },
+      {
+        "name": "baseline-signed64-sums",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 234.65909999999997
+      },
+      {
+        "name": "baseline-deterministic-mixed",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 121.74569999999994
+      },
+      {
+        "name": "baseline-invalid-json",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 124.56310000000008
+      },
+      {
+        "name": "baseline-trailing-garbage",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 112.14520000000016
+      },
+      {
+        "name": "baseline-array-record",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 109.97219999999993
+      },
+      {
+        "name": "baseline-null-record",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 99.0123000000001
+      },
+      {
+        "name": "baseline-missing-service",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 111.47509999999988
+      },
+      {
+        "name": "baseline-service-number",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 97.56529999999998
+      },
+      {
+        "name": "baseline-missing-level",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 104.30870000000004
+      },
+      {
+        "name": "baseline-level-string",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 112.45100000000002
+      },
+      {
+        "name": "baseline-level-bool",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 110.6293999999998
+      },
+      {
+        "name": "baseline-level-range",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 119.67669999999998
+      },
+      {
+        "name": "baseline-value-range",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 101.93229999999994
+      },
+      {
+        "name": "baseline-level-decimal-literal",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 100.50520000000006
+      },
+      {
+        "name": "baseline-value-exponent-literal",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 101.13209999999981
+      },
+      {
+        "name": "baseline-value-fraction",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 107.04590000000007
+      },
+      {
+        "name": "baseline-value-null",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 130.17409999999973
+      },
+      {
+        "name": "baseline-missing-value",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 116.92930000000024
+      },
+      {
+        "name": "baseline-value-string",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 107.5014000000001
+      },
+      {
+        "name": "baseline-late-invalid",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 127.4067
+      },
+      {
+        "name": "baseline-filtered-invalid",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 97.63290000000006
+      },
+      {
+        "name": "baseline-bad-cli-level",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 123.31950000000006
+      },
+      {
+        "name": "baseline-unknown-option",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 107.53879999999981
+      },
+      {
+        "name": "baseline-missing-option-value",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 114.85469999999987
+      },
+      {
+        "name": "maintenance-max-only",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 122.75779999999986
+      },
+      {
+        "name": "maintenance-bounded-range",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 126.65530000000035
+      },
+      {
+        "name": "maintenance-same-endpoints",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 99.05870000000004
+      },
+      {
+        "name": "maintenance-maximum-zero",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 112.63150000000041
+      },
+      {
+        "name": "maintenance-explicit-full-range",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 106.5623999999998
+      },
+      {
+        "name": "maintenance-reversed-range",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 119.15729999999985
+      },
+      {
+        "name": "maintenance-maximum-out-of-range",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 120.46500000000015
+      },
+      {
+        "name": "maintenance-maximum-negative",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 109.79229999999916
+      },
+      {
+        "name": "maintenance-maximum-missing",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 102.11370000000079
+      },
+      {
+        "name": "maintenance-excluded-invalid",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 115.88140000000021
+      },
+      {
+        "name": "maintenance-repeat-two",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 107.2478000000001
+      },
+      {
+        "name": "maintenance-repeat-three",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 121.97910000000047
+      },
+      {
+        "name": "maintenance-repeat-zero",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 107.8747000000003
+      },
+      {
+        "name": "maintenance-repeat-high",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 108.65909999999985
+      },
+      {
+        "name": "maintenance-repeat-fraction",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 100.71739999999954
+      },
+      {
+        "name": "maintenance-repeat-missing",
+        "passed": true,
+        "detail": "ok",
+        "elapsed_ms": 96.26929999999993
+      }
+    ]
+  },
+  "extra_app": {
+    "passed": 11,
+    "failed": 0,
+    "checks": [
+      {
+        "name": "huge exponent",
+        "passed": true
+      },
+      {
+        "name": "huge integer",
+        "passed": true
+      },
+      {
+        "name": "deep ignored",
+        "passed": true
+      },
+      {
+        "name": "malformed ignored escape",
+        "passed": true
+      },
+      {
+        "name": "malformed ignored nesting",
+        "passed": true
+      },
+      {
+        "name": "malformed ignored number",
+        "passed": true
+      },
+      {
+        "name": "trailing garbage",
+        "passed": true
+      },
+      {
+        "name": "required decimal",
+        "passed": true
+      },
+      {
+        "name": "required exponent",
+        "passed": true
+      },
+      {
+        "name": "UTF-8",
+        "passed": true
+      },
+      {
+        "name": "line limit",
+        "passed": true
+      }
+    ],
+    "root": "G:\\Vela\\build\\stage11\\json-app-IEMdFh"
+  },
+  "native": {
+    "windows": "original/formatted passed",
+    "cases": "huge ignored numbers, strict integer spelling/range, Float range, malformed skip, duplicates, UTF-8, all budgets, exact offsets/paths, shared progress, sticky syntax",
+    "max_depth": 4096,
+    "linux": "native fixture passed; normal GC peak 4077989"
+  },
+  "gc_stress": {
+    "peak": 64161,
+    "collections": 821298,
+    "repetitions": 16,
+    "platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "depth": 64,
+    "number_retains_dynamic_input": true
+  },
+  "logs": [
+    "build/stage11/1.1.4-windows-gc-bounded.log",
+    "build/stage11/1.1.4-linux.log"
+  ],
+  "limitations": [
+    "Depth-4096 forced-GC stress was terminated after excessive runtime; no success claimed for that combination. Depth 4096 passes normal GC; all-allocation stress uses explicit depth 64.",
+    "Reader consumes a bounded buffer, not an unbounded file stream."
+  ],
+  "next": "1.1.5",
+  "verify": {
+    "bundler_fixed_point": true,
+    "compiler_fixed_point": true,
+    "skipped": 0,
+    "command": ".\\vela-dev.cmd verify",
+    "failed": 0,
+    "passed": 1228,
+    "log": "build/stage11/1.1.4-verify.log"
+  },
+  "mcp_setup": "build/stage11/1.1.4-mcp-setup.log: passed",
+  "extra_linux": {
+    "platform": "Linux ELF",
+    "passed": 11,
+    "failed": 0,
+    "checks": [
+      {
+        "name": "huge exponent",
+        "passed": true
+      },
+      {
+        "name": "huge integer",
+        "passed": true
+      },
+      {
+        "name": "deep ignored",
+        "passed": true
+      },
+      {
+        "name": "malformed ignored escape",
+        "passed": true
+      },
+      {
+        "name": "malformed ignored nesting",
+        "passed": true
+      },
+      {
+        "name": "malformed ignored number",
+        "passed": true
+      },
+      {
+        "name": "trailing garbage",
+        "passed": true
+      },
+      {
+        "name": "required decimal",
+        "passed": true
+      },
+      {
+        "name": "required exponent",
+        "passed": true
+      },
+      {
+        "name": "UTF-8",
+        "passed": true
+      },
+      {
+        "name": "line limit",
+        "passed": true
+      }
+    ],
+    "root": "G:\\Vela\\build\\stage11\\json-app-Ut8hIi"
+  },
+  "repeat": {
+    "passed": true,
+    "repeat": 300,
+    "observed_changed_content": true,
+    "gc": "vela gc: collections=1847 peak=1058346 bytes=355338",
+    "work": "G:\\Vela\\build\\stage11\\logs-repeat-5UutrT"
+  }
+}

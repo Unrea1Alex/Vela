@@ -6,7 +6,7 @@ import os from 'node:os';
 import {execFileSync,spawnSync} from 'node:child_process';
 import {Client} from '@modelcontextprotocol/client';
 import {StdioClientTransport} from '@modelcontextprotocol/client/stdio';
-const root=path.resolve('../..'),pkg=path.resolve('.');
+const root=path.resolve(process.env.VELA_TEST_NATIVE_ROOT??'../..'),pkg=path.resolve('.');
 test('setup idempotence, preserved config and real MCP handshake',async()=>{
  const work=await fs.mkdtemp(path.join(os.tmpdir(),'vela-setup-'));
  const workspace=path.join(work,'проект with spaces');await fs.mkdir(workspace);
@@ -26,11 +26,15 @@ test('setup idempotence, preserved config and real MCP handshake',async()=>{
   assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib/json.vela'),'utf8'),await fs.readFile(path.join(root,'std/json.vela'),'utf8'));
   assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib/event_loop.vela'),'utf8'),await fs.readFile(path.join(root,'std/event_loop.vela'),'utf8'));
   assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib/tasks.vela'),'utf8'),await fs.readFile(path.join(root,'std/tasks.vela'),'utf8'));
-  for(const name of ['task_group','async_io','gui','http','http_server']) assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib',name+'.vela'),'utf8'),await fs.readFile(path.join(root,'std',name+'.vela'),'utf8'));
+  for(const name of ['json_stream','directory','task_group','async_io','gui','http','http_server']) assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib',name+'.vela'),'utf8'),await fs.readFile(path.join(root,'std',name+'.vela'),'utf8'));
   const client=new Client({name:'vela-installed-library-gate',version:'1'});
   const transport=new StdioClientTransport({command:process.execPath,args:[path.join(pkg,'dist/index.js'),'--config',configPath]});
   try {
    await client.connect(transport);
+   const directory=await client.callTool({name:'vela_check',arguments:{path:'directory.vela',text:'import "vela-stdlib/directory.vela" as d; import "vela-stdlib/path.vela" as p; fn listing()->Result<List<d::Entry>,d::Error> effects{state,io}{return d::entries_bounded(p::Path(value:"."),32);} fn traverse()->Result<List<d::WalkEntry>,d::Error> effects{state,io}{return d::walk(p::Path(value:"."),d::Limits(depth:4,entries:32));} fn main()->Int{return 0;}'}});
+   assert.equal(directory.structuredContent.status,'ok');
+   const streaming=await client.callTool({name:'vela_check',arguments:{path:'streaming.vela',text:'import "vela-stdlib/json_stream.vela" as j; fn parse()->Result<Bool,j::Error> effects{state}{let reader=j::create("1e9999",j::Limits(bytes:128,depth:16,nodes:100))?;return j::skip_value(reader);} fn main()->Int{return 0;}'}});
+   assert.equal(streaming.structuredContent.status,'ok');
    const checked=await client.callTool({name:'vela_check',arguments:{path:'suite.vela',text:'import "vela-stdlib/testing.vela" as t; test "installed library" {t::equal(2,2,"numbers");}'}});
    assert.equal(checked.structuredContent.status,'ok');
    const loop=await client.callTool({name:'vela_check',arguments:{path:'loop.vela',text:'import "vela-stdlib/event_loop.vela" as loop; import "vela-stdlib/process.vela" as process; test "installed process loop" effects { state } {let scheduler=loop::create<process::Completed>(0);}' }});
@@ -41,6 +45,14 @@ test('setup idempotence, preserved config and real MCP handshake',async()=>{
    assert.equal(grouped.structuredContent.status,'ok');
    const http=await client.callTool({name:'vela_check',arguments:{path:'http-api.vela',text:'import "vela-stdlib/http.vela" as h; import "vela-stdlib/http_server.vela" as s; import "vela-stdlib/text.vela" as t; fn configured()->Result<h::Request,h::Error> effects{state} {let req=h::from_url("https://localhost/health",100,1024)?;let post=h::with_method(req,h::Method::Post,t::Bytes(data:"{}"))?;let headers=list_new<h::Header>();list_push(headers,h::Header(name:"Content-Type",value:"application/json"));return h::with_headers(post,headers);} fn response()->s::Response{return s::Response(status:s::Status::Ok,body:t::Bytes(data:"{}"),content_type:"application/json");} fn main()->Int{return 0;}' }});
    assert.equal(http.structuredContent.status,'ok');
+   const transfer=await client.callTool({name:'vela_check',arguments:{path:'transfer.vela',text:'import "vela-stdlib/http.vela" as h; import "vela-stdlib/path.vela" as p; fn transport()->Result<h::Curl,h::Error>{return h::curl_transfer(p::Path(value:"/curl"),Option<p::Path>::None);} fn main()->Int{return 0;}'}});
+   assert.equal(transfer.structuredContent.status,'ok');
+   const preludeText='fn directory_open()->Int{return 42;} fn main()->Int{return directory_open();}';
+   const prelude=await client.callTool({name:'vela_check',arguments:{path:'prelude.vela',text:preludeText}});
+   assert.equal(prelude.structuredContent.status,'ok');
+   const preludeSymbols=await client.callTool({name:'vela_symbols',arguments:{path:'prelude.vela',text:preludeText}});
+   assert.equal(preludeSymbols.structuredContent.status,'ok');
+   assert.ok(preludeSymbols.structuredContent.data.native.functions.some(value=>value.name==='directory_open'&&value.returns==='Int'));
    const enums=await client.callTool({name:'vela_check',arguments:{path:'enums.vela',text:'enum State {Ready,Done} fn main()->Int {let same=State::Ready==State::Ready;let different=State::Ready!=State::Done;return 0;}' }});
    assert.equal(enums.structuredContent.status,'ok');
    const help=await client.callTool({name:'vela_get_help',arguments:{topic:'testing'}});

@@ -1,0 +1,33 @@
+import "../../../std/directory.vela" as directory;
+import "../../../std/path.vela" as path;
+fn must<T, E>(value: Result<T, E>) -> T { match value { Result::Ok(v) => { return v; } Result::Err(_) => { assert_true(false, "walk operation"); } } return must(value); }
+fn string(value: StringResult) -> String { return match value { StringResult::Ok(v) => v, StringResult::Err(_) => "" }; }
+fn main() -> Unit effects { state, io } {
+    let base = string(temp_dir("@TMP@")); let root = path::Path(value: base);
+    assert_true(list_len(must(directory::walk(root, directory::Limits(depth: 0, entries: 1)))) == 0, "empty at depth zero");
+    let a = make_dir(base + "/подкаталог"); let b = write_file(base + "/подкаталог/one", "x");
+    let c = write_file(base + "/two", "");
+    let entries = must(directory::walk(root, directory::Limits(depth: 2, entries: 3)));
+    assert_true(list_len(entries) == 3, "entries count includes directory");
+    let seen = dict_new<String, Int>();
+    for item in entries { dict_set(seen, item.relative, item.depth); }
+    assert_true(dict_get(seen, "подкаталог/one") == 2 && dict_get(seen, "two") == 1, "relative slash paths and depths");
+    assert_true(match directory::walk(root, directory::Limits(depth: 1, entries: 3)) { Result::Err(e) => e.reason == "depth limit exceeded", Result::Ok(_) => false }, "depth bound");
+    assert_true(match directory::walk(root, directory::Limits(depth: 2, entries: 2)) { Result::Err(e) => e.reason == "entry limit exceeded", Result::Ok(_) => false }, "entry bound");
+    assert_true(match directory::walk(root, directory::Limits(depth: 1025, entries: 3)) { Result::Err(e) => e.reason == "invalid traversal limits", Result::Ok(_) => false }, "invalid depth");
+    assert_true(match directory::walk(root, directory::Limits(depth: 2, entries: 0)) { Result::Err(_) => true, Result::Ok(_) => false }, "invalid entries");
+    for i in 0 .. 130 { let again = must(directory::walk(root, directory::Limits(depth: 2, entries: 3))); }
+    if platform() == "linux" {
+        let deep_root = base + "/deep"; let made = make_dir(deep_root);
+        let locations = list_new<String>(); var current = deep_root;
+        for i in 0 .. 160 { current = current + "/a"; let made_child = make_dir(current); list_push(locations, current); }
+        assert_true(list_len(must(directory::walk(path::Path(value: deep_root), directory::Limits(depth: 160, entries: 160)))) == 160, "iterative deep traversal");
+        assert_true(match directory::walk(path::Path(value: deep_root), directory::Limits(depth: 159, entries: 160)) { Result::Err(_) => true, Result::Ok(_) => false }, "deep boundary");
+        var at = list_len(locations);
+        while at > 0 { at = at - 1; let removed = remove_dir(list_get(locations, at)); }
+        let removed_root = remove_dir(deep_root);
+    }
+    let d = remove_file(base + "/подкаталог/one"); let e = remove_dir(base + "/подкаталог");
+    let f = remove_file(base + "/two"); let g = remove_dir(base);
+    print("walk checks passed");
+}

@@ -78,11 +78,11 @@
   "cancellations": 25,
   "stress": {
     "baseline": {
-      "WorkingSet64": 97382400,
+      "WorkingSet64": 97247232,
       "HandleCount": 223
     },
     "final": {
-      "WorkingSet64": 148934656,
+      "WorkingSet64": 146710528,
       "HandleCount": 223
     }
   }

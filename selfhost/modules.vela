@@ -14,20 +14,23 @@ import "incremental.vela";
 pub fn parse_import(c: Context) -> ImportSpec effects { state, io, process } {
     let start = expect(c, "import").span.start;
     let path = take(c);
-    if path.kind != 52 || path.text == ""|| contains_byte(path.text, 0) || contains_byte(path.text, 10) || contains_byte(path.text, 13) {
+    if path.kind != 52 || path.text == "" || contains_byte(path.text, 0) || contains_byte(path.text,
+        10) || contains_byte(path.text, 13) {
         bad(c, "E221", "Import requires a nonempty file path.", path.span);
     }
-    if str_byte(path.text, 0) == 47 || str_byte(path.text, 0) == 92 || contains_byte(path.text, 58) {
+    if str_byte(path.text, 0) == 47 || str_byte(path.text, 0) == 92 || contains_byte(path.text,
+        58) {
         bad(c, "E221", "Import path must be relative.", path.span);
     }
     var alias = "";
     if accept(c, "as") {
         alias = identifier(c).text;
     }
-    let end = expect(c,";");
+    let end = expect(c, ";");
     return ImportSpec(path: path.text, alias: alias, span: Span(start: start, end: end.span.end));
 }
-pub fn module_import_specs(local: Context, code: String, cache: Cache) -> List<ImportSpec> effects { state, io, process } {
+pub fn module_import_specs(local: Context, code: String,
+    cache: Cache) -> List<ImportSpec> effects { state, io, process } {
     var key = "";
     if cache.directory != "" {
         key = import_cache_key(code);
@@ -36,7 +39,10 @@ pub fn module_import_specs(local: Context, code: String, cache: Cache) -> List<I
             Option::Some(saved) => {
                 if str_len(saved) <= 1048576 {
                     match decode_imports(saved, str_len(code)) {
-                        Option::Some(specs) => { cache_event(cache, "read", "imports", "hit", "reused", key, "", false); return specs; }
+                        Option::Some(specs) => {
+                            cache_event(cache, "read", "imports", "hit", "reused", key, "", false);
+                            return specs;
+                        }
                         Option::None => {}
                     }
                 }
@@ -46,16 +52,24 @@ pub fn module_import_specs(local: Context, code: String, cache: Cache) -> List<I
     }
     let specs = list_new<ImportSpec>();
     lex(local);
-    while at(local, "import") { list_push(specs, parse_import(local)); }
+    while at(local, "import") {
+        list_push(specs, parse_import(local));
+    }
     if cache.directory != "" {
         let encoded = encode_imports(specs);
-        if str_len(encoded) <= 1048576 { cache_store(cache, key, encoded, "imports"); }
+        if str_len(encoded) <= 1048576 {
+            cache_store(cache, key, encoded, "imports");
+        }
     }
     return specs;
 }
-pub fn collect_module(units: List<SourceUnit>, imports: List<ModuleImport>, path: String, name: String, code: String, identity: String, json_mode: Bool, depth: Int, dependencies: List<ProjectDependency>, overlays: List<QueryOverlay>, cache: Cache) -> Int effects { state, io, process } {
+pub fn collect_module(units: List<SourceUnit>, imports: List<ModuleImport>, path: String,
+    name: String, code: String, identity: String, json_mode: Bool, depth: Int,
+    dependencies: List<ProjectDependency>, overlays: List<QueryOverlay>,
+    cache: Cache) -> Int effects { state, io, process } {
     for i in 0 .. list_len(units) {
-        if identity != "" && list_get(units, i).identity == identity || identity == "" && path_key(path) == path_key(list_get(units, i).path) {
+        if identity != "" && list_get(units, i).identity == identity || identity == "" && path_key(
+            path) == path_key(list_get(units, i).path) {
             return i;
         }
     }
@@ -78,10 +92,11 @@ pub fn collect_module(units: List<SourceUnit>, imports: List<ModuleImport>, path
         bad(local, "E221", "Module graph exceeds 16 MiB.", empty_span());
     }
     let owner = list_len(units);
-    list_push(units, SourceUnit(path: path, name: name, identity: identity, code: code, start: start, end: start + str_len(code), line_base: line_base));
+    list_push(units, SourceUnit(path: path, name: name, identity: identity, code: code,
+        start: start, end: start + str_len(code), line_base: line_base));
     for spec in module_import_specs(local, code, cache) {
         for previous in imports {
-            if spec.alias != ""&& previous.owner == owner && previous.alias == spec.alias {
+            if spec.alias != "" && previous.owner == owner && previous.alias == spec.alias {
                 bad(local, "E222", "Duplicate import alias.", spec.span);
             }
         }
@@ -111,24 +126,35 @@ pub fn collect_module(units: List<SourceUnit>, imports: List<ModuleImport>, path
         let edge = list_len(imports);
         let span = Span(start: start + spec.span.start, end: start + spec.span.end);
         list_push(imports, ModuleImport(owner: owner, target: -1, alias: spec.alias, span: span));
-        let target = collect_module(units, imports, imported_path, imported_path, imported_code, target_identity, json_mode, depth + 1, dependencies, overlays, cache);
-        list_set(imports, edge, ModuleImport(owner: owner, target: target, alias: spec.alias, span: span));
+        let target = collect_module(units, imports, imported_path, imported_path, imported_code,
+            target_identity, json_mode, depth + 1, dependencies, overlays, cache);
+        list_set(imports, edge, ModuleImport(owner: owner, target: target, alias: spec.alias,
+            span: span));
     }
     return owner;
 }
-pub fn module_context(path: String, name: String, code: String, json_mode: Bool) -> Context effects { state, io, process } {
+pub fn module_context(path: String, name: String, code: String,
+    json_mode: Bool) -> Context effects { state, io, process } {
     return project_module_context(path, name, code, json_mode, list_new<ProjectDependency>());
 }
-pub fn project_module_context(path: String, name: String, code: String, json_mode: Bool, dependencies: List<ProjectDependency>) -> Context effects { state, io, process } {
-    return project_overlay_context(path, name, code, json_mode, dependencies, list_new<QueryOverlay>());
+pub fn project_module_context(path: String, name: String, code: String, json_mode: Bool,
+    dependencies: List<ProjectDependency>) -> Context effects { state, io, process } {
+    return project_overlay_context(path, name, code, json_mode, dependencies,
+        list_new<QueryOverlay>());
 }
-pub fn project_overlay_context(path: String, name: String, code: String, json_mode: Bool, dependencies: List<ProjectDependency>, overlays: List<QueryOverlay>) -> Context effects { state, io, process } {
-    return project_cached_context(path, name, code, json_mode, dependencies, overlays, Cache(directory: "", report: false));
+pub fn project_overlay_context(path: String, name: String, code: String, json_mode: Bool,
+    dependencies: List<ProjectDependency>, overlays: List<QueryOverlay>) -> Context effects { state,
+    io, process } {
+    return project_cached_context(path, name, code, json_mode, dependencies, overlays, Cache(
+        directory: "", report: false));
 }
-pub fn project_cached_context(path: String, name: String, code: String, json_mode: Bool, dependencies: List<ProjectDependency>, overlays: List<QueryOverlay>, cache: Cache) -> Context effects { state, io, process } {
+pub fn project_cached_context(path: String, name: String, code: String, json_mode: Bool,
+    dependencies: List<ProjectDependency>, overlays: List<QueryOverlay>,
+    cache: Cache) -> Context effects { state, io, process } {
     let units = list_new<SourceUnit>();
     let imports = list_new<ModuleImport>();
-    let entry = collect_module(units, imports, path, name, code, io_value(file_identity(path)), json_mode, 0, dependencies, overlays, cache);
+    let entry = collect_module(units, imports, path, name, code, io_value(file_identity(path)),
+        json_mode, 0, dependencies, overlays, cache);
     let parts = strings_new();
     for unit in units {
         strings_push(parts, unit.code + "\n");
@@ -156,11 +182,13 @@ pub fn module_canonical(owner: Int, name: String) -> String {
     if owner == 0 {
         return name;
     }
-    return "@" + to_string(owner) +"::"+ name;
+    return "@" + to_string(owner) + "::" + name;
 }
-pub fn declare_module_name(c: Context, name: String, exported: Bool, span: Span) -> Unit effects { state, io, process } {
+pub fn declare_module_name(c: Context, name: String, exported: Bool,
+    span: Span) -> Unit effects { state, io, process } {
     let owner = source_unit_at(c, span.start);
-    list_push(c.declarations, ModuleDeclaration(owner: owner, name: name, canonical: module_canonical(owner, name), exported: exported, span: span));
+    list_push(c.declarations, ModuleDeclaration(owner: owner, name: name,
+        canonical: module_canonical(owner, name), exported: exported, span: span));
 }
 pub fn module_declaration(c: Context, owner: Int, name: String) -> Int effects { state } {
     for i in 0 .. list_len(c.declarations) {
@@ -180,7 +208,8 @@ pub fn module_alias(c: Context, name: String, span: Span) -> Int effects { state
     }
     return -1;
 }
-pub fn module_global_name(c: Context, name: String, span: Span) -> String effects { state, io, process } {
+pub fn module_global_name(c: Context, name: String, span: Span) -> String effects { state, io,
+    process } {
     if name == "" {
         return name;
     }
@@ -217,7 +246,7 @@ pub fn module_global_name(c: Context, name: String, span: Span) -> String effect
             if index >= 0 {
                 let d = list_get(c.declarations, index);
                 if d.exported {
-                    if found != ""&& found != d.canonical {
+                    if found != "" && found != d.canonical {
                         bad(c, "E222", "Ambiguous imported name: " + name, span);
                     }
                     found = d.canonical;
@@ -241,13 +270,16 @@ pub fn module_global_name(c: Context, name: String, span: Span) -> String effect
     }
     return module_canonical(owner, name);
 }
-pub fn module_type_name(c: Context, name: String, parameters: List<TypeParameter>, span: Span, public_api: Bool) -> String effects { state, io, process } {
+pub fn module_type_name(c: Context, name: String, parameters: List<TypeParameter>, span: Span,
+    public_api: Bool) -> String effects { state, io, process } {
     if name == "" {
         return name;
     }
     for parameter in parameters {
         if parameter.name == name {
-            if parameter.bound == "$effect" { bad(c, "E210", "Effect parameters are not value types.", span); }
+            if parameter.bound == "$effect" {
+                bad(c, "E210", "Effect parameters are not value types.", span);
+            }
             return name;
         }
     }
@@ -255,7 +287,8 @@ pub fn module_type_name(c: Context, name: String, parameters: List<TypeParameter
     var base = list_get(parts, 0);
     if dynamic_pattern(base) {
         let interface_name = str_slice(base, 5, str_len(base));
-        base = "@dyn:" + module_type_name(c, interface_name, list_new<TypeParameter>(), span, public_api);
+        base = "@dyn:" + module_type_name(c, interface_name, list_new<TypeParameter>(), span,
+            public_api);
     } else {
         base = module_global_name(c, base, span);
     }
@@ -267,7 +300,8 @@ pub fn module_type_name(c: Context, name: String, parameters: List<TypeParameter
             if d.canonical == base && !d.exported {
                 var details = empty_details();
                 details.exposed_type = name;
-                list_push(details.related, RelatedLocation(message: "Private declaration is here.", span: d.span));
+                list_push(details.related, RelatedLocation(message: "Private declaration is here.",
+                    span: d.span));
                 fail_details(c, "E224", "Public API exposes private type: " + name, span, details);
             }
         }
@@ -279,7 +313,7 @@ pub fn module_type_name(c: Context, name: String, parameters: List<TypeParameter
     for i in 1 .. list_len(parts) {
         list_push(args, module_type_name(c, list_get(parts, i), parameters, span, public_api));
     }
-    return base + "<" + join_text(args,",") + ">";
+    return base + "<" + join_text(args, ",") + ">";
 }
 pub fn bind_impl_owners(c: Context) -> List<Int> effects { state, io, process } {
     let owners = list_new<Int>();
@@ -291,66 +325,101 @@ pub fn bind_impl_owners(c: Context) -> List<Int> effects { state, io, process } 
         let declaration = module_declaration(c, unit, name);
         var interface_name = "";
         if implementation.interface_name != "" {
-            interface_name = module_global_name(c, implementation.interface_name, implementation.span);
+            interface_name = module_global_name(c, implementation.interface_name,
+                implementation.span);
             if find_interface(c, interface_name) < 0 {
-                interface_error(c, "E235", "impl_interface", implementation.interface_name, name, "", "Expected a nominal interface.", implementation.span, empty_span());
+                interface_error(c, "E235", "impl_interface", implementation.interface_name, name,
+                    "", "Expected a nominal interface.", implementation.span, empty_span());
             }
         }
         var index = -1;
         if declaration >= 0 {
             let declared = list_get(c.declarations, declaration);
             for i in 0 .. list_len(c.bound_types) {
-                if list_get(c.bound_types, i).name == declared.canonical { index = i; break; }
+                if list_get(c.bound_types, i).name == declared.canonical {
+                    index = i;
+                    break;
+                }
             }
         }
         if index < 0 {
             if interface_name != "" {
-                interface_error(c, "E235", "impl_owner", implementation.interface_name, name, "", "The implementation belongs in the module defining the type.", implementation.span, empty_span());
+                interface_error(c, "E235", "impl_owner", implementation.interface_name, name, "",
+                    "The implementation belongs in the module defining the type.",
+                    implementation.span, empty_span());
             }
-            method_error(c, "method_owner", name, "", "An inherent impl requires a nominal type declared in this module.", implementation.span, empty_span());
+            method_error(c, "method_owner", name, "",
+                "An inherent impl requires a nominal type declared in this module.",
+                implementation.span, empty_span());
         }
         let target = list_get(c.bound_types, index);
         let key = target.name + "#" + interface_name;
         if dict_has(seen, key) {
             if interface_name != "" {
-                interface_error(c, "E235", "impl_duplicate", implementation.interface_name, name, "", "Duplicate interface implementation.", implementation.span, dict_get(seen, key));
+                interface_error(c, "E235", "impl_duplicate", implementation.interface_name, name,
+                    "", "Duplicate interface implementation.", implementation.span, dict_get(seen,
+                    key));
             }
-            method_error(c, "method_duplicate_impl", name, "", "Only one inherent impl is allowed per type.", implementation.span, dict_get(seen, key));
+            method_error(c, "method_duplicate_impl", name, "",
+                "Only one inherent impl is allowed per type.", implementation.span, dict_get(seen,
+                key));
         }
         let count = list_len(implementation.parameters);
         let parameters = bind_type_bounds(c, implementation.parameters, false);
         if count != list_len(target.type_parameters) || list_len(parts) != count + 1 {
             if interface_name != "" {
-                interface_error(c, "E235", "impl_conditional", implementation.interface_name, name, "", "An impl must cover the owning type's complete parameter list.", implementation.span, target.span);
+                interface_error(c, "E235", "impl_conditional", implementation.interface_name, name,
+                    "", "An impl must cover the owning type's complete parameter list.",
+                    implementation.span, target.span);
             }
-            method_error(c, "method_impl_parameters", name, "", "Impl must cover the owning type's complete generic parameter list.", implementation.span, target.span);
+            method_error(c, "method_impl_parameters", name, "",
+                "Impl must cover the owning type's complete generic parameter list.",
+                implementation.span, target.span);
         }
         for i in 0 .. count {
             let p = list_get(parameters, i);
-            if p.name != list_get(parts, i + 1) || p.bound != list_get(target.type_parameters, i).bound {
+            if p.name != list_get(parts, i + 1) || p.bound != list_get(target.type_parameters,
+                i).bound {
                 if interface_name != "" {
-                    interface_error(c, "E235", "impl_conditional", implementation.interface_name, name, "", "Implementation parameters must match the owner in order.", implementation.span, target.span);
+                    interface_error(c, "E235", "impl_conditional", implementation.interface_name,
+                        name, "", "Implementation parameters must match the owner in order.",
+                        implementation.span, target.span);
                 }
-                method_error(c, "method_impl_parameters", name, "", "Impl parameters and bounds must match the owner in order.", implementation.span, target.span);
+                method_error(c, "method_impl_parameters", name, "",
+                    "Impl parameters and bounds must match the owner in order.",
+                    implementation.span, target.span);
             }
         }
         validate_type_parameters(c, parameters);
         dict_set(seen, key, implementation.span);
-        list_push(c.bound_impls, SyntaxImpl(interface_name: interface_name, owner: target.name, parameters: parameters, span: implementation.span));
+        list_push(c.bound_impls, SyntaxImpl(interface_name: interface_name, owner: target.name,
+            parameters: parameters, span: implementation.span));
         list_push(owners, index);
     }
     return owners;
 }
 pub fn bind_modules(c: Context) -> Unit effects { state, io, process } {
     for i in 0 .. list_len(c.declarations) {
-        let d = list_get(c.declarations, i);
+        var d = list_get(c.declarations, i);
         for j in 0 .. i {
             let previous = list_get(c.declarations, j);
             if previous.owner == d.owner && previous.name == d.name {
                 duplicate(c, "Duplicate declaration '" + d.name + "'.", d.span, previous.span);
             }
         }
-        if has_type(find_type(c, d.name)) || has_symbol(find_symbol(c, c.signatures, d.name)) || d.name == "List" || d.name == "Dict" {
+        let prelude = find_symbol(c, c.signatures, d.name);
+        var reserved_function = has_symbol(prelude);
+        if has_symbol(prelude) && symbol_info(c, prelude).prelude_fallback {
+            reserved_function = false;
+            if d.owner == 0 {
+                // Post-1.0 prelude additions must not reserve valid old names.
+                // Other modules already have distinct canonical identities.
+                d.canonical = "@0::" + d.name;
+                list_set(c.declarations, i, d);
+            }
+        }
+        if has_type(find_type(c, d.name)) || reserved_function || d.name == "List" || d.name
+            == "Dict" {
             bad(c, "E202", "Reserved declaration: " + d.name, d.span);
         }
         if module_alias(c, d.name, d.span) >= 0 {
@@ -364,11 +433,13 @@ pub fn bind_modules(c: Context) -> Unit effects { state, io, process } {
         var bound = syntax;
         bound.type_parameters = bind_type_bounds(c, syntax.type_parameters, d.exported);
         bound.name = d.canonical;
-        bound.base = module_type_name(c, syntax.base, syntax.type_parameters, syntax.span, d.exported);
+        bound.base = module_type_name(c, syntax.base, syntax.type_parameters, syntax.span,
+            d.exported);
         bound.fields = list_new<SyntaxField>();
         for field in syntax.fields {
             var f = field;
-            f.annotation = module_type_name(c, field.annotation, syntax.type_parameters, field.span, d.exported && !syntax.opaque);
+            f.annotation = module_type_name(c, field.annotation, syntax.type_parameters, field.span,
+                d.exported && !syntax.opaque);
             list_push(bound.fields, f);
         }
         bound.variants = list_new<SyntaxVariant>();
@@ -376,7 +447,8 @@ pub fn bind_modules(c: Context) -> Unit effects { state, io, process } {
             var v = variant;
             v.fields = list_new<String>();
             for field in variant.fields {
-                list_push(v.fields, module_type_name(c, field, syntax.type_parameters, variant.span, d.exported));
+                list_push(v.fields, module_type_name(c, field, syntax.type_parameters, variant.span,
+                    d.exported));
             }
             list_push(bound.variants, v);
         }
@@ -399,20 +471,30 @@ pub fn bind_modules(c: Context) -> Unit effects { state, io, process } {
             let target = list_get(c.bound_types, list_get(impl_owners, syntax.impl_index));
             let local_name = list_get(type_parts(implementation.owner), 0);
             let declaration = list_get(c.declarations, module_declaration(c, owner, local_name));
-            let exact = module_type_name(c, implementation.owner, syntax.type_parameters, implementation.span, false);
+            let exact = module_type_name(c, implementation.owner, syntax.type_parameters,
+                implementation.span, false);
             bound.type_parameters = implementation_bound.parameters;
             if list_len(syntax.parameters) == 0 {
                 if implementation_bound.interface_name != "" {
-                    interface_error(c, "E236", "impl_receiver", implementation.interface_name, local_name, syntax.name, "Expected self with the owning type.", syntax.name_span, target.span);
+                    interface_error(c, "E236", "impl_receiver", implementation.interface_name,
+                        local_name, syntax.name, "Expected self with the owning type.",
+                        syntax.name_span, target.span);
                 }
-                method_error(c, "method_receiver", local_name, syntax.name, "A method requires a first parameter self: Owner.", syntax.name_span, target.span);
+                method_error(c, "method_receiver", local_name, syntax.name,
+                    "A method requires a first parameter self: Owner.", syntax.name_span,
+                    target.span);
             }
             let receiver = list_get(syntax.parameters, 0);
-            if receiver.name != "self" || module_type_name(c, receiver.annotation, syntax.type_parameters, receiver.span, false) != exact {
+            if receiver.name != "self" || module_type_name(c, receiver.annotation,
+                syntax.type_parameters, receiver.span, false) != exact {
                 if implementation_bound.interface_name != "" {
-                    interface_error(c, "E236", "impl_receiver", implementation.interface_name, local_name, syntax.name, "Expected self with the owning type.", receiver.span, target.span);
+                    interface_error(c, "E236", "impl_receiver", implementation.interface_name,
+                        local_name, syntax.name, "Expected self with the owning type.",
+                        receiver.span, target.span);
                 }
-                method_error(c, "method_receiver", local_name, syntax.name, "The first parameter must be self with the exact owning type.", receiver.span, target.span);
+                method_error(c, "method_receiver", local_name, syntax.name,
+                    "The first parameter must be self with the exact owning type.", receiver.span,
+                    target.span);
             }
             if implementation_bound.interface_name != "" {
                 bound.name = implementation_method_name(implementation_bound, syntax.name);
@@ -420,33 +502,44 @@ pub fn bind_modules(c: Context) -> Unit effects { state, io, process } {
             } else {
                 for field in target.fields {
                     if field.name == syntax.name {
-                        method_error(c, "method_collision", local_name, syntax.name, "Method conflicts with a field.", syntax.name_span, field.span);
+                        method_error(c, "method_collision", local_name, syntax.name,
+                            "Method conflicts with a field.", syntax.name_span, field.span);
                     }
                 }
                 for variant in target.variants {
                     if variant.name == syntax.name {
-                        method_error(c, "method_collision", local_name, syntax.name, "Method conflicts with an enum variant.", syntax.name_span, variant.span);
+                        method_error(c, "method_collision", local_name, syntax.name,
+                            "Method conflicts with an enum variant.", syntax.name_span,
+                            variant.span);
                     }
                 }
                 if target.kind == 77 && syntax.name == "value" {
-                    method_error(c, "method_collision", local_name, syntax.name, "Method conflicts with the distinct value field.", syntax.name_span, target.span);
+                    method_error(c, "method_collision", local_name, syntax.name,
+                        "Method conflicts with the distinct value field.", syntax.name_span,
+                        target.span);
                 }
                 bound.name = target.name + "::" + syntax.name;
                 public_api = syntax.method_exported && declaration.exported;
             }
             if dict_has(methods, bound.name) {
                 if implementation_bound.interface_name != "" {
-                    interface_error(c, "E236", "impl_duplicate_method", implementation.interface_name, local_name, syntax.name, "Duplicate interface method.", syntax.name_span, dict_get(methods, bound.name));
+                    interface_error(c, "E236", "impl_duplicate_method",
+                        implementation.interface_name, local_name, syntax.name,
+                        "Duplicate interface method.", syntax.name_span, dict_get(methods,
+                        bound.name));
                 }
-                method_error(c, "method_collision", local_name, syntax.name, "Duplicate method.", syntax.name_span, dict_get(methods, bound.name));
+                method_error(c, "method_collision", local_name, syntax.name, "Duplicate method.",
+                    syntax.name_span, dict_get(methods, bound.name));
             }
             dict_set(methods, bound.name, syntax.name_span);
         }
-        bound.return_name = module_type_name(c, syntax.return_name, syntax.type_parameters, syntax.span, public_api);
+        bound.return_name = module_type_name(c, syntax.return_name, syntax.type_parameters,
+            syntax.span, public_api);
         bound.parameters = list_new<SyntaxField>();
         for parameter in syntax.parameters {
             var p = parameter;
-            p.annotation = module_type_name(c, parameter.annotation, syntax.type_parameters, parameter.span, public_api);
+            p.annotation = module_type_name(c, parameter.annotation, syntax.type_parameters,
+                parameter.span, public_api);
             let effect_parameter = direct_effect_parameter(c, p.annotation, p.span);
             list_push(bound.parameters, p);
         }

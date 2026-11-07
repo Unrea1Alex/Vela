@@ -1,0 +1,2 @@
+import "../../../std/json_stream.vela" as stream;
+fn main() -> Unit { let reader = stream::create("0", stream::default_limits()); }

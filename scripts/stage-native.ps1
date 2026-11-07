@@ -6,6 +6,8 @@ if (Test-Path -LiteralPath $PackageRoot) { throw 'Use a new destination for stag
 New-Item -ItemType Directory -Path $PackageRoot | Out-Null
 $Entries = @('README.md','README.ru.md','LICENSE','AGENTS.md','vela.cmd','velac.cmd','vela-dev.cmd','selfhost','tools','std','tests/cases','tests/stdlib','tests/ffi','tests/gc-repeat.vela','tests/helper.vela','tests/README.md','scripts/verify-gc.ps1','examples','apps/timelog','apps/config-report','prototypes/windows','docs','bootstrap','integrations/agent','integrations/mcp/README.md','bin/README.md','bin/build-manifest.json','dist/timelog-windows-x64.zip')
 $Entries += @('vela-lsp.cmd','scripts/verify-lsp.mjs','integrations/vscode')
+$Entries += @('apps/tree-index','apps/log-summary','apps/http-collector','tests/library11',
+    'scripts/stage-native.ps1','scripts/package-1.1-windows.ps1','scripts/package-1.1-linux.sh','scripts/verify-1.1-recovery.ps1')
 $Entries += 'integrations/mcp/compatibility.json'
 $Entries += @('README.md','main.vela','route.vela','audit.vela','tests.vela','soak.vela','verify.ps1','validation.json','demo.ndjson','demo-report.tsv') |
     ForEach-Object { 'apps/route-audit/' + $_ }

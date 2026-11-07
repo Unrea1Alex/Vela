@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.1.0 — 2026-11-07
+
+Compatible library additions: Windows/Linux directory metadata and bounded
+iterative no-follow traversal; a pull JSON reader with validated skip, preserved
+number spellings and explicit budgets; opt-in curl_transfer with the original
+transfer timeout and separate bounded helper supervision. The legacy curl factory
+keeps its 1.0 combined launch/transfer deadline.
+
+New builtin functions are prelude fallbacks derived from catalog since metadata,
+so valid 1.0 user functions/types/imports with the same names keep working.
+Existing builtin reservations, public enum variants, project/lock formats and FFI
+ABI 1/runtime ABI 2 remain unchanged. New tree-index, log-summary and http-collector
+applications use the standard SDK. See [acceptance and platform scope](VALIDATION-1.1.md).
+
+## Unreleased — source-tree maintenance
+
+Removed the historical Python 0.2 frontend, reference tests, compatibility wrappers
+and Python packaging metadata. Native compiler/CLI behavior, language semantics,
+project/lock formats and ABIs are unchanged. The old implementation remains in Git
+history. Updated current instructions and removed generated development copies;
+historical release ZIPs and the registered Linux build environment are retained.
+See [cleanup and validation](CLEANUP-1.0.md).
+
 ## 1.0.0 — 2026-11-07
 
 Release acceptance found a Windows AppContainer failure when publishing an allowed
