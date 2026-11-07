@@ -1,0 +1,331 @@
+{
+  "schema_version": 1,
+  "version": "0.9.0",
+  "platform": "Windows x64 / MSVC",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 999,
+    "failed": 0,
+    "skipped": 0
+  },
+  "clean_native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 999,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "0.9.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 52,
+    "tests_run": true
+  },
+  "recovery_c_sha256": "7ed841376070d63755f3bc48380a9ab32dd2c092343e227dd0eb9175f7f8b2a4",
+  "lsp": {
+    "requests": 200,
+    "elapsed_ms": 4346,
+    "baseline": {
+      "WorkingSet64": 7782400,
+      "HandleCount": 107
+    },
+    "final": {
+      "WorkingSet64": 8507392,
+      "HandleCount": 107
+    },
+    "utf16": true,
+    "stale_versions": true,
+    "parity": true,
+    "unchanged": true
+  },
+  "compiler_refactoring": {
+    "edits": {
+      "selfhost/query.vela": 2,
+      "selfhost/semantic.vela": 3
+    },
+    "compiler_checked_and_built": true,
+    "before": "query_use",
+    "after": "record_query_use"
+  },
+  "raw_normalized_c_sha256": "4747c2a60e0955329e89f56b29fe6a4d82fea85658f4be3f59e6f9dd8963f96c",
+  "measurelab": {
+    "sdk": {
+      "passed": true,
+      "tools": [
+        "vela_get_context",
+        "vela_get_help",
+        "vela_check",
+        "vela_format",
+        "vela_symbols",
+        "vela_query",
+        "vela_plan",
+        "vela_read_output",
+        "vela_build",
+        "vela_test",
+        "vela_run"
+      ],
+      "transport": "official SDK / local stdio",
+      "native_tools_in_current_chat": false,
+      "compiler_id": "3f02f5f82bfc7b41b5444711eb7cf23e0e38d724bba51001e5b38c6517cfc644",
+      "execution_toolchain_id": "25fa9cce1bf32706eb9257ee4c33712aa3feeb3791fc4ff64fc7b82da2e0c46f",
+      "named_tests": 12,
+      "exit_code": 3,
+      "stdout": "Saved: isolated-report.html\r\nscenarios=3 samples=60 over_budget=1\r\nРазбор JSON · 128 КБ: mean=4.04 p95=4.30 sigma=0.19 мс\r\nПостроение поискового индекса: mean=13.68 p95=22.10 sigma=3.35 мс\r\nЭкспорт отчёта в HTML: mean=6.63 p95=7.10 sigma=0.31 мс\r\n",
+      "native_dependencies": 0,
+      "generated_html": {
+        "size": 17500,
+        "sha256": "39f30df4d5dcb8548291a5e241e906e44a3e99d3e2be882070a9010f304510ea",
+        "saved_explicitly": true
+      }
+    },
+    "named_tests": 12,
+    "report_sha256": "39f30df4d5dcb8548291a5e241e906e44a3e99d3e2be882070a9010f304510ea",
+    "cli": 29
+  },
+  "route_audit": {
+    "named_tests_after_fmt": 8,
+    "max_route_vela_width_bytes": 99,
+    "report_sha256": "03f1b0d743fad274f3080ca330954664a8b9f6a134fde4300715e31157d7f26c"
+  },
+  "mcp": {
+    "outputs": [
+      "fresh SDK session discovers output tool",
+      "provenance",
+      "chunked bytes and SHA-256",
+      "no implicit write",
+      "executable ID cannot read a generated file",
+      "forged output ID",
+      "output ID cannot execute",
+      "out of range",
+      "unsafe name ../result.html",
+      "unsafe name a.html:stream",
+      "unsafe name NUL.html",
+      "unsafe name a.exe",
+      "reject missing",
+      "reject extra",
+      "reject directory",
+      "byte bound",
+      "nonzero does not export",
+      "timeout does not export",
+      "cancelled run releases job and export slot",
+      "hardlink rejection",
+      "junction rejection",
+      "expiry removes bytes"
+    ],
+    "isolation": [
+      "startup access, socket, build/run/test probes",
+      "--memory",
+      "--memory bounded capture",
+      "--process-limit",
+      "--process-limit bounded capture",
+      "--breakaway",
+      "--breakaway bounded capture",
+      "--flood",
+      "--flood bounded capture",
+      "--disk",
+      "--disk bounded capture",
+      "--files",
+      "--files bounded capture",
+      "--tree",
+      "--tree bounded capture",
+      "child preserves LPAC/job",
+      "timeout kills descendant",
+      "explicit cancellation",
+      "cancel kills descendant",
+      "disconnect cancels job",
+      "disconnect kills descendant",
+      "supervisor death fails closed and recovers profile",
+      "supervisor death kills descendant",
+      "toolchain bytes unchanged",
+      "forced Node death kills descendants",
+      "forced Node death removes snapshot and lease"
+    ],
+    "analysis": {
+      "schema_version": 1,
+      "node": "v24.17.0",
+      "sdk": "2.4.0",
+      "checks": [
+        "seven tools with input/output schemas",
+        "context fingerprint",
+        "version-matched help resources",
+        "resource/help catalog identical",
+        "native check",
+        "CLI JSON equivalence",
+        "format exact CLI output",
+        "format preserves file",
+        "unsaved source check",
+        "overlay never writes source",
+        "manifest overlay rejected",
+        "symbols include original source",
+        "native semantic CLI parity",
+        "rename preview validated without writes",
+        "native stale revision rejected",
+        "raw snapshot changes invalidate plans",
+        "reject path ../secret.vela",
+        "reject path C:/secret.vela",
+        "reject path @unknown",
+        "reject path main.vela:stream",
+        "rejection and changed snapshot",
+        "Unicode coordinates",
+        "invalid UTF8 diagnostic",
+        "native snapshot read boundary",
+        "strict input schema",
+        "unknown tool rejected",
+        "bounded concurrency",
+        "project snapshot lock",
+        "project unsaved source alias",
+        "native stale lock",
+        "1000 analyses",
+        "RSS growth <=64MiB",
+        "handle growth <=16",
+        "protocol stdout clean",
+        "spawn failure",
+        "output limit",
+        "timeout",
+        "file size limit",
+        "hardlink refusal",
+        "junction refusal",
+        "snapshot change rejected",
+        "cancellation reached compiler 0",
+        "cancellation reached compiler 1",
+        "cancellation reached compiler 2",
+        "cancellation reached compiler 3",
+        "cancellation reached compiler 4",
+        "cancellation reached compiler 5",
+        "cancellation reached compiler 6",
+        "cancellation reached compiler 7",
+        "cancellation reached compiler 8",
+        "cancellation reached compiler 9",
+        "cancellation reached compiler 10",
+        "cancellation reached compiler 11",
+        "cancellation reached compiler 12",
+        "cancellation reached compiler 13",
+        "cancellation reached compiler 14",
+        "cancellation reached compiler 15",
+        "cancellation reached compiler 16",
+        "cancellation reached compiler 17",
+        "cancellation reached compiler 18",
+        "cancellation reached compiler 19",
+        "cancellation reached compiler 20",
+        "cancellation reached compiler 21",
+        "cancellation reached compiler 22",
+        "cancellation reached compiler 23",
+        "cancellation reached compiler 24",
+        "no idle temporary directories",
+        "same-version mismatch",
+        "no temporary/process residue"
+      ],
+      "sequential": 1000,
+      "cancellations": 25,
+      "stress": {
+        "baseline": {
+          "WorkingSet64": 78848000,
+          "HandleCount": 215
+        },
+        "final": {
+          "WorkingSet64": 109170688,
+          "HandleCount": 215
+        }
+      }
+    },
+    "semantic_soak": {
+      "requests": 200,
+      "elapsed_ms": 23178,
+      "baseline": {
+        "WorkingSet64": 84852736,
+        "HandleCount": 216
+      },
+      "final": {
+        "WorkingSet64": 83009536,
+        "HandleCount": 216
+      }
+    },
+    "execution": [
+      "eleven native MCP tools",
+      "execution enabled after OS startup probe",
+      "isolated MSVC build issues artifact",
+      "Unicode output and no inherited secret",
+      "source unchanged",
+      "forged artifact rejected",
+      "invalid argv 6",
+      "invalid argv 7",
+      "invalid argv 8",
+      "invalid code rejected with native diagnostic",
+      "path escape rejected",
+      "native tests continue after failure",
+      "unsaved source build",
+      "application nonzero exit is run result",
+      "overlay is private",
+      "stale snapshot rejected",
+      "native bytes require host allowlist",
+      "hardlinked snapshot rejected",
+      "loop build",
+      "execution concurrency limit",
+      "wall time limit",
+      "server recovers after cancellation",
+      "transport stdout contains only MCP",
+      "MCP disconnect releases execution cache"
+    ],
+    "faults": [
+      "changed artifact bytes rejected",
+      "expired artifact rejected",
+      "artifact count bound",
+      "invalid UTF8 stdout uses hex",
+      "snapshot race rejected",
+      "cancelled build publishes nothing",
+      "authorized native DLL is pinned and staged",
+      "toolchain mutation disables execution",
+      "failed backend keeps analysis only"
+    ],
+    "fresh_client": {
+      "schema_version": 1,
+      "exit": 0,
+      "workspace": "G:\\Vela\\work\\measurelab-09-agent-TwJS3i",
+      "expected": "39f30df4d5dcb8548291a5e241e906e44a3e99d3e2be882070a9010f304510ea",
+      "saved_hash": "39f30df4d5dcb8548291a5e241e906e44a3e99d3e2be882070a9010f304510ea",
+      "saved_bytes": 17500,
+      "tool_calls": [
+        {
+          "name": "vela_get_context",
+          "status": "ok"
+        },
+        {
+          "name": "vela_get_help",
+          "status": "ok"
+        },
+        {
+          "name": "vela_check",
+          "status": "ok"
+        },
+        {
+          "name": "vela_build",
+          "status": "ok"
+        },
+        {
+          "name": "vela_run",
+          "status": "ok"
+        },
+        {
+          "name": "vela_read_output",
+          "status": "ok"
+        }
+      ],
+      "save_method": "Explicit request from read-only fresh client; host verifies and writes fixture file.",
+      "passed": true
+    }
+  },
+  "sha256": {
+    "bin/velac.exe": "3f02f5f82bfc7b41b5444711eb7cf23e0e38d724bba51001e5b38c6517cfc644",
+    "bin/vela-dev.exe": "93984ffd5d1e9a7e581b80435c55442342989de497f910fff2b189c3bcac84dc",
+    "bin/vela-test.exe": "03b0207f6ecaa3205fb71dcfbca41fa559d25af08ff4257e2c48d4012bce2ee4",
+    "bin/vela-bundle.exe": "a8f5f42b64a1b04e17842d3b0722cb31ad8b83461299d3ccf44b3aeb36e7bfd4",
+    "bin/vela-lsp.exe": "61f0b2196e3c206366a6013dd947685a30f08a57682efc0753a8f73aae34378f",
+    "bootstrap/velac.c": "7ed841376070d63755f3bc48380a9ab32dd2c092343e227dd0eb9175f7f8b2a4",
+    "selfhost/compiler.vela": "829246e9a2ccb546600462ec44ffda47ce1c0fe31d1dbd5c6cae5f25eb3ce1b8",
+    "integrations/mcp/compatibility.json": "018f79642e8cd4942550a3554fe71ea832aec95048003851161739ff722c4896"
+  }
+}

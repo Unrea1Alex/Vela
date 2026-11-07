@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "compiler": "Vela 0.9.0 (self-hosted)",
+  "passed": 31,
+  "failed": 0,
+  "checks": [
+    "real native query: exact modules/functions/call sites/imports; generic result types",
+    "Unicode paths and byte-identical output under forced GC with system-only PATH",
+    "malformed JSON preserves report",
+    "invalid UTF-8 preserves report",
+    "2 MiB input bound",
+    "future schema",
+    "failed analysis",
+    "nonboolean status",
+    "missing definitions",
+    "invalid revision",
+    "duplicate documents",
+    "document count bound",
+    "unknown document in function",
+    "negative coordinate",
+    "wrong coordinate type with JSON path",
+    "reversed range",
+    "unknown effect",
+    "conflicting function identity",
+    "unknown caller",
+    "unknown callee",
+    "unknown import target",
+    "duplicate instantiations keep exact report and counts",
+    "sparse document IDs",
+    "HTML injection escaped in paths and symbol names",
+    "512 KiB output bound preserves previous report",
+    "same-file and hardlink input protection",
+    "missing output directory",
+    "help and invalid CLI option",
+    "full RouteAudit import graph renders successfully",
+    "self index exceeds current std JSON node budget",
+    "formatter fixed point, raw HTML/CSS/JS preserved"
+  ],
+  "demo": {
+    "modules": 3,
+    "functions": 12,
+    "calls": 25,
+    "imports": 3,
+    "bytes": 20922,
+    "sha256": "467ca95f8abf66ffa28590d384e54f497d42d080fa5e095aa3692ec532f9f622"
+  },
+  "stress_collections": 4863749,
+  "stress_ms": 28291,
+  "large_index": {
+    "bytes": 834306,
+    "json_nodes": 66590,
+    "result": "expected JSON node-limit rejection"
+  },
+  "formatted": [
+    "main.vela",
+    "graph.vela",
+    "report.vela",
+    "tests.vela"
+  ]
+}

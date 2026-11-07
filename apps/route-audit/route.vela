@@ -1,0 +1,104 @@
+import "../../std/json.vela" as json;
+
+pub struct Point {
+    x: Float64,
+    y: Float64
+}
+
+pub struct Route {
+    name: String,
+    jump_limit: Float64,
+    points: List<Point>
+}
+
+pub struct Summary {
+    length: Float64,
+    max_step: Float64,
+    jumps: Int
+}
+
+fn decoded<T>(outcome: Result<T, json::At<json::DecodeCause>>) -> Result<T, String> {
+    return match outcome {
+        Result::Ok(value) => Result<T, String>::Ok(value),
+        Result::Err(error) => Result<T, String>::Err(json::describe(error))
+    };
+}
+
+fn number(record: json::Cursor, field_name: String) -> Result<Float64, String> effects { state } {
+    let selected = decoded(json::field(record, field_name))?;
+    return decoded(json::as_number(selected, json::IntegerMode::Exact));
+}
+
+fn coordinate(record: json::Cursor, index: Int) -> Result<Float64, String> effects { state } {
+    let selected = decoded(json::item(record, index))?;
+    let value = decoded(json::as_number(selected, json::IntegerMode::Exact))?;
+    if value < -1000000.0 || value > 1000000.0 {
+        return Result<Float64, String>::Err(selected.path + ": coordinate must be within +/-1000000 m");
+    }
+    return Result<Float64, String>::Ok(value);
+}
+
+pub fn parse(line: String) -> Result<Route, String> effects { state } {
+    let root = decoded(json::decode(line))?;
+    let fields = decoded(json::as_object(root))?;
+    for field in fields {
+        if field.name != "name" && field.name != "jump_limit_m" && field.name != "points" {
+            return Result<Route, String>::Err("$: unexpected field " + field.name);
+        }
+    }
+    let selected_name = decoded(json::field(root, "name"))?;
+    let name = decoded(json::as_string(selected_name))?;
+    if str_len(name) < 1 || str_len(name) > 96 {
+        return Result<Route, String>::Err("$.name: expected 1..96 UTF-8 bytes");
+    }
+    for i in 0 .. str_len(name) {
+        let byte = str_byte(name, i);
+        if byte < 32 || byte == 127 {
+            return Result<Route, String>::Err("$.name: control bytes are forbidden");
+        }
+    }
+    let limit = number(root, "jump_limit_m")?;
+    if limit <= 0.0 || limit > 3000000.0 {
+        return Result<Route, String>::Err("$.jump_limit_m: expected 0 < limit <= 3000000");
+    }
+    let selected_points = decoded(json::field(root, "points"))?;
+    let entries = decoded(json::as_array(selected_points))?;
+    let count = list_len(entries);
+    if count < 2 || count > 256 {
+        return Result<Route, String>::Err("$.points: expected 2..256 points");
+    }
+    let points = list_new<Point>();
+    for i in 0 .. count {
+        let entry = decoded(json::item(selected_points, i))?;
+        let pair = decoded(json::as_array(entry))?;
+        if list_len(pair) != 2 {
+            return Result<Route, String>::Err(entry.path + ": expected an [x, y] pair");
+        }
+        let x = coordinate(entry, 0)?;
+        let y = coordinate(entry, 1)?;
+        list_push(points, Point(x: x, y: y));
+    }
+    return Result<Route, String>::Ok(Route(name: name, jump_limit: limit, points: points));
+}
+
+pub fn summarize(route: Route) -> Result<Summary, String> effects { state } {
+    var previous = list_get(route.points, 0);
+    var length = 0.0;
+    var longest = 0.0;
+    var jumps = 0;
+    for i in 1 .. list_len(route.points) {
+        let current = list_get(route.points, i);
+        let dx = current.x - previous.x;
+        let dy = current.y - previous.y;
+        var step = 0.0;
+        match float_sqrt(dx * dx + dy * dy) {
+            FloatResult::Ok(value) => { step = value; }
+            FloatResult::Err(error) => { return Result<Summary, String>::Err(error); }
+        }
+        length = length + step;
+        if step > longest { longest = step; }
+        if step > route.jump_limit { jumps = jumps + 1; }
+        previous = current;
+    }
+    return Result<Summary, String>::Ok(Summary(length: length, max_step: longest, jumps: jumps));
+}

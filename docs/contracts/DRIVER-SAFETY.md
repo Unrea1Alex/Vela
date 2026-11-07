@@ -1,5 +1,8 @@
 # Driver safety and file identity
 
+Memory descriptions of the original version are historical. In 0.8,
+[the tracing heap](../MEMORY.md) governs managed values.
+
 Status: accepted, 2026-11-04. Implementation/validation tracked in ROADMAP.md.
 
 `file_identity(path: String) -> StringResult effects { io }` queries the OS.

@@ -1,0 +1,4 @@
+interface Empty {}
+fn legacy<T>(x: T) -> Int { return x.field; }
+fn unused<T: Empty>(x: T) -> Int { return legacy(x); }
+fn main() -> Int { return 0; }

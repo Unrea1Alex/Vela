@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "workspace": "G:\\Vela\\build\\stage1040\\candidate-fixed\\native\\work\\vela-execution-onboarding-GJ5XA5",
+  "exit": 0,
+  "native_mcp_calls": [
+    {
+      "server": "vela",
+      "tool": "vela_get_context",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_check",
+      "status": "failed",
+      "result_status": "rejected"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_check",
+      "status": "failed",
+      "result_status": "rejected"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_check",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_build",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_test",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_run",
+      "status": "completed",
+      "result_status": "ok"
+    }
+  ],
+  "skill_path": "",
+  "skill_disk_read": false,
+  "skill_activation": "Client automatically supplies activated skill instructions; disk reading is recorded separately.",
+  "notes": "Skill-file reading denied by policy at G:\\Vela\\build\\stage1040\\candidate-fixed\\native\\work\\vela-execution-onboarding-GJ5XA5\\.agents\\skills\\vela-app\\SKILL.md; used supplied skill instructions instead. Intentional draft rejected with E201 at main.vela:1:20 (String returned as Int). Corrected an additional E100 at 8:27 by replacing a block in a match expression with statement matching. Native help → check → build → test → run completed using the unsaved main.vela overlay and matching installed library. All 3 named tests passed. Run exited 0 with exact stdout \"count=3 total=10.5 mean=3.5\\r\\n\" and empty stderr. No workspace files, compiler implementation, connection settings or hashes changed.",
+  "stdout": "count=3 total=10.5 mean=3.5",
+  "passed": true
+}

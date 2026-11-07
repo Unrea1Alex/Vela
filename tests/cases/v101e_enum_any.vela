@@ -1,0 +1,11 @@
+enum State {
+    Ready,
+    Done(Int)
+}
+fn equal<T>(a: T, b: T) -> Bool {
+    return a == b;
+}
+fn main() -> Int {
+    let invalid = equal(State::Ready, State::Ready);
+    return 0;
+}

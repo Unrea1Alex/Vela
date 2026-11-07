@@ -1,0 +1,4 @@
+fn both<effect E>(a: fn() -> Int effects E, b: fn() -> Int effects E) -> Int effects E { return a() + b(); }
+fn pure() -> Int { return 0; }
+fn printer() -> Int effects { io } { print(0); return 0; }
+fn main() -> Int { return both(pure, printer); }

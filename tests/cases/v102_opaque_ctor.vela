@@ -1,0 +1,2 @@
+import "opaque-owner.vela" as api;
+fn main() -> Int { let x = api::Empty(); return 0; }

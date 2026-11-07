@@ -1,0 +1,3 @@
+struct Hidden { x: Counter }
+pub opaque struct Counter { secret: Hidden }
+fn main() -> Int { return 0; }

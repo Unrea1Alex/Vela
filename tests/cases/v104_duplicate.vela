@@ -1,0 +1,5 @@
+interface Empty {}
+struct Foo {}
+impl Empty for Foo {}
+impl Empty for Foo {}
+fn main() -> Int { return 0; }

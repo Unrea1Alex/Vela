@@ -1,0 +1,326 @@
+{
+  "peak_metric": "compiler process peak working set sampled at 5ms",
+  "machine": "Windows x64/MSVC",
+  "milestone": "0.11.4",
+  "schema_version": 1,
+  "limitations": [
+    "C toolchain runs every build",
+    "measurement includes process launch, disk cache and contention on this host"
+  ],
+  "cache": [
+    {
+      "action": "check",
+      "output_bytes": 33,
+      "ms": 277,
+      "case": "fielddesk",
+      "trial": 1,
+      "peak_working_set_bytes": 33521664
+    },
+    {
+      "action": "check",
+      "output_bytes": 33,
+      "ms": 67,
+      "case": "fielddesk",
+      "trial": 2,
+      "peak_working_set_bytes": 7806976
+    },
+    {
+      "action": "build",
+      "output_bytes": 0,
+      "ms": 7549,
+      "case": "fielddesk",
+      "trial": 1,
+      "peak_working_set_bytes": 59527168
+    },
+    {
+      "action": "build",
+      "output_bytes": 0,
+      "ms": 7101,
+      "case": "fielddesk",
+      "trial": 2,
+      "peak_working_set_bytes": 11845632
+    },
+    {
+      "action": "check",
+      "output_bytes": 35,
+      "ms": 100,
+      "case": "source-lens",
+      "trial": 1,
+      "peak_working_set_bytes": 17915904
+    },
+    {
+      "action": "check",
+      "output_bytes": 35,
+      "ms": 39,
+      "case": "source-lens",
+      "trial": 2,
+      "peak_working_set_bytes": 7688192
+    },
+    {
+      "action": "build",
+      "output_bytes": 0,
+      "ms": 2180,
+      "case": "source-lens",
+      "trial": 1,
+      "peak_working_set_bytes": 33198080
+    },
+    {
+      "action": "build",
+      "output_bytes": 0,
+      "ms": 1892,
+      "case": "source-lens",
+      "trial": 2,
+      "peak_working_set_bytes": 9703424
+    },
+    {
+      "action": "check",
+      "output_bytes": 28,
+      "ms": 399,
+      "case": "selfhost",
+      "trial": 1,
+      "peak_working_set_bytes": 52559872
+    },
+    {
+      "action": "check",
+      "output_bytes": 28,
+      "ms": 42,
+      "case": "selfhost",
+      "trial": 2,
+      "peak_working_set_bytes": 7135232
+    },
+    {
+      "action": "build",
+      "output_bytes": 0,
+      "ms": 41502,
+      "case": "selfhost",
+      "trial": 1,
+      "peak_working_set_bytes": 141885440
+    },
+    {
+      "action": "build",
+      "output_bytes": 0,
+      "ms": 38599,
+      "case": "selfhost",
+      "trial": 2,
+      "peak_working_set_bytes": 19505152
+    }
+  ],
+  "baseline": [
+    {
+      "ms": 349,
+      "case": "fielddesk",
+      "output_bytes": 33,
+      "action": "check",
+      "trial": 1,
+      "peak_working_set_bytes": 35291136
+    },
+    {
+      "ms": 280,
+      "case": "fielddesk",
+      "output_bytes": 33,
+      "action": "check",
+      "trial": 2,
+      "peak_working_set_bytes": 35037184
+    },
+    {
+      "ms": 328,
+      "case": "fielddesk",
+      "output_bytes": 33,
+      "action": "check",
+      "trial": 3,
+      "peak_working_set_bytes": 35024896
+    },
+    {
+      "ms": 682,
+      "case": "fielddesk",
+      "output_bytes": 2116444,
+      "action": "query",
+      "trial": 1,
+      "peak_working_set_bytes": 52523008
+    },
+    {
+      "ms": 656,
+      "case": "fielddesk",
+      "output_bytes": 2116444,
+      "action": "query",
+      "trial": 2,
+      "peak_working_set_bytes": 52523008
+    },
+    {
+      "ms": 572,
+      "case": "fielddesk",
+      "output_bytes": 2116444,
+      "action": "query",
+      "trial": 3,
+      "peak_working_set_bytes": 52506624
+    },
+    {
+      "ms": 10325,
+      "case": "fielddesk",
+      "output_bytes": 0,
+      "action": "build",
+      "trial": 1,
+      "peak_working_set_bytes": 57434112
+    },
+    {
+      "ms": 10522,
+      "case": "fielddesk",
+      "output_bytes": 0,
+      "action": "build",
+      "trial": 2,
+      "peak_working_set_bytes": 57409536
+    },
+    {
+      "ms": 9534,
+      "case": "fielddesk",
+      "output_bytes": 0,
+      "action": "build",
+      "trial": 3,
+      "peak_working_set_bytes": 57401344
+    },
+    {
+      "ms": 302,
+      "case": "source-lens",
+      "output_bytes": 35,
+      "action": "check",
+      "trial": 1,
+      "peak_working_set_bytes": 15843328
+    },
+    {
+      "ms": 123,
+      "case": "source-lens",
+      "output_bytes": 35,
+      "action": "check",
+      "trial": 2,
+      "peak_working_set_bytes": 17080320
+    },
+    {
+      "ms": 122,
+      "case": "source-lens",
+      "output_bytes": 35,
+      "action": "check",
+      "trial": 3,
+      "peak_working_set_bytes": 17104896
+    },
+    {
+      "ms": 222,
+      "case": "source-lens",
+      "output_bytes": 909293,
+      "action": "query",
+      "trial": 1,
+      "peak_working_set_bytes": 28807168
+    },
+    {
+      "ms": 229,
+      "case": "source-lens",
+      "output_bytes": 909293,
+      "action": "query",
+      "trial": 2,
+      "peak_working_set_bytes": 28823552
+    },
+    {
+      "ms": 183,
+      "case": "source-lens",
+      "output_bytes": 909293,
+      "action": "query",
+      "trial": 3,
+      "peak_working_set_bytes": 28811264
+    },
+    {
+      "ms": 2403,
+      "case": "source-lens",
+      "output_bytes": 0,
+      "action": "build",
+      "trial": 1,
+      "peak_working_set_bytes": 31891456
+    },
+    {
+      "ms": 2527,
+      "case": "source-lens",
+      "output_bytes": 0,
+      "action": "build",
+      "trial": 2,
+      "peak_working_set_bytes": 31797248
+    },
+    {
+      "ms": 2242,
+      "case": "source-lens",
+      "output_bytes": 0,
+      "action": "build",
+      "trial": 3,
+      "peak_working_set_bytes": 31801344
+    },
+    {
+      "ms": 410,
+      "case": "selfhost",
+      "output_bytes": 28,
+      "action": "check",
+      "trial": 1,
+      "peak_working_set_bytes": 51277824
+    },
+    {
+      "ms": 416,
+      "case": "selfhost",
+      "output_bytes": 28,
+      "action": "check",
+      "trial": 2,
+      "peak_working_set_bytes": 50614272
+    },
+    {
+      "ms": 406,
+      "case": "selfhost",
+      "output_bytes": 28,
+      "action": "check",
+      "trial": 3,
+      "peak_working_set_bytes": 51273728
+    },
+    {
+      "ms": 1164,
+      "case": "selfhost",
+      "output_bytes": 5212242,
+      "action": "query",
+      "trial": 1,
+      "peak_working_set_bytes": 113836032
+    },
+    {
+      "ms": 1198,
+      "case": "selfhost",
+      "output_bytes": 5212242,
+      "action": "query",
+      "trial": 2,
+      "peak_working_set_bytes": 113987584
+    },
+    {
+      "ms": 1290,
+      "case": "selfhost",
+      "output_bytes": 5212242,
+      "action": "query",
+      "trial": 3,
+      "peak_working_set_bytes": 113905664
+    },
+    {
+      "ms": 46978,
+      "case": "selfhost",
+      "output_bytes": 0,
+      "action": "build",
+      "trial": 1,
+      "peak_working_set_bytes": 133427200
+    },
+    {
+      "ms": 39817,
+      "case": "selfhost",
+      "output_bytes": 0,
+      "action": "build",
+      "trial": 2,
+      "peak_working_set_bytes": 133402624
+    },
+    {
+      "ms": 40071,
+      "case": "selfhost",
+      "output_bytes": 0,
+      "action": "build",
+      "trial": 3,
+      "peak_working_set_bytes": 133316608
+    }
+  ]
+}

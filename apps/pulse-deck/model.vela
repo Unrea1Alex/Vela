@@ -1,0 +1,225 @@
+import "../../std/json.vela" as json;
+import "../../std/http.vela" as http;
+import "../../std/path.vela" as path;
+import "../../std/result.vela" as result;
+pub struct Endpoint {
+    name: String,
+    scheme: http::Scheme,
+    host: String,
+    port: Int,
+    target: String,
+    expect: Int,
+    delay: Int,
+    timeout: Int,
+    limit: Int
+}
+pub struct Settings {
+    demo: Bool,
+    curl: String,
+    ca: String,
+    concurrency: Int,
+    endpoints: List<Endpoint>
+}
+pub enum State {
+    Queued,
+    Running,
+    Healthy,
+    HttpError,
+    Error,
+    Cancelled
+}
+pub fn language_version() -> String {
+    return "1.0.0";
+}
+pub fn state_name(state: State) -> String {
+    return match state {
+        State::Queued => "queued",
+        State::Running => "running",
+        State::Healthy => "healthy",
+        State::HttpError => "http-error",
+        State::Error => "error",
+        State::Cancelled => "cancelled"
+    };
+}
+pub struct Row {
+    name: String,
+    state: State,
+    message: String,
+    status: Int,
+    bytes: Int,
+    digest: String,
+    elapsed: Int
+}
+fn string(c: json::Cursor, key: String) -> Result<String, String> effects { state } {
+    let child = result::map_error(json::field(c, key), json::describe)?;
+    return result::map_error(json::as_string(child), json::describe);
+}
+fn integer(c: json::Cursor, key: String) -> Result<Int, String> effects { state } {
+    let child = result::map_error(json::field(c, key), json::describe)?;
+    return result::map_error(json::as_int(child), json::describe);
+}
+pub fn http_error(error: http::Error) -> String {
+    return match error {
+        http::Error::InvalidEndpoint => "invalid endpoint",
+        http::Error::InvalidLimit => "invalid request budget",
+        http::Error::InvalidHeaders => "invalid headers",
+        http::Error::InvalidBody => "invalid body",
+        http::Error::InvalidTransport => "invalid curl or CA path",
+        http::Error::Schedule(_) => "cannot schedule request",
+        http::Error::Connect(code) => f"connection failed ({code:d})",
+        http::Error::Tls(code) => f"TLS verification/handshake failed ({code:d})",
+        http::Error::Transfer(code) => f"transfer failed ({code:d})",
+        http::Error::Protocol => "invalid HTTP response",
+        http::Error::Limit => "response byte limit exceeded",
+        http::Error::TimedOut => "deadline exceeded",
+        http::Error::Cancelled => "cancelled",
+        http::Error::Pending => "pending",
+        http::Error::Closed => "exchange closed",
+        http::Error::Storage(message) => "transport storage: " + message
+    };
+}
+pub fn request(endpoint: Endpoint, demo_port: Int) -> Result<http::Request, String> {
+    var port = endpoint.port;
+    if port == 0 {
+        port = demo_port;
+    }
+    let scheme = match endpoint.scheme {
+        http::Scheme::Http => "http",
+        http::Scheme::Https => "https"
+    };
+    return match http::from_url(scheme + "://" + endpoint.host + ":" + to_string(port)
+        + endpoint.target, endpoint.timeout, endpoint.limit) {
+        Result::Ok(request) => Result<http::Request, String>::Ok(request),
+        Result::Err(error) => Result<http::Request, String>::Err(http_error(error))
+    };
+}
+fn endpoint(c: json::Cursor, demo: Bool) -> Result<Endpoint, String> effects { state } {
+    let name = string(c, "name")?;
+    if str_len(name) < 1 || str_len(name) > 80 {
+        return Result<Endpoint, String>::Err("Endpoint name must contain 1..80 UTF-8 bytes");
+    }
+    for i in 0 .. str_len(name) {
+        if str_byte(name, i) < 32 || str_byte(name, i) == 127 {
+            return Result<Endpoint, String>::Err("Control byte in endpoint name");
+        }
+    }
+    let scheme_name = string(c, "scheme")?;
+    var scheme = http::Scheme::Http;
+    if scheme_name == "https" {
+        scheme = http::Scheme::Https;
+    } else if scheme_name != "http" {
+        return Result<Endpoint, String>::Err("Scheme must be http or https");
+    }
+    let entry = Endpoint(name: name, scheme: scheme, host: string(c, "host")?, port: integer(c,
+        "port")?, target: string(c, "target")?, expect: integer(c, "expect")?, delay: integer(c,
+        "delay_ms")?, timeout: integer(c, "timeout_ms")?, limit: integer(c, "body_limit")?);
+    if entry.expect < 100 || entry.expect > 599 || entry.delay < 0 || entry.delay > 10000 {
+        return Result<Endpoint, String>::Err(name + ": invalid expected status or delay");
+    }
+    if entry.port == 0 && (!demo || entry.host != "127.0.0.1" || scheme_name != "http") {
+        return Result<Endpoint, String>::Err("Port 0 requires the HTTP loopback demo");
+    }
+    let checked = request(entry, 1)?;
+    return Result<Endpoint, String>::Ok(entry);
+}
+pub fn parse(data: String) -> Result<Settings, String> effects { state } {
+    if str_len(data) > 65536 {
+        return Result<Settings, String>::Err("Settings exceed 64 KiB");
+    }
+    let root = result::map_error(json::decode(data), json::describe)?;
+    let demo_field = result::map_error(json::field(root, "demo"), json::describe)?;
+    let demo = result::map_error(json::as_bool(demo_field), json::describe)?;
+    let curl = string(root, "curl")?;
+    let ca = string(root, "ca_file")?;
+    let concurrency = integer(root, "concurrency")?;
+    if concurrency < 1 || concurrency > 4 {
+        return Result<Settings, String>::Err("Concurrency must be 1..4");
+    }
+    let nodes = result::map_error(json::field(root, "endpoints"), json::describe)?;
+    let entries = result::map_error(json::as_array(nodes), json::describe)?;
+    if list_len(entries) < 1 || list_len(entries) > 16 {
+        return Result<Settings, String>::Err("Expected 1..16 endpoints");
+    }
+    let endpoints = list_new<Endpoint>();
+    let seen = dict_new<String, Bool>();
+    for i in 0 .. list_len(entries) {
+        let child = result::map_error(json::item(nodes, i), json::describe)?;
+        let entry = endpoint(child, demo)?;
+        if dict_has(seen, entry.name) {
+            return Result<Settings, String>::Err("Duplicate endpoint name: " + entry.name);
+        }
+        dict_set(seen, entry.name, true);
+        list_push(endpoints, entry);
+    }
+    return Result<Settings, String>::Ok(Settings(demo: demo, curl: curl, ca: ca,
+        concurrency: concurrency, endpoints: endpoints));
+}
+pub fn row(name: String, state: State, message: String, elapsed: Int) -> Row {
+    return Row(name: name, state: state, message: message, status: 0, bytes: 0, digest: "",
+        elapsed: elapsed);
+}
+pub fn response(entry: Endpoint, answer: http::Response, elapsed: Int) -> Row {
+    var state = State::HttpError;
+    if answer.status == entry.expect {
+        state = State::Healthy;
+    }
+    return Row(name: entry.name, state: state,
+        message: f"HTTP {answer.status:d}; expected {entry.expect:d}", status: answer.status,
+        bytes: str_len(answer.body.data), digest: sha256(answer.body.data), elapsed: elapsed);
+}
+pub fn terminal(row: Row) -> Bool {
+    return match row.state {
+        State::Queued => false,
+        State::Running => false,
+        State::Healthy => true,
+        State::HttpError => true,
+        State::Error => true,
+        State::Cancelled => true
+    };
+}
+pub fn display(rows: List<Row>) -> String effects { state } {
+    let parts = strings_new();
+    for row in rows {
+        strings_push(parts, row.name + "\r\n  " + state_name(row.state) + " | " + row.message
+            + " | " + to_string(row.elapsed) + " ms\r\n\r\n");
+    }
+    return strings_join(parts, "");
+}
+pub fn counts(rows: List<Row>) -> String effects { state } {
+    var done = 0;
+    var healthy = 0;
+    for row in rows {
+        if terminal(row) {
+            done = done + 1;
+        }
+        if row.state == State::Healthy {
+            healthy = healthy + 1;
+        }
+    }
+    return f"{done:d}/{list_len(rows):d} completed | {healthy:d} healthy";
+}
+fn add(fields: List<json::Member>, key: String, value: json::Value) -> Unit effects { state } {
+    list_push(fields, json::Member(name: key, value: value));
+}
+pub fn report(rows: List<Row>, peak: Int, cleanup: Int) -> Result<String,
+    String> effects { state } {
+    let items = list_new<json::Value>();
+    for row in rows {
+        let fields = list_new<json::Member>();
+        add(fields, "name", json::Value::StringValue(row.name));
+        add(fields, "state", json::Value::StringValue(state_name(row.state)));
+        add(fields, "message", json::Value::StringValue(row.message));
+        add(fields, "status", json::Value::Integer(row.status));
+        add(fields, "bytes", json::Value::Integer(row.bytes));
+        add(fields, "sha256", json::Value::StringValue(row.digest));
+        add(fields, "elapsed_ms", json::Value::Integer(row.elapsed));
+        list_push(items, json::Value::Object(fields));
+    }
+    let root = list_new<json::Member>();
+    add(root, "application", json::Value::StringValue("PulseDeck 1.0"));
+    add(root, "vela", json::Value::StringValue(language_version()));
+    add(root, "peak_in_flight", json::Value::Integer(peak));
+    add(root, "timer_cleanups", json::Value::Integer(cleanup));
+    add(root, "results", json::Value::Array(items));
+    return result::explain(json::stringify(json::Value::Object(root)), "Cannot encode report");
+}

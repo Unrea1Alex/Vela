@@ -40,7 +40,7 @@ pub fn check_for(c: Context, syntax: SyntaxStmt) -> CheckedStmt effects { state,
         require_effects(c, find_symbol(c, c.signatures, "list_len"), syntax.span);
     }
     push_scope(c);
-    n.binding = bind(c, syntax.name, element, false, syntax.span, false);
+    n.binding = bind(c, syntax.name, element, false, syntax.name_span, false);
     enter_loop(c);
     n.yes = check_block(c, syntax.yes, false);
     leave_loop(c);

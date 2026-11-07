@@ -1,0 +1,3 @@
+async fn task() -> Int { return 3; }
+fn takes(callback: fn() -> Int) -> Int { return callback(); }
+fn main() -> Int { return takes(task); }

@@ -1,0 +1,14 @@
+{
+  "demo": true,
+  "curl": "system",
+  "ca_file": "",
+  "concurrency": 3,
+  "endpoints": [
+    {"name":"Inventory API","scheme":"http","host":"127.0.0.1","port":0,"target":"/health","expect":200,"delay_ms":0,"timeout_ms":3000,"body_limit":4096},
+    {"name":"Москва · Unicode","scheme":"http","host":"127.0.0.1","port":0,"target":"/unicode","expect":200,"delay_ms":500,"timeout_ms":3000,"body_limit":4096},
+    {"name":"Maintenance service","scheme":"http","host":"127.0.0.1","port":0,"target":"/failed","expect":200,"delay_ms":900,"timeout_ms":3000,"body_limit":4096},
+    {"name":"Missing route","scheme":"http","host":"127.0.0.1","port":0,"target":"/missing","expect":200,"delay_ms":1400,"timeout_ms":3000,"body_limit":4096},
+    {"name":"Payload guard","scheme":"http","host":"127.0.0.1","port":0,"target":"/large","expect":200,"delay_ms":1800,"timeout_ms":3000,"body_limit":32},
+    {"name":"Expected missing","scheme":"http","host":"127.0.0.1","port":0,"target":"/missing","expect":404,"delay_ms":2200,"timeout_ms":3000,"body_limit":4096}
+  ]
+}

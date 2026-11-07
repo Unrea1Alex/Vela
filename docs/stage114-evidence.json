@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "milestone": "0.11.4",
+  "compiler": "0.11.0-dev.3",
+  "platform": "Windows x64/MSVC",
+  "compiler_sha256": "59969e5da488184a5ef2895888233b25d4ce9951bd484d7a397d691700409aae",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1167,
+    "failed": 0,
+    "skipped": 0
+  },
+  "compiler_fixed_point": true,
+  "bundler_fixed_point": true,
+  "log": "build/stage114/verify-retry.log",
+  "incremental": {
+    "checks": [
+      "cold and warm C byte equality",
+      "corrupt cache recovery",
+      "changed imported source invalidates check and C",
+      "source-name key and output protection on a warm cache",
+      "project lock is verified even on cache hit",
+      "concurrent cache publication",
+      "stale continuation rejected",
+      "page parity on FieldDesk, SourceLens and selfhost",
+      "FieldDesk entry-only rename scope"
+    ],
+    "pageStats": [
+      {
+        "input": "apps/fielddesk/vela.project",
+        "pages": 6,
+        "records": 10261
+      },
+      {
+        "input": "apps/source-lens/vela.project",
+        "pages": 3,
+        "records": 4415
+      },
+      {
+        "input": "selfhost/compiler.vela",
+        "pages": 13,
+        "records": 24710
+      }
+    ]
+  },
+  "batch": {
+    "negative": "E241",
+    "apps": [
+      "FieldDesk",
+      "SourceLens"
+    ],
+    "exits": [
+      0,
+      0,
+      1
+    ],
+    "peak_jobs": 2,
+    "log": "build/stage114/batch.log"
+  },
+  "lsp_scope_warning": true,
+  "measurements": "docs/stage114-measurements.json"
+}

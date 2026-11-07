@@ -1,0 +1,161 @@
+import "text.vela" as text;
+pub struct Line {
+    data: String,
+    number: Int
+}
+struct Cursor {
+    chunk: String,
+    position: Int,
+    total: Int,
+    offset: Int,
+    number: Int,
+    eof: Bool,
+    busy: Bool,
+    failed: Bool,
+    error: String
+}
+pub opaque struct Reader {
+    cursor: List<Cursor>,
+    max_bytes: Int,
+    max_line: Int,
+    chunk_bytes: Int
+}
+pub fn reader(max_bytes: Int, max_line: Int, chunk_bytes: Int) -> Result<Reader,
+    String> effects { state } {
+    if max_bytes < 1 || max_bytes > 268435456 || max_line < 1 || max_line > 1048576 || chunk_bytes
+        < 1 || chunk_bytes > 8192 {
+        return Result<Reader, String>::Err("Invalid line reader limits");
+    }
+    let cursor = list_new<Cursor>();
+    list_push(cursor, Cursor(chunk: "", position: 0, total: 0, offset: 0, number: 1, eof: false,
+        busy: false, failed: false, error: ""));
+    return Result<Reader, String>::Ok(Reader(cursor: cursor, max_bytes: max_bytes,
+        max_line: max_line, chunk_bytes: chunk_bytes));
+}
+fn too_long(number: Int, limit: Int) -> Result<Option<Line>, String> {
+    var size = to_string(limit) + " bytes";
+    if limit == 65536 {
+        size = "64 KiB";
+    }
+    return Result<Option<Line>, String>::Err("line " + to_string(number) + ": line exceeds "
+        + size);
+}
+fn read_line<effect E>(reader: Reader, pull: fn(Int) -> Result<String,
+    String> effects E) -> Result<Option<Line>, String> effects { state, E } {
+    var current = list_get(reader.cursor, 0);
+    let parts = strings_new();
+    var size = 0;
+    var newline = false;
+    var allowance = reader.max_line;
+    if current.number == 1 {
+        allowance = allowance + 3;
+    }
+    while !newline {
+        if current.position == str_len(current.chunk) {
+            if current.eof {
+                break;
+            }
+            let bytes = pull(reader.chunk_bytes)?;
+            let length = str_len(bytes);
+            if length > reader.chunk_bytes {
+                return Result<Option<Line>, String>::Err("Source exceeded requested chunk size");
+            }
+            if length > reader.max_bytes - current.total {
+                return Result<Option<Line>, String>::Err("Input exceeds " + to_string(
+                    reader.max_bytes) + " bytes");
+            }
+            current.chunk = bytes;
+            current.position = 0;
+            current.total = current.total + length;
+            current.eof = length == 0;
+            if current.eof {
+                break;
+            }
+        }
+        let start = current.position;
+        var end = start;
+        while end < str_len(current.chunk) && str_byte(current.chunk, end) != 10 {
+            end = end + 1;
+        }
+        let consumed = end - start;
+        if consumed > allowance - size {
+            return too_long(current.number, reader.max_line);
+        }
+        if consumed > 0 {
+            strings_push(parts, str_slice(current.chunk, start, end));
+        }
+        size = size + consumed;
+        current.position = end;
+        newline = end < str_len(current.chunk);
+        if newline {
+            current.position = end + 1;
+        }
+    }
+    if size == 0 && !newline {
+        list_set(reader.cursor, 0, current);
+        return Result<Option<Line>, String>::Ok(Option<Line>::None);
+    }
+    var data = strings_join(parts, "");
+    let invalid = text::invalid_offset(data);
+    if invalid >= 0 {
+        return Result<Option<Line>, String>::Err("Invalid UTF-8 at byte " + to_string(current.offset
+            + invalid));
+    }
+    if current.number == 1 && str_len(data) >= 3 && str_byte(data, 0) == 239 && str_byte(data, 1)
+        == 187 && str_byte(data, 2) == 191 {
+        data = str_slice(data, 3, str_len(data));
+    }
+    if str_len(data) > reader.max_line {
+        return too_long(current.number, reader.max_line);
+    }
+    let line = Line(data: data, number: current.number);
+    current.number = current.number + 1;
+    current.offset = current.offset + size;
+    if newline {
+        current.offset = current.offset + 1;
+    }
+    list_set(reader.cursor, 0, current);
+    return Result<Option<Line>, String>::Ok(Option<Line>::Some(line));
+}
+pub fn next<effect E>(reader: Reader, pull: fn(Int) -> Result<String,
+    String> effects E) -> Result<Option<Line>, String> effects { state, E } {
+    var current = list_get(reader.cursor, 0);
+    if current.failed {
+        return Result<Option<Line>, String>::Err(current.error);
+    }
+    if current.busy {
+        return Result<Option<Line>, String>::Err("Line reader is already active");
+    }
+    current.busy = true;
+    list_set(reader.cursor, 0, current);
+    let answer = read_line(reader, pull);
+    current = list_get(reader.cursor, 0);
+    current.busy = false;
+    match answer {
+        Result::Ok(_) => {}
+        Result::Err(error) => {
+            current.failed = true;
+            current.error = error;
+        }
+    }
+    list_set(reader.cursor, 0, current);
+    return answer;
+}
+pub fn from_string(data: String) -> fn(Int) -> Result<String,
+    String> effects { state } effects { state } {
+    let offset = list_new<Int>();
+    list_push(offset, 0);
+    return fn [ data, offset ](limit: Int) -> Result<String, String> effects { state } {
+        if limit < 1 || limit > 8192 {
+            return Result<String, String>::Err("Invalid source chunk size");
+        }
+        let start = list_get(offset, 0);
+        let remaining = str_len(data) - start;
+        var count = limit;
+        if count > remaining {
+            count = remaining;
+        }
+        list_set(offset, 0, start + count);
+        return Result<String, String>::Ok(str_slice(data, start, start + count));
+    };
+}

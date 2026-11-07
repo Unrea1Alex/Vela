@@ -1,0 +1,144 @@
+import "../../std/gui.vela" as ui;
+import "ui.vela" as form;
+import "../../std/event_loop.vela" as loop;
+import "../../std/tasks.vela" as tasks;
+import "../../std/process.vela" as process;
+import "../../std/path.vela" as path;
+fn must<T, E>(value: Result<T, E>, message: String) -> T {
+    match value {
+        Result::Ok(found) => {
+            return found;
+        }
+        Result::Err(_) => {
+            assert_true(false, message);
+        }
+    }
+    return must(value, message);
+}
+fn argument(index: Int) -> String effects { args } {
+    return match arg(index) {
+        StringResult::Ok(value) => value,
+        StringResult::Err(_) => ""
+    };
+}
+fn now() -> Int effects { io } {
+    match monotonic_millis() {
+        IntResult::Ok(value) => {
+            return value;
+        }
+        IntResult::Err(message) => {
+            assert_true(false, message);
+        }
+    }
+    return 0;
+}
+fn done(answer: WriteResult) -> Unit {
+    match answer {
+        WriteResult::Ok => {}
+        WriteResult::Err(message) => {
+            assert_true(false, message);
+        }
+    }
+}
+fn idle(turn: loop::Turn) -> Bool {
+    return match turn {
+        loop::Turn::Idle => true,
+        loop::Turn::Dispatched => false,
+        loop::Turn::Waiting(_) => false
+    };
+}
+fn waiting<T>(task: loop::Task<T>) -> Bool effects { state } {
+    return match loop::outcome(task) {
+        Option::None => true,
+        Option::Some(_) => false
+    };
+}
+fn cancelled<T>(task: loop::Task<T>) -> Bool effects { state } {
+    return match loop::outcome(task) {
+        Option::None => false,
+        Option::Some(value) => match value {
+            loop::Outcome::Cancelled => true,
+            loop::Outcome::TimedOut => false,
+            loop::Outcome::Done(_) => false,
+            loop::Outcome::Failed(_) => false
+        }
+    };
+}
+fn main() -> Int effects { args, io, process, state } {
+    if arg_count() != 2 {
+        eprint("Usage: async-notes.exe PROCESS_FIXTURE OUTPUT_DIRECTORY");
+        return 2;
+    }
+    let worker_args = list_new<String>();
+    list_push(worker_args, argument(0));
+    list_push(worker_args, "loop");
+    let directory = argument(1);
+    let start = now();
+    let workers = must(loop::create<process::Completed>(start), "create worker loop");
+    let tasks_loop = must(loop::create<Int>(start), "create task loop");
+    let worker = must(process::schedule(workers, worker_args, path::Path(value: directory),
+        path::Path(value: directory + "/async-notes.out"), path::Path(value: directory
+        + "/async-notes.err"), 120000), "schedule worker");
+    let cleanup = list_new<Int>();
+    let wait_for_worker = async fn [ worker, cleanup ]() -> Int effects { state } {
+        defer {
+            list_push(cleanup, 1);
+        }
+        let value = await tasks::wait_for(worker);
+        return 1;
+    };
+    let waiter = must(tasks::submit(tasks_loop, 120000, wait_for_worker), "submit waiter");
+    let events = list_new<Int>();
+    let window = must(form::open("Vela Notes async lifecycle"), "create window");
+    if true {
+        let started = must(loop::tick(workers, now()), "start worker");
+        let suspended = must(loop::tick(tasks_loop, now()), "suspend task");
+        assert_true(waiting(worker) && waiting(waiter), "both tasks pending");
+        assert_true(ui::status(window, "Worker pending. Type a note and click Save, then Close."),
+            "show status");
+        print("Worker pending and task suspended");
+        var closing = false;
+        var input = false;
+        while !closing {
+            for code in must(ui::pump(window, 30), "pump") {
+                list_push(events, code);
+            }
+            for event in events {
+                if event == 103 {
+                    closing = true;
+                    break;
+                }
+                if event == 102 && str_len(must(ui::snapshot(window), "snapshot")) > 0 {
+                    assert_true(waiting(worker) && waiting(waiter), "input during work");
+                    input = true;
+                    assert_true(ui::status(window, "Input accepted while both tasks wait."),
+                        "show input status");
+                }
+            }
+            list_truncate(events, 0);
+            if !closing {
+                let progress = must(loop::tick(workers, now()), "poll worker");
+                let resumed = must(loop::tick(tasks_loop, now()), "poll waiter");
+            }
+        }
+        let stop_waiter = must(loop::shutdown(tasks_loop), "shutdown waiter");
+        let stop_worker = must(loop::shutdown(workers), "shutdown worker");
+        let end = now() + 10000;
+        var drained = false;
+        while !drained && now() < end {
+            let task_turn = must(loop::tick(tasks_loop, now()), "drain waiter");
+            let worker_turn = must(loop::tick(workers, now()), "drain worker");
+            drained = idle(task_turn) && idle(worker_turn);
+            if !drained {
+                let events = must(ui::pump(window, 5), "pump during shutdown");
+            }
+        }
+        assert_true(drained && cancelled(waiter) && cancelled(worker),
+            "both tasks cancelled before close");
+        assert_true(list_len(cleanup) == 1, "defer runs once");
+        let closed = must(ui::close(window), "close window");
+        assert_true(input, "edited input received before close");
+        print("Window closed after task cleanup and Job drain");
+    }
+    return 0;
+}

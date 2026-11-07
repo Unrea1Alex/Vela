@@ -1,5 +1,8 @@
 # Standard library — 0.7.2 contract
 
+Memory descriptions of the original version are historical. In 0.8,
+[the tracing heap](../MEMORY.md) governs managed values.
+
 Status: included in Vela 0.7.0, verified on Windows x64/MSVC.
 Original stage 0.7.2 verify: 916/916, no skips, three generations and both fixed points.
 Focused module/application and atomic-temp cleanup checks also passed. POSIX was

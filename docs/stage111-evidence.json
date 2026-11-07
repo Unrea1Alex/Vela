@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "milestone": "0.11.1",
+  "compiler_version": "0.11.0-dev.2",
+  "platform": "Windows x64 / MSVC",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1162,
+    "failed": 0,
+    "skipped": 0
+  },
+  "build": {
+    "generations": 3,
+    "compiler_sha256": "7e08b8a2dda303eaa45b9d164b2d8bba42b830acd59248914a00aeea5efc222e",
+    "c_sha256": "244ea7e2c208c1646eb9e8b6b490d79b91a066e5bdba65d7d5b353375f87376e",
+    "bundle_sha256": "366ca52c2db5fca35e1517fe987cd9e89005112aa5eb037b1a1ee38944f7c71d",
+    "verify_exit_code": 0,
+    "log": "build/stage111/verify-dev2.log",
+    "transition_orchestrator_version": "0.11.0-dev.1"
+  },
+  "focused": [
+    "cancel during gated launch",
+    "independent worker thread",
+    "process-tree drain and alias safety",
+    "two typed tasks under forced GC",
+    "nested cancellation and LIFO defer",
+    "suspended method receiver under forced GC",
+    "E240 and E241 rejection fixtures"
+  ],
+  "gui": {
+    "scenario": "apps/gui-notes/async_demo.vela",
+    "window": "Vela Notes async lifecycle",
+    "input": "Unicode and Save processed while both tasks wait",
+    "close": "typed cleanup once, both tasks cancelled, Job drained, callback cancelled, window closed",
+    "gc_stress": true,
+    "process_exit_code": 0
+  },
+  "mcp": {
+    "sdk_setup_handshake": "passed",
+    "async_source_check": "passed",
+    "execution_gate": "not run"
+  },
+  "platform_limits": [
+    "typed task stacks and worker launcher use Windows primitives",
+    "typed tasks await timers and other typed calls; tasks::wait_for can observe an independently driven operation"
+  ]
+}

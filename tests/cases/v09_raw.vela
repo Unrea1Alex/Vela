@@ -1,0 +1,9 @@
+fn main() -> Int effects { io } {
+    let body = """<!doctype html>
+  <a title="🧭">\n {raw}</a>
+""";
+    assert_true(body == "<!doctype html>\n  <a title=\"🧭\">\\n {raw}</a>\n", "raw string bytes");
+    assert_true("""""" == "", "empty raw string");
+    print(body);
+    return 0;
+}

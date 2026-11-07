@@ -1,0 +1,3 @@
+fn load() -> StringResult effects { io } { return read_file("file"); }
+async fn bad() -> StringResult effects { io } { return load(); }
+fn main() -> Int { return 0; }

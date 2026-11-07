@@ -41,11 +41,12 @@ Exponent is lowercase e; non-finite spellings are `nan`, `inf`, `-inf`; -0 is `-
 `:d` remains Int-only. The JSON module added in stage 0.7.2 rejects non-finite
 numbers, accepts only JSON decimal grammar, and serializes Number values with
 a decimal point or exponent to preserve their distinction from Integer.
-There is no precision option or sqrt builtin in 0.7.0. Roadmap 0.8.7–0.8.8 will
-define those additions before implementation; the rules above remain current.
+In 0.8, `float_sqrt` returns FloatResult and `float_to_fixed` returns StringResult.
+See [square root](MATH.md) and [fixed formatting](NUMBER-FORMAT.md). The display
+format above keeps its existing rules.
 
-Storage is an 8-byte C double with compile-time binary64 checks. No new ownership
-model; formatted strings live in the process region. Bootstrap first introduces
+Storage is an 8-byte C double with compile-time binary64 checks. Formatted
+strings use the [managed heap](../MEMORY.md). The 0.7 bootstrap first introduced
 the numeric runtime/catalog/backend, then enables compiler literal range checks
 using the new probe. Final verify must compare three generations and cover
 edge values, negative zero, NaN, conversion failures, generics/collections,

@@ -1,14 +1,15 @@
 # GUI direction and bounded prototype — 0.7.6
 
-Status: accepted design; Windows x64 prototype implemented and validated.
+Historical status for 0.7.6. Windows x64 prototype implemented and validated.
+The current Notes application follows the [0.10.10 contract](GUI-APPLICATION.md).
 Visible UI inspection and coordinate click changed the Vela-owned counter 4 → 5;
 Unicode label was readable, close removed the window and process exit was 0.
 Evidence: build/stage07/076-gui.png, 076-gui-tree.txt, 076-gui-exit.txt.
 The initial count 4 reflected user interaction before the automated check.
 Source: [adapter](../../prototypes/windows/gui.c),
 [Vela application](../../prototypes/windows/gui.vela).
-This is not the GUI framework milestone 0.10.10 (formerly 0.10.5;
-see the 2026-11-05 roadmap renumbering). Callbacks are planned in 0.10.9.
+The prototype predates retained [C callbacks](CALLBACKS.md) and the
+Notes milestone.
 
 Requirements: native window lifecycle, Unicode text, application-owned state,
 typed events, main-thread affinity, bounded queues, explicit close and no Vela

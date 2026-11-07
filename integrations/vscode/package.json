@@ -1,0 +1,38 @@
+{
+  "name": "vela-language",
+  "displayName": "Vela Language",
+  "description": "Syntax highlighting for the Vela programming language",
+  "version": "0.1.0",
+  "publisher": "unrea1alex",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Unrea1Alex/Vela.git",
+    "directory": "integrations/vscode"
+  },
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "files": ["LICENSE", "language-configuration.json", "syntaxes/vela.tmLanguage.json"],
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "vela",
+        "aliases": ["Vela", "vela"],
+        "extensions": [".vela"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "vela",
+        "scopeName": "source.vela",
+        "path": "./syntaxes/vela.tmLanguage.json",
+        "tokenTypes": {
+          "meta.interpolation.vela": "other"
+        }
+      }
+    ]
+  }
+}

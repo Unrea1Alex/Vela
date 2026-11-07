@@ -1,0 +1,349 @@
+{
+  "schema_version": 1,
+  "item": "0.10.1",
+  "scope": "design contracts and validation plan; no compiler implementation",
+  "current_compiler": "0.9.0",
+  "contracts": [
+    "ENCAPSULATION",
+    "METHODS",
+    "INTERFACES",
+    "CALLABLES-EFFECTS",
+    "EFFECTS-CAPABILITIES",
+    "ABSTRACTIONS-VALIDATION"
+  ],
+  "local_links_checked": 148,
+  "planned_scenarios": [
+    {
+      "id": "A02-01",
+      "stage": "0.10.2",
+      "status": "planned"
+    },
+    {
+      "id": "A02-02",
+      "stage": "0.10.2",
+      "status": "planned"
+    },
+    {
+      "id": "A02-03",
+      "stage": "0.10.2",
+      "status": "planned"
+    },
+    {
+      "id": "A02-04",
+      "stage": "0.10.2",
+      "status": "planned"
+    },
+    {
+      "id": "A02-05",
+      "stage": "0.10.2",
+      "status": "planned"
+    },
+    {
+      "id": "A02-06",
+      "stage": "0.10.2",
+      "status": "planned"
+    },
+    {
+      "id": "A03-01",
+      "stage": "0.10.3",
+      "status": "planned"
+    },
+    {
+      "id": "A03-02",
+      "stage": "0.10.3",
+      "status": "planned"
+    },
+    {
+      "id": "A03-03",
+      "stage": "0.10.3",
+      "status": "planned"
+    },
+    {
+      "id": "A03-04",
+      "stage": "0.10.3",
+      "status": "planned"
+    },
+    {
+      "id": "A03-05",
+      "stage": "0.10.3",
+      "status": "planned"
+    },
+    {
+      "id": "A04-01",
+      "stage": "0.10.4",
+      "status": "planned"
+    },
+    {
+      "id": "A04-02",
+      "stage": "0.10.4",
+      "status": "planned"
+    },
+    {
+      "id": "A04-03",
+      "stage": "0.10.4",
+      "status": "planned"
+    },
+    {
+      "id": "A04-04",
+      "stage": "0.10.4",
+      "status": "planned"
+    },
+    {
+      "id": "A04-05",
+      "stage": "0.10.4",
+      "status": "planned"
+    },
+    {
+      "id": "A04-06",
+      "stage": "0.10.4",
+      "status": "planned"
+    },
+    {
+      "id": "A04-07",
+      "stage": "0.10.4",
+      "status": "planned"
+    },
+    {
+      "id": "A04-08",
+      "stage": "0.10.4",
+      "status": "planned"
+    },
+    {
+      "id": "A05-01",
+      "stage": "0.10.5",
+      "status": "planned"
+    },
+    {
+      "id": "A05-02",
+      "stage": "0.10.5",
+      "status": "planned"
+    },
+    {
+      "id": "A05-03",
+      "stage": "0.10.5",
+      "status": "planned"
+    },
+    {
+      "id": "A05-04",
+      "stage": "0.10.5",
+      "status": "planned"
+    },
+    {
+      "id": "A05-05",
+      "stage": "0.10.5",
+      "status": "planned"
+    },
+    {
+      "id": "A05-06",
+      "stage": "0.10.5",
+      "status": "planned"
+    },
+    {
+      "id": "A06-01",
+      "stage": "0.10.6",
+      "status": "planned"
+    },
+    {
+      "id": "A06-02",
+      "stage": "0.10.6",
+      "status": "planned"
+    },
+    {
+      "id": "A06-03",
+      "stage": "0.10.6",
+      "status": "planned"
+    },
+    {
+      "id": "A06-04",
+      "stage": "0.10.6",
+      "status": "planned"
+    },
+    {
+      "id": "A06-05",
+      "stage": "0.10.6",
+      "status": "planned"
+    },
+    {
+      "id": "AX-01",
+      "stage": "0.10.5–6",
+      "status": "planned"
+    },
+    {
+      "id": "AX-02",
+      "stage": "0.10.5–6",
+      "status": "planned"
+    },
+    {
+      "id": "AX-03",
+      "stage": "0.10.3–6",
+      "status": "planned"
+    },
+    {
+      "id": "AX-04",
+      "stage": "0.10.2–6",
+      "status": "planned"
+    },
+    {
+      "id": "AX-05",
+      "stage": "0.10.7",
+      "status": "planned"
+    },
+    {
+      "id": "AX-06",
+      "stage": "0.10.9–11",
+      "status": "planned"
+    }
+  ],
+  "reserved_diagnostics": [
+    "E232",
+    "E233",
+    "E234",
+    "E235",
+    "E236",
+    "E237",
+    "E238",
+    "E239"
+  ],
+  "native_baseline_probes": [
+    {
+      "name": "legacy-contextual-names",
+      "expected": "ok",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "legacy-open-struct",
+      "expected": "ok",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "legacy-deferred-generic",
+      "expected": "ok",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "missing-effects",
+      "expected": "E209",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "new-effect-not-enabled",
+      "expected": "E206",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "foreign-effects-retained",
+      "expected": "E228",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "opaque-not-enabled",
+      "expected": "E100",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "interface-not-enabled",
+      "expected": "E100",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "methods-not-enabled",
+      "expected": "E100",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "current-value-copy-and-shared-list",
+      "expected": "1,2,9",
+      "passed": true
+    }
+  ],
+  "unchanged_files": 38,
+  "unchanged_compiler_sha256": "3f02f5f82bfc7b41b5444711eb7cf23e0e38d724bba51001e5b38c6517cfc644",
+  "native_verify_run": false,
+  "compiler_rebuilt": false,
+  "mcp_client_run": false,
+  "pins_refreshed": false,
+  "reason": "Documentation-only stage; executable baseline fixture was built and run. Current semantics and pinned help did not change.",
+  "checked_files": {
+    "docs/contracts/ENCAPSULATION.md": "43dcf81eeaa43a54018b7def8685e5df729fac3d38785ccdc3691cda61348515",
+    "docs/contracts/METHODS.md": "43eadd374bc133baafb088c2a15bc9f54e6f7a6ceb23cbcbd95f2ee91297b50b",
+    "docs/contracts/INTERFACES.md": "2f9f6325b16f531cbb718c787279586d578fa5779da8a45d2257e63ca7327f8c",
+    "docs/contracts/CALLABLES-EFFECTS.md": "5222e1a0c6bd86a6ed4676797a93e770dfb5182272be65f6a48f26e94fb85622",
+    "docs/contracts/EFFECTS-CAPABILITIES.md": "0d38d94e0de01894a0d148ae08ca27dfef31bcb6e9954e5877feed23da067cd7",
+    "docs/contracts/ABSTRACTIONS-VALIDATION.md": "4ea1a32bce01887e05f4fdd93f1eec40c5e20bb24b7a0637f087f5ffd76e9a06",
+    "docs/rfcs/0004-abstractions-effects.md": "6fa209c502b6f656cd2c1dcf2e5fb143206b321ce188fef4fb33d31f120191d7",
+    "docs/rfcs/0002-generics-callables.md": "06a34f733796c8c79308d2b751d0d9796fc5575fa2a6e4d60048c714b68c6191",
+    "docs/ROADMAP.md": "84ab70c5b11f3cb5b99594a7ca199ba574a8307e972ffd761aa6b562b13d1823",
+    "docs/VALIDATION-0.10.1.md": "4d946a3c5243e280658efc88d70786067317234ea14c880bb4463fab71f6998c"
+  },
+  "roadmap_items": [
+    {
+      "id": "0.10.1",
+      "complete": true
+    },
+    {
+      "id": "0.10.2",
+      "complete": false
+    },
+    {
+      "id": "0.10.3",
+      "complete": false
+    },
+    {
+      "id": "0.10.4",
+      "complete": false
+    },
+    {
+      "id": "0.10.5",
+      "complete": false
+    },
+    {
+      "id": "0.10.6",
+      "complete": false
+    },
+    {
+      "id": "0.10.7",
+      "complete": false
+    },
+    {
+      "id": "0.10.8",
+      "complete": false
+    },
+    {
+      "id": "0.10.9",
+      "complete": false
+    },
+    {
+      "id": "0.10.10",
+      "complete": false
+    },
+    {
+      "id": "0.10.11",
+      "complete": false
+    }
+  ],
+  "date": "2026-11-05",
+  "status": "verified-design",
+  "next_item": "0.10.2",
+  "new_language_features_implemented": false,
+  "independent_review": {
+    "skill": "write-reviewed-text",
+    "version": "v3",
+    "rounds": 3,
+    "verdict": "accepted",
+    "resolved": [
+      "R1: private interface bound belongs to 0.10.4",
+      "R2: diagnostics define conditional fields",
+      "R3: empty interface wording",
+      "R4: builtin/extern do not claim a checked Vela body"
+    ]
+  }
+}

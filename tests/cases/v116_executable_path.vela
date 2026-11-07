@@ -1,0 +1,26 @@
+fn main() -> Int effects { io } {
+    match executable_path() {
+        StringResult::Ok(value) => {
+            assert_true(str_len(value) > 1, "running image path");
+            match canonical_path(value, true) {
+                StringResult::Ok(resolved) => {
+                    assert_true(str_len(resolved) > 1, "canonical image path");
+                }
+                StringResult::Err(message) => {
+                    assert_true(false, message);
+                }
+            }
+        }
+        StringResult::Err(message) => {
+            assert_true(false, message);
+        }
+    }
+    match canonical_path("", false) {
+        StringResult::Ok(_) => {
+            return 1;
+        }
+        StringResult::Err(_) => {
+            return 0;
+        }
+    }
+}

@@ -1,0 +1,2 @@
+extern "fixture.dll" fn test_callable(callback: fn() -> Int) -> Unit effects { state, process };
+fn main() -> Unit {}

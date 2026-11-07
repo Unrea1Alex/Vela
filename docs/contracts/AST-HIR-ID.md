@@ -1,5 +1,8 @@
 # AST, HIR and ID contract
 
+Memory descriptions of the original version are historical. In 0.8,
+[the tracing heap](../MEMORY.md) governs managed values.
+
 Status: implemented and verified in 0.4.2, 2026-11-04. Native verify: 231/231.
 
 ## Identity and storage

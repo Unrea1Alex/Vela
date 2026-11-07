@@ -1,0 +1,87 @@
+import "audit.vela" as audit;
+import "../../std/cli.vela" as cli;
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+
+fn usage() -> String {
+    return "Usage: route-audit.exe INPUT.ndjson OUTPUT.tsv [--fail-on-jump]\n       route-audit.exe --help";
+}
+
+fn io_message(error: fs::Error) -> String {
+    return match error {
+        fs::Error::InvalidPath(_) => "Invalid file path",
+        fs::Error::Encoding(_) => "Invalid UTF-8",
+        fs::Error::Limit(limit) => "Input exceeds " + to_string(limit) + " bytes",
+        fs::Error::Io(file, why) => file + ": " + why,
+        fs::Error::Cleanup(folder, committed) => "Cleanup failed in " + folder + "; report committed=" + to_string(committed)
+    };
+}
+
+fn identity(file: String) -> Result<String, String> effects { io } {
+    return match file_identity(file) {
+        StringResult::Ok(id) => Result<String, String>::Ok(id),
+        StringResult::Err(why) => Result<String, String>::Err(why)
+    };
+}
+
+fn read_input(file: path::Path) -> Result<audit::Audit, String> effects { io, state } {
+    match stream_open(file.value, 2097152) {
+        StreamResult::Limit => {
+            return Result<audit::Audit, String>::Err("Input exceeds 2097152 bytes");
+        }
+        StreamResult::Err(error) => {
+            return Result<audit::Audit, String>::Err(file.value + ": " + error);
+        }
+        StreamResult::Ok(handle) => {
+            let pull = fn [handle](limit: Int) -> Result<String, String> effects { io, state } {
+                return match stream_next(handle, limit) {
+                    ReadResult::Ok(bytes) => Result<String, String>::Ok(bytes),
+                    ReadResult::Limit => Result<String, String>::Err("Invalid stream chunk size"),
+                    ReadResult::Err(error) => Result<String, String>::Err(error)
+                };
+            };
+            let batch = audit::run_source(pull, 8192);
+            match stream_close(handle) {
+                WriteResult::Err(error) => { return Result<audit::Audit, String>::Err(file.value + ": " + error); }
+                WriteResult::Ok => {}
+            }
+            return batch;
+        }
+    }
+}
+
+fn work() -> Result<Int, String> effects { args, state, io } {
+    let specs = list_new<cli::Spec>();
+    list_push(specs, cli::Spec(name: "help", takes_value: false));
+    list_push(specs, cli::Spec(name: "fail-on-jump", takes_value: false));
+    let arguments = audit::explain(cli::current(specs), usage())?;
+    if dict_has(arguments.options, "help") {
+        print(usage());
+        return Result<Int, String>::Ok(0);
+    }
+    if list_len(arguments.positional) != 2 { return Result<Int, String>::Err(usage()); }
+    let input = audit::explain(path::checked(list_get(arguments.positional, 0)), "Invalid input path")?;
+    let output = audit::explain(path::checked(list_get(arguments.positional, 1)), "Invalid output path")?;
+    let input_id = identity(input.value)?;
+    let output_id = identity(output.value)?;
+    if input_id != "" && input_id == output_id {
+        return Result<Int, String>::Err("Output aliases input");
+    }
+    let batch = read_input(input)?;
+    match fs::write_text_atomic(output, batch.report) {
+        Result::Ok(_) => {}
+        Result::Err(error) => { return Result<Int, String>::Err(io_message(error)); }
+    }
+    print(f"routes={batch.routes:d} jumps={batch.jumps:d}");
+    if batch.jumps > 0 && dict_has(arguments.options, "fail-on-jump") {
+        return Result<Int, String>::Ok(3);
+    }
+    return Result<Int, String>::Ok(0);
+}
+
+fn main() -> Int effects { args, state, io } {
+    match work() {
+        Result::Ok(code) => { return code; }
+        Result::Err(error) => { eprint(error); return 2; }
+    }
+}

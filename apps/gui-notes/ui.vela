@@ -1,0 +1,10 @@
+import "../../std/gui.vela" as ui;
+pub fn open(title: String) -> Result<ui::Window, String> effects { io, process, state } {
+    let buttons = list_new<ui::Button>();
+    list_push(buttons, ui::Button(id: 101, label: "Load"));
+    list_push(buttons, ui::Button(id: 102, label: "Save"));
+    list_push(buttons, ui::Button(id: 103, label: "Close"));
+    return ui::open(ui::Config(title: title, caption: "Note (UTF-8, up to 4096 bytes)", width: 512,
+        height: 310, read_only: false, text_limit: 4096, buttons: buttons, close_id: 103,
+        changed_id: 0));
+}

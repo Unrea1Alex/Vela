@@ -1,0 +1,16 @@
+fn cycle() -> fn() -> Int effects { state } effects { state } {
+    let callbacks = list_new<fn() -> Int effects { state }>();
+    let callback = fn [callbacks]() -> Int effects { state } { return list_len(callbacks); };
+    list_push(callbacks, callback);
+    return callback;
+}
+
+fn main() -> Unit effects { args, io, state } {
+    let live = cycle();
+    var count = 10;
+    if arg_count() > 0 { count = 1000; }
+    for i in 0 .. count { assert_true(cycle()() == 1, "live cycle"); }
+    let trigger = list_new<Int>();
+    assert_true(list_len(trigger) == 0, "allocation");
+    print(live());
+}

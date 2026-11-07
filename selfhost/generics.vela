@@ -4,6 +4,8 @@ import "core.vela";
 import "types.vela";
 import "semantic.vela";
 import "emitter.vela";
+import "interfaces.vela";
+import "callables.vela";
 // Monomorphization belongs to semantic analysis; all instances precede emission.
 pub fn validate_type_parameters(c: Context, parameters: List<TypeParameter>) -> Unit effects { state, io, process } {
     let names = dict_new<String, Bool>();
@@ -13,8 +15,11 @@ pub fn validate_type_parameters(c: Context, parameters: List<TypeParameter>) -> 
         if dict_has(names, p.name) || (has_type(named) && type_kind(c, named) == 0) || p.name == "Option" || p.name == "Result" || p.name == "List" || p.name == "Dict" || p.name == "Any" || p.name == "Scalar" || p.name == "Number" {
             bad(c, "E210", "Duplicate or reserved type parameter: " + p.name, p.span);
         }
-        if p.bound != "Any" && p.bound != "Scalar" && p.bound != "Number" {
+        if !builtin_bound(p.bound) && find_interface(c, p.bound) < 0 {
             bad(c, "E210", "Unknown type constraint: " + p.bound, p.span);
+        }
+        if p.bound == "$effect" && effect_bit(p.name) != 0 {
+            effect_error(c, p.name, "effect_parameter_name", p.span, empty_span());
         }
         dict_set(names, p.name, true);
     }
@@ -27,11 +32,28 @@ pub fn generic_mapping(c: Context, parameters: List<TypeParameter>, args: List<T
     for i in 0 .. list_len(parameters) {
         let p = list_get(parameters, i);
         let t = list_get(args, i);
+        if p.bound == "$effect" {
+            if !has_type(t) { effect_error(c, p.name, "effect_not_inferred", span, p.span); }
+            if type_kind(c, t) != 81 { effect_error(c, p.name, "effect_argument_kind", span, p.span); }
+            dict_set(mapping, p.name, t);
+            continue;
+        }
         if !has_type(t) {
             bad(c, "E210", "Cannot infer type argument " + p.name + "; provide explicit <Types>.", span);
         }
-        if (p.bound == "Scalar" && !is_scalar(scalar_type(c, t))) || (p.bound == "Number" && t != int_type() && t != float_type()) {
+        let actual = type_info(c, t);
+        if actual.kind == 81 { bad(c, "E210", "Expected a type argument.", span); }
+        let numeric = t == int_type() || t == float_type() || actual.constraint == "Number";
+        if (p.bound == "Scalar" && !supports_scalar(c, t)) || (p.bound == "Number" && !numeric) {
+            if actual.parameter_name != "" { bound_error(c, t, "", p.bound, span); }
             bad(c, "E210", "Type " + type_name(c, t) + " does not satisfy " + p.bound +".", span);
+        }
+        if !builtin_bound(p.bound) {
+            if actual.parameter_name != "" {
+                if actual.constraint != p.bound { bound_error(c, t, p.bound, p.name, span); }
+            } else if lookup_implementation(c, t, p.bound) < 0 {
+                bound_error(c, t, p.bound, p.name, span);
+            }
         }
         dict_set(mapping, p.name, t);
     }
@@ -61,7 +83,9 @@ pub fn fill_type(c: Context, id: TypeId, syntax: SyntaxType, mapping: Dict<Strin
             if has_symbol(previous) {
                 duplicate(c, "Duplicate struct field '" + field.name + "'.", field.span, symbol_info(c, previous).span);
             }
-            list_push(t.fields, add_symbol(c, symbol_record(72, field.name, resolve_pattern(c, field.annotation, mapping, field.span), field.span)));
+            var member = symbol_record(72, field.name, resolve_pattern(c, field.annotation, mapping, field.span), field.span);
+            member.owner = id;
+            list_push(t.fields, add_symbol(c, member));
             j = j + 1;
         }
     } else {
@@ -111,6 +135,7 @@ pub fn instantiate_type(c: Context, name: String, args: List<TypeId>, span: Span
     ctl.type_instances = ctl.type_instances + 1;
     list_set(c.control, 0, ctl);
     var t = type_record(syntax.kind, canonical, syntax.span);
+    t.opaque = syntax.opaque;
     t.arguments = args;
     t.template_index = syntax_index;
     let id = add_type(c, t);
@@ -122,7 +147,15 @@ pub fn instantiate_type(c: Context, name: String, args: List<TypeId>, span: Span
 }
 pub fn concrete_signature(c: Context, syntax: SyntaxFunction, name: String, mapping: Dict<String, TypeId>) -> Symbol effects { state, io, process } {
     var sig = symbol_record(73, name, resolve_pattern(c, syntax.return_name, mapping, syntax.span), syntax.span);
+    sig.suspending = syntax.suspending;
     sig.effect_mask = syntax.effect_mask;
+    if syntax.effect_pattern != "" {
+        sig.effect_mask = resolve_effect_pattern(c, syntax.effect_pattern, mapping, syntax.span);
+    }
+    if syntax.impl_index >= 0 {
+        sig.method_span = syntax.name_span;
+        sig.method_exported = syntax.method_exported;
+    }
     sig.foreign_library = syntax.foreign_library;
     sig.foreign_name = syntax.foreign_name;
     for i in 0 .. list_len(syntax.parameters) {
@@ -148,7 +181,7 @@ pub fn concrete_signature(c: Context, syntax: SyntaxFunction, name: String, mapp
     return sig;
 }
 pub fn foreign_type(t: TypeId, is_return: Bool) -> Bool {
-    return t == int_type() || t == int32_type() || t == float_type() || t == bool_type() || t == foreign_handle_type() || is_return && t == unit_type() || !is_return && t == string_type();
+    return t == int_type() || t == int32_type() || t == float_type() || t == bool_type() || t == foreign_handle_type() || is_return && t == unit_type() || !is_return && (t == string_type() || t == callback_handle_type());
 }
 pub fn generic_function_call(c: Context, template: SymbolId, args: List<SyntaxArgument>, explicit: List<String>, span: Span) -> ExprId effects { state, io, process } {
     let sig = symbol_info(c, template);
@@ -180,7 +213,19 @@ pub fn generic_function_call(c: Context, template: SymbolId, args: List<SyntaxAr
             bad(c, "E210", "Named arguments require a struct constructor.", span);
         }
         let value = check_expr(c, a.value);
-        unify_pattern(c, list_get(syntax.parameters, i).annotation, checked_expr(c, value).type_id, mapping, ast_expr(c, a.value).span);
+        let pattern = list_get(syntax.parameters, i).annotation;
+        let actual = checked_expr(c, value).type_id;
+        let argument_span = ast_expr(c, a.value).span;
+        unify_pattern(c, pattern, actual, mapping, argument_span);
+        if list_len(explicit) == 0 {
+            let variable = direct_effect_parameter(c, pattern, argument_span);
+            if variable != "" {
+                let previous = dict_get(mapping, variable);
+                var mask = type_info(c, actual).call_effect_mask % 16;
+                if has_type(previous) { mask = union_effects(mask, type_info(c, previous).call_effect_mask); }
+                dict_set(mapping, variable, effect_argument(c, mask));
+            }
+        }
         list_push(checked, value);
         i = i + 1;
     }
@@ -190,6 +235,22 @@ pub fn generic_function_call(c: Context, template: SymbolId, args: List<SyntaxAr
         list_push(types, dict_get(mapping, list_get(syntax.type_parameters, i).name));
         i = i + 1;
     }
+    let id = instantiate_function(c, template, types, span);
+    let concrete = symbol_info(c, id);
+    for j in 0 .. list_len(checked) {
+        let parameter = symbol_info(c, list_get(concrete.parameters, j));
+        let argument = checked_expr(c, list_get(checked, j));
+        require_type_at(c, argument.type_id, parameter.type_id, argument.span, parameter.span);
+    }
+    require_effects(c, id, span);
+    var n = expression_record(107, span, symbol_info(c, id).type_id);
+    n.symbol = id;
+    n.arguments = checked;
+    return add_expr(c, n);
+}
+pub fn instantiate_function(c: Context, template: SymbolId, types: List<TypeId>, span: Span) -> SymbolId effects { state, io, process } {
+    let sig = symbol_info(c, template);
+    let syntax = list_get(c.bound_functions, sig.template_index);
     let validated = generic_mapping(c, syntax.type_parameters, types, span);
     let canonical = instance_name(c, sig.name, types);
     var id = no_symbol();
@@ -205,9 +266,5 @@ pub fn generic_function_call(c: Context, template: SymbolId, args: List<SyntaxAr
         dict_set(c.generic_functions, canonical, id);
         list_push(c.instances, FunctionInstance(depth: list_get(c.control, 0).instance_depth + 1, signature: id, syntax_index: sig.template_index, mapping: validated));
     }
-    require_effects(c, id, span);
-    var n = expression_record(107, span, symbol_info(c, id).type_id);
-    n.symbol = id;
-    n.arguments = checked;
-    return add_expr(c, n);
+    return id;
 }

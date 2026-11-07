@@ -1,0 +1,189 @@
+import "model.vela" as model;
+import "analyze.vela" as analyze;
+import "report.vela" as report;
+import "demo.vela" as demo;
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+import "../../std/process.vela" as process;
+import "../../std/replay.vela" as replay;
+import "../../std/result.vela" as result;
+import "../../std/services.vela" as services;
+import "../../std/text.vela" as text;
+pub struct Paths {
+    config: path::Path,
+    input: path::Path,
+    output: path::Path,
+    worker: services::Command
+}
+pub struct Product {
+    html: String,
+    analysis: analyze::Analysis
+}
+pub interface Exchange {
+    fn request(self: Self, input: replay::Request) -> Result<replay::Answer, String> effects { io,
+        process, state };
+}
+pub opaque struct Live {
+    recorder: replay::Recorder
+}
+pub opaque struct Playback {
+    session: replay::Replay
+}
+pub opaque struct DemoFiles {
+    target: dyn services::FileStore,
+    measurements: String
+}
+pub fn demo_files(target: dyn services::FileStore) -> DemoFiles {
+    return DemoFiles(target: target, measurements: demo::data());
+}
+pub fn source_files(target: dyn services::FileStore, measurements: String) -> DemoFiles {
+    return DemoFiles(target: target, measurements: measurements);
+}
+impl services::FileStore for DemoFiles {
+    fn read(self: DemoFiles, file: path::Path, limit: Int) -> Result<text::Bytes,
+        fs::Error> effects { io, state } {
+        var bytes = "";
+        if file.value == "@demo-settings" {
+            bytes = demo::config();
+        } else if file.value == "@demo-data" {
+            bytes = self.measurements;
+        } else {
+            return self.target.read(file, limit);
+        }
+        if str_len(bytes) > limit {
+            return Result<text::Bytes, fs::Error>::Err(fs::Error::Limit(limit));
+        }
+        return Result<text::Bytes, fs::Error>::Ok(text::Bytes(data: bytes));
+    }
+    fn publish(self: DemoFiles, file: path::Path, bytes: text::Bytes) -> Result<Bool,
+        fs::Error> effects { io, state } {
+        return self.target.publish(file, bytes);
+    }
+}
+pub fn failure(error: replay::Failure) -> String {
+    return match error {
+        replay::Failure::Full => "Replay transcript full",
+        replay::Failure::Busy => "Replay recorder busy",
+        replay::Failure::Mismatch(index, expected, actual) =>
+            f"Replay mismatch at {index:d}: {expected:s} / {actual:s}",
+        replay::Failure::Extra(index) => f"Replay extra request at {index:d}",
+        replay::Failure::Missing(index) => f"Replay missing request at {index:d}"
+    };
+}
+pub fn file_error(error: fs::Error) -> String {
+    return match error {
+        fs::Error::InvalidPath(_) => "Invalid path",
+        fs::Error::Encoding(_) => "Invalid UTF-8",
+        fs::Error::Limit(limit) => f"File exceeds {limit:d} bytes",
+        fs::Error::Io(file, why) => file + ": " + why,
+        fs::Error::Cleanup(folder, committed) =>
+            f"Cleanup failed in {folder:s}; committed={committed:b}"
+    };
+}
+pub fn live(files: dyn services::FileStore, processes: dyn services::Processes,
+    clock: dyn services::Clock, entropy: dyn services::Entropy) -> Live effects { state } {
+    return Live(recorder: replay::recorder(files, processes, clock, entropy));
+}
+pub fn transcript(value: Live) -> replay::Transcript effects { state } {
+    return replay::transcript(value.recorder);
+}
+pub fn playback(trace: replay::Transcript) -> Playback effects { state } {
+    return Playback(session: replay::start(trace));
+}
+pub fn finish(value: Playback) -> Result<Bool, String> effects { state } {
+    return result::map_error(replay::finish(value.session), failure);
+}
+impl Exchange for Live {
+    fn request(self: Live, input: replay::Request) -> Result<replay::Answer, String> effects { io,
+        process, state } {
+        return result::map_error(replay::record(self.recorder, input), failure);
+    }
+}
+impl Exchange for Playback {
+    fn request(self: Playback, input: replay::Request) -> Result<replay::Answer,
+        String> effects { state } {
+        return result::map_error(replay::next(self.session, input), failure);
+    }
+}
+fn read(exchange: dyn Exchange, file: path::Path, limit: Int) -> Result<String,
+    String> effects { io, process, state } {
+    match exchange.request(replay::Request::Read(file, limit))? {
+        replay::Answer::Read(value) => {
+            return Result<String, String>::Ok(result::map_error(value, file_error)?.data);
+        }
+        replay::Answer::Publish(_) => {}
+        replay::Answer::Run(_) => {}
+        replay::Answer::Now(_) => {}
+        replay::Answer::Entropy(_) => {}
+    }
+    return Result<String, String>::Err("Protocol expected file data");
+}
+fn observation(exchange: dyn Exchange, request: replay::Request) -> Result<Int,
+    String> effects { io, process, state } {
+    match exchange.request(request)? {
+        replay::Answer::Now(value) => {
+            return result::explain(value, "Clock unavailable");
+        }
+        replay::Answer::Entropy(value) => {
+            return result::explain(value, "Entropy unavailable");
+        }
+        replay::Answer::Read(_) => {}
+        replay::Answer::Publish(_) => {}
+        replay::Answer::Run(_) => {}
+    }
+    return Result<Int, String>::Err("Protocol expected observation");
+}
+fn publish(exchange: dyn Exchange, file: path::Path, html: String) -> Result<Bool,
+    String> effects { io, process, state } {
+    match exchange.request(replay::Request::Publish(file, text::Bytes(data: html)))? {
+        replay::Answer::Publish(value) => {
+            let committed = result::map_error(value, file_error)?;
+            if !committed {
+                return Result<Bool, String>::Err("Report was not committed");
+            }
+            return Result<Bool, String>::Ok(true);
+        }
+        replay::Answer::Read(_) => {}
+        replay::Answer::Run(_) => {}
+        replay::Answer::Now(_) => {}
+        replay::Answer::Entropy(_) => {}
+    }
+    return Result<Bool, String>::Err("Protocol expected publication");
+}
+fn worker(exchange: dyn Exchange, command: services::Command) -> Result<Bool, String> effects { io,
+    process, state } {
+    match exchange.request(replay::Request::Run(command))? {
+        replay::Answer::Run(value) => {
+            let completed = result::explain(value,
+                "Report published; verifier failed to launch or timed out")?;
+            if completed.code != 0 {
+                return Result<Bool, String>::Err(
+                    f"Report published; verifier exited {completed.code:d}");
+            }
+            return Result<Bool, String>::Ok(true);
+        }
+        replay::Answer::Read(_) => {}
+        replay::Answer::Publish(_) => {}
+        replay::Answer::Now(_) => {}
+        replay::Answer::Entropy(_) => {}
+    }
+    return Result<Bool, String>::Err("Protocol expected worker result");
+}
+pub fn run(exchange: dyn Exchange, paths: Paths, stream: Bool) -> Result<Product,
+    String> effects { io, process, state } {
+    let config = model::settings(read(exchange, paths.config, 4096)?)?;
+    var analysis = Result<analyze::Analysis, String>::Err("No input");
+    if stream {
+        analysis = analyze::file(paths.input.value, config);
+    } else {
+        analysis = analyze::memory(read(exchange, paths.input, 524288)?, config, 8192);
+    }
+    let data = analysis?;
+    let timestamp = observation(exchange, replay::Request::Now)?;
+    let seed = observation(exchange, replay::Request::Entropy)?;
+    let run_id = services::random_step(seed).value;
+    let html = report::html(data, config, timestamp, run_id)?;
+    let saved = publish(exchange, paths.output, html)?;
+    let verified = worker(exchange, paths.worker)?;
+    return Result<Product, String>::Ok(Product(html: html, analysis: data));
+}

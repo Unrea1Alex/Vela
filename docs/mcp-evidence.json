@@ -3,8 +3,9 @@
   "node": "v24.17.0",
   "sdk": "2.4.0",
   "checks": [
-    "five tools with input/output schemas",
+    "seven tools with input/output schemas",
     "context fingerprint",
+    "context reports pinned compiler version",
     "version-matched help resources",
     "resource/help catalog identical",
     "native check",
@@ -15,6 +16,10 @@
     "overlay never writes source",
     "manifest overlay rejected",
     "symbols include original source",
+    "native semantic CLI parity",
+    "rename preview validated without writes",
+    "native stale revision rejected",
+    "raw snapshot changes invalidate plans",
     "reject path ../secret.vela",
     "reject path C:/secret.vela",
     "reject path @unknown",
@@ -73,12 +78,12 @@
   "cancellations": 25,
   "stress": {
     "baseline": {
-      "WorkingSet64": 80396288,
-      "HandleCount": 218
+      "WorkingSet64": 97382400,
+      "HandleCount": 223
     },
     "final": {
-      "WorkingSet64": 107986944,
-      "HandleCount": 218
+      "WorkingSet64": 148934656,
+      "HandleCount": 223
     }
   }
 }

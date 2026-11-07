@@ -1,5 +1,8 @@
 # Modules (Vela 0.6)
 
+Memory descriptions of the original version are historical. In 0.8,
+[the tracing heap](../MEMORY.md) governs managed values.
+
 Status: implemented and verified; roadmap contract 0.6.1, implementation 0.6.2. Existing 0.5 programs
 remain valid. A module is one normalized UTF-8 source file; it contains only
 imports and declarations, never executable initialization.
@@ -21,9 +24,16 @@ supported. Dependency-prefixed paths such as "@math" are resolved from an explic
 project manifest; see [PROJECT-FORMAT](PROJECT-FORMAT.md).
 
 Declarations are private by default; `pub` applies to fn/struct/enum/distinct type.
-Fields and variants of a public type are public in this version. Public signatures
-and public type representations may not expose private types. Generic type
-parameters are not module declarations. Generic bodies resolve names in their
+Fields and constructors of an ordinary public struct and variants of a public
+enum are public. In the 0.10 development compiler, an
+[opaque struct](ENCAPSULATION.md) exports its type without exposing its fields
+or constructor. Public signatures and open representations may not expose
+private types; opaque fields can contain private types.
+Methods declared in the owner's [impl block](METHODS.md) are private unless
+marked `pub` and the owning type is public. They are selected by the receiver's
+nominal type or by an explicit type qualification.
+
+Generic type parameters are not module declarations. Generic bodies resolve names in their
 defining module, including private helpers; call-site type arguments resolve at
 the call site. All ordinary function bodies are checked, including unused ones.
 
@@ -62,7 +72,8 @@ JSON coordinates remain normalized Unicode code points per file, not byte offset
 in aggregate storage. No backend receives syntax nodes or resolves imports.
 
 E221: import/graph failure; E222: ambiguous or unknown module-qualified name;
-E223: private declaration access; E224: private type in public API.
+E223: private declaration or opaque field access; E224: private type in public
+API; E232: opaque constructor outside its defining module.
 An invalid program exits 1; environment/toolchain failures retain exit 2.
 
 ## Validation and bootstrap migration

@@ -37,7 +37,15 @@ fn main() -> Unit effects { state, process, io } {
     assert_true(!ffi_is_null(handle), "allocation");
     let alias = handle;
     assert_true(resource_value(alias) == 42, "handle alias");
-    closed(ffi_close(handle, "release_resource"));
+    closed(ffi_retain(handle));
+    match ffi_retain(alias) { WriteResult::Err(_) => {} WriteResult::Ok => { assert_true(false, "duplicate retain"); } }
+    closed(ffi_release(alias));
+    closed(ffi_retain(alias));
+    scope {
+        defer { closed(ffi_close(handle, "release_resource")); }
+        assert_true(resource_value(alias) == 42, "retention preserves resource");
+    }
+    match ffi_release(alias) { WriteResult::Err(_) => {} WriteResult::Ok => { assert_true(false, "release after close"); } }
     assert_true(rounding() == 1 && release_count() == 1, "destructor once and fenv");
     match ffi_close(alias, "release_resource") { WriteResult::Err(_) => {} WriteResult::Ok => { assert_true(false, "repeated close"); } }
     assert_true(release_count() == 1, "second close did not enter C");

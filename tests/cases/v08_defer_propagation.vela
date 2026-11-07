@@ -1,0 +1,3 @@
+fn main() -> Unit {
+    defer { let value = Option<Int>::Some(1)?; }
+}

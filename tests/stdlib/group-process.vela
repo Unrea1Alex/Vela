@@ -1,0 +1,116 @@
+import "../../std/task_group.vela" as group;
+import "../../std/async_io.vela" as aio;
+import "../../std/event_loop.vela" as loop;
+import "../../std/path.vela" as path;
+fn must<T, E>(value: Result<T, E>) -> T effects { process } {
+    match value {
+        Result::Ok(found) => {
+            return found;
+        }
+        Result::Err(_) => {
+            panic("process group fixture");
+        }
+    }
+}
+fn arg_value(index: Int) -> String effects { args, process } {
+    match arg(index) {
+        StringResult::Ok(value) => {
+            return value;
+        }
+        StringResult::Err(message) => {
+            panic(message);
+        }
+    }
+}
+fn now() -> Int effects { io, process } {
+    match monotonic_millis() {
+        IntResult::Ok(time) => {
+            return time;
+        }
+        IntResult::Err(error) => {
+            panic(error);
+        }
+    }
+}
+fn main() -> Int effects { args, io, process, state } {
+    if platform() != "windows" {
+        print("group process unsupported");
+        return 0;
+    }
+    let exe = arg_value(0);
+    let directory = arg_value(1);
+    let argv = list_new<String>();
+    list_push(argv, exe);
+    list_push(argv, "124");
+    let owner = must(group::create(now(), 2));
+    let action = async fn [ argv, directory ](scope: group::Scope) -> Int effects { state } {
+        let outcome = await aio::run_process(scope, argv, path::Path(value: directory), path::Path(
+            value: directory + "/group.out"), path::Path(value: directory + "/group.err"), 3000);
+        return match outcome {
+            Result::Ok(done) => done.code,
+            Result::Err(_) => -1
+        };
+    };
+    let task = must(group::spawn(owner, 5000, action));
+    var done = false;
+    while !done {
+        done = must(group::tick(owner, now()));
+        let slept = host_sleep(1);
+    }
+    match group::task_outcome(task) {
+        Option::None => {
+            panic("pending");
+        }
+        Option::Some(outcome) => {
+            match outcome {
+                loop::Outcome::Done(code) => {
+                    assert_true(code == 124, "exit 124 is an exit, not a timeout");
+                }
+                loop::Outcome::Failed(error) => {
+                    panic(error);
+                }
+                loop::Outcome::Cancelled => {
+                    panic("cancelled");
+                }
+                loop::Outcome::TimedOut => {
+                    panic("timeout");
+                }
+            }
+        }
+    }
+    list_set(argv, 1, "loop");
+    let cancelled = must(group::spawn(owner, 5000, action));
+    let start = now();
+    while now() - start < 100 {
+        let ticked = must(group::tick(owner, now()));
+        let slept = host_sleep(1);
+    }
+    let requested = group::cancel_task(cancelled);
+    done = false;
+    while !done {
+        done = must(group::tick(owner, now()));
+        let slept = host_sleep(1);
+    }
+    assert_true(now() - start < 4000, "cancel did not wait for task deadline");
+    match group::task_outcome(cancelled) {
+        Option::None => {
+            panic("pending after drain");
+        }
+        Option::Some(outcome) => {
+            match outcome {
+                loop::Outcome::Cancelled => {}
+                loop::Outcome::Done(_) => {
+                    panic("not cancelled");
+                }
+                loop::Outcome::Failed(error) => {
+                    panic(error);
+                }
+                loop::Outcome::TimedOut => {
+                    panic("timeout");
+                }
+            }
+        }
+    }
+    print("group process passed");
+    return 0;
+}

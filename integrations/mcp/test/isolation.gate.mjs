@@ -4,7 +4,9 @@ import path from 'node:path';
 import {execFileSync,spawn} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {Sandbox,hash} from '../dist/sandbox.js';
-const root=path.resolve('../..'),manifest=path.join(root,'build/mcp-execution/execution.json');
+const root=path.resolve(process.env.VELA_TEST_NATIVE_ROOT ?? '../..'),manifest=path.join(root,'build/mcp-execution/execution.json');
+const evidence=path.resolve(process.env.VELA_TEST_EVIDENCE_DIR ?? path.join(root,'build/stage08'));
+await fs.mkdir(evidence,{recursive:true});
 const s=new Sandbox(manifest,hash(await fs.readFile(manifest))),checks=[];
 const check=(name,value)=>{assert.ok(value,name);checks.push(name);console.log('PASS',name);};
 const signal=()=>new AbortController().signal;
@@ -47,7 +49,7 @@ try{
  await s.verify();check('toolchain bytes unchanged',true);
  await s.close();
  // Model clients that kill their MCP Node process instead of closing stdio.
- const readyFile=path.join(root,'build/stage07/forced-host.json');await fs.rm(readyFile,{force:true});
+ const readyFile=path.join(evidence,'forced-host.json');await fs.rm(readyFile,{force:true});
  const childCode='import fs from "node:fs/promises";import path from "node:path";import {Sandbox,hash} from '+JSON.stringify(pathToFileURL(path.resolve('dist/sandbox.js')).href)+';'+
   'const [manifest,compiler,ready]=process.argv.slice(1);const s=new Sandbox(manifest,hash(await fs.readFile(manifest)));await s.init(hash(await fs.readFile(compiler)));const work=await s.directory();await fs.writeFile(ready,JSON.stringify({base:s.base,work}));await s.run(work,path.join(s.manifest.root,"probe.exe"),["--tree"],new AbortController().signal,30000);await s.close();';
  const owner=spawn(process.execPath,['--input-type=module','-e',childCode,manifest,path.join(root,'bin/velac.exe'),readyFile],{windowsHide:true,stdio:'ignore'});
@@ -68,5 +70,5 @@ try{
   console.log('forced host paths',state);
   check('forced Node death removes snapshot and lease',!(await fs.stat(manifest+'.lock').catch(()=>null))&&!(await fs.stat(state.base).catch(()=>null)));
  }finally{owner.kill();await fs.rm(readyFile,{force:true});}
-}finally{await s.close();await fs.writeFile(path.join(root,'build/stage07/078-isolation.json'),JSON.stringify({schema_version:1,checks},null,2));}
+}finally{await s.close();await fs.writeFile(path.join(evidence,'isolation.json'),JSON.stringify({schema_version:1,checks},null,2));}
 console.log('Isolation checks:',checks.length);

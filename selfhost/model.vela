@@ -21,6 +21,19 @@ pub struct RelatedLocation {
     span: Span
 }
 pub struct DiagnosticDetails {
+    effect_parameter: String,
+    capture: String,
+    expected: String,
+    actual: String,
+    interface_name: String,
+    implementor: String,
+    type_parameter: String,
+    operation: String,
+    reason: String,
+    owner: String,
+    member: String,
+    method: String,
+    exposed_type: String,
     expected_type: String,
     actual_type: String,
     callee: String,
@@ -40,9 +53,11 @@ pub struct SyntaxArgument {
     value: AstExprId
 }
 pub struct SyntaxExpr {
+    closure_index: Int,
     arms: List<SyntaxArm>,
     kind: Int,
     span: Span,
+    name_span: Span,
     text: String,
     qualifier: String,
     left: AstExprId,
@@ -54,10 +69,19 @@ pub struct SyntaxName {
     name: String,
     span: Span
 }
+pub struct SyntaxClosure {
+    suspending: Bool,
+    effect_pattern: String,
+    captures: List<SyntaxName>,
+    parameters: List<SyntaxField>,
+    return_name: String,
+    body: List<AstStmtId>
+}
 pub struct SyntaxArm {
     value: AstExprId,
     owner: String,
     variant: String,
+    variant_span: Span,
     names: List<SyntaxName>,
     body: List<AstStmtId>,
     span: Span
@@ -66,6 +90,7 @@ pub struct SyntaxStmt {
     mode: Int,
     kind: Int,
     span: Span,
+    name_span: Span,
     name: String,
     annotation: String,
     mutable: Bool,
@@ -91,6 +116,7 @@ pub struct TypeParameter {
     span: Span
 }
 pub struct SyntaxType {
+    opaque: Bool,
     type_parameters: List<TypeParameter>,
     kind: Int,
     name: String,
@@ -99,7 +125,35 @@ pub struct SyntaxType {
     variants: List<SyntaxVariant>,
     span: Span
 }
+pub struct SyntaxImpl {
+    interface_name: String,
+    owner: String,
+    parameters: List<TypeParameter>,
+    span: Span
+}
+pub struct SyntaxOperation {
+    name: String,
+    parameters: List<SyntaxField>,
+    return_name: String,
+    effect_mask: Int,
+    span: Span
+}
+pub struct SyntaxInterface {
+    name: String,
+    operations: List<SyntaxOperation>,
+    span: Span
+}
+pub struct InterfaceOperation {
+    owner: String,
+    name: String,
+    signature: SymbolId
+}
 pub struct SyntaxFunction {
+    suspending: Bool,
+    effect_pattern: String,
+    impl_index: Int,
+    method_exported: Bool,
+    name_span: Span,
     foreign_library: String,
     foreign_name: String,
     test_name: String,
@@ -114,6 +168,10 @@ pub struct SyntaxFunction {
     span: Span
 }
 pub struct TypeInfo {
+    call_effect_mask: Int,
+    constraint: String,
+    parameter_name: String,
+    opaque: Bool,
     template_index: Int,
     kind: Int,
     name: String,
@@ -126,6 +184,12 @@ pub struct TypeInfo {
     visit: Int
 }
 pub struct Symbol {
+    suspending: Bool,
+    capture_origin: SymbolId,
+    interface_operation: Bool,
+    constraints_checked: Bool,
+    method_span: Span,
+    method_exported: Bool,
     foreign_library: String,
     foreign_name: String,
     template_index: Int,
@@ -145,6 +209,7 @@ pub struct Symbol {
     return_pattern: String
 }
 pub struct CheckedExpr {
+    reference: SymbolId,
     arms: List<CheckedArm>,
     kind: Int,
     span: Span,
@@ -177,6 +242,7 @@ pub struct CheckedStmt {
     returns: Bool
 }
 pub struct CheckedFunction {
+    captures: List<SymbolId>,
     symbol: SymbolId,
     parameters: List<SymbolId>,
     result_binding: SymbolId,
@@ -192,8 +258,12 @@ pub struct FunctionInstance {
     mapping: Dict<String, TypeId>
 }
 pub struct Control {
+    in_async: Bool,
+    await_site: Span,
+    scope_base: Int,
     loop_depth: Int,
     in_contract: Bool,
+    in_defer: Bool,
     instance_depth: Int,
     type_mapping: Dict<String, TypeId>,
     type_depth: Int,
@@ -207,12 +277,23 @@ pub struct Control {
     function_index: Int
 }
 pub struct Context {
+    debug_codegen: Bool,
+    query_mode: Bool,
+    query_uses: List<QueryUse>,
+    query_types: List<SyntaxName>,
+    generic_tokens: Dict<Int, Bool>,
+    arm_commas: Dict<Int, Bool>,
     source_units: List<SourceUnit>,
     imports: List<ModuleImport>,
     declarations: List<ModuleDeclaration>,
     bound_types: List<SyntaxType>,
     bound_functions: List<SyntaxFunction>,
+    bound_interfaces: List<SyntaxInterface>,
+    bound_impls: List<SyntaxImpl>,
+    interface_operations: List<InterfaceOperation>,
     loop_labels: List<String>,
+    loop_cleanup_depths: List<Int>,
+    cleanup_blocks: List<StmtId>,
     instances: List<FunctionInstance>,
     generic_functions: Dict<String, SymbolId>,
     source_text: String,
@@ -225,6 +306,9 @@ pub struct Context {
     syntax_exprs: List<SyntaxExpr>,
     syntax_stmts: List<SyntaxStmt>,
     syntax_types: List<SyntaxType>,
+    syntax_impls: List<SyntaxImpl>,
+    syntax_closures: List<SyntaxClosure>,
+    syntax_interfaces: List<SyntaxInterface>,
     syntax_functions: List<SyntaxFunction>,
     expressions: List<CheckedExpr>,
     statements: List<CheckedStmt>,
@@ -236,6 +320,12 @@ pub struct Context {
     type_order: List<TypeId>,
     control: List<Control>
 }
+pub struct QueryUse {
+    span: Span,
+    symbol: SymbolId,
+    type_id: TypeId,
+    role: String
+}
 pub struct SourceUnit {
     path: String,
     name: String,
@@ -244,6 +334,10 @@ pub struct SourceUnit {
     start: Int,
     end: Int,
     line_base: Int
+}
+pub struct QueryOverlay {
+    path: String,
+    code: String
 }
 pub struct ImportSpec {
     path: String,
@@ -319,6 +413,7 @@ pub fn float_type() -> TypeId {
 }
 pub fn foreign_handle_type() -> TypeId { return TypeId(8); }
 pub fn int32_type() -> TypeId { return TypeId(9); }
+pub fn callback_handle_type() -> TypeId { return TypeId(10); }
 pub fn primitive_type_id(index: Int) -> TypeId {
     return TypeId(index);
 }
@@ -377,6 +472,9 @@ pub fn add_symbol(c: Context, value: Symbol) -> SymbolId effects { state } {
     list_push(c.symbols, value);
     return SymbolId(list_len(c.symbols));
 }
+pub fn symbol_at(index: Int) -> SymbolId {
+    return SymbolId(index + 1);
+}
 pub fn set_type(c: Context, id: TypeId, value: TypeInfo) -> Unit effects { state, io, process } {
     list_set(c.types, table_index(id.value, list_len(c.types), "type"), value);
 }
@@ -384,22 +482,22 @@ pub fn set_symbol(c: Context, id: SymbolId, value: Symbol) -> Unit effects { sta
     list_set(c.symbols, table_index(id.value, list_len(c.symbols), "symbol"), value);
 }
 pub fn syntax_expression(kind: Int, span: Span, text: String) -> SyntaxExpr effects { state } {
-    return SyntaxExpr(arms: list_new<SyntaxArm>(), kind: kind, span: span, text: text, qualifier: "", left: no_ast_expr(), right: no_ast_expr(), arguments: list_new<SyntaxArgument>(), type_arguments: list_new<String>());
+    return SyntaxExpr(closure_index: -1, arms: list_new<SyntaxArm>(), kind: kind, span: span, name_span: span, text: text, qualifier: "", left: no_ast_expr(), right: no_ast_expr(), arguments: list_new<SyntaxArgument>(), type_arguments: list_new<String>());
 }
 pub fn syntax_statement(kind: Int, span: Span) -> SyntaxStmt effects { state } {
-    return SyntaxStmt(mode: 0, kind: kind, span: span, name: "", annotation: "", mutable: false, value: no_ast_expr(), target: no_ast_expr(), yes: list_new<AstStmtId>(), no: list_new<AstStmtId>(), arms: list_new<SyntaxArm>());
+    return SyntaxStmt(mode: 0, kind: kind, span: span, name_span: span, name: "", annotation: "", mutable: false, value: no_ast_expr(), target: no_ast_expr(), yes: list_new<AstStmtId>(), no: list_new<AstStmtId>(), arms: list_new<SyntaxArm>());
 }
 pub fn expression_record(kind: Int, span: Span, type_id: TypeId) -> CheckedExpr effects { state } {
-    return CheckedExpr(arms: list_new<CheckedArm>(), kind: kind, span: span, type_id: type_id, text: "", left: no_expr(), right: no_expr(), arguments: list_new<ExprId>(), symbol: no_symbol(), fields: list_new<SymbolId>());
+    return CheckedExpr(reference: no_symbol(), arms: list_new<CheckedArm>(), kind: kind, span: span, type_id: type_id, text: "", left: no_expr(), right: no_expr(), arguments: list_new<ExprId>(), symbol: no_symbol(), fields: list_new<SymbolId>());
 }
 pub fn statement_record(kind: Int, span: Span) -> CheckedStmt effects { state } {
     return CheckedStmt(mode: 0, exits: false, kind: kind, span: span, binding: no_symbol(), value: no_expr(), target: no_expr(), yes: list_new<StmtId>(), no: list_new<StmtId>(), arms: list_new<CheckedArm>(), returns: false);
 }
 pub fn type_record(kind: Int, name: String, span: Span) -> TypeInfo effects { state } {
-    return TypeInfo(template_index: -1, kind: kind, name: name, fields: list_new<SymbolId>(), variants: list_new<SymbolId>(), arguments: list_new<TypeId>(), base: no_type(), base_name: "", span: span, visit: 0);
+    return TypeInfo(call_effect_mask: 0, constraint: "", parameter_name: "", opaque: false, template_index: -1, kind: kind, name: name, fields: list_new<SymbolId>(), variants: list_new<SymbolId>(), arguments: list_new<TypeId>(), base: no_type(), base_name: "", span: span, visit: 0);
 }
 pub fn symbol_record(kind: Int, name: String, type_id: TypeId, span: Span) -> Symbol effects { state } {
-    return Symbol(foreign_library: "", foreign_name: "", template_index: -1, kind: kind, name: name, type_id: type_id, owner: no_type(), span: span, parameters: list_new<SymbolId>(), effect_mask: 0, mutable: false, tag: 0, builtin: false, abi: "", variables: list_new<String>(), patterns: list_new<String>(), return_pattern: "");
+    return Symbol(suspending: false, capture_origin: no_symbol(), interface_operation: false, constraints_checked: false, method_span: empty_span(), method_exported: false, foreign_library: "", foreign_name: "", template_index: -1, kind: kind, name: name, type_id: type_id, owner: no_type(), span: span, parameters: list_new<SymbolId>(), effect_mask: 0, mutable: false, tag: 0, builtin: false, abi: "", variables: list_new<String>(), patterns: list_new<String>(), return_pattern: "");
 }
 pub fn table_get<T>(items: List<T>, id: Int, category: String) -> T effects { state, io, process } {
     return list_get(items, table_index(id, list_len(items), category));

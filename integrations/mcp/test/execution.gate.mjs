@@ -5,8 +5,11 @@ import os from 'node:os';
 import {Client} from '@modelcontextprotocol/client';
 import {StdioClientTransport} from '@modelcontextprotocol/client/stdio';
 import {hash} from '../dist/sandbox.js';
-const root=path.resolve('../..'),manifest=path.join(root,'build/mcp-execution/execution.json');
+const root=path.resolve(process.env.VELA_TEST_NATIVE_ROOT ?? '../..'),manifest=path.join(root,'build/mcp-execution/execution.json');
+const evidence=path.resolve(process.env.VELA_TEST_EVIDENCE_DIR ?? path.join(root,'build/stage08'));
+await fs.mkdir(evidence,{recursive:true});
 const work=await fs.mkdtemp(path.join(os.tmpdir(),'vela-execution-gate-')),workspace=path.join(work,'app');await fs.mkdir(workspace);
+assert.equal(path.dirname(path.resolve(work)),path.resolve(os.tmpdir()));
 const config={schema_version:1,workspace,toolchain:root,aliases:{},execution:{manifest,sha256:hash(await fs.readFile(manifest)),native_allowlist:[]}};
 const cfg=path.join(work,'config.json');await fs.writeFile(cfg,JSON.stringify(config));
 const client=new Client({name:'vela-execution-gate',version:'1'});
@@ -19,8 +22,15 @@ const source='fn main()->Unit effects{io,process}{print("Привет 😀");pri
 await fs.writeFile(path.join(workspace,'main.vela'),source);
 try{
  await client.connect(transport);
- check('eight native MCP tools',(await client.listTools()).tools.length===8);
+ check('eleven native MCP tools',(await client.listTools()).tools.length===11);
  const context=await call('vela_get_context');check('execution enabled after OS startup probe',context.data.execution===true);
+ if(/^0\.10\.0(?:-dev\.(?:[3-9]|\d{2,}))?$/.test(context.data.version)||/^(?:0\.11\.|1\.)/.test(context.data.version)){
+  const text='opaque struct Counter { value: Int }\nimpl Counter { fn answer(self: Counter) -> Int { return self.value; } }\nfn main() -> Int effects { io } { print(Counter(value: 42).answer()); return 0; }\n';
+  const built=await call('vela_build',{path:'method.vela',text});
+  check('isolated compiler accepts opaque structs and methods',built.status==='ok');
+  const executed=await call('vela_run',{artifact_id:built.data.artifact_id});
+  check('isolated method call prints the expected value',executed.status==='ok'&&executed.data.exit_code===0&&executed.data.stdout.trim()==='42');
+ }
  const build=await call('vela_build',{path:'main.vela'});console.log('build',JSON.stringify(build));
  check('isolated MSVC build issues artifact',build.status==='ok'&&build.data.artifact_id?.length===64);
  const id=build.data.artifact_id;
@@ -67,7 +77,7 @@ try{
  check('MCP disconnect releases execution cache',!(await fs.stat(manifest+'.lock').catch(()=>null)));
 }finally{
  await client.close();await transport.close();
- await fs.writeFile(path.join(root,'build/stage07/078-execution-sdk.json'),JSON.stringify(report,null,2));
+ await fs.writeFile(path.join(evidence,'execution-sdk.json'),JSON.stringify(report,null,2));
  await fs.rm(work,{recursive:true,force:true,maxRetries:10});
 }
 console.log('Execution SDK checks:',report.checks.length);

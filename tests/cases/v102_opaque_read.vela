@@ -1,0 +1,2 @@
+import "opaque-owner.vela" as api;
+fn main() -> Int effects { state } { let x = api::create(7); return x.scalar; }

@@ -1,0 +1,5 @@
+fn main() -> Int {
+    let offset = 1;
+    let compute = fn [offset, offset]() -> Int { return offset; };
+    return compute();
+}

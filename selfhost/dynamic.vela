@@ -1,0 +1,98 @@
+import "model.vela";
+import "core.vela";
+import "types.vela";
+import "modules.vela";
+import "interfaces.vela";
+import "generics.vela";
+import "semantic.vela";
+
+pub fn dynamic_pattern(name: String) -> Bool {
+    return str_len(name) >= 5 && str_slice(name, 0, 5) == "@dyn:";
+}
+
+pub fn interface_label(c: Context, name: String) -> String effects { state } {
+    for declaration in c.declarations {
+        if declaration.canonical == name { return declaration.name; }
+    }
+    return name;
+}
+
+pub fn dynamic_error(c: Context, interface_name: String, reason: String, message: String, span: Span) -> Unit effects { state, io, process } {
+    var details = empty_details();
+    details.interface_name = interface_label(c, interface_name);
+    details.reason = reason;
+    let index = find_interface(c, interface_name);
+    if index >= 0 {
+        list_push(details.related, RelatedLocation(message: "Interface declared here.", span: list_get(c.bound_interfaces, index).span));
+    }
+    fail_details(c, "E237", message, span, details);
+}
+
+pub fn resolve_dynamic_type(c: Context, name: String, span: Span) -> TypeId effects { state, io, process } {
+    if list_len(type_parts(name)) != 1 || dynamic_pattern(name) {
+        dynamic_error(c, name, "dynamic_interface", "Expected a nominal interface after dyn.", span);
+    }
+    let interface_name = module_global_name(c, name, span);
+    if find_interface(c, interface_name) < 0 {
+        dynamic_error(c, interface_name, "dynamic_interface", "Expected a nominal interface after dyn.", span);
+    }
+    let key = "@dyn:" + interface_name;
+    let previous = find_type(c, key);
+    if has_type(previous) { return previous; }
+    var info = type_record(82, key, span);
+    info.base_name = interface_name;
+    return add_type(c, info);
+}
+
+pub fn interface_operation(c: Context, owner: String, name: String, span: Span) -> SymbolId effects { state, io, process } {
+    for operation in c.interface_operations {
+        if operation.owner == owner && operation.name == name { return operation.signature; }
+    }
+    bad(c, "E203", "Unknown interface operation: " + name, span);
+    return no_symbol();
+}
+
+pub fn check_dynamic_box(c: Context, syntax: SyntaxExpr) -> ExprId effects { state, io, process } {
+    let target = resolve_dynamic_type(c, syntax.qualifier, syntax.name_span);
+    let owner = type_info(c, target).base_name;
+    if list_len(syntax.arguments) != 1 || list_get(syntax.arguments, 0).label != "" {
+        dynamic_error(c, owner, "dynamic_arity", "Dynamic packing requires one positional value.", syntax.span);
+    }
+    let payload = check_expr(c, list_get(syntax.arguments, 0).value);
+    let concrete = checked_expr(c, payload).type_id;
+    let info = type_info(c, concrete);
+    var box = expression_record(121, syntax.span, target);
+    box.left = payload;
+    if info.parameter_name != "" {
+        if info.constraint != owner {
+            dynamic_error(c, owner, "dynamic_missing_impl", "Type parameter lacks the required interface bound.", syntax.span);
+        }
+        return add_expr(c, box);
+    }
+    if info.kind == 82 {
+        dynamic_error(c, owner, "dynamic_repack", "Dynamic interface values cannot be packed again.", syntax.span);
+    }
+    let index = lookup_implementation(c, concrete, owner);
+    if index < 0 {
+        dynamic_error(c, owner, "dynamic_missing_impl", "Value type does not implement this interface.", syntax.span);
+    }
+    let implementation = list_get(c.bound_impls, index);
+    let interface = list_get(c.bound_interfaces, find_interface(c, owner));
+    for operation in interface.operations {
+        var method = find_symbol(c, c.signatures, implementation_method_name(implementation, operation.name));
+        if symbol_info(c, method).template_index >= 0 {
+            method = instantiate_function(c, method, info.arguments, syntax.span);
+        }
+        list_push(box.fields, method);
+    }
+    return add_expr(c, box);
+}
+
+pub fn dynamic_call(c: Context, operation: SymbolId, receiver: ExprId, arguments: List<SyntaxArgument>, span: Span, name: Span) -> ExprId effects { state, io, process } {
+    let signature = symbol_info(c, operation);
+    var call = expression_record(122, span, signature.type_id);
+    call.symbol = operation;
+    call.arguments = check_arguments_with_receiver(c, arguments, signature.parameters, receiver, span);
+    require_effects(c, operation, name);
+    return add_expr(c, call);
+}

@@ -1,0 +1,110 @@
+import "route.vela" as route;
+import "audit.vela" as audit;
+import "../../std/testing.vela" as testlib;
+import "../../std/text.vela" as text;
+import "../../std/lines.vela" as lines;
+
+fn example() -> String {
+    return "{\"name\":\"Контроль 🌳\",\"jump_limit_m\":5,\"points\":[[0,0],[3,4],[9,12]]}";
+}
+
+test "Euclidean geometry and strict jump threshold" effects { state } {
+    match route::parse(example()) {
+        Result::Err(error) => { assert_true(false, error); }
+        Result::Ok(record) => {
+            match route::summarize(record) {
+                Result::Err(error) => { assert_true(false, error); }
+                Result::Ok(stats) => {
+                    testlib::close(stats.length, 15.0, 0.0, "total");
+                    testlib::close(stats.max_step, 10.0, 0.0, "maximum");
+                    testlib::equal(stats.jumps, 1, "equality does not trigger a jump");
+                }
+            }
+        }
+    }
+}
+
+test "TSV output with BOM, CRLF, blank lines and no final newline" effects { state } {
+    let bom = str_from_byte(239) + str_from_byte(187) + str_from_byte(191);
+    let input = bom + "\r\n  " + example() + " \r\n\t\n" + example();
+    match audit::run_source(lines::from_string(input), 1) {
+        Result::Err(error) => { assert_true(false, error); }
+        Result::Ok(batch) => {
+            let header = "name\tpoints\tlength_m\tmax_step_m\tjumps\n";
+            let row = "Контроль 🌳\t3\t15.00\t10.00\t1\n";
+            testlib::equal(batch.report.data, header + row + row, "exact report");
+            testlib::equal(batch.routes, 2, "route count");
+            testlib::equal(batch.jumps, 2, "jump count");
+        }
+    }
+}
+
+test "nested JSON error keeps physical line and field path" effects { state } {
+    let invalid = "{\"name\":\"Broken\",\"jump_limit_m\":5,\"points\":[[0,0],[1,null]]}";
+    match audit::run(example() + "\n\n" + invalid) {
+        Result::Ok(_) => { assert_true(false, "null coordinate accepted"); }
+        Result::Err(error) => {
+            testlib::equal(error, "line 3: $.points[1][1]: expected number", "source location");
+        }
+    }
+}
+
+test "absent field differs from present null" effects { state } {
+    match route::parse("{\"name\":\"X\",\"points\":[[0,0],[1,0]]}") {
+        Result::Ok(_) => { assert_true(false, "missing threshold accepted"); }
+        Result::Err(error) => { testlib::equal(error, "$.jump_limit_m: missing field", "missing"); }
+    }
+    match route::parse("{\"name\":\"X\",\"jump_limit_m\":null,\"points\":[[0,0],[1,0]]}") {
+        Result::Ok(_) => { assert_true(false, "null threshold accepted"); }
+        Result::Err(error) => { testlib::equal(error, "$.jump_limit_m: expected number", "null"); }
+    }
+}
+
+test "rounded output does not change jump decisions" effects { state } {
+    let input = "{\"name\":\"X\",\"jump_limit_m\":1,\"points\":[[0,0],[1.004,0]]}";
+    match audit::run(input) {
+        Result::Err(error) => { assert_true(false, error); }
+        Result::Ok(batch) => {
+            testlib::equal(batch.jumps, 1, "raw distance exceeds the limit");
+            testlib::equal(batch.report.data, "name\tpoints\tlength_m\tmax_step_m\tjumps\nX\t2\t1.00\t1.00\t1\n", "two digits");
+        }
+    }
+}
+
+test "reject invalid UTF-8 and oversized lines" effects { state } {
+    testlib::is_err(audit::run(str_from_byte(255)), "invalid UTF-8");
+    var line = " ";
+    for i in 0 .. 17 { line = line + line; }
+    testlib::is_err(audit::run(line), "64 KiB per-line limit");
+    testlib::is_err(audit::run("\r\n \t\n"), "empty log");
+}
+
+test "reject malformed route fields" effects { state } {
+    testlib::is_err(route::parse("{\"name\":\"A\\tB\",\"jump_limit_m\":2,\"points\":[[0,0],[1,1]]}"), "TSV separator");
+    testlib::is_err(route::parse("{\"name\":\"X\",\"jump_limit_m\":0,\"points\":[[0,0],[1,1]]}"), "zero limit");
+    testlib::is_err(route::parse("{\"name\":\"X\",\"jump_limit_m\":1,\"points\":[[0,0]]}"), "one point");
+    testlib::is_err(route::parse("{\"name\":\"X\",\"jump_limit_m\":1,\"points\":[[0,0],[9007199254740993,0]]}"), "inexact integer");
+    testlib::is_err(route::parse("{\"name\":\"X\",\"jump_limit_m\":1,\"points\":[[0,0],[1,0]],\"extra\":0}"), "unknown field");
+}
+
+fn exercise_cleanup() -> Result<Bool, String> effects { state } {
+    let record = route::parse(example())?;
+    let scratch = audit::explain(text::builder(256), "scratch")?;
+    let too_small = audit::explain(text::builder(0), "small output")?;
+    testlib::is_err(audit::append_row(too_small, scratch, record), "output append fails");
+    testlib::equal(text::finish_bytes(scratch).data, "", "defer reset on error");
+    testlib::equal(text::finish_bytes(too_small).data, "", "failed append has no partial row");
+    let output = audit::explain(text::builder(256), "output")?;
+    let jumps = audit::append_row(output, scratch, record)?;
+    testlib::equal(jumps, 1, "same buffer reused");
+    testlib::equal(text::finish_bytes(scratch).data, "", "defer reset on success");
+    testlib::equal(text::finish_bytes(output).data, "Контроль 🌳\t3\t15.00\t10.00\t1\n", "copied row survives reset");
+    return Result<Bool, String>::Ok(true);
+}
+
+test "defer clears shared scratch on both exit paths" effects { state } {
+    match exercise_cleanup() {
+        Result::Ok(_) => {}
+        Result::Err(error) => { assert_true(false, error); }
+    }
+}

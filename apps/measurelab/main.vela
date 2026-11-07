@@ -53,7 +53,7 @@ fn work() -> Result<Int, String> effects { args, state, io, process } {
         }
     }
     let data = report::analyze(model::parse(raw)?)?;
-    let html = report::html(data);
+    let html = report::html(data)?;
     match fs::write_text_atomic(output, text::Text(data: html)) {
         Result::Ok(_) => {}
         Result::Err(error) => {

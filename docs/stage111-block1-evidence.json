@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "milestone": "0.11.1",
+  "scope": "first verified implementation block",
+  "version": "0.11.0-dev.1",
+  "platform": "Windows x64 / MSVC",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1147,
+    "failed": 0,
+    "skipped": 0
+  },
+  "build": {
+    "generations": 3,
+    "compiler_sha256": "3f47259bf18b39e75eefee4d3b36e15a655d94350735759e6f723bac3cf65ad5",
+    "c_fixed_point_sha256": "c337358358084d4149b40a6e5eac9763035b4c92094f893b31b12fc8ad815a76",
+    "bundle_fixed_point_sha256": "a8f71357435019b4810254dcf59f58f82e3d9315de22a725f6afe7cff1272762",
+    "verify_exit_code": 0,
+    "log": "build/stage111/verify-final.log",
+    "transition_orchestrator_version": "0.10.0"
+  },
+  "focused": {
+    "loop_under_forced_gc": "passed",
+    "process_under_forced_gc": "passed",
+    "live_descendant_and_job_drain": "passed",
+    "output_alias_preserves_bytes": "passed",
+    "fielddesk_and_notes_source_checks": "passed"
+  },
+  "mcp": {
+    "setup_sdk_handshake": "passed",
+    "installed_stdlib_check": "passed",
+    "version_guard": "0.11.0-dev.1",
+    "execution_gate": "not run"
+  },
+  "retries": [
+    "Moved the relative-import fixture from the standalone case table into the stdlib graph after E221",
+    "Added the verified development compiler to the MCP compatibility allowlist after the first handshake rejected it"
+  ],
+  "remaining": [
+    "OS operation preparation off the loop thread",
+    "async fn and await with compiler blocking analysis",
+    "GUI owner shutdown with suspended work",
+    "0.11.2 through 0.11.6 and the release gate"
+  ]
+}

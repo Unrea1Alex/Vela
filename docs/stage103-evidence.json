@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "stage": "0.10.3",
+  "compiler": "0.10.0-dev.3",
+  "compiler_sha256": "77fcc5fba635b1a7847246f32cfefdad8bc078dbb5e2acab4d69f61d88100811",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1053,
+    "failed": 0,
+    "skipped": 0
+  },
+  "fixed_point": true,
+  "bundler_fixed_point": true,
+  "bootstrap_driver_version": "0.10.0-dev.2",
+  "recovery": {
+    "compiled": true,
+    "byte_identical": true,
+    "sha256": "154a03b23607e29eb01ad1e08839019df1657c26f6df56538a9df145019bee3c"
+  },
+  "focused": [
+    "A03-01 receiver,a,b,body order and single evaluation",
+    "A03-02 early propagation skips method and later argument; defer executes",
+    "A03-03 immutable receiver and scalar copy/shared list",
+    "A03-04 owner, exact self, field/variant collision, duplicate block, privacy and effects",
+    "A03-05 generic owner, forced GC, fmt fixed point and query identity"
+  ],
+  "lsp": {
+    "requests": 200,
+    "elapsed_ms": 3114,
+    "baseline": {
+      "WorkingSet64": 7794688,
+      "HandleCount": 109
+    },
+    "final": {
+      "WorkingSet64": 8151040,
+      "HandleCount": 109
+    },
+    "utf16": true,
+    "stale_versions": true,
+    "parity": true,
+    "unchanged": true,
+    "methods": true
+  },
+  "rename_plan_edits": 3,
+  "mcp": {
+    "sdk_suites_passed": 3,
+    "execution_checks_passed": 26,
+    "isolated_method_stdout": "42",
+    "pinned_compiler_verified": true
+  },
+  "release_gate_complete": false,
+  "next_item": "0.10.4"
+}

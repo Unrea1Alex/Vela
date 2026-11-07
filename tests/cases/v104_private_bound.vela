@@ -1,0 +1,3 @@
+interface Hidden {}
+pub fn leak<T: Hidden>(x: T) -> T { return x; }
+fn main() -> Int { return 0; }

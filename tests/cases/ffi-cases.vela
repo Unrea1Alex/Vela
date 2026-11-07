@@ -22,15 +22,34 @@ pub fn ffi_runtime_case(suite: Suite, name: String, source: String, message: Str
     let actual = ffi_program(suite, source);
     return record(suite, name, actual.code == 70 && contains(actual.err, "ffi-error.vela:") && contains(actual.err, message), actual.out + actual.err);
 }
+fn runtime_case(s: Suite, name: String, source: String, expected: String) -> Suite effects { state, io, process } {
+    let args = command(env("VELA_CC"));
+    let exe = s.dir + "/" + name + ".exe";
+    for flag in split("/nologo|/std:c11|/MT|/O2|/fp:strict", 124) { strings_push(args, flag); }
+    strings_push(args, "/Fo" + s.dir + "/" + name + ".obj");
+    strings_push(args, "/Fe" + exe);
+    strings_push(args, s.root + "/" + source);
+    let compiled = invoke(s, args, 30000);
+    if compiled.code != 0 { return record(s, name, false, compiled.out + compiled.err); }
+    let ran = invoke(s, command(exe), 10000);
+    return record(s, name, ran.code == 0 && ran.out == expected && ran.err == "", ran.out + ran.err);
+}
 pub fn ffi_checks(suite: Suite) -> Suite effects { state, io, process } {
     var s = suite;
     let native = ffi_library(s, "fixture", 1);
     s = record(s, "ffi_native_adapter", native.code == 0, native.out + native.err);
+    s = runtime_case(s, "ffi_explicit_roots", "tests/ffi/roots.c", "ffi roots passed\n");
+    s = runtime_case(s, "fixed_numeric_locale", "tests/cases/fixed-locale.c", "fixed locale passed\n");
+    s = runtime_case(s, "process_launch_worker", "tests/stdlib/process-worker.c", "process worker passed\n");
     let exe = s.dir + "/ffi.exe";
     let built = build(s, s.root + "/tests/ffi/main.vela", exe);
     let ran = invoke(s, command(exe), 10000);
     s = record(s, "ffi_abi_behavior", built.code == 0 && ran.code == 0 && ran.out == "ffi ABI 1 passed\n", built.err + ran.out + ran.err);
     let other = ffi_library(s, "other", 1);
+    let callback_exe = s.dir + "/callbacks.exe";
+    let callback_built = build(s, s.root + "/tests/ffi/callbacks.vela", callback_exe);
+    let callback_ran = invoke(s, command(callback_exe), 10000);
+    s = record(s, "ffi_callback_lifecycle", callback_built.code == 0 && callback_ran.code == 0 && callback_ran.out == "callbacks passed\n" && callback_ran.err == "", callback_built.err + callback_ran.out + callback_ran.err);
     let wrong = ffi_library(s, "wrong", 2);
     s = record(s, "ffi_aux_adapters", other.code == 0 && wrong.code == 0, other.out + wrong.out);
     let effect_decl = " effects {state,process}";
@@ -40,7 +59,14 @@ pub fn ffi_checks(suite: Suite) -> Suite effects { state, io, process } {
     s = ffi_runtime_case(s, "ffi_bool_validation", "extern \"fixture.dll\" fn invalid_bool()->Bool" + effect_decl + "; fn main()->Unit" + effect_decl + "{let b=invalid_bool();}", "foreign Bool must be 0 or 1");
     let handle = "extern \"fixture.dll\" fn resource(x:Int)->ForeignHandle" + effect_decl + "; ";
     let consume = "fn resource_value(x:ForeignHandle)->Int" + effect_decl + "; ";
+    let stale_callback = handle + "extern \"fixture.dll\" fn save_callback(owner:ForeignHandle, callback:CallbackHandle)->Unit" + effect_decl + "; fn main()->Unit effects{state,process}{let owner=resource(1);match ffi_callback_register(owner,fn [](n:Int)->Int{return n;}){CallbackResult::Ok(token)=>{let done=ffi_callback_cancel(token);save_callback(owner,token);} CallbackResult::Err(error)=>{assert_true(false,error);}}}";
+    s = ffi_runtime_case(s, "ffi_closed_callback_argument", stale_callback, "callback registration is closed");
     s = ffi_runtime_case(s, "ffi_closed_alias", handle + "extern \"fixture.dll\" " + consume + "fn main()->Int effects{state,process,io}{let h=resource(1);let alias=h;let closed=ffi_close(h,\"release_resource\");return resource_value(alias);}", "foreign handle is closed");
+    s = ffi_runtime_case(s, "ffi_closed_capture", handle + "extern \"fixture.dll\" " + consume + "fn main()->Int effects{state,process,io}{let h=resource(1);let read=fn [h]()->Int effects{state,process}{return resource_value(h);};let closed=ffi_close(h,\"release_resource\");return read();}", "foreign handle is closed");
+    let box = handle + "extern \"fixture.dll\" " + consume + "interface Reader{fn read(self:Self)->Int effects{state,process};} opaque struct Box{value:ForeignHandle} impl Reader for Box{fn read(self:Box)->Int effects{state,process}{return resource_value(self.value);}} ";
+    s = ffi_runtime_case(s, "ffi_closed_dynamic_alias", box + "fn main()->Int effects{state,process,io}{let h=resource(1);let reader=dyn Reader(Box(value:h));let alias=reader;let closed=ffi_close(h,\"release_resource\");return alias.read();}", "foreign handle is closed");
+    let live_box = ffi_program(s, box + "fn main()->Unit effects{state,process,io}{let h=resource(17);let reader=dyn Reader(Box(value:h));match ffi_close(h,\"absent\"){WriteResult::Err(_)=>{} WriteResult::Ok=>{assert_true(false,\"missing destructor\");}} match ffi_retain(h){WriteResult::Ok=>{} WriteResult::Err(e)=>{assert_true(false,e);}} match ffi_release(h){WriteResult::Ok=>{} WriteResult::Err(e)=>{assert_true(false,e);}} assert_true(reader.read()==17,\"retained handle state\"); match ffi_close(h,\"release_resource\"){WriteResult::Ok=>{} WriteResult::Err(e)=>{assert_true(false,e);}} match ffi_close(h,\"release_resource\"){WriteResult::Err(_)=>{} WriteResult::Ok=>{assert_true(false,\"repeated close\");}}}");
+    s = record(s, "ffi_dynamic_close_failure_and_release", live_box.code == 0, live_box.out + live_box.err);
     s = ffi_runtime_case(s, "ffi_wrong_owner", handle + "extern \"other.dll\" " + consume + "fn main()->Int" + effect_decl + "{return resource_value(resource(1));}", "belongs to another library");
     let preflight = ffi_program(s, "fn main()->Unit effects{state,process}{for name in names(){match ffi_load(name){WriteResult::Err(_)=>{} WriteResult::Ok=>{assert_true(false,\"must fail\");}}}} fn names()->List<String> effects{state}{let a=list_new<String>();list_push(a,\"absent.dll\");list_push(a,\"wrong.dll\");list_push(a,\"../fixture.dll\");list_push(a,\"fixture.dll\\0\");return a;}");
     s = record(s, "ffi_recoverable_preflight", preflight.code == 0, preflight.out + preflight.err);

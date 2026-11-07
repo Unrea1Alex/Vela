@@ -33,7 +33,7 @@ export async function inspect(configPath) {
  const task=(async()=>{
   await client.connect(transport);
   const listed=await client.listTools();
-  const expected=['vela_get_context','vela_get_help','vela_check','vela_format','vela_symbols'];
+  const expected=['vela_get_context','vela_get_help','vela_check','vela_format','vela_symbols','vela_query','vela_plan'];
   if(expected.some(name=>!listed.tools.some(t=>t.name===name)))throw Error('Missing required Vela tools.');
   const response=await client.callTool({name:'vela_get_context',arguments:{}});
   const value=response.structuredContent;

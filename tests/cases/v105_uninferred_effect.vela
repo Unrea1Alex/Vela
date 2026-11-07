@@ -1,0 +1,3 @@
+fn pure() -> Int { return 0; }
+fn mapper<effect E>() -> fn() -> Int effects E { return pure; }
+fn main() -> Int { let callback = mapper(); return 0; }

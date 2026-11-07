@@ -10,6 +10,7 @@ import "formatter.vela";
 import "emitter.vela";
 import "driver.vela";
 import "types.vela";
+import "artifacts.vela";
 pub fn capture_data(data: String) -> String effects { state } {
     if utf8_valid(data) {
         return data;
@@ -67,7 +68,7 @@ pub fn project_test(p: Project, json_mode: Bool) -> Int effects { state, io, pro
             let generated = generate_entry(c, entry);
             let dir = io_value(temp_dir(""));
             let exe = dir + "/test.exe";
-            var exit_code = build_or_run_native(generated, exe, strings_new(), false, p.natives);
+            var exit_code = build_or_run_native(generated, exe, strings_new(), false, p.natives, p.assets);
             var status = "build_error";
             var out = "";
             var err = "";
@@ -119,6 +120,7 @@ pub fn project_test(p: Project, json_mode: Bool) -> Int effects { state, io, pro
             ignored_write(remove_file(dir + "/stderr"));
             ignored_write(remove_file(exe));
             for native in p.natives { ignored_write(remove_file(dir + "/" + native.name)); }
+            unstage_assets(p.assets, dir);
             var artifact = "";
             match remove_dir(dir) {
                 WriteResult::Ok => {}

@@ -1,0 +1,19 @@
+extern "fixture.dll" fn resource(value: Int) -> ForeignHandle effects { state, process };
+extern "fixture.dll" fn save_callback(owner: ForeignHandle,
+    callback: CallbackHandle) -> Unit effects { state, process };
+extern "fixture.dll" fn invoke_saved(value: Int) -> Int effects { state, process };
+fn main() -> Int effects { io, state, process } {
+    let owner = resource(17);
+    let action = fn [ ](value: Int) -> Int effects { process } {
+        panic(f"callback {value:d}");
+    };
+    match ffi_callback_register(owner, action) {
+        CallbackResult::Ok(handle) => {
+            save_callback(owner, handle);
+            return invoke_saved(42);
+        }
+        CallbackResult::Err(error) => {
+            panic(error);
+        }
+    }
+}

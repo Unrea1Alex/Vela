@@ -1,0 +1,195 @@
+import "../std/event_loop.vela" as loop;
+import "../std/path.vela" as path;
+import "../std/process.vela" as process;
+import "../std/result.vela" as result;
+struct Batch {
+    compiler: String,
+    directory: String,
+    cwd: path::Path,
+    cache: String,
+    jobs: Int,
+    roots: List<String>
+}
+struct Job {
+    index: Int,
+    directory: String,
+    task: loop::Task<process::Completed>
+}
+fn clock() -> Result<Int, String> effects { io } {
+    return match monotonic_millis() {
+        IntResult::Ok(value) => Result<Int, String>::Ok(value),
+        IntResult::Err(message) => Result<Int, String>::Err(message)
+    };
+}
+fn string_value(value: StringResult) -> Result<String, String> {
+    return match value {
+        StringResult::Ok(text) => Result<String, String>::Ok(text),
+        StringResult::Err(message) => Result<String, String>::Err(message)
+    };
+}
+fn argument(index: Int) -> Result<String, String> effects { args } {
+    return string_value(arg(index));
+}
+fn setup() -> Result<Batch, String> effects { args, io, state } {
+    if platform() != "windows" || arg_count() < 5 || arg_count() > 68 {
+        return Result<Batch, String>::Err(
+            "Usage on Windows: build-batch COMPILER OUTPUT_DIR JOBS CACHE_DIR_OR_DASH ROOT...");
+    }
+    let compiler = string_value(absolute_path(argument(0)?))?;
+    let destination = string_value(absolute_path(argument(1)?))?;
+    let number = argument(2)?;
+    var jobs = 0;
+    match parse_int(number) {
+        IntResult::Ok(value) => {
+            jobs = value;
+        }
+        IntResult::Err(_) => {}
+    }
+    if jobs < 1 || jobs > 8 {
+        return Result<Batch, String>::Err("JOBS must be 1..8");
+    }
+    var cache = argument(3)?;
+    if cache == "-" {
+        cache = "";
+    } else {
+        cache = string_value(absolute_path(cache))?;
+    }
+    let roots = list_new<String>();
+    for i in 4 .. arg_count() {
+        list_push(roots, string_value(absolute_path(argument(i)?))?);
+    }
+    let cwd = string_value(absolute_path("."))?;
+    let directory = string_value(temp_dir(destination))?;
+    return Result<Batch, String>::Ok(Batch(compiler: compiler, directory: directory,
+        cwd: path::Path(value: cwd), cache: cache, jobs: jobs, roots: roots));
+}
+fn launch(batch: Batch, index: Int, scheduler: loop::Loop<process::Completed>) -> Result<Job,
+    String> effects { io, state } {
+    let dir = batch.directory + "/job-" + to_string(index + 1);
+    match make_dir(dir) {
+        WriteResult::Ok => {}
+        WriteResult::Err(message) => {
+            return Result<Job, String>::Err(message);
+        }
+    }
+    let argv = list_new<String>();
+    list_push(argv, batch.compiler);
+    list_push(argv, "build");
+    list_push(argv, list_get(batch.roots, index));
+    list_push(argv, "-o");
+    list_push(argv, dir + "/program.exe");
+    if batch.cache != "" {
+        list_push(argv, "--cache");
+        list_push(argv, batch.cache);
+    }
+    let task = result::explain(process::schedule(scheduler, argv, batch.cwd, path::Path(value: dir
+        + "/stdout.log"), path::Path(value: dir + "/stderr.log"), 300000),
+        "Cannot schedule compiler")?;
+    return Result<Job, String>::Ok(Job(index: index, directory: dir, task: task));
+}
+fn pause() -> Result<Bool, String> effects { io } {
+    return match host_sleep(5) {
+        WriteResult::Ok => Result<Bool, String>::Ok(true),
+        WriteResult::Err(message) => Result<Bool, String>::Err(message)
+    };
+}
+fn drive(batch: Batch, scheduler: loop::Loop<process::Completed>, running: List<Job>) -> Result<Int,
+    String> effects { io, process, state } {
+    var next = 0;
+    var failures = 0;
+    var peak = 0;
+    while next < list_len(batch.roots) || list_len(running) > 0 {
+        let turn = result::explain(loop::tick(scheduler, clock()?), "Cannot tick build jobs")?;
+        var i = 0;
+        while i < list_len(running) {
+            let job = list_get(running, i);
+            match loop::outcome(job.task) {
+                Option::None => {
+                    i = i + 1;
+                }
+                Option::Some(outcome) => {
+                    let code = match outcome {
+                        loop::Outcome::Done(value) => value.code,
+                        loop::Outcome::TimedOut => 124,
+                        loop::Outcome::Cancelled => 130,
+                        loop::Outcome::Failed(_) => 2
+                    };
+                    print(f"job {job.index + 1:d}: exit {code:d} " + job.directory);
+                    if code != 0 {
+                        failures = failures + 1;
+                    }
+                    let last = list_len(running) - 1;
+                    list_set(running, i, list_get(running, last));
+                    list_truncate(running, last);
+                }
+            }
+        }
+        while next < list_len(batch.roots) && list_len(running) < batch.jobs {
+            match launch(batch, next, scheduler) {
+                Result::Ok(job) => {
+                    list_push(running, job);
+                }
+                Result::Err(error) => {
+                    eprint(f"job {next + 1:d}: " + error);
+                    failures = failures + 1;
+                }
+            }
+            next = next + 1;
+        }
+        if list_len(running) > peak {
+            peak = list_len(running);
+        }
+        if list_len(running) > 0 {
+            let waited = pause()?;
+        }
+    }
+    print(f"peak jobs={peak:d}, failures={failures:d}");
+    if failures > 0 {
+        return Result<Int, String>::Ok(2);
+    }
+    return Result<Int, String>::Ok(0);
+}
+fn close(scheduler: loop::Loop<process::Completed>, running: List<Job>) -> Result<Bool,
+    String> effects { io, process, state } {
+    for job in running {
+        let cancelled = loop::cancel(job.task);
+    }
+    var pending = true;
+    while pending {
+        pending = false;
+        for job in running {
+            match loop::outcome(job.task) {
+                Option::None => {
+                    pending = true;
+                }
+                Option::Some(_) => {}
+            }
+        }
+        if pending {
+            let turn = result::explain(loop::tick(scheduler, clock()?), "Cannot drain build jobs")?;
+            let waited = pause()?;
+        }
+    }
+    return result::explain(loop::shutdown(scheduler), "Cannot close build pool");
+}
+fn run() -> Result<Int, String> effects { args, io, state, process } {
+    let batch = setup()?;
+    let scheduler = result::explain(loop::create<process::Completed>(clock()?),
+        "Cannot create build pool")?;
+    let running = list_new<Job>();
+    print("batch=" + batch.directory);
+    let outcome = drive(batch, scheduler, running);
+    let closed = close(scheduler, running)?;
+    return outcome;
+}
+fn main() -> Int effects { args, io, state, process } {
+    match run() {
+        Result::Ok(code) => {
+            return code;
+        }
+        Result::Err(message) => {
+            eprint(message);
+            return 2;
+        }
+    }
+}

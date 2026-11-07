@@ -1,0 +1,35 @@
+import "stdlib/path.vela" as path;
+fn expect<T, E>(value: Result<T, E>) -> T effects { process } {
+    match value {
+        Result::Ok(found) => {
+            return found;
+        }
+        Result::Err(_) => {
+            panic("Cannot resolve packaged path");
+        }
+    }
+}
+fn content() -> String effects { io, process } {
+    let base = expect(path::resource_base());
+    let file = expect(path::join(base, path::Path(value: "assets/tables/check.bin")));
+    match read_file_bounded(file.value, 1024) {
+        ReadResult::Ok(data) => {
+            return data;
+        }
+        ReadResult::Limit => {
+            panic("Resource limit");
+        }
+        ReadResult::Err(message) => {
+            panic(message);
+        }
+    }
+}
+fn main() -> Int effects { io, process } {
+    let executable = expect(path::executable());
+    print(executable.value);
+    print(sha256(content()));
+    return 0;
+}
+test "packaged resource" effects { io, process } {
+    assert_true(content() == "Vela" + str_from_byte(0) + str_from_byte(255), "resource bytes");
+}

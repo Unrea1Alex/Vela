@@ -1,0 +1,6 @@
+import "enum-equality-owner.vela" as a;
+import "enum-equality-other.vela" as b;
+fn main() -> Int {
+    let invalid = a::State::Ready == b::State::Ready;
+    return 0;
+}

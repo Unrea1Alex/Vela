@@ -1,0 +1,3 @@
+interface Hidden {}
+pub opaque struct Leak<T: Hidden> { value: T }
+fn main() -> Int { return 0; }

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "stage": "0.10.8",
+  "compiler": "0.10.0-dev.8",
+  "compiler_sha256": "6676bfd78a4816fc9d845eb760d262680a05758a7b806991c5d5fdb9ce88eec7",
+  "bootstrap_driver_version": "0.10.0-dev.7",
+  "recovery_c_sha256": "11a372ce1921d99258537a9d4f9eb1d6f4d83e452864266aec8ec78e07864fee",
+  "native": { "passed": 1134, "failed": 0, "skipped": 0 },
+  "fixed_point": true,
+  "bundler_fixed_point": true,
+  "forced_gc": true,
+  "checks": ["mixed_service_order", "typed_errors", "immutable_snapshot", "independent_replays", "argument_mismatch", "extra_call", "missing_call", "no_repeated_publication"],
+  "mcp_setup_and_handshake": true,
+  "next_item": "0.10.9"
+}

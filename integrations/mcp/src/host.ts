@@ -36,6 +36,7 @@ export class Host {
   base = '';
   compiler = '';
   compilerId = '';
+  compilerVersion = '';
   pins: Record<string, string> = {};
   docs = new Map<string,string>();
   private compilerBytes = Buffer.alloc(0);
@@ -46,7 +47,11 @@ export class Host {
     this.config.workspace = await fs.realpath(this.config.workspace);
     this.config.toolchain = await fs.realpath(this.config.toolchain);
     const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
-    if (manifest.schema_version !== 1 || manifest.version !== '0.7.0') throw new HostError('incompatible', 'Unsupported compatibility manifest.');
+    if (manifest.schema_version !== 1 || typeof manifest.version !== 'string'
+        || !/^(0\.9\.0|0\.10\.0(?:-dev\.\d+)?|0\.11\.0(?:-dev\.[1234])?|1\.0\.0(?:-dev\.[12345]|-rc\.[12])?)$/.test(manifest.version)) {
+      throw new HostError('incompatible', 'Unsupported compatibility manifest.');
+    }
+    this.compilerVersion = manifest.version;
     this.pins = manifest.files;
     const executable = process.platform === 'win32' ? 'bin/velac.exe' : 'bin/velac';
     if (!this.pins[executable] || Object.values(topics).some(p => !this.pins[p])) throw new HostError('incompatible', 'Missing compiler/document pins.');
@@ -67,12 +72,26 @@ export class Host {
     await this.tempReady;
   }
   async verify() {
+    const buffer = Buffer.allocUnsafe(64 * 1024);
     for (const [relative, expected] of Object.entries(this.pins)) {
       const file = path.resolve(this.config.toolchain, relative);
       if (!within(this.config.toolchain, file)) throw new HostError('incompatible', 'Invalid pinned path.');
-      let bytes: Buffer;
-      try { bytes = await fs.readFile(file); } catch { throw new HostError('incompatible', 'Missing pinned file: ' + relative); }
-      if (digest(bytes) !== expected) throw new HostError('incompatible', 'Toolchain/docs mismatch: ' + relative);
+      const hash = createHash('sha256');
+      try {
+        const handle = await fs.open(file, 'r');
+        try {
+          for (;;) {
+            const { bytesRead } = await handle.read(buffer, 0, buffer.length, null);
+            if (bytesRead === 0) break;
+            hash.update(buffer.subarray(0, bytesRead));
+          }
+        } finally {
+          await handle.close();
+        }
+      } catch {
+        throw new HostError('incompatible', 'Missing pinned file: ' + relative);
+      }
+      if (hash.digest('hex') !== expected) throw new HostError('incompatible', 'Toolchain/docs mismatch: ' + relative);
     }
   }
   resolve(input: string) {
@@ -150,7 +169,8 @@ export class Host {
       });
     });
   }
-  async analyze(kind: 'check'|'symbols'|'fmt', input: string, external: AbortSignal, text?: string, overlayPath?: string) {
+  async analyze(kind: 'check'|'symbols'|'fmt'|'query'|'plan', input: string, external: AbortSignal, text?: string, overlayPath?: string,
+    options: {at?:{path:string;line:number;character:number};plan?:{snapshot_id:string;revision:string;document:number;byte?:number;new_name?:string}} = {}) {
     let snapshotId = ''; let dir = '';
     const answer = (status: Status, data: Record<string,unknown>, message='') =>
       ({ schema_version: 1 as const, status, compiler_id: this.compilerId, snapshot_id: snapshotId, data, message });
@@ -189,7 +209,25 @@ export class Host {
       const second = await this.inventory(signal);
       if (this.inventoryId(first) !== this.inventoryId(second) || JSON.stringify(first.map(e=>e.signature)) !== JSON.stringify(second.map(e=>e.signature))) throw new HostError('source_changed', 'Workspace changed during snapshot capture.');
       snapshotId = digest(this.compilerId + this.inventoryId(effective));
-      const outcome = await this.run([kind, path.join(dir,relative), '--json'], dir, signal);
+      const args = [kind, path.join(dir,relative)];
+      if (kind === 'plan') {
+        const plan = options.plan!;
+        if (plan.snapshot_id !== snapshotId) throw new HostError('source_changed','Analysis snapshot changed; query again.');
+        args.push(plan.revision,String(plan.document));
+        if (plan.byte === undefined) args.push('fmt'); else args.push(String(plan.byte),plan.new_name!);
+      } else {
+        args.push('--json');
+        if (kind === 'query' && options.at) {
+          const at = options.at;
+          args.push('--at',path.join(dir,this.resolve(at.path)),String(at.line),String(at.character));
+        }
+      }
+      const outcome = await this.run(args, dir, signal);
+      if (kind === 'query' || kind === 'plan') {
+        const after = await this.inventory(signal);
+        if (this.inventoryId(first) !== this.inventoryId(after) || JSON.stringify(first.map(e=>e.signature)) !== JSON.stringify(after.map(e=>e.signature)))
+          throw new HostError('source_changed','Workspace changed during semantic analysis.');
+      }
       const remap = (value: unknown): unknown => {
         if (Array.isArray(value)) return value.map(remap);
         if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([k,v]) => [k,

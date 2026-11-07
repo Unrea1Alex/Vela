@@ -1,0 +1,30 @@
+{
+  "stage": "1.0.1c",
+  "compiler_version": "1.0.0-dev.3",
+  "compiler_sha256": "b1e7bc1a58af5fbe7b23d6c87ea49a543ea3012a9af023235c321be1f9d37aac",
+  "native_passed": 1189,
+  "native_failed": 0,
+  "native_skipped": 0,
+  "compiler_generations": 3,
+  "c_fixed_point": true,
+  "bundler_fixed_point": true,
+  "gui_focused_checks": 4,
+  "gui_gc_stress": "passed",
+  "notes_named": 2,
+  "pulsedeck_named": 10,
+  "pulsedeck_network": 21,
+  "fielddesk_named": 17,
+  "fielddesk_cli": 19,
+  "fielddesk_network": 8,
+  "mcp_setup": "passed including gui source delivery",
+  "actual_ui": [
+    "Notes Unicode edit, scroll, save/load, Ctrl+A",
+    "PulseDeck cancel/rerun/close; no curl or app process; report only",
+    "FieldDesk Analyze: accepted 9 excluded 1 alerts 2 mean 20.67",
+    "96/144/192 DPI real rendered windows via synthetic WM_DPICHANGED"
+  ],
+  "unperformed": [
+    "physical multi-monitor transition",
+    "Linux GUI unsupported"
+  ]
+}

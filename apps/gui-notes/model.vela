@@ -1,0 +1,47 @@
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+import "../../std/result.vela" as result;
+import "../../std/services.vela" as services;
+import "../../std/text.vela" as text;
+pub opaque struct Note {
+    file: path::Path,
+    contents: String
+}
+pub fn empty(file: path::Path) -> Note {
+    return Note(file: file, contents: "");
+}
+pub fn contents(note: Note) -> String {
+    return note.contents;
+}
+pub fn edited(note: Note, value: String) -> Result<Note, String> {
+    if str_len(value) > 4096 {
+        return Result<Note, String>::Err("Note exceeds 4096 bytes");
+    }
+    if text::invalid_offset(value) >= 0 {
+        return Result<Note, String>::Err("Invalid UTF-8");
+    }
+    for i in 0 .. str_len(value) {
+        if str_byte(value, i) == 0 {
+            return Result<Note, String>::Err("Embedded NUL");
+        }
+    }
+    return Result<Note, String>::Ok(Note(file: note.file, contents: value));
+}
+fn problem(error: fs::Error) -> String {
+    return match error {
+        fs::Error::InvalidPath(_) => "Invalid path",
+        fs::Error::Encoding(_) => "Invalid UTF-8",
+        fs::Error::Limit(limit) => f"Note exceeds {limit:d} bytes",
+        fs::Error::Io(_, why) => why,
+        fs::Error::Cleanup(_, committed) => f"Cleanup failed, committed={committed:b}"
+    };
+}
+pub fn load(note: Note, files: dyn services::FileStore) -> Result<Note, String> effects { io,
+    state } {
+    let bytes = result::map_error(files.read(note.file, 4096), problem)?;
+    return edited(note, bytes.data);
+}
+pub fn save(note: Note, files: dyn services::FileStore) -> Result<Bool, String> effects { io,
+    state } {
+    return result::map_error(files.publish(note.file, text::Bytes(data: note.contents)), problem);
+}

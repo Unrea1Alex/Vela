@@ -1,0 +1,270 @@
+pub enum Step<T> {
+    Done(T),
+    Failed(String),
+    Wait(Int)
+}
+pub enum Outcome<T> {
+    Done(T),
+    Failed(String),
+    Cancelled,
+    TimedOut
+}
+pub enum Error {
+    Clock,
+    Timeout,
+    Capacity,
+    Busy,
+    Closed
+}
+pub enum Turn {
+    Dispatched,
+    Waiting(Int),
+    Idle
+}
+enum Stop {
+    Cancel,
+    Deadline,
+    Failure(String)
+}
+struct Work<T> {
+    resume: fn() -> Step<T> effects { io, process, state },
+    stop: fn() -> Bool effects { io, process, state },
+    cleanup: fn() -> Unit effects { io, process, state }
+}
+struct Pending<T> {
+    work: Work<T>,
+    wake: Int,
+    deadline: Int,
+    started: Bool,
+    stopping: Option<Stop>
+}
+enum Progress<T> {
+    Pending(Pending<T>),
+    Terminal(Outcome<T>)
+}
+pub opaque struct Task<T> {
+    progress: List<Progress<T>>,
+    cancel: List<Bool>
+}
+struct Control {
+    now: Int,
+    busy: Bool,
+    closing: Bool
+}
+pub opaque struct Loop<T> {
+    jobs: List<Task<T>>,
+    control: List<Control>
+}
+fn max_time() -> Int {
+    return 9223372036854775807 - 2147483647;
+}
+pub fn create<T>(now: Int) -> Result<Loop<T>, Error> effects { state } {
+    if now < 0 || now > max_time() {
+        return Result<Loop<T>, Error>::Err(Error::Clock);
+    }
+    let control = list_new<Control>();
+    list_push(control, Control(now: now, busy: false, closing: false));
+    return Result<Loop<T>, Error>::Ok(Loop<T>(jobs: list_new<Task<T>>(), control: control));
+}
+pub fn submit<T>(loop: Loop<T>, timeout: Int, resume: fn() -> Step<T> effects { io, process,
+    state }, stop: fn() -> Bool effects { io, process, state }, cleanup: fn() -> Unit effects { io,
+    process, state }) -> Result<Task<T>, Error> effects { state } {
+    let control = list_get(loop.control, 0);
+    if control.busy {
+        return Result<Task<T>, Error>::Err(Error::Busy);
+    }
+    if control.closing {
+        return Result<Task<T>, Error>::Err(Error::Closed);
+    }
+    if timeout < 1 || timeout > 2147483647 || timeout > max_time() - control.now {
+        return Result<Task<T>, Error>::Err(Error::Timeout);
+    }
+    if list_len(loop.jobs) >= 128 {
+        return Result<Task<T>, Error>::Err(Error::Capacity);
+    }
+    let progress = list_new<Progress<T>>();
+    let cancel = list_new<Bool>();
+    let work = Work<T>(resume: resume, stop: stop, cleanup: cleanup);
+    let pending = Pending<T>(work: work, wake: control.now, deadline: control.now + timeout,
+        started: false, stopping: Option<Stop>::None);
+    list_push(progress, Progress<T>::Pending(pending));
+    list_push(cancel, false);
+    let task = Task<T>(progress: progress, cancel: cancel);
+    list_push(loop.jobs, task);
+    return Result<Task<T>, Error>::Ok(task);
+}
+pub fn outcome<T>(task: Task<T>) -> Option<Outcome<T>> effects { state } {
+    return match list_get(task.progress, 0) {
+        Progress::Pending(_) => Option<Outcome<T>>::None,
+        Progress::Terminal(value) => Option<Outcome<T>>::Some(value)
+    };
+}
+pub fn cancel<T>(task: Task<T>) -> Bool effects { state } {
+    if list_get(task.cancel, 0) {
+        return false;
+    }
+    match list_get(task.progress, 0) {
+        Progress::Terminal(_) => {
+            return false;
+        }
+        Progress::Pending(pending) => {
+            match pending.stopping {
+                Option::Some(_) => {
+                    return false;
+                }
+                Option::None => {}
+            }
+        }
+    }
+    list_set(task.cancel, 0, true);
+    return true;
+}
+pub fn shutdown<T>(loop: Loop<T>) -> Result<Bool, Error> effects { state } {
+    let control = list_get(loop.control, 0);
+    if control.busy {
+        return Result<Bool, Error>::Err(Error::Busy);
+    }
+    list_set(loop.control, 0, Control(now: control.now, busy: false, closing: true));
+    for task in loop.jobs {
+        let requested = cancel(task);
+    }
+    return Result<Bool, Error>::Ok(true);
+}
+fn scheduled<T>(task: Task<T>, pending: Pending<T>, now: Int) -> Int effects { state } {
+    match pending.stopping {
+        Option::Some(_) => {
+            return pending.wake;
+        }
+        Option::None => {}
+    }
+    if list_get(task.cancel, 0) {
+        return now;
+    }
+    if now >= pending.deadline || pending.wake > pending.deadline {
+        return pending.deadline;
+    }
+    return pending.wake;
+}
+fn stopping<T>(task: Task<T>, pending: Pending<T>, now: Int) -> Option<Stop> effects { state } {
+    match pending.stopping {
+        Option::Some(reason) => {
+            return Option<Stop>::Some(reason);
+        }
+        Option::None => {}
+    }
+    if list_get(task.cancel, 0) {
+        return Option<Stop>::Some(Stop::Cancel);
+    }
+    if now >= pending.deadline {
+        return Option<Stop>::Some(Stop::Deadline);
+    }
+    return Option<Stop>::None;
+}
+fn finish<T>(task: Task<T>, pending: Pending<T>, value: Outcome<T>) -> Bool effects { io, process,
+    state } {
+    let cleanup = pending.work.cleanup;
+    cleanup();
+    list_set(task.progress, 0, Progress<T>::Terminal(value));
+    return false;
+}
+fn stop_work<T>(task: Task<T>, pending: Pending<T>, reason: Stop, now: Int) -> Bool effects { io,
+    process, state } {
+    var plan = pending;
+    plan.stopping = Option<Stop>::Some(reason);
+    list_set(task.progress, 0, Progress<T>::Pending(plan));
+    let stop = pending.work.stop;
+    if pending.started && !stop() {
+        plan.wake = now;
+        if now < max_time() {
+            plan.wake = now + 1;
+        }
+        list_set(task.progress, 0, Progress<T>::Pending(plan));
+        return true;
+    }
+    let value = match reason {
+        Stop::Cancel => Outcome<T>::Cancelled,
+        Stop::Deadline => Outcome<T>::TimedOut,
+        Stop::Failure(error) => Outcome<T>::Failed(error)
+    };
+    return finish(task, pending, value);
+}
+fn dispatch<T>(task: Task<T>, pending: Pending<T>, now: Int) -> Bool effects { io, process,
+    state } {
+    match stopping(task, pending, now) {
+        Option::Some(reason) => {
+            return stop_work(task, pending, reason, now);
+        }
+        Option::None => {}
+    }
+    let resume = pending.work.resume;
+    var plan = pending;
+    plan.started = true;
+    match resume() {
+        Step::Done(value) => {
+            return finish(task, plan, Outcome<T>::Done(value));
+        }
+        Step::Failed(error) => {
+            return stop_work(task, plan, Stop::Failure(error), now);
+        }
+        Step::Wait(delay) => {
+            if delay < 0 || delay > 2147483647 {
+                return stop_work(task, plan, Stop::Failure("Invalid continuation delay"), now);
+            }
+            plan.wake = now + delay;
+            list_set(task.progress, 0, Progress<T>::Pending(plan));
+            return true;
+        }
+    }
+}
+pub fn tick<T>(loop: Loop<T>, now: Int) -> Result<Turn, Error> effects { io, process, state } {
+    let control = list_get(loop.control, 0);
+    if control.busy {
+        return Result<Turn, Error>::Err(Error::Busy);
+    }
+    if now < control.now || now > max_time() {
+        return Result<Turn, Error>::Err(Error::Clock);
+    }
+    list_set(loop.control, 0, Control(now: now, busy: true, closing: control.closing));
+    defer {
+        list_set(loop.control, 0, Control(now: now, busy: false, closing: control.closing));
+    }
+    let count = list_len(loop.jobs);
+    if count == 0 {
+        return Result<Turn, Error>::Ok(Turn::Idle);
+    }
+    var index = -1;
+    var earliest = 9223372036854775807;
+    for i in 0 .. count {
+        let task = list_get(loop.jobs, i);
+        match list_get(task.progress, 0) {
+            Progress::Pending(pending) => {
+                let time = scheduled(task, pending, now);
+                if index == -1 || time < earliest {
+                    index = i;
+                    earliest = time;
+                }
+            }
+            Progress::Terminal(_) => {}
+        }
+    }
+    if index < 0 {
+        return Result<Turn, Error>::Ok(Turn::Idle);
+    }
+    if earliest > now {
+        return Result<Turn, Error>::Ok(Turn::Waiting(earliest));
+    }
+    let task = list_get(loop.jobs, index);
+    for i in index .. count - 1 {
+        list_set(loop.jobs, i, list_get(loop.jobs, i + 1));
+    }
+    list_truncate(loop.jobs, count - 1);
+    match list_get(task.progress, 0) {
+        Progress::Pending(pending) => {
+            if dispatch(task, pending, now) {
+                list_push(loop.jobs, task);
+            }
+        }
+        Progress::Terminal(_) => {}
+    }
+    return Result<Turn, Error>::Ok(Turn::Dispatched);
+}

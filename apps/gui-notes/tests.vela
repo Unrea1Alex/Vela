@@ -1,0 +1,31 @@
+import "model.vela" as model;
+import "../../std/path.vela" as path;
+import "../../std/services.vela" as services;
+import "../../std/testing.vela" as testing;
+test "one model round trips Unicode through injected files" effects { io, state } {
+    let note = model::empty(path::Path(value: "model-test-note.txt"));
+    let store = dyn services::FileStore(services::memory_files());
+    match model::edited(note, "Vela 🌿\r\nзаметка") {
+        Result::Err(error) => {
+            assert_true(false, error);
+        }
+        Result::Ok(edited) => {
+            testing::is_ok(model::save(edited, store), "publish");
+            match model::load(note, store) {
+                Result::Err(error) => {
+                    assert_true(false, error);
+                }
+                Result::Ok(loaded) => {
+                    testing::equal(model::contents(loaded), "Vela 🌿\r\nзаметка",
+                        "contents");
+                }
+            }
+        }
+    }
+}
+test "model rejects invalid bytes and keeps the previous note" {
+    let note = model::empty(path::Path(value: "model-test-note.txt"));
+    testing::is_err(model::edited(note, str_from_byte(255)), "invalid UTF-8");
+    testing::is_err(model::edited(note, "bad\0text"), "embedded NUL");
+    testing::equal(model::contents(note), "", "prior contents");
+}

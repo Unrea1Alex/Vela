@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "archive": "dist/fielddesk-1.0-vela-0.10-windows-x64.zip",
+  "sha256": "514f900065108193362340636d5f9300ff7ef54938e5b42b54564e18b63a0540",
+  "archive_bytes": 589210,
+  "verified_archive_entries": 15,
+  "all_entry_hashes_match_stage": true,
+  "extracted_run": {
+    "path": "Windows and System32 only",
+    "compiler_python_node_required": false,
+    "executable_sha256": "9f823574e0cdbbcd2a464794e49c7766aaea7b4da0657dcd83427ae1b729378a",
+    "replay_identical": true,
+    "exit_code": 0,
+    "cwd": "system temporary directory"
+  },
+  "compatibility": {
+    "changed": 0,
+    "checked_files": 45
+  },
+  "compiler_verify_repeated": false,
+  "reason": "Application only; compiler/runtime/standard library unchanged",
+  "text_review": "v2 accepted by independent reviewer",
+  "limitations": [
+    "same Windows machine, not a clean-machine install",
+    "final ZIP not published to GitHub"
+  ]
+}

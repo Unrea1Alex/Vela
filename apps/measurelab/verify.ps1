@@ -114,10 +114,14 @@ $Run=Invoke-App @($Known,(Join-Path $Work 'missing/report.html')) 2
 $Checks.Add('missing output directory')
 $NoDll=Join-Path $Work 'without-dll';New-Item -ItemType Directory -Path $NoDll|Out-Null
 Copy-Item -LiteralPath $Executable -Destination (Join-Path $NoDll 'measurelab.exe')
-$Prior=[IO.File]::ReadAllText($Target)
-$Run=Invoke-App @($Known,$Target) 2 (Join-Path $NoDll 'measurelab.exe')
-Require ($Run.stderr.Contains('Cannot load math adapter:')) 'recoverable FFI error'
-Require ([IO.File]::ReadAllText($Target) -eq $Prior) 'FFI error preserves report'
-$Checks.Add('missing native DLL fails before publication')
+$Run=Invoke-App @($Known,$Target) 0 (Join-Path $NoDll 'measurelab.exe')
+Require ($Run.stderr -eq '' -and (Test-Path -LiteralPath $Target)) 'standalone report without DLL'
+$Checks.Add('relocated executable builds report without DLL')
+$Nested = Put 'nested-type-error.json' '{"title":"Nested","scenarios":[{"name":"A","unit":"ms","baseline":5,"budget":9,"samples":[1]},{"name":"B","unit":"ms","baseline":5,"budget":9,"samples":[0,0,0,0,0,0,0,0,0,0,0,0,"bad"]}]}'
+$Prior = [IO.File]::ReadAllText($Target)
+$Run = Invoke-App @($Nested,$Target) 2
+Require ($Run.stderr.Contains('$.scenarios[1].samples[12]: expected number')) 'nested JSON error path'
+Require ([IO.File]::ReadAllText($Target) -eq $Prior) 'nested validation preserves previous report'
+$Checks.Add('nested JSON error reports indexed path')
 [IO.File]::WriteAllText((Join-Path $PSScriptRoot 'cli-tests.json'),([ordered]@{passed=$Checks.Count;failed=0;checks=@($Checks);workspace=$Work;path_without_node_python=$true}|ConvertTo-Json -Depth 4),$Utf8)
 Write-Output "CLI checks: $($Checks.Count) passed"

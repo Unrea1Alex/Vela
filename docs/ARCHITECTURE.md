@@ -1,4 +1,4 @@
-# Архитектура Vela: типизированный компилятор 0.6
+# Архитектура Vela: типизированный компилятор 0.9
 
 ## Компилятор
 
@@ -20,6 +20,29 @@ UTF-8 + source spans + modules.vela: source graph
 отделены от AST; backend получает разрешённые символы, а не import или syntax nodes.
 Контракт: [MODULES](contracts/MODULES.md).
 
+При `--cache` сборщик графа может повторно использовать список импортов
+проверенного модуля. Драйвер проверяет разрешённый граф и безопасность
+выходного пути перед повторным использованием успешной проверки или C.
+Границы AST и checked HIR остаются прежними. [Контракт кэша](contracts/INCREMENTAL-BUILD.md).
+
+В 0.11.0-dev.2 семантика различает синхронные и приостанавливаемые
+callable. Проверка графа разрешённых вызовов работает по checked IR.
+C backend получает проверенный await и вставляет переход в цикл и
+лексическую уборку при отмене. Нативная подсистема хранит стеки и
+дескрипторы ОС, а очередь задач и дедлайны реализованы на Vela.
+[Контракт](contracts/ASYNC-CANCELLATION.md).
+
+Начиная с 0.10.3 связывание проверяет владельца и получателя inherent-метода.
+Семантика разрешает метод по номинальному типу и добавляет проверенного получателя
+первым аргументом обычного checked call. C backend получает выбранный SymbolId,
+не разрешает имена методов и применяет обычные правила порядка и GC roots.
+
+В 0.10.4 связывание строит таблицу интерфейсов и реализаций. Отдельный проход
+проверяет тела с interface-bound на символических типах, включая транзитивные
+generic-вызовы. Его временные записи удаляются до конкретной специализации.
+В checked call для генерации кода сохраняется выбранная реализация. Ссылка на
+объявление интерфейсной операции нужна для навигации и анализа её эффектов.
+
 В 0.7.1 lexer/parser различают Int и Float64 литералы; checker проверяет диапазон
 через числовой runtime-примитив и сохраняет отдельный тип/kind HIR. Backend
 эмитирует только проверенный десятичный литерал и double-операции с отключённым
@@ -38,9 +61,21 @@ symbols выдаёт тесты отдельно от функций; test repor
 токенов; formatter не требует semantic analysis. Результат повторно разбирается
 и сравнивается с последовательностью токенов/комментариев до вывода или записи.
 
+Семантический анализ отмечает ссылки на разрешённые символы и их точные
+исходные позиции. `query.vela` строит индекс и проверяет временные правки
+повторным анализом, не обращаясь к C backend. `tools/lsp.vela` хранит версии
+буферов и запускает тот же нативный query/plan worker. MCP вызывает эти команды
+на изолированном снимке. См. [контракт](contracts/SEMANTIC-QUERIES.md).
+
 AST и HIR — разные записи. Проверка имён, типов, полей, generic-параметров,
 эффектов и полноты match завершается до вызова backend. Backend не принимает AST
 и не использует C-компилятор для проверки языка.
+
+В 1.0.1e checker разрешает `==`/`!=` для одного номинального enum без полей
+во всех вариантах. Checked binary HIR сохраняет Bool-результат и проверенные
+операнды. Backend вычисляет их слева направо во временные значения и сравнивает
+теги, без чтения payload или memcmp; ABI и модель памяти не меняются.
+[Контракт](contracts/ENUM-EQUALITY.md).
 
 Generic-типы кэшируются до разрешения полей; конкретные функции ставятся в очередь
 до проверки тел, что поддерживает взаимную рекурсию без смешивания областей имён.
@@ -93,6 +128,18 @@ C-runtime хранит байтовые элементы известного р
 в порядке записи аргументов, а не объявления полей. Короткое замыкание логических
 операторов сохранено. Арифметика Int остаётся проверяемой.
 
+Именованные функции и замыкания имеют один внутренний C calling convention с
+первым аргументом для окружения. Прямой вызов передаёт null. Проверенный косвенный
+вызов восстанавливает C-сигнатуру из типа callable и передаёт захваченное
+окружение. Для непустого захвата backend выводит собственный тип payload и
+GC visitor из проверенных типов полей. У runtime сохраняется ABI 2.
+
+Для динамических интерфейсов checker записывает конкретные методы в HIR
+упаковки и ссылку на интерфейсную операцию в HIR вызова. Backend выводит одну
+таблицу на пару типов и создаёт адаптеры, которые передают копию получателя
+методу. Упаковка использует точный GC visitor исходного типа, в том числе
+для opaque-полей. Динамический вызов обращается к известной позиции таблицы.
+
 ## Общий каталог
 
 `vela/builtins.def` задаёт prelude-enum, имена функций, параметры типов,
@@ -128,3 +175,25 @@ or signature inference. Native companions are staged by the Vela project driver.
 
 Python остаётся необязательным frontend 0.2 и дополнительной исторической
 проверкой. Обычный цикл 0.3 не требует Python, pip или Python-пакетов.
+## Managed heap lowering
+
+The 0.8 C backend derives trace visitors from checked type and layout records.
+It registers typed root slots for parameters, temporaries, locals and iteration
+snapshots, and restores the root chain on every structured exit. Native runtime
+code traces storage using those visitors. It never resolves Vela types or reads
+syntax or HIR. See [memory](MEMORY.md) and [runtime ABI](contracts/GC-RUNTIME-ABI.md).
+
+Task groups (1.0.1a) compose checked async callables and host-operation closures
+in Vela's standard library. The checker still rejects blocking async call graphs;
+enqueueing a closure does not execute it. Host ticks invoke I/O after yielding,
+and task outcomes remain pending while owned children drain. This introduces no
+new backend syntax or runtime ownership scheme. See [task groups](contracts/TASK-GROUPS.md).
+
+Cache observability (1.0.1b) is confined to the driver, source graph and cache
+storage layer. JSON Lines on stderr describe reuse/publication, never influence
+type checking, and never mix with generated C or command JSON on stdout.
+
+The GUI layer (1.0.1c) keeps form configuration, event queue ownership and the
+public Window API in Vela. One ABI 1 adapter owns Win32 objects, Unicode
+conversion, message delivery and DPI layout. It does not run application policy.
+All three GUI examples share this boundary; see [GUI contract](contracts/GUI-LIBRARY.md).

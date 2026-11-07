@@ -1,0 +1,3 @@
+struct Secret { value: Int }
+pub struct Open { secret: Secret }
+fn main() -> Int { return 0; }

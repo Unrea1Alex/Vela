@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "stage": "0.10.2",
+  "compiler": "0.10.0-dev.2",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1021,
+    "failed": 0,
+    "skipped": 0
+  },
+  "fixed_point": true,
+  "bundler_fixed_point": true,
+  "focused": [
+    "A02-01 owner factory/private enum",
+    "A02-02 constructor rejection E232 with location and details",
+    "A02-03 field read/write and generic access E223",
+    "A02-04 private API leakage E224",
+    "A02-05 value copies/shared list and hidden string under GC stress",
+    "A02-06 stale lock rejected, updated layout builds same client and prints 7",
+    "query opacity metadata",
+    "contextual identifier and ordinary public fields preserved"
+  ],
+  "compiler_sha256": "1690edf57f8b9be037218d214e5fb6222cff9254192c1dc7268e38d405937499",
+  "recovery_c_sha256": "b804e4513a58e08f86ac6645af6489c5da66e268ac6fe5de0475cb21b03ff692",
+  "mcp": {
+    "sdk_suites_passed": 3,
+    "opaque_index_and_rejection": true
+  }
+}

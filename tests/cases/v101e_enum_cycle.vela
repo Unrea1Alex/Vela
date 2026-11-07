@@ -1,0 +1,8 @@
+enum Node {
+    Empty,
+    Children(List<Node>)
+}
+fn main() -> Int {
+    let invalid = Node::Empty != Node::Empty;
+    return 0;
+}

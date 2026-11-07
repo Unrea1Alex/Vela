@@ -1,5 +1,8 @@
 # Project format 1 (0.6.3)
 
+Memory descriptions of the original version are historical. In 0.8,
+[the tracing heap](../MEMORY.md) governs managed values.
+
 Historical base: implemented and verified in 0.6.3. Aggregate: 878/878, three compiler
 generations from selfhost/vela.project and both fixed points. Evidence:
 build/stage06/063-verify.log; focused project checks: 22/22.
@@ -35,8 +38,8 @@ edge owner/target/alias; absolute paths and OS file IDs are not persisted. File
 identity deduplicates modules during one traversal. A relocated identical tree
 keeps its lock valid. All dependency modules are covered, including cycles.
 Own source changes do not change the lock unless imported by a dependency.
-Missing/stale/tampered locks fail E226 before semantic analysis. No incremental
-cache exists: every invocation rereads, fingerprints and checks the full graph.
+Missing/stale/tampered locks fail E226 before semantic analysis.
+The [incremental cache](INCREMENTAL-BUILD.md) keeps lock verification in place.
 Lock is reproducibility/integrity metadata, not a signature or trust grant.
 
 `sha256(String)->String` hashes exact bytes, including NUL, returning 64 lowercase
@@ -62,3 +65,8 @@ Build/run/test stage declared companions beside their executable; differing
 existing companions are refused. Source/native inputs cannot be output targets.
 Native files are trusted code: review before locking. No permission or sandbox
 is granted by a lock. See [FFI](FFI.md) for ABI/lifetime/loading rules.
+
+The 0.11.6 extension accepts explicit Windows x64 ABI 1 shared metadata and
+external resource rows in the same format. See [PACKAGING](PACKAGING.md) for
+exact spellings, snapshot limits, lock fields and output rules. Static multiline
+text may also use [raw strings](TEXT-LITERALS-RESOURCES.md).

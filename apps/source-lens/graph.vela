@@ -1,0 +1,290 @@
+import "@json" as json;
+import "@result" as result;
+pub struct Document {
+    id: Int,
+    path: String
+}
+pub struct Function {
+    id: String,
+    name: String,
+    document: Int,
+    line: Int,
+    character: Int,
+    types: StringList,
+    declared_effects: StringList
+}
+pub struct Call {
+    caller: String,
+    target: String,
+    document: Int,
+    line: Int,
+    character: Int
+}
+pub struct Import {
+    from: Int,
+    to: Int,
+    alias: String
+}
+pub struct Graph {
+    revision: String,
+    documents: List<Document>,
+    functions: List<Function>,
+    calls: List<Call>,
+    imports: List<Import>,
+    document_index: Dict<Int, Int>,
+    function_index: Dict<String, Int>
+}
+fn decoded<T>(value: Result<T, json::At<json::DecodeCause>>) -> Result<T, String> {
+    return result::map_error(value, json::describe);
+}
+fn field(c: json::Cursor, name: String) -> Result<json::Cursor, String> effects { state } {
+    return decoded(json::field(c, name));
+}
+fn string(c: json::Cursor, name: String) -> Result<String, String> effects { state } {
+    let value = decoded(json::as_string(field(c, name)?))?;
+    if str_len(value) > 4096 {
+        return Result<String, String>::Err(c.path + "." + name + ": text too long");
+    }
+    return Result<String, String>::Ok(value);
+}
+fn number(c: json::Cursor, name: String) -> Result<Int, String> effects { state } {
+    let value = decoded(json::as_int(field(c, name)?))?;
+    if value < 0 || value > 2147483647 {
+        return Result<Int, String>::Err(c.path + "." + name
+            + ": expected integer in 0..2147483647");
+    }
+    return Result<Int, String>::Ok(value);
+}
+fn array(c: json::Cursor, name: String) -> Result<json::Cursor, String> effects { state } {
+    let outcome = field(c, name)?;
+    let checked = decoded(json::as_array(outcome))?;
+    return Result<json::Cursor, String>::Ok(outcome);
+}
+fn count(c: json::Cursor) -> Int effects { state } {
+    return match c.value {
+        json::Value::Array(items) => list_len(items),
+        json::Value::Null => 0,
+        json::Value::Boolean(_) => 0,
+        json::Value::Integer(_) => 0,
+        json::Value::Number(_) => 0,
+        json::Value::StringValue(_) => 0,
+        json::Value::Object(_) => 0
+    };
+}
+fn item(c: json::Cursor, n: Int) -> Result<json::Cursor, String> effects { state } {
+    return decoded(json::item(c, n));
+}
+fn append_unique(values: StringList, value: String) -> Unit effects { state } {
+    for i in 0 .. strings_len(values) {
+        if strings_get(values, i) == value {
+            return;
+        }
+    }
+    strings_push(values, value);
+}
+fn read_effects(c: json::Cursor) -> Result<StringList, String> effects { state } {
+    let values = array(c, "effects")?;
+    let outcome = strings_new();
+    for i in 0 .. count(values) {
+        let effect = decoded(json::as_string(item(values, i)?))?;
+        if effect != "io" && effect != "state" && effect != "args" && effect != "process" {
+            return Result<StringList, String>::Err(values.path + ": unknown 0.9 effect");
+        }
+        append_unique(outcome, effect);
+    }
+    return Result<StringList, String>::Ok(outcome);
+}
+fn document(c: json::Cursor, name: String, g: Graph) -> Result<Int, String> effects { state } {
+    let id = number(c, name)?;
+    if !dict_has(g.document_index, id) {
+        return Result<Int, String>::Err(c.path + ": unknown document");
+    }
+    return Result<Int, String>::Ok(id);
+}
+fn range(c: json::Cursor, g: Graph) -> Result<json::Cursor, String> effects { state } {
+    let r = field(c, "range")?;
+    let doc = document(r, "document", g)?;
+    let start = field(r, "start")?;
+    let end = field(r, "end")?;
+    let start_line = number(start, "line")?;
+    let end_line = number(end, "line")?;
+    let start_char = number(start, "character")?;
+    let end_char = number(end, "character")?;
+    let start_byte = number(start, "byte")?;
+    let end_byte = number(end, "byte")?;
+    if end_byte < start_byte || end_line < start_line || (end_line == start_line && end_char
+        < start_char) {
+        return Result<json::Cursor, String>::Err(r.path + ": reversed range");
+    }
+    return Result<json::Cursor, String>::Ok(r);
+}
+fn load_documents(c: json::Cursor, g: Graph) -> Result<Bool, String> effects { state } {
+    let values = array(c, "documents")?;
+    if count(values) < 1 || count(values) > 128 {
+        return Result<Bool, String>::Err("Expected 1..128 documents");
+    }
+    for i in 0 .. count(values) {
+        let value = item(values, i)?;
+        let id = number(value, "id")?;
+        if dict_has(g.document_index, id) {
+            return Result<Bool, String>::Err(value.path + ": duplicate document");
+        }
+        let path = string(value, "path")?;
+        if path == "" {
+            return Result<Bool, String>::Err(value.path + ": empty path");
+        }
+        list_push(g.documents, Document(id: id, path: path));
+        dict_set(g.document_index, id, i);
+    }
+    return Result<Bool, String>::Ok(true);
+}
+fn load_functions(c: json::Cursor, g: Graph) -> Result<Bool, String> effects { state } {
+    let values = array(c, "definitions")?;
+    for i in 0 .. count(values) {
+        let value = item(values, i)?;
+        if string(value, "kind")? != "function" {
+            continue;
+        }
+        let id = string(value, "id")?;
+        let name = string(value, "name")?;
+        if id == "" || name == "" {
+            return Result<Bool, String>::Err(value.path + ": empty function identity");
+        }
+        let r = range(value, g)?;
+        let start = field(r, "start")?;
+        let doc = number(r, "document")?;
+        let line = number(start, "line")?;
+        let character = number(start, "character")?;
+        let kind = string(value, "type")?;
+        let declared = read_effects(value)?;
+        if dict_has(g.function_index, id) {
+            let existing = list_get(g.functions, dict_get(g.function_index, id));
+            if existing.name != name || existing.document != doc || existing.line != line
+                || existing.character != character {
+                return Result<Bool, String>::Err(value.path + ": conflicting function identity");
+            }
+            if kind != "" {
+                append_unique(existing.types, kind);
+            }
+            for j in 0 .. strings_len(declared) {
+                append_unique(existing.declared_effects, strings_get(declared, j));
+            }
+        } else {
+            if list_len(g.functions) >= 1024 {
+                return Result<Bool, String>::Err("At most 1024 functions");
+            }
+            let types = strings_new();
+            if kind != "" {
+                strings_push(types, kind);
+            }
+            dict_set(g.function_index, id, list_len(g.functions));
+            list_push(g.functions, Function(id: id, name: name, document: doc, line: line,
+                character: character, types: types, declared_effects: declared));
+        }
+    }
+    return Result<Bool, String>::Ok(true);
+}
+pub fn is_builtin(id: String) -> Bool {
+    return str_len(id) > 8 && str_slice(id, 0, 8) == "builtin:";
+}
+fn load_calls(c: json::Cursor, g: Graph) -> Result<Bool, String> effects { state } {
+    let values = array(c, "references")?;
+    let seen = dict_new<String, Bool>();
+    for i in 0 .. count(values) {
+        let value = item(values, i)?;
+        if string(value, "role")? != "call" {
+            continue;
+        }
+        let caller = string(value, "caller")?;
+        let target = string(value, "id")?;
+        if !dict_has(g.function_index, caller) {
+            return Result<Bool, String>::Err(value.path + ": unknown caller; use a full query");
+        }
+        if !dict_has(g.function_index, target) && !is_builtin(target) {
+            return Result<Bool, String>::Err(value.path
+                + ": unknown call target; use a full query");
+        }
+        let inferred = string(value, "type")?;
+        if inferred != "" && dict_has(g.function_index, target) {
+            append_unique(list_get(g.functions, dict_get(g.function_index, target)).types,
+                inferred);
+        }
+        let r = range(value, g)?;
+        let start = field(r, "start")?;
+        let doc = number(r, "document")?;
+        let byte = number(start, "byte")?;
+        // Length-prefixed IDs keep distinct sites distinct even for hostile JSON.
+        let key = f"{doc:d}:{byte:d}:{str_len(caller):d}:{caller:s}{str_len(target):d}:{target:s}";
+        if dict_has(seen, key) {
+            continue;
+        }
+        dict_set(seen, key, true);
+        if list_len(g.calls) >= 8192 {
+            return Result<Bool, String>::Err("At most 8192 call sites");
+        }
+        list_push(g.calls, Call(caller: caller, target: target, document: doc, line: number(start,
+            "line")?, character: number(start, "character")?));
+    }
+    return Result<Bool, String>::Ok(true);
+}
+fn load_imports(c: json::Cursor, g: Graph) -> Result<Bool, String> effects { state } {
+    let values = array(c, "imports")?;
+    for i in 0 .. count(values) {
+        let value = item(values, i)?;
+        list_push(g.imports, Import(from: document(value, "from", g)?, to: document(value, "to",
+            g)?, alias: string(value, "alias")?));
+    }
+    return Result<Bool, String>::Ok(true);
+}
+pub fn parse(input: String) -> Result<Graph, String> effects { state } {
+    return parse_with_node_limit(input, json::default_limits().nodes);
+}
+fn parse_error(error: json::ParseError) -> String {
+    return "$: " + json::describe_parse_error(error);
+}
+pub fn parse_with_node_limit(input: String, nodes: Int) -> Result<Graph, String> effects { state } {
+    if str_len(input) > 2097152 {
+        return Result<Graph, String>::Err("Input exceeds 2 MiB");
+    }
+    let limits = json::Limits(bytes: 2097152, depth: json::default_limits().depth, nodes: nodes);
+    let document = result::map_error(json::parse_with_limits(input, limits), parse_error)?;
+    let c = json::Cursor(value: document, path: "$");
+    if number(c, "schema_version")? != 1 {
+        return Result<Graph, String>::Err("Expected query schema 1");
+    }
+    let successful = field(c, "ok")?;
+    let status = decoded(json::as_bool(successful))?;
+    if !status {
+        return Result<Graph, String>::Err("Query was not successful: $.ok must be true");
+    }
+    let revision = string(c, "revision")?;
+    if str_len(revision) != 64 {
+        return Result<Graph, String>::Err("Expected a SHA-256 revision");
+    }
+    for i in 0 .. 64 {
+        let b = str_byte(revision, i);
+        if !((b >= 48 && b <= 57) || (b >= 97 && b <= 102)) {
+            return Result<Graph, String>::Err("Expected a SHA-256 revision");
+        }
+    }
+    let g = Graph(revision: revision, documents: list_new<Document>(),
+        functions: list_new<Function>(), calls: list_new<Call>(), imports: list_new<Import>(),
+        document_index: dict_new<Int, Int>(), function_index: dict_new<String, Int>());
+    let documents = load_documents(c, g)?;
+    let functions = load_functions(c, g)?;
+    let calls = load_calls(c, g)?;
+    let imports = load_imports(c, g)?;
+    return Result<Graph, String>::Ok(g);
+}
+pub fn path(g: Graph, id: Int) -> String effects { state } {
+    return list_get(g.documents, dict_get(g.document_index, id)).path;
+}
+pub fn call_count(g: Graph, id: String, incoming: Bool) -> Int effects { state } {
+    var outcome = 0;
+    for call in g.calls {
+        if (incoming && call.target == id) || (!incoming && call.caller == id) {
+            outcome = outcome + 1;
+        }
+    }
+    return outcome;
+}

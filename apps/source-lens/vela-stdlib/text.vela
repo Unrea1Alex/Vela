@@ -1,0 +1,208 @@
+pub struct Bytes {
+    data: String
+}
+pub struct Text {
+    data: String
+}
+pub enum Error {
+    InvalidUtf8(Int),
+    InvalidSlice,
+    InvalidCodepoint,
+    Limit
+}
+pub fn invalid_offset(data: String) -> Int {
+    var i = 0;
+    while i < str_len(data) {
+        let start = i;
+        let b = str_byte(data, i);
+        i = i + 1;
+        if b < 128 {
+            continue;
+        }
+        var count = 0;
+        var value = 0;
+        var minimum = 0;
+        if b >= 194 && b <= 223 {
+            count = 1;
+            value = b - 192;
+            minimum = 128;
+        } else if b >= 224 && b <= 239 {
+            count = 2;
+            value = b - 224;
+            minimum = 2048;
+        } else if b >= 240 && b <= 244 {
+            count = 3;
+            value = b - 240;
+            minimum = 65536;
+        } else {
+            return start;
+        }
+        if i + count > str_len(data) {
+            return start;
+        }
+        for unused in 0 .. count {
+            let next = str_byte(data, i);
+            if next < 128 || next > 191 {
+                return i;
+            }
+            value = value * 64 + next - 128;
+            i = i + 1;
+        }
+        if value < minimum || value > 1114111 || (value >= 55296 && value <= 57343) {
+            return start;
+        }
+    }
+    return -1;
+}
+pub fn decode(raw: Bytes) -> Result<Text, Error> {
+    let invalid = invalid_offset(raw.data);
+    if invalid >= 0 {
+        return Result<Text, Error>::Err(Error::InvalidUtf8(invalid));
+    }
+    return Result<Text, Error>::Ok(Text(data: raw.data));
+}
+pub fn checked(data: String) -> Result<Text, Error> {
+    return decode(Bytes(data: data));
+}
+pub fn encode(value: Text) -> Result<Bytes, Error> {
+    let valid = checked(value.data)?;
+    return Result<Bytes, Error>::Ok(Bytes(data: valid.data));
+}
+pub fn slice(value: Text, start: Int, end: Int) -> Result<Text, Error> {
+    let valid = checked(value.data)?;
+    if start < 0 || end < start || end > str_len(valid.data) {
+        return Result<Text, Error>::Err(Error::InvalidSlice);
+    }
+    if start < str_len(valid.data) && str_byte(valid.data, start) >= 128 && str_byte(valid.data, start) <= 191 {
+        return Result<Text, Error>::Err(Error::InvalidSlice);
+    }
+    if end < str_len(valid.data) && str_byte(valid.data, end) >= 128 && str_byte(valid.data, end) <= 191 {
+        return Result<Text, Error>::Err(Error::InvalidSlice);
+    }
+    return checked(str_slice(valid.data, start, end));
+}
+pub fn codepoint(value: Int) -> Result<Text, Error> {
+    if value < 0 || value > 1114111 || (value >= 55296 && value <= 57343) {
+        return Result<Text, Error>::Err(Error::InvalidCodepoint);
+    }
+    var data = "";
+    if value < 128 {
+        data = str_from_byte(value);
+    } else if value < 2048 {
+        data = str_from_byte(192 + value / 64) + str_from_byte(128 + value % 64);
+    } else if value < 65536 {
+        data = str_from_byte(224 + value / 4096) + str_from_byte(128 + value / 64 % 64) + str_from_byte(128 + value % 64);
+    } else {
+        data = str_from_byte(240 + value / 262144) + str_from_byte(128 + value / 4096 % 64) + str_from_byte(128 + value / 64 % 64) + str_from_byte(128 + value % 64);
+    }
+    return Result<Text, Error>::Ok(Text(data: data));
+}
+fn space(b: Int) -> Bool {
+    return b == 32 || b == 9 || b == 10 || b == 13;
+}
+pub fn trim(value: Text) -> Result<Text, Error> {
+    let valid = checked(value.data)?;
+    var begin = 0;
+    var end = str_len(valid.data);
+    while begin < end && space(str_byte(valid.data, begin)) {
+        begin = begin + 1;
+    }
+    while end > begin && space(str_byte(valid.data, end - 1)) {
+        end = end - 1;
+    }
+    return checked(str_slice(valid.data, begin, end));
+}
+pub fn split(value: Text, separator: Text) -> Result<List<Text>, Error> effects { state } {
+    let valid = checked(value.data)?;
+    let sep = checked(separator.data)?;
+    if str_len(sep.data) == 0 {
+        return Result<List<Text>, Error>::Err(Error::InvalidSlice);
+    }
+    let parts = list_new<Text>();
+    var start = 0;
+    var i = 0;
+    while i <= str_len(valid.data) - str_len(sep.data) {
+        if str_slice(valid.data, i, i + str_len(sep.data)) == sep.data {
+            list_push(parts, Text(data: str_slice(valid.data, start, i)));
+            i = i + str_len(sep.data);
+            start = i;
+        } else {
+            i = i + 1;
+        }
+    }
+    list_push(parts, Text(data: str_slice(valid.data, start, str_len(valid.data))));
+    return Result<List<Text>, Error>::Ok(parts);
+}
+pub fn html(value: Text) -> Result<Text, Error> effects { state } {
+    let valid = checked(value.data)?;
+    let parts = strings_new();
+    for i in 0 .. str_len(valid.data) {
+        let b = str_byte(valid.data, i);
+        var piece = str_from_byte(b);
+        if b == 38 {
+            piece = "&amp;";
+        } else if b == 60 {
+            piece = "&lt;";
+        } else if b == 62 {
+            piece = "&gt;";
+        } else if b == 34 {
+            piece = "&quot;";
+        } else if b == 39 {
+            piece = "&#39;";
+        }
+        strings_push(parts, piece);
+    }
+    return Result<Text, Error>::Ok(Text(data: strings_join(parts, "")));
+}
+pub fn pad_zero(n: Int, width: Int) -> Result<Text, Error> {
+    if width < 0 || width > 4096 {
+        return Result<Text, Error>::Err(Error::Limit);
+    }
+    var number = to_string(n);
+    var prefix = "";
+    var target = width;
+    if n < 0 {
+        prefix = "-";
+        target = width - 1;
+        number = str_slice(number, 1, str_len(number));
+    }
+    while str_len(number) < target {
+        number = "0" + number;
+    }
+    return Result<Text, Error>::Ok(Text(data: prefix + number));
+}
+pub struct Builder {
+    fragments: StringList,
+    used: IntList,
+    limit: Int
+}
+pub fn builder(limit: Int) -> Result<Builder, Error> effects { state } {
+    if limit < 0 || limit > 16777216 {
+        return Result<Builder, Error>::Err(Error::Limit);
+    }
+    let used = ints_new();
+    ints_push(used, 0);
+    return Result<Builder, Error>::Ok(Builder(fragments: strings_new(), used: used, limit: limit));
+}
+pub fn append(b: Builder, fragment: Bytes) -> Result<Bool, Error> effects { state } {
+    let size = str_len(fragment.data);
+    let used = ints_get(b.used, 0);
+    if size > b.limit - used {
+        return Result<Bool, Error>::Err(Error::Limit);
+    }
+    if size != 0 {
+        strings_push(b.fragments, fragment.data);
+        ints_set(b.used, 0, used + size);
+    }
+    return Result<Bool, Error>::Ok(true);
+}
+pub fn finish_bytes(b: Builder) -> Bytes effects { state } {
+    return Bytes(data: strings_join(b.fragments, ""));
+}
+pub fn finish_text(b: Builder) -> Result<Text, Error> effects { state } {
+    return decode(finish_bytes(b));
+}
+pub fn reset(b: Builder) -> Unit effects { state } {
+    strings_truncate(b.fragments, 0);
+    ints_set(b.used, 0, 0);
+}

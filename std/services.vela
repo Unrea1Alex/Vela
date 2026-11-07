@@ -1,0 +1,201 @@
+import "collections.vela" as collections;
+import "fs.vela" as fs;
+import "path.vela" as path;
+import "process.vela" as process;
+import "text.vela" as text;
+pub interface FileStore {
+    fn read(self: Self, file: path::Path, limit: Int) -> Result<text::Bytes,
+        fs::Error> effects { io, state };
+    fn publish(self: Self, file: path::Path, data: text::Bytes) -> Result<Bool,
+        fs::Error> effects { io, state };
+}
+pub opaque struct OsFiles {}
+pub opaque struct MemoryFiles {
+    data: Dict<String, String>
+}
+pub fn os_files() -> OsFiles {
+    return OsFiles();
+}
+pub fn memory_files() -> MemoryFiles effects { state } {
+    return MemoryFiles(data: dict_new<String, String>());
+}
+impl FileStore for OsFiles {
+    fn read(self: OsFiles, file: path::Path, limit: Int) -> Result<text::Bytes,
+        fs::Error> effects { io } {
+        return fs::read_bytes(file, limit);
+    }
+    fn publish(self: OsFiles, file: path::Path, data: text::Bytes) -> Result<Bool,
+        fs::Error> effects { io } {
+        return fs::write_atomic(file, data);
+    }
+}
+fn file_path(file: path::Path) -> Result<String, fs::Error> {
+    return match path::checked(file.value) {
+        Result::Ok(valid) => Result<String, fs::Error>::Ok(valid.value),
+        Result::Err(error) => Result<String, fs::Error>::Err(fs::Error::InvalidPath(error))
+    };
+}
+impl FileStore for MemoryFiles {
+    fn read(self: MemoryFiles, file: path::Path, limit: Int) -> Result<text::Bytes,
+        fs::Error> effects { state } {
+        let name = file_path(file)?;
+        if limit < 0 || limit > 268435456 {
+            return Result<text::Bytes, fs::Error>::Err(fs::Error::Limit(limit));
+        }
+        if !dict_has(self.data, name) {
+            return Result<text::Bytes, fs::Error>::Err(fs::Error::Io(name, "no memory file"));
+        }
+        let bytes = dict_get(self.data, name);
+        if str_len(bytes) > limit {
+            return Result<text::Bytes, fs::Error>::Err(fs::Error::Limit(limit));
+        }
+        return Result<text::Bytes, fs::Error>::Ok(text::Bytes(data: bytes));
+    }
+    fn publish(self: MemoryFiles, file: path::Path, data: text::Bytes) -> Result<Bool,
+        fs::Error> effects { state } {
+        let name = file_path(file)?;
+        if str_len(data.data) > 268435456 {
+            return Result<Bool, fs::Error>::Err(fs::Error::Limit(268435456));
+        }
+        dict_set(self.data, name, data.data);
+        return Result<Bool, fs::Error>::Ok(true);
+    }
+}
+pub struct Command {
+    argv: List<String>,
+    cwd: path::Path,
+    stdout: path::Path,
+    stderr: path::Path,
+    timeout_ms: Int
+}
+pub interface Processes {
+    fn run(self: Self, command: Command) -> Result<process::Completed, process::Error> effects { io,
+        process, state };
+}
+pub opaque struct OsProcesses {}
+pub opaque struct ScriptedProcesses {
+    responses: List<Result<process::Completed, process::Error>>,
+    index: List<Int>
+}
+pub fn os_processes() -> OsProcesses {
+    return OsProcesses();
+}
+fn index() -> List<Int> effects { state } {
+    let position = list_new<Int>();
+    list_push(position, 0);
+    return position;
+}
+pub fn scripted_processes(responses: List<Result<process::Completed,
+    process::Error>>) -> ScriptedProcesses effects { state } {
+    return ScriptedProcesses(responses: collections::copy(responses), index: index());
+}
+impl Processes for OsProcesses {
+    fn run(self: OsProcesses, command: Command) -> Result<process::Completed,
+        process::Error> effects { io, process, state } {
+        return process::run(command.argv, command.cwd, command.stdout, command.stderr,
+            command.timeout_ms);
+    }
+}
+impl Processes for ScriptedProcesses {
+    fn run(self: ScriptedProcesses, command: Command) -> Result<process::Completed,
+        process::Error> effects { state } {
+        let current = list_get(self.index, 0);
+        if current >= list_len(self.responses) {
+            return Result<process::Completed, process::Error>::Err(process::Error::Launch(
+                "scripted process responses exhausted"));
+        }
+        list_set(self.index, 0, current + 1);
+        return list_get(self.responses, current);
+    }
+}
+pub enum ObservationError {
+    Exhausted,
+    InvalidEntropy(Int),
+    System(String)
+}
+pub interface Clock {
+    fn now_ms(self: Self) -> Result<Int, ObservationError> effects { io, state };
+}
+pub interface Entropy {
+    fn next_u32(self: Self) -> Result<Int, ObservationError> effects { io, state };
+}
+pub opaque struct OsClock {}
+pub opaque struct OsEntropy {}
+pub fn os_clock() -> OsClock {
+    return OsClock();
+}
+pub fn os_entropy() -> OsEntropy {
+    return OsEntropy();
+}
+fn observation(value: IntResult) -> Result<Int, ObservationError> {
+    return match value {
+        IntResult::Ok(n) => Result<Int, ObservationError>::Ok(n),
+        IntResult::Err(error) => Result<Int, ObservationError>::Err(ObservationError::System(error))
+    };
+}
+impl Clock for OsClock {
+    fn now_ms(self: OsClock) -> Result<Int, ObservationError> effects { io } {
+        return observation(clock_millis());
+    }
+}
+impl Entropy for OsEntropy {
+    fn next_u32(self: OsEntropy) -> Result<Int, ObservationError> effects { io } {
+        return observation(entropy_u32());
+    }
+}
+struct Readings {
+    values: List<Int>,
+    index: List<Int>
+}
+pub opaque struct ScriptedClock {
+    readings: Readings
+}
+pub opaque struct ScriptedEntropy {
+    readings: Readings
+}
+fn script(values: List<Int>) -> Readings effects { state } {
+    return Readings(values: collections::copy(values), index: index());
+}
+pub fn scripted_clock(values: List<Int>) -> ScriptedClock effects { state } {
+    return ScriptedClock(readings: script(values));
+}
+pub fn scripted_entropy(values: List<Int>) -> ScriptedEntropy effects { state } {
+    return ScriptedEntropy(readings: script(values));
+}
+fn next(readings: Readings) -> Result<Int, ObservationError> effects { state } {
+    let current = list_get(readings.index, 0);
+    if current >= list_len(readings.values) {
+        return Result<Int, ObservationError>::Err(ObservationError::Exhausted);
+    }
+    list_set(readings.index, 0, current + 1);
+    return Result<Int, ObservationError>::Ok(list_get(readings.values, current));
+}
+impl Clock for ScriptedClock {
+    fn now_ms(self: ScriptedClock) -> Result<Int, ObservationError> effects { state } {
+        return next(self.readings);
+    }
+}
+impl Entropy for ScriptedEntropy {
+    fn next_u32(self: ScriptedEntropy) -> Result<Int, ObservationError> effects { state } {
+        let value = next(self.readings)?;
+        if value < 0 || value > 4294967295 {
+            return Result<Int, ObservationError>::Err(ObservationError::InvalidEntropy(value));
+        }
+        return Result<Int, ObservationError>::Ok(value);
+    }
+}
+pub struct RandomStep {
+    value: Int,
+    seed: Int
+}
+pub fn random_step(seed: Int) -> RandomStep {
+    var normalized = seed;
+    if normalized < 1 || normalized > 2147483646 {
+        normalized = normalized % 2147483646;
+        if normalized < 1 {
+            normalized = normalized + 2147483646;
+        }
+    }
+    let next_seed = (normalized * 48271) % 2147483647;
+    return RandomStep(value: next_seed, seed: next_seed);
+}

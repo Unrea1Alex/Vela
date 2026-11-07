@@ -1,10 +1,11 @@
-# Native libraries and resources — current support and retained design
+# Native libraries and resources
 
-The original stage 0.6.5 established a design boundary. The narrower native-DLL
-subset was implemented in 0.7.5 and shipped in the local 0.7.0 release; the wider
-resource/multi-target design below remains planned. These are different statuses.
+For the current manifest and resource contract see [PACKAGING](PACKAGING.md).
+The original stage 0.6.5 established a design boundary. The native-DLL subset
+shipped in 0.7.0 and remains compatible. The 0.11 extension uses the same
+format header for explicit Windows native metadata and distributed resources.
 
-## Implemented in 0.7.0
+## Historical 0.7.0 baseline
 
 Manifest header `vela-project|1` accepts `native|BASENAME.dll|relative/path.dll`.
 The lock records the DLL byte SHA-256; build/run/test stage declared companions
@@ -20,9 +21,8 @@ ABI/load/invalid-handle failures are located runtime errors, not C type checking
 ffi_load offers recoverable preflight. No arbitrary flags, build hooks, downloads
 or native-source compilation are inferred from a manifest.
 
-General resource records, six-field native records, format 2, static linking and
-automatic embedding are not implemented. Unsupported manifest records fail with
-E225. A hand-written application resource-copy step is not a project-format feature.
+The 0.7.0 release supported the three-field row. The 0.11 format 1 extensions
+are specified in the current packaging contract.
 
 ## Retained proposal beyond the implemented subset
 
@@ -33,11 +33,10 @@ native|name|target-triple|static-or-shared|relative-library-path|sha256
 resource|name|relative-source-path|relative-distribution-path|sha256
 ```
 
-These spellings are design inputs, not accepted current syntax. The next contract
-must decide whether format 2 is needed and define compatibility/migration from
-the implemented three-field native record. Resource/text choices are planned in
-ROADMAP 0.9.7; remaining multi-platform packaging is assigned to 0.11.6. Selecting
-raw literals in 0.9.7 does not cancel the remaining resource-packaging obligation.
+These spellings are historical design inputs. The accepted 0.11 spellings
+retain format 1, keep DLL metadata in its native row and hash resource contents
+in the lock. 0.9.7 selected [raw literals](TEXT-LITERALS-RESOURCES.md) for
+inline static text. Static linking and automatic embedding remain separate.
 
 Retained requirements: unique names, SHA-256 of exact bytes, explicit target/ABI
 and artifact kind where applicable, deterministic inventory, no shell/linker search
@@ -48,21 +47,21 @@ the lock. Include redistribution metadata in the delivery inventory.
 
 The original resource design copied files atomically to a distribution root with
 their relative layout and did not embed them into C. MeasureLab motivates comparing
-that design with explicitly declared text embedding in 0.9.7. The decision must
+declared text embedding with raw strings. The file-resource decision must
 cover exact bytes/UTF-8/line endings, limits, diagnostic source locations, lock
 changes, MCP snapshots and locating resources independently of the caller's cwd.
 No resource mechanism is implemented by documenting these alternatives.
 
-Ownership/rooting is handled by 0.8.4–0.8.5, callbacks by 0.10.9 (formerly 0.10.4). The current
-no-unload policy stays in force; 0.8.5 must explicitly retain it or specify a safe
-transition, rather than silently enabling unload because GC exists.
+Ownership and rooting use [lexical cleanup](RESOURCES.md) and [foreign roots](FFI-ROOTS.md).
+DLLs remain loaded until process teardown. See [callbacks](CALLBACKS.md) for
+registered callable lifetime.
 
 ## Acceptance ownership
 
 The implemented DLL subset passed the 0.7.5 focused/native gate and final
 [0.7.0 acceptance](../VALIDATION-0.7.md). It does not prove resource packaging.
 
-0.9.7/0.11.6 must cover changed hashes, invalid/missing/wrong-target artifacts,
+0.11.6 must cover changed hashes, invalid/missing/wrong-target artifacts,
 Unicode paths, duplicate destinations, traversal, deterministic distribution and
 a packaged resource read with independently specified output after relocation.
 0.8.4–0.8.5 cover handle lifetime/rooting and the explicit unload decision;

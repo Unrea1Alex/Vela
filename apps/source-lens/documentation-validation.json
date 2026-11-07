@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "files": [
+    "README.md",
+    "README.ru.md",
+    "docs/ROADMAP.md",
+    "docs/TOOLING.md",
+    "docs/PROJECTS.md",
+    "docs/AGENT-QUICKSTART.md",
+    "docs/contracts/SEMANTIC-QUERIES.md",
+    "apps/source-lens/README.md"
+  ],
+  "local_links": 172,
+  "compiler_unchanged": true,
+  "compiler_sha256": "3f02f5f82bfc7b41b5444711eb7cf23e0e38d724bba51001e5b38c6517cfc644",
+  "vendored_modules_match": 6,
+  "browser": {
+    "passed": true,
+    "effect_io_visible": 2,
+    "rules_visible": 4,
+    "no_matches": 0,
+    "reset": 12,
+    "link_clears_filters": true,
+    "console_errors": 0,
+    "preview": "preview.png"
+  }
+}

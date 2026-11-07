@@ -1,0 +1,45 @@
+interface Reader {
+    fn read(self: Self, key: Int) -> Result<Int, String> effects { state };
+}
+struct Fixed { value: Int }
+opaque struct Memory { value: Int, calls: List<Int> }
+impl Reader for Fixed {
+    fn read(self: Fixed, key: Int) -> Result<Int, String> {
+        if key < 0 { return Result<Int, String>::Err("negative key"); }
+        return Result<Int, String>::Ok(self.value + key);
+    }
+}
+impl Reader for Memory {
+    fn read(self: Memory, key: Int) -> Result<Int, String> effects { state } {
+        list_push(self.calls, key);
+        var local = self;
+        local.value = local.value + 1;
+        return Reader::read(Fixed(value: local.value - 1), key);
+    }
+}
+fn box<T: Reader>(store: T) -> dyn Reader { return dyn Reader(store); }
+fn select(choice: Bool, calls: List<Int>) -> dyn Reader {
+    if choice { return box(Memory(value: 40, calls: calls)); }
+    return dyn Reader(Fixed(value: 20));
+}
+fn value(answer: Result<Int, String>) -> Unit effects { io } {
+    match answer {
+        Result::Ok(n) => { print(n); }
+        Result::Err(error) => { print(error); }
+    }
+}
+fn key(calls: List<Int>, n: Int) -> Int effects { state } {
+    list_push(calls, 100);
+    return n;
+}
+fn main() -> Unit effects { io, state } {
+    let calls = list_new<Int>();
+    let copy = select(true, calls);
+    let reader = copy;
+    value(reader.read(key(calls, 2)));
+    value(Reader::read(copy, -1));
+    value(select(false, calls).read(2));
+    value(Reader::read(Fixed(value: 40), 2));
+    value(Reader::read(Fixed(value: 40), -1));
+    for call in calls { print(call); }
+}

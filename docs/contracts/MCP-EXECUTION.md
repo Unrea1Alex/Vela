@@ -1,7 +1,7 @@
-# MCP execution contract — 0.7.7
+# MCP execution contract — 0.9
 
 Status: verified on Windows x64; version/platform acceptance is recorded in ROADMAP.md.
-Analysis-only protocol 0.6 remains available. Execution is optional and off until
+Analysis without execution remains available. Execution is optional and off until
 the configured isolation backend passes a real startup probe.
 
 ## Tools and snapshots
@@ -18,8 +18,9 @@ use native test report schema 2. Tests execute under exactly the same OS policy
 as run, including subprocesses. A successful check is not a successful test.
 
 vela_run accepts only an artifact_id issued by this server, optional argument
-array (up to 64 values, 16 KiB total, valid text without NUL), and optional timeout
-within the host's cap. No caller-supplied cwd, command, path or environment.
+array (up to 64 values, 16 KiB total, valid text without NUL), optional timeout
+within the host's cap, and optionally declared output names. No caller-supplied
+cwd, command, host path or environment.
 The artifact is bound to executable bytes, complete effective source snapshot,
 native companion bytes and the pinned compiler/C toolchain/helper. Store at most
 8 artifacts/64 MiB total, expire after 30 minutes; disconnect deletes them.
@@ -118,9 +119,9 @@ profiles are cleaned on all ordinary exit paths; unexpected helper death fails
 closed, kills its job via handle closure and reports any cleanup limitation.
 Only completed, bounded regular-file outputs can be returned as artifacts; never
 copy them into the user's workspace implicitly.
-In 0.7.0 artifact_id addresses the built executable only. There is no endpoint
-for retrieving a generated HTML/image/data file. Explicit output-file artifacts
-are planned in ROADMAP 0.9.9; no future tool name or schema is part of this contract.
+`artifact_id` addresses a built executable. In 0.9, opted-in exit-zero runs
+can publish separate generated `output_id` values. See the
+[output artifact contract](MCP-OUTPUT-ARTIFACTS.md) for limits and retrieval.
 
 ## Required gate before enabling a platform
 

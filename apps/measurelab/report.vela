@@ -28,37 +28,26 @@ pub fn analyze(document: model::Document) -> Result<Report, String> effects { st
             verdict = Verdict::OverBudget;
             exceeded = exceeded + 1;
         }
-        list_push(rows, Row(scenario: scenario, summary: summary, change:(summary.mean / scenario.baseline - 1.0) * 100.0, verdict: verdict));
+        list_push(rows, Row(scenario: scenario, summary: summary, change:(summary.mean
+            / scenario.baseline - 1.0) * 100.0, verdict: verdict));
         total = total + summary.count;
     }
-    return Result<Report, String>::Ok(Report(title: document.title, rows: rows, total: total, exceeded: exceeded));
+    return Result<Report, String>::Ok(Report(title: document.title, rows: rows, total: total,
+        exceeded: exceeded));
 }
 pub fn fixed(value: Float64) -> String {
-    var magnitude = value;
-    var sign = "";
-    if magnitude < 0.0 {
-        magnitude = -magnitude;
-        sign = "-";
-    }
-    var scaled = 0;
-    match float_to_int(float_round(magnitude * 100.0)) {
-        IntResult::Ok(n) => {
-            scaled = n;
+    match float_to_fixed(value, 2) {
+        StringResult::Ok(formatted) => {
+            if formatted == "-0.00" {
+                return "0.00";
+            }
+            return formatted;
         }
-        IntResult::Err(_) => {
-            return float_to_string(value);
+        StringResult::Err(error) => {
+            assert_true(false, error);
+            return "";
         }
     }
-    if scaled == 0 {
-        sign = "";
-    }
-    let whole = scaled / 100;
-    let fraction = scaled % 100;
-    var zero = "";
-    if fraction < 10 {
-        zero = "0";
-    }
-    return sign + to_string(whole) +"."+ zero + to_string(fraction);
 }
 pub fn escaped(value: String) -> String effects { state } {
     match text::html(text::Text(data: value)) {
@@ -70,14 +59,21 @@ pub fn escaped(value: String) -> String effects { state } {
         }
     }
 }
-fn chart(row: Row) -> String effects { state } {
+fn fragments() -> Result<text::Builder, String> effects { state } {
+    return model::explain(text::builder(8388608), "Cannot initialize report builder");
+}
+fn append(b: text::Builder, fragment: String) -> Result<Bool, String> effects { state } {
+    return model::explain(text::append(b, text::Bytes(data: fragment)),
+        "Report fragment exceeds 8 MiB");
+}
+fn chart(row: Row) -> Result<String, String> effects { state } {
     var scale = row.summary.maximum;
     if row.scenario.budget > scale {
         scale = row.scenario.budget;
     }
     scale = scale * 1.15;
-    var points = "";
-    var dots = "";
+    let points = fragments()?;
+    let dots = fragments()?;
     for index in 0 .. row.summary.count {
         var x = 380.0;
         if row.summary.count > 1 {
@@ -87,16 +83,23 @@ fn chart(row: Row) -> String effects { state } {
         let y = 150.0 - value / scale * 120.0;
         let px = fixed(x);
         let py = fixed(y);
-        points = points + px +"," + py + " ";
-        dots = dots + "<circle cx='" + px + "' cy='" + py + "' r='3'><title>" + to_string(index + 1) + ": " + fixed(value) + " " + escaped(row.scenario.unit) + "</title></circle>";
+        let point_added = append(points, px + "," + py + " ")?;
+        let dot_added = append(dots, "<circle cx='" + px + "' cy='" + py + "' r='3'><title>"
+            + to_string(index + 1) + ": " + fixed(value) + " " + escaped(row.scenario.unit)
+            + "</title></circle>")?;
     }
     let budgetY = fixed(150.0 - row.scenario.budget / scale * 120.0);
-    return "<svg viewBox='0 0 760 180' role='img' aria-label='Измерения по порядку; пунктир — лимит p95'><path class='grid' d='M20 30H740 M20 90H740 M20 150H740'/><path class='limit' d='M20 " + budgetY + "H740'/><polyline points='" + points + "'/>" + dots + "<text x='20' y='174'>ПЕРВЫЙ ЗАМЕР</text><text x='740' y='174' text-anchor='end'>ПОСЛЕДНИЙ ЗАМЕР</text></svg>";
+    return Result<String, String>::Ok(
+        "<svg viewBox='0 0 760 180' role='img' aria-label='Измерения по порядку; пунктир — лимит p95'><path class='grid' d='M20 30H740 M20 90H740 M20 150H740'/><path class='limit' d='M20 "
+        + budgetY + "H740'/><polyline points='" + text::finish_bytes(points).data + "'/>"
+        + text::finish_bytes(dots).data
+        + "<text x='20' y='174'>ПЕРВЫЙ ЗАМЕР</text><text x='740' y='174' text-anchor='end'>ПОСЛЕДНИЙ ЗАМЕР</text></svg>");
 }
 fn metric(name: String, value: Float64, unit: String) -> String effects { state } {
-    return "<div class='metric'><span>" + name + "</span><strong>" + fixed(value) + " <small>" + escaped(unit) + "</small></strong></div>";
+    return "<div class='metric'><span>" + name + "</span><strong>" + fixed(value) + " <small>"
+        + escaped(unit) + "</small></strong></div>";
 }
-fn card(row: Row, index: Int) -> String effects { state } {
+fn card(row: Row, index: Int) -> Result<String, String> effects { state } {
     let s = row.scenario;
     let m = row.summary;
     var status = "В пределах лимита";
@@ -112,22 +115,111 @@ fn card(row: Row, index: Int) -> String effects { state } {
     if row.change > 0.0 {
         delta = "+" + delta;
     }
-    var cells = "";
+    let cells = fragments()?;
     for i in 0 .. m.count {
-        cells = cells + "<tr><td>" + to_string(i + 1) + "</td><td>" + fixed(list_get(s.samples, i)) + "</td></tr>";
+        let added = append(cells, "<tr><td>" + to_string(i + 1) + "</td><td>" + fixed(list_get(
+            s.samples, i)) + "</td></tr>")?;
     }
-    return "<article class='scenario " + tone + "'><div class='scenario-head'><div><div class='eyebrow'>СЦЕНАРИЙ / 0" + to_string(index) + "</div><h2>" + escaped(s.name) + "</h2></div><span class='badge'>" + status + "</span></div><div class='metrics'>" + metric("Среднее", m.mean, s.unit) + metric("Медиана", m.median, s.unit) + metric("p95", m.p95, s.unit) + metric("Станд. отклонение", m.deviation, s.unit) + "</div><div class='plot'>" + chart(row) + "</div><div class='foot'><span><i></i> " + to_string(m.count) + " измерений · " + fixed(m.minimum) + "–" + fixed(m.maximum) + " " + escaped(s.unit) + "</span><span>Лимит p95: <b>" + fixed(s.budget) + " " + escaped(s.unit) + "</b></span><span>К базовому среднему: <b>" + delta + "</b></span></div><details><summary>Исходные измерения</summary><div class='table-wrap'><table><thead><tr><th>№</th><th>Значение, " + escaped(s.unit) + "</th></tr></thead><tbody>" + cells + "</tbody></table></div></details></article>";
+    return Result<String, String>::Ok("<article class='scenario " + tone
+        + "'><div class='scenario-head'><div><div class='eyebrow'>СЦЕНАРИЙ / 0" + to_string(
+        index) + "</div><h2>" + escaped(s.name) + "</h2></div><span class='badge'>" + status
+        + "</span></div><div class='metrics'>" + metric("Среднее", m.mean, s.unit) + metric(
+        "Медиана", m.median, s.unit) + metric("p95", m.p95, s.unit) + metric(
+        "Станд. отклонение", m.deviation, s.unit) + "</div><div class='plot'>" + (
+        chart(row)?) + "</div><div class='foot'><span><i></i> " + to_string(m.count)
+        + " измерений · " + fixed(m.minimum) + "–" + fixed(m.maximum) + " " + escaped(
+        s.unit) + "</span><span>Лимит p95: <b>" + fixed(s.budget) + " " + escaped(s.unit)
+        + "</b></span><span>К базовому среднему: <b>" + delta
+        + "</b></span></div><details><summary>Исходные измерения</summary><div class='table-wrap'><table><thead><tr><th>№</th><th>Значение, "
+        + escaped(s.unit) + "</th></tr></thead><tbody>" + text::finish_bytes(cells).data
+        + "</tbody></table></div></details></article>");
 }
-pub fn html(data: Report) -> String effects { state } {
+pub fn html(data: Report) -> Result<String, String> effects { state } {
     let parts = strings_new();
-    strings_push(parts, "<!doctype html><html lang='ru'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta http-equiv='Content-Security-Policy' content=\"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'\"><title>" + escaped(data.title) + " · MeasureLab</title><style>");
-    strings_push(parts, "*{box-sizing:border-box}body{margin:0;background:#f3f3ee;color:#203a36;font:15px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1120px;margin:auto;padding:34px 32px 64px}nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #d5ddd4;padding-bottom:22px}.brand{font-size:22px;font-weight:800;letter-spacing:-1px}.brand b{color:#16766b}.tag,.eyebrow{font:11px/1.5 ui-monospace,Consolas,monospace;letter-spacing:1.4px}.tag{border:1px solid #c7d5cb;padding:6px 10px;border-radius:5px}header{padding:50px 0 28px;max-width:830px}header .eyebrow{color:#16766b;font-weight:700}h1{font-size:clamp(32px,4.5vw,52px);line-height:1.12;letter-spacing:-2px;margin:14px 0 18px;overflow-wrap:anywhere}header p{color:#61726b;font-size:16px;max-width:710px;margin:0}.overview{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:0 0 30px}.overview div{background:#e5ebe2;padding:19px 23px;border-radius:12px}.overview strong{display:block;font-size:32px;line-height:1.3;font-weight:650}.overview span{font-size:12px;color:#526b61}.overview .alert{background:#f6e9db;color:#a44825}.scenario{background:#fffefb;border:1px solid #e0e5dc;border-radius:16px;padding:25px 28px;margin-bottom:22px;box-shadow:0 4px 20px #203a3604}.scenario-head{display:flex;align-items:center;justify-content:space-between;gap:15px}.eyebrow{color:#7b8981}h2{font-size:22px;letter-spacing:-.5px;margin:5px 0 0;overflow-wrap:anywhere}.badge{border-radius:20px;padding:5px 12px;font-size:12px;background:#e4f1e9;color:#25614a;white-space:nowrap}.warn .badge{color:#9b4727;background:#fae9df}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0 0}.metric{border-left:2px solid #e5eae3;padding-left:13px}.metric span{display:block;color:#76867d;font-size:12px}.metric strong{font-size:25px;font-weight:600;font-variant-numeric:tabular-nums}.metric small{font-size:12px;color:#77867e;font-weight:400}.plot{padding-top:10px}svg{display:block;width:100%;max-height:220px;overflow:visible}.grid{stroke:#eaf0e8;stroke-width:1}.limit{stroke:#d79763;stroke-width:1.2;stroke-dasharray:5 5}polyline{stroke:#258f80;fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}circle{fill:#258f80;stroke:#fffefb;stroke-width:1.5}svg text{fill:#8b988f;font:8px ui-monospace,Consolas,monospace;letter-spacing:.8px}.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#76837a;font-size:12px;padding:7px 0 14px}.foot b{font-weight:600;color:#3d5549}.foot i{display:inline-block;width:7px;height:7px;background:#258f80;border-radius:50%;margin-right:4px}details{border-top:1px solid #e8ece4;font-size:12px}summary{cursor:pointer;padding:13px 0 0;color:#557466}.table-wrap{max-height:260px;overflow:auto;margin-top:10px}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}th,td{text-align:right;padding:6px 12px;border-bottom:1px solid #edf0e8}th:first-child,td:first-child{text-align:left}th{background:#f2f5ee;position:sticky;top:0}.method{display:grid;grid-template-columns:1fr 2fr;gap:30px;padding:24px 0;border-bottom:1px solid #d5ddd4;font-size:12px;color:#687d70}.method strong{color:#344f40}footer{display:flex;justify-content:space-between;gap:20px;font-size:11px;color:#7b8b7f;padding-top:18px}@media(max-width:650px){main{padding:20px 16px 40px}header{padding-top:34px}h1{letter-spacing:-1px}.scenario{padding:20px 17px}.scenario-head{align-items:flex-start;flex-direction:column}.metrics{grid-template-columns:repeat(2,1fr);gap:18px}.metric strong{font-size:22px}.overview{gap:8px}.overview div{padding:14px 12px}.overview strong{font-size:26px}.method{grid-template-columns:1fr;gap:10px}footer{flex-direction:column;gap:4px}}@media print{body{background:white}main{padding:0}.scenario{break-inside:avoid;box-shadow:none}.tag,details{display:none}}");
-    strings_push(parts, "</style></head><body><main><nav><div class='brand'>Measure<b>Lab</b></div><span class='tag'>LOCAL REPORT / VELA 0.7</span></nav><header><div class='eyebrow'>ЛАБОРАТОРИЯ ИЗМЕРЕНИЙ</div><h1>" + escaped(data.title) + "</h1><p>Каждый замер на своём месте. Сравните типичное время, длинный хвост и разброс — прежде чем делать выводы о производительности.</p></header><section class='overview' aria-label='Сводка'><div><strong>" + to_string(list_len(data.rows)) + "</strong><span>Сценарии</span></div><div><strong>" + to_string(data.total) + "</strong><span>Измерения</span></div><div class='alert'><strong>" + to_string(data.exceeded) + "</strong><span>Превышено лимитов p95</span></div></section>");
+    strings_push(parts,
+        """<!doctype html><html lang='ru'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta http-equiv='Content-Security-Policy' content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"><title>"""
+        + escaped(data.title) + " · MeasureLab</title><style>");
+    strings_push(parts, """*{box-sizing:border-box}
+body{margin:0;background:#f3f3ee;color:#203a36;font:15px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1120px;margin:auto;padding:34px 32px 64px}
+nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #d5ddd4;padding-bottom:22px}
+.brand{font-size:22px;font-weight:800;letter-spacing:-1px}
+.brand b{color:#16766b}
+.tag,.eyebrow{font:11px/1.5 ui-monospace,Consolas,monospace;letter-spacing:1.4px}
+.tag{border:1px solid #c7d5cb;padding:6px 10px;border-radius:5px}
+header{padding:50px 0 28px;max-width:830px}
+header .eyebrow{color:#16766b;font-weight:700}
+h1{font-size:clamp(32px,4.5vw,52px);line-height:1.12;letter-spacing:-2px;margin:14px 0 18px;overflow-wrap:anywhere}
+header p{color:#61726b;font-size:16px;max-width:710px;margin:0}
+.overview{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:0 0 30px}
+.overview div{background:#e5ebe2;padding:19px 23px;border-radius:12px}
+.overview strong{display:block;font-size:32px;line-height:1.3;font-weight:650}
+.overview span{font-size:12px;color:#526b61}
+.overview .alert{background:#f6e9db;color:#a44825}
+.scenario{background:#fffefb;border:1px solid #e0e5dc;border-radius:16px;padding:25px 28px;margin-bottom:22px;box-shadow:0 4px 20px #203a3604}
+.scenario-head{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.eyebrow{color:#7b8981}
+h2{font-size:22px;letter-spacing:-.5px;margin:5px 0 0;overflow-wrap:anywhere}
+.badge{border-radius:20px;padding:5px 12px;font-size:12px;background:#e4f1e9;color:#25614a;white-space:nowrap}
+.warn .badge{color:#9b4727;background:#fae9df}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0 0}
+.metric{border-left:2px solid #e5eae3;padding-left:13px}
+.metric span{display:block;color:#76867d;font-size:12px}
+.metric strong{font-size:25px;font-weight:600;font-variant-numeric:tabular-nums}
+.metric small{font-size:12px;color:#77867e;font-weight:400}
+.plot{padding-top:10px}
+svg{display:block;width:100%;max-height:220px;overflow:visible}
+.grid{stroke:#eaf0e8;stroke-width:1}
+.limit{stroke:#d79763;stroke-width:1.2;stroke-dasharray:5 5}
+polyline{stroke:#258f80;fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+circle{fill:#258f80;stroke:#fffefb;stroke-width:1.5}
+svg text{fill:#8b988f;font:8px ui-monospace,Consolas,monospace;letter-spacing:.8px}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#76837a;font-size:12px;padding:7px 0 14px}
+.foot b{font-weight:600;color:#3d5549}
+.foot i{display:inline-block;width:7px;height:7px;background:#258f80;border-radius:50%;margin-right:4px}
+details{border-top:1px solid #e8ece4;font-size:12px}
+summary{cursor:pointer;padding:13px 0 0;color:#557466}
+.table-wrap{max-height:260px;overflow:auto;margin-top:10px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:6px 12px;border-bottom:1px solid #edf0e8}
+th:first-child,td:first-child{text-align:left}
+th{background:#f2f5ee;position:sticky;top:0}
+.method{display:grid;grid-template-columns:1fr 2fr;gap:30px;padding:24px 0;border-bottom:1px solid #d5ddd4;font-size:12px;color:#687d70}
+.method strong{color:#344f40}
+footer{display:flex;justify-content:space-between;gap:20px;font-size:11px;color:#7b8b7f;padding-top:18px}
+@media(max-width:650px){main{padding:20px 16px 40px}
+header{padding-top:34px}
+h1{letter-spacing:-1px}
+.scenario{padding:20px 17px}
+.scenario-head{align-items:flex-start;flex-direction:column}
+.metrics{grid-template-columns:repeat(2,1fr);gap:18px}
+.metric strong{font-size:22px}
+.overview{gap:8px}
+.overview div{padding:14px 12px}
+.overview strong{font-size:26px}
+.method{grid-template-columns:1fr;gap:10px}
+footer{flex-direction:column;gap:4px}
+}
+@media print{body{background:white}
+main{padding:0}
+.scenario{break-inside:avoid;box-shadow:none}
+.tag,details{display:none}
+}""");
+    strings_push(parts,
+        "</style></head><body><main><nav><div class='brand'>Measure<b>Lab</b></div><span class='tag'>LOCAL REPORT / VELA 0.8</span></nav><header><div class='eyebrow'>ЛАБОРАТОРИЯ ИЗМЕРЕНИЙ</div><h1>"
+        + escaped(data.title)
+        + "</h1><p>Каждый замер на своём месте. Сравните типичное время, длинный хвост и разброс — прежде чем делать выводы о производительности.</p></header><section class='overview' aria-label='Сводка'><div><strong>"
+        + to_string(list_len(data.rows))
+        + "</strong><span>Сценарии</span></div><div><strong>" + to_string(data.total)
+        + "</strong><span>Измерения</span></div><div class='alert'><strong>" + to_string(
+        data.exceeded)
+        + "</strong><span>Превышено лимитов p95</span></div></section>");
     var index = 0;
     for row in data.rows {
         index = index + 1;
-        strings_push(parts, card(row, index));
+        strings_push(parts, card(row, index)?);
     }
-    strings_push(parts, "<section class='method'><strong>Как читать этот отчёт</strong><div>Меньше — лучше. Изменение в процентах сравнивает среднее с заданным baseline. p95 — ближайший ранг ceil(0.95 × n); при малой выборке он может совпадать с максимумом. Разброс — популяционное стандартное отклонение. Пунктир на графике обозначает лимит. Числа округлены для показа, решения принимаются по полной точности. Это описательная статистика, не тест значимости.</div></section><footer><span>Создано MeasureLab · расчёты и отчёт на Vela</span><span>Float64 · JSON · FFI ABI 1 · автономный HTML</span></footer></main></body></html>\n");
-    return strings_join(parts, "");
+    strings_push(parts,
+        "<section class='method'><strong>Как читать этот отчёт</strong><div>Меньше — лучше. Изменение в процентах сравнивает среднее с заданным baseline. p95 — ближайший ранг ceil(0.95 × n); при малой выборке он может совпадать с максимумом. Разброс — популяционное стандартное отклонение. Пунктир на графике обозначает лимит. Числа округлены для показа, решения принимаются по полной точности. Это описательная статистика, не тест значимости.</div></section><footer><span>Создано MeasureLab · расчёты и отчёт на Vela</span><span>Float64 · JSON · GC · автономный HTML</span></footer></main></body></html>\n");
+    return Result<String, String>::Ok(strings_join(parts, ""));
 }

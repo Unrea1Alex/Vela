@@ -1,0 +1,614 @@
+import "event_loop.vela" as loop;
+import "path.vela" as path;
+import "process.vela" as process;
+import "text.vela" as text;
+pub enum Scheme {
+    Http,
+    Https
+}
+pub enum Method {
+    Get,
+    Head,
+    Post,
+    Put,
+    Delete
+}
+pub struct Header {
+    name: String,
+    value: String
+}
+pub enum Error {
+    InvalidEndpoint,
+    InvalidLimit,
+    InvalidTransport,
+    InvalidHeaders,
+    InvalidBody,
+    Schedule(process::ScheduleError),
+    Connect(Int),
+    Tls(Int),
+    Transfer(Int),
+    Protocol,
+    Limit,
+    TimedOut,
+    Cancelled,
+    Pending,
+    Closed,
+    Storage(String)
+}
+pub opaque struct Request {
+    url: String,
+    timeout_ms: Int,
+    body_limit: Int,
+    method: Method,
+    headers: String,
+    upload: String
+}
+pub struct Response {
+    status: Int,
+    headers: text::Bytes,
+    body: text::Bytes
+}
+struct Files {
+    directory: String,
+    status: String,
+    errors: String,
+    headers: String,
+    body: String,
+    upload: String
+}
+struct Work {
+    task: loop::Task<process::Completed>,
+    files: Files,
+    body_limit: Int,
+    head: Bool
+}
+enum Source {
+    Process(Work),
+    Scripted(Result<Response, Error>)
+}
+pub opaque struct Exchange {
+    source: Source,
+    closed: List<Bool>
+}
+pub opaque struct Curl {
+    executable: path::Path,
+    ca_file: Option<path::Path>
+}
+pub opaque struct Scripted {
+    result_value: Result<Response, Error>
+}
+pub interface Transport {
+    fn start(self: Self, scheduler: loop::Loop<process::Completed>, request: Request,
+        directory: path::Path) -> Result<Exchange, Error> effects { io, state };
+}
+fn alphanumeric(value: Int) -> Bool {
+    return (value >= 48 && value <= 57) || (value >= 65 && value <= 90) || (value >= 97 && value
+        <= 122);
+}
+fn valid_host(value: String) -> Bool {
+    let size = str_len(value);
+    if size == 0 || size > 253 {
+        return false;
+    }
+    var label = 0;
+    var previous = 0;
+    for i in 0 .. size {
+        let byte = str_byte(value, i);
+        if byte == 46 {
+            if label == 0 || previous == 45 {
+                return false;
+            }
+            label = 0;
+        } else {
+            if !alphanumeric(byte) && (byte != 45 || label == 0) {
+                return false;
+            }
+            label = label + 1;
+            if label > 63 {
+                return false;
+            }
+        }
+        previous = byte;
+    }
+    return label > 0 && previous != 45;
+}
+fn hex(byte: Int) -> Bool {
+    return (byte >= 48 && byte <= 57) || (byte >= 65 && byte <= 70) || (byte >= 97 && byte <= 102);
+}
+pub fn valid_target(value: String) -> Bool {
+    let size = str_len(value);
+    if size < 1 || size > 2048 || str_byte(value, 0) != 47 {
+        return false;
+    }
+    var i = 0;
+    while i < size {
+        let byte = str_byte(value, i);
+        if byte < 33 || byte > 126 || byte == 35 || byte == 92 {
+            return false;
+        }
+        if byte == 37 {
+            if i + 2 >= size || !hex(str_byte(value, i + 1)) || !hex(str_byte(value, i + 2)) {
+                return false;
+            }
+            i = i + 2;
+        }
+        i = i + 1;
+    }
+    return true;
+}
+pub fn get(scheme: Scheme, host: String, port: Int, target: String, timeout_ms: Int,
+    body_limit: Int) -> Result<Request, Error> {
+    if !valid_host(host) || port < 1 || port > 65535 || !valid_target(target) {
+        return Result<Request, Error>::Err(Error::InvalidEndpoint);
+    }
+    if timeout_ms < 1 || timeout_ms > 120000 || body_limit < 1 || body_limit > 1048576 {
+        return Result<Request, Error>::Err(Error::InvalidLimit);
+    }
+    let protocol = match scheme {
+        Scheme::Http => "http",
+        Scheme::Https => "https"
+    };
+    let url = protocol + "://" + host + ":" + to_string(port) + target;
+    return Result<Request, Error>::Ok(Request(url: url, timeout_ms: timeout_ms,
+        body_limit: body_limit, method: Method::Get, headers: "", upload: ""));
+}
+pub fn url(request: Request) -> String {
+    return request.url;
+}
+pub fn from_url(value: String, timeout_ms: Int, body_limit: Int) -> Result<Request, Error> {
+    let size = str_len(value);
+    if size < 8 || size > 4096 {
+        return Result<Request, Error>::Err(Error::InvalidEndpoint);
+    }
+    var start = 7;
+    var scheme = Scheme::Http;
+    var port = 80;
+    if str_slice(value, 0, 7) != "http://" {
+        if size < 9 || str_slice(value, 0, 8) != "https://" {
+            return Result<Request, Error>::Err(Error::InvalidEndpoint);
+        }
+        start = 8;
+        scheme = Scheme::Https;
+        port = 443;
+    }
+    var end = start;
+    while end < size && str_byte(value, end) != 47 && str_byte(value, end) != 63 {
+        end = end + 1;
+    }
+    var colon = start;
+    while colon < end && str_byte(value, colon) != 58 {
+        colon = colon + 1;
+    }
+    let host = str_slice(value, start, colon);
+    if colon < end {
+        if end - colon < 2 || end - colon > 6 {
+            return Result<Request, Error>::Err(Error::InvalidEndpoint);
+        }
+        port = 0;
+        for i in colon + 1 .. end {
+            let byte = str_byte(value, i);
+            if byte < 48 || byte > 57 {
+                return Result<Request, Error>::Err(Error::InvalidEndpoint);
+            }
+            port = port * 10 + byte - 48;
+        }
+    }
+    var target = "/";
+    if end < size {
+        target = str_slice(value, end, size);
+        if str_byte(value, end) == 63 {
+            target = "/" + target;
+        }
+    }
+    return get(scheme, host, port, target, timeout_ms, body_limit);
+}
+pub fn with_method(request: Request, method: Method, body: text::Bytes) -> Result<Request, Error> {
+    if str_len(body.data) > 1048576 {
+        return Result<Request, Error>::Err(Error::InvalidLimit);
+    }
+    let empty = match method {
+        Method::Get => true,
+        Method::Head => true,
+        Method::Post => false,
+        Method::Put => false,
+        Method::Delete => false
+    };
+    if empty && body.data != "" {
+        return Result<Request, Error>::Err(Error::InvalidBody);
+    }
+    var changed = request;
+    changed.method = method;
+    changed.upload = body.data;
+    return Result<Request, Error>::Ok(changed);
+}
+fn header_name(value: String) -> String {
+    if str_len(value) < 1 || str_len(value) > 64 {
+        return "";
+    }
+    var name = "";
+    for i in 0 .. str_len(value) {
+        var byte = str_byte(value, i);
+        if !alphanumeric(byte) && byte != 45 {
+            return "";
+        }
+        if byte >= 65 && byte <= 90 {
+            byte = byte + 32;
+        }
+        name = name + str_from_byte(byte);
+    }
+    return name;
+}
+pub fn with_headers(request: Request, headers: List<Header>) -> Result<Request,
+    Error> effects { state } {
+    if list_len(headers) > 32 {
+        return Result<Request, Error>::Err(Error::InvalidLimit);
+    }
+    var encoded = "";
+    for i in 0 .. list_len(headers) {
+        let item = list_get(headers, i);
+        let name = header_name(item.name);
+        if name == "" || name == "host" || name == "content-length" || name == "transfer-encoding"
+            || name == "connection" || name == "expect" || name == "upgrade" || name
+            == "authorization" || name == "proxy-authorization" || name == "cookie" {
+            return Result<Request, Error>::Err(Error::InvalidHeaders);
+        }
+        for j in 0 .. i {
+            if name == header_name(list_get(headers, j).name) {
+                return Result<Request, Error>::Err(Error::InvalidHeaders);
+            }
+        }
+        if str_len(item.value) > 1024 {
+            return Result<Request, Error>::Err(Error::InvalidLimit);
+        }
+        for j in 0 .. str_len(item.value) {
+            let byte = str_byte(item.value, j);
+            if byte < 32 || byte > 126 {
+                return Result<Request, Error>::Err(Error::InvalidHeaders);
+            }
+        }
+        if str_len(encoded) + str_len(name) + str_len(item.value) + 3 > 8192 {
+            return Result<Request, Error>::Err(Error::InvalidLimit);
+        }
+        encoded = encoded + name + ": " + item.value + "\n";
+    }
+    var changed = request;
+    changed.headers = encoded;
+    return Result<Request, Error>::Ok(changed);
+}
+fn absolute(value: path::Path) -> Bool {
+    return match path::absolute(value) {
+        Result::Ok(yes) => yes,
+        Result::Err(_) => false
+    };
+}
+pub fn curl(executable: path::Path, ca_file: Option<path::Path>) -> Result<Curl, Error> {
+    if !absolute(executable) {
+        return Result<Curl, Error>::Err(Error::InvalidTransport);
+    }
+    match ca_file {
+        Option::Some(file) => {
+            if !absolute(file) {
+                return Result<Curl, Error>::Err(Error::InvalidTransport);
+            }
+        }
+        Option::None => {}
+    }
+    return Result<Curl, Error>::Ok(Curl(executable: executable, ca_file: ca_file));
+}
+pub fn scripted(result_value: Result<Response, Error>) -> Scripted {
+    return Scripted(result_value: result_value);
+}
+fn exchange(source: Source) -> Exchange effects { state } {
+    let closed = list_new<Bool>();
+    list_push(closed, false);
+    return Exchange(source: source, closed: closed);
+}
+impl Transport for Scripted {
+    fn start(self: Scripted, scheduler: loop::Loop<process::Completed>, request: Request,
+        directory: path::Path) -> Result<Exchange, Error> effects { state } {
+        return Result<Exchange, Error>::Ok(exchange(Source::Scripted(self.result_value)));
+    }
+}
+fn timeout_text(ms: Int) -> String {
+    let digits = to_string(1000 + ms % 1000);
+    return to_string(ms / 1000) + "." + str_slice(digits, 1, 4);
+}
+fn arguments(transport: Curl, request: Request, files: Files) -> List<String> effects { state } {
+    let args = list_new<String>();
+    list_push(args, transport.executable.value);
+    list_push(args, "--disable");
+    list_push(args, "--silent");
+    list_push(args, "--show-error");
+    list_push(args, "--globoff");
+    list_push(args, "--path-as-is");
+    list_push(args, "--no-ssl-auto-client-cert");
+    list_push(args, "--noproxy");
+    list_push(args, "*");
+    list_push(args, "--proto");
+    list_push(args, "=http,https");
+    list_push(args, "--max-time");
+    list_push(args, timeout_text(request.timeout_ms));
+    let head = match request.method {
+        Method::Head => true,
+        Method::Get => false,
+        Method::Post => false,
+        Method::Put => false,
+        Method::Delete => false
+    };
+    if head {
+        list_push(args, "--head");
+    } else {
+        list_push(args, "--max-filesize");
+        list_push(args, to_string(request.body_limit));
+        list_push(args, "--request");
+        list_push(args, match request.method {
+            Method::Get => "GET",
+            Method::Head => "HEAD",
+            Method::Post => "POST",
+            Method::Put => "PUT",
+            Method::Delete => "DELETE"
+        });
+    }
+    var start = 0;
+    var content_type = false;
+    for i in 0 .. str_len(request.headers) {
+        if str_byte(request.headers, i) == 10 {
+            var header = str_slice(request.headers, start, i);
+            if str_len(header) >= 13 && str_slice(header, 0, 13) == "content-type:" {
+                content_type = true;
+            }
+            if str_len(header) >= 2 && str_slice(header, str_len(header) - 2, str_len(header))
+                == ": " {
+                header = str_slice(header, 0, str_len(header) - 2) + ";";
+            }
+            list_push(args, "--header");
+            list_push(args, header);
+            start = i + 1;
+        }
+    }
+    let upload = match request.method {
+        Method::Get => false,
+        Method::Head => false,
+        Method::Post => true,
+        Method::Put => true,
+        Method::Delete => true
+    };
+    if upload {
+        list_push(args, "--header");
+        list_push(args, "Expect:");
+        if !content_type {
+            list_push(args, "--header");
+            list_push(args, "Content-Type: application/octet-stream");
+        }
+        list_push(args, "--data-binary");
+        list_push(args, "@" + files.upload);
+    }
+    list_push(args, "--dump-header");
+    list_push(args, files.headers);
+    list_push(args, "--output");
+    list_push(args, files.body);
+    list_push(args, "--write-out");
+    list_push(args, "%{http_code}");
+    match transport.ca_file {
+        Option::None => {}
+        Option::Some(file) => {
+            list_push(args, "--cacert");
+            list_push(args, file.value);
+        }
+    }
+    list_push(args, "--url");
+    list_push(args, request.url);
+    return args;
+}
+impl Transport for Curl {
+    fn start(self: Curl, scheduler: loop::Loop<process::Completed>, request: Request,
+        directory: path::Path) -> Result<Exchange, Error> effects { io, state } {
+        if !absolute(directory) {
+            return Result<Exchange, Error>::Err(Error::InvalidTransport);
+        }
+        match temp_dir(directory.value) {
+            StringResult::Err(message) => {
+                return Result<Exchange, Error>::Err(Error::Storage(message));
+            }
+            StringResult::Ok(base) => {
+                let files = Files(directory: base, status: base + "/status", errors: base
+                    + "/errors", headers: base + "/headers", body: base + "/body", upload: base
+                    + "/upload");
+                let upload = match request.method {
+                    Method::Get => false,
+                    Method::Head => false,
+                    Method::Post => true,
+                    Method::Put => true,
+                    Method::Delete => true
+                };
+                if upload {
+                    match write_file(files.upload, request.upload) {
+                        WriteResult::Ok => {}
+                        WriteResult::Err(message) => {
+                            let removed = remove_owned(files.upload)?;
+                            match remove_dir(base) {
+                                WriteResult::Ok => {}, WriteResult::Err(error) => {
+                                    return Result<Exchange, Error>::Err(Error::Storage(error));
+                                }
+                            }
+                            return Result<Exchange, Error>::Err(Error::Storage(message));
+                        }
+                    }
+                }
+                match process::schedule(scheduler, arguments(self, request, files), path::Path(
+                    value: base), path::Path(value: files.status), path::Path(value: files.errors),
+                    request.timeout_ms) {
+                    Result::Ok(task) => {
+                        let head = match request.method {
+                            Method::Head => true,
+                            Method::Get => false,
+                            Method::Post => false,
+                            Method::Put => false,
+                            Method::Delete => false
+                        };
+                        let work = Work(task: task, files: files, body_limit: request.body_limit,
+                            head: head);
+                        return Result<Exchange, Error>::Ok(exchange(Source::Process(work)));
+                    }
+                    Result::Err(error) => {
+                        let removed = remove_owned(files.upload)?;
+                        match remove_dir(base) {
+                            WriteResult::Err(message) => {
+                                return Result<Exchange, Error>::Err(Error::Storage(message));
+                            }
+                            WriteResult::Ok => {
+                                return Result<Exchange, Error>::Err(Error::Schedule(error));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+pub fn cancel(request: Exchange) -> Bool effects { state } {
+    if list_get(request.closed, 0) {
+        return false;
+    }
+    return match request.source {
+        Source::Process(work) => loop::cancel(work.task),
+        Source::Scripted(_) => false
+    };
+}
+pub fn pending(request: Exchange) -> Bool effects { state } {
+    return match request.source {
+        Source::Scripted(_) => false,
+        Source::Process(work) => match loop::outcome(work.task) {
+            Option::None => true,
+            Option::Some(_) => false
+        }
+    };
+}
+fn exit_error(code: Int) -> Error {
+    if code == 5 || code == 6 || code == 7 {
+        return Error::Connect(code);
+    }
+    if code == 28 {
+        return Error::TimedOut;
+    }
+    if code == 63 {
+        return Error::Limit;
+    }
+    if code == 35 || code == 51 || code == 58 || code == 59 || code == 60 || code == 77 || code
+        == 83 || code == 90 || code == 91 {
+        return Error::Tls(code);
+    }
+    return Error::Transfer(code);
+}
+fn read(path_value: String, limit: Int) -> Result<String, Error> effects { io } {
+    return match read_file_bounded(path_value, limit) {
+        ReadResult::Ok(bytes) => Result<String, Error>::Ok(bytes),
+        ReadResult::Limit => Result<String, Error>::Err(Error::Limit),
+        ReadResult::Err(message) => Result<String, Error>::Err(Error::Storage(message))
+    };
+}
+fn response(work: Work, code: Int) -> Result<Response, Error> effects { io } {
+    if code != 0 {
+        return Result<Response, Error>::Err(exit_error(code));
+    }
+    let status = read(work.files.status, 3)?;
+    if str_len(status) != 3 {
+        return Result<Response, Error>::Err(Error::Protocol);
+    }
+    match parse_int(status) {
+        IntResult::Err(_) => {
+            return Result<Response, Error>::Err(Error::Protocol);
+        }
+        IntResult::Ok(number) => {
+            if number < 100 || number > 599 {
+                return Result<Response, Error>::Err(Error::Protocol);
+            }
+            let headers = read(work.files.headers, 32768)?;
+            var body = "";
+            if !work.head {
+                body = read(work.files.body, work.body_limit)?;
+            }
+            return Result<Response, Error>::Ok(Response(status: number, headers: text::Bytes(
+                data: headers), body: text::Bytes(data: body)));
+        }
+    }
+}
+fn ready(value: Result<Response, Error>) -> Result<Option<Response>, Error> {
+    return match value {
+        Result::Ok(found) => Result<Option<Response>, Error>::Ok(Option<Response>::Some(found)),
+        Result::Err(error) => Result<Option<Response>, Error>::Err(error)
+    };
+}
+pub fn poll(request: Exchange) -> Result<Option<Response>, Error> effects { state, io } {
+    if list_get(request.closed, 0) {
+        return Result<Option<Response>, Error>::Err(Error::Closed);
+    }
+    match request.source {
+        Source::Scripted(value) => {
+            return ready(value);
+        }
+        Source::Process(work) => {
+            match loop::outcome(work.task) {
+                Option::None => {
+                    return Result<Option<Response>, Error>::Ok(Option<Response>::None);
+                }
+                Option::Some(value) => {
+                    return match value {
+                        loop::Outcome::Done(done) => ready(response(work, done.code)),
+                        loop::Outcome::Cancelled => Result<Option<Response>, Error>::Err(
+                            Error::Cancelled),
+                        loop::Outcome::TimedOut => Result<Option<Response>, Error>::Err(
+                            Error::TimedOut),
+                        loop::Outcome::Failed(message) => Result<Option<Response>, Error>::Err(
+                            Error::Storage(message))
+                    };
+                }
+            }
+        }
+    }
+}
+fn remove_owned(file: String) -> Result<Bool, Error> effects { io } {
+    match file_identity(file) {
+        StringResult::Err(message) => {
+            return Result<Bool, Error>::Err(Error::Storage(message));
+        }
+        StringResult::Ok(identity) => {
+            if identity == "" {
+                return Result<Bool, Error>::Ok(true);
+            }
+        }
+    }
+    return match remove_file(file) {
+        WriteResult::Ok => Result<Bool, Error>::Ok(true),
+        WriteResult::Err(message) => Result<Bool, Error>::Err(Error::Storage(message))
+    };
+}
+pub fn release(request: Exchange) -> Result<Bool, Error> effects { state, io } {
+    if list_get(request.closed, 0) {
+        return Result<Bool, Error>::Ok(true);
+    }
+    match request.source {
+        Source::Scripted(_) => {}
+        Source::Process(work) => {
+            match loop::outcome(work.task) {
+                Option::None => {
+                    return Result<Bool, Error>::Err(Error::Pending);
+                }
+                Option::Some(_) => {}
+            }
+            let status = remove_owned(work.files.status)?;
+            let errors = remove_owned(work.files.errors)?;
+            let headers = remove_owned(work.files.headers)?;
+            let body = remove_owned(work.files.body)?;
+            let upload = remove_owned(work.files.upload)?;
+            match remove_dir(work.files.directory) {
+                WriteResult::Err(message) => {
+                    return Result<Bool, Error>::Err(Error::Storage(message));
+                }
+                WriteResult::Ok => {}
+            }
+        }
+    }
+    list_set(request.closed, 0, true);
+    return Result<Bool, Error>::Ok(true);
+}

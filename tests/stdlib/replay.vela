@@ -1,0 +1,152 @@
+import "../../std/replay.vela" as replay;
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+import "../../std/process.vela" as process;
+import "../../std/services.vela" as services;
+import "../../std/text.vela" as text;
+fn required<T, E>(outcome: Result<T, E>, message: String) -> T {
+    match outcome {
+        Result::Ok(value) => {
+            return value;
+        }
+        Result::Err(_) => {
+            assert_true(false, message);
+        }
+    }
+    return required(outcome, message);
+}
+fn written(outcome: WriteResult) -> Unit {
+    match outcome {
+        WriteResult::Ok => {}
+        WriteResult::Err(error) => {
+            assert_true(false, error);
+        }
+    }
+}
+fn answer(value: replay::Answer) -> String {
+    return match value {
+        replay::Answer::Read(bytes) => match bytes {
+            Result::Ok(data) => data.data,
+            Result::Err(_) => "read failed"
+        },
+        replay::Answer::Publish(committed) => match committed {
+            Result::Ok(ok) => to_string(ok),
+            Result::Err(_) => "publish failed"
+        },
+        replay::Answer::Run(completed) => match completed {
+            Result::Ok(done) => to_string(done.code),
+            Result::Err(_) => "process failed"
+        },
+        replay::Answer::Now(observed) => match observed {
+            Result::Ok(value) => to_string(value),
+            Result::Err(_) => "clock failed"
+        },
+        replay::Answer::Entropy(observed) => match observed {
+            Result::Ok(value) => to_string(value),
+            Result::Err(_) => "entropy failed"
+        }
+    };
+}
+fn failure<T>(value: Result<T, replay::Failure>) -> String {
+    return match value {
+        Result::Ok(_) => "ok",
+        Result::Err(error) => match error {
+            replay::Failure::Full => "full",
+            replay::Failure::Busy => "busy",
+            replay::Failure::Mismatch(index, expected, actual) =>
+                f"mismatch:{index:d}:{expected:s}:{actual:s}",
+            replay::Failure::Extra(index) => f"extra:{index:d}",
+            replay::Failure::Missing(index) => f"missing:{index:d}"
+        }
+    };
+}
+fn session(trace: replay::Transcript, requests: List<replay::Request>,
+    expected: List<String>) -> Unit effects { state } {
+    let player = replay::start(trace);
+    for i in 0 .. list_len(requests) {
+        let actual = required(replay::next(player, list_get(requests, i)), "replay step");
+        assert_true(answer(actual) == list_get(expected, i), "exact replay");
+    }
+    assert_true(required(replay::finish(player), "finish"), "complete");
+    assert_true(failure(replay::next(player, replay::Request::Now)) == "extra:7", "extra step");
+    assert_true(failure(replay::finish(player)) == "extra:7", "extra is sticky");
+}
+fn main() -> Unit effects { io, state, process } {
+    var dir = "";
+    match temp_dir(".") {
+        StringResult::Ok(folder) => {
+            dir = folder;
+        }
+        StringResult::Err(error) => {
+            assert_true(false, error);
+        }
+    }
+    let file = path::Path(value: dir + "/record.txt");
+    let missing = path::Path(value: dir + "/missing.txt");
+    let readings = list_new<Int>();
+    list_push(readings, 91);
+    let outcomes = list_new<Result<process::Completed, process::Error>>();
+    list_push(outcomes, Result<process::Completed, process::Error>::Ok(process::Completed(
+        code: 7)));
+    let recorder = replay::recorder(dyn services::FileStore(services::os_files()),
+        dyn services::Processes(services::scripted_processes(outcomes)), dyn services::Clock(
+        services::scripted_clock(readings)), dyn services::Entropy(services::scripted_entropy(
+        readings)));
+    let argv = list_new<String>();
+    list_push(argv, "tool");
+    list_push(argv, "quoted Я");
+    let command = services::Command(argv: argv, cwd: path::Path(value: dir), stdout: path::Path(
+        value: dir + "/stdout"), stderr: path::Path(value: dir + "/stderr"), timeout_ms: 20);
+    let requests = list_new<replay::Request>();
+    list_push(requests, replay::Request::Publish(file, text::Bytes(data: "recorded")));
+    list_push(requests, replay::Request::Read(file, 64));
+    list_push(requests, replay::Request::Read(missing, 64));
+    list_push(requests, replay::Request::Run(command));
+    list_push(requests, replay::Request::Now);
+    list_push(requests, replay::Request::Entropy);
+    list_push(requests, replay::Request::Entropy);
+    let expected = list_new<String>();
+    list_push(expected, "true");
+    list_push(expected, "recorded");
+    list_push(expected, "read failed");
+    list_push(expected, "7");
+    list_push(expected, "91");
+    list_push(expected, "91");
+    list_push(expected, "entropy failed");
+    for i in 0 .. list_len(requests) {
+        let actual = required(replay::record(recorder, list_get(requests, i)), "record step");
+        assert_true(answer(actual) == list_get(expected, i), "exact recording");
+    }
+    let trace = replay::transcript(recorder);
+    let additional = required(replay::record(recorder, replay::Request::Now),
+        "append after snapshot");
+    assert_true(answer(additional) == "clock failed", "recording still usable");
+    written(write_file(file.value, "after recording"));
+    session(trace, requests, expected);
+    session(trace, requests, expected);
+    match read_file(file.value) {
+        StringResult::Ok(data) => {
+            assert_true(data == "after recording", "replay does not publish");
+        }
+        StringResult::Err(error) => {
+            assert_true(false, error);
+        }
+    }
+    let wrong = replay::start(trace);
+    assert_true(failure(replay::next(wrong, replay::Request::Now)) == "mismatch:0:publish:now",
+        "wrong order");
+    assert_true(failure(replay::finish(wrong)) == "mismatch:0:publish:now",
+        "wrong order is sticky");
+    let missing_step = replay::start(trace);
+    assert_true(failure(replay::finish(missing_step)) == "missing:0", "missing step");
+    let changed = replay::start(trace);
+    for i in 0 .. 3 {
+        assert_true(failure(replay::next(changed, list_get(requests, i))) == "ok", "prefix");
+    }
+    list_set(argv, 1, "different bytes");
+    assert_true(failure(replay::next(changed, replay::Request::Run(command)))
+        == "mismatch:3:run:run", "copied process arguments");
+    written(remove_file(file.value));
+    written(remove_dir(dir));
+    print("replay passed");
+}

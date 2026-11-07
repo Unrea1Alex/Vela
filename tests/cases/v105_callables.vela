@@ -1,0 +1,35 @@
+struct Counter { value: Int }
+impl Counter { fn read(self: Counter) -> Int { return self.value; } }
+fn identity<T>(x: T) -> T { return x; }
+fn increment(x: Int) -> Int { return x + 1; }
+fn apply(f: fn(Int) -> Int effects { io }, x: Int) -> Int effects { io } { return f(x); }
+fn make(x: Int) -> fn(Int) -> Int { return fn [x](n: Int) -> Int { return x + n; }; }
+fn cycle() -> fn(Int) -> Int effects { state } effects { state } {
+    let callbacks = list_new<fn(Int) -> Int effects { state }>();
+    let recurse = fn [callbacks](n: Int) -> Int effects { state } {
+        if n == 0 { return 0; }
+        return list_get(callbacks, 0)(n - 1) + 1;
+    };
+    list_push(callbacks, recurse);
+    return recurse;
+}
+fn main() -> Int effects { io, state } {
+    var number = 1;
+    let before = fn [number]() -> Int { return number; };
+    number = 9;
+    let values = list_new<Int>();
+    let collect = fn [values](x: Int) -> Unit effects { state } { list_push(values, x); };
+    collect(number);
+    print(before());
+    print(list_get(values, 0));
+    print(apply(increment, 6));
+    let typed = identity<Int>;
+    print(typed(5));
+    let read = Counter::read;
+    print(read(Counter(value: 8)));
+    print(make(20)(22));
+    print((fn [](x: Int) -> Int { return x + 1; })(1));
+    let recursive = cycle();
+    print(recursive(10));
+    return 0;
+}

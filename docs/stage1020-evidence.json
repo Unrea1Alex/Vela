@@ -1,0 +1,14 @@
+{
+  "stage": "1.0.2",
+  "version": "1.0.0-rc.1",
+  "native": 1212,
+  "failed": 0,
+  "skipped": 0,
+  "compiler_generations": 3,
+  "c_fixed_point": true,
+  "bundler_fixed_point": true,
+  "contract_files": 84,
+  "negative_checks": 2,
+  "mcp_setup": "passed",
+  "compiler_sha256": "c2b401b07f82af2ba4584764404b74c432cd9f97b6aa0823e64187a39abd8151"
+}

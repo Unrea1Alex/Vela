@@ -1,0 +1,81 @@
+import "route.vela" as route;
+import "../../std/json.vela" as json;
+import "../../std/result.vela" as result;
+import "../../std/lines.vela" as lines;
+import "../../std/text.vela" as text;
+
+pub struct Audit {
+    report: text::Text,
+    routes: Int,
+    jumps: Int
+}
+
+pub fn explain<T, E>(outcome: Result<T, E>, message: String) -> Result<T, String> {
+    return result::explain(outcome, message);
+}
+
+fn append(builder: text::Builder, value: String) -> Result<Bool, String> effects { state } {
+    return explain(text::append(builder, text::Bytes(data: value)), "Report byte limit exceeded");
+}
+
+fn fixed(value: Float64) -> Result<String, String> {
+    return match float_to_fixed(value, 2) {
+        StringResult::Ok(s) => Result<String, String>::Ok(s),
+        StringResult::Err(message) => Result<String, String>::Err(message)
+    };
+}
+
+pub fn append_row(output: text::Builder, scratch: text::Builder, record: route::Route) -> Result<Int, String> effects { state } {
+    scope {
+        defer { text::reset(scratch); }
+        let stats = route::summarize(record)?;
+        let length = fixed(stats.length)?;
+        let longest = fixed(stats.max_step)?;
+        let prefix = append(scratch, record.name + "\t" + to_string(list_len(record.points)) + "\t")?;
+        let metrics = append(scratch, length + "\t" + longest + "\t" + to_string(stats.jumps) + "\n")?;
+        let saved = append(output, text::finish_bytes(scratch).data)?;
+        return Result<Int, String>::Ok(stats.jumps);
+    }
+}
+
+fn with_line<T>(outcome: Result<T, String>, line: Int) -> Result<T, String> {
+    return result::map_error(outcome, fn [line] (cause: String) -> String {
+        return "line " + to_string(line) + ": " + cause;
+    });
+}
+
+pub fn run(input: String) -> Result<Audit, String> effects { state } {
+    if str_len(input) > 2097152 {
+        return Result<Audit, String>::Err("Input exceeds 2 MiB");
+    }
+    return run_source(lines::from_string(input), 8192);
+}
+pub fn run_source<effect E>(pull: fn(Int) -> Result<String, String> effects E, chunk_bytes: Int) -> Result<Audit, String> effects { state, E } {
+    let source = lines::reader(2097152, 65536, chunk_bytes)?;
+    let output = explain(text::builder(1048576), "Cannot initialize report")?;
+    let scratch = explain(text::builder(256), "Cannot initialize row buffer")?;
+    let header = append(output, "name\tpoints\tlength_m\tmax_step_m\tjumps\n")?;
+    var routes = 0;
+    var jumps = 0;
+    while true {
+        var line = 0;
+        var raw = "";
+        match lines::next(source, pull)? {
+            Option::None => { break; }
+            Option::Some(value) => { line = value.number; raw = value.data; }
+        }
+        let trimmed = explain(text::trim(text::Text(data: raw)), "Cannot trim route line")?;
+        if trimmed.data == "" { continue; }
+        if routes == 4096 {
+            return Result<Audit, String>::Err("line " + to_string(line) + ": expected at most 4096 routes");
+        }
+        let record = with_line(route::parse(trimmed.data), line)?;
+        jumps = jumps + with_line(append_row(output, scratch, record), line)?;
+        routes = routes + 1;
+    }
+    if routes == 0 {
+        return Result<Audit, String>::Err("Expected at least one route");
+    }
+    let report = explain(text::finish_text(output), "Cannot finish UTF-8 report")?;
+    return Result<Audit, String>::Ok(Audit(report: report, routes: routes, jumps: jumps));
+}

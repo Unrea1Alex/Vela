@@ -1,0 +1,135 @@
+import "../../std/services.vela" as services;
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+import "../../std/process.vela" as process;
+import "../../std/text.vela" as text;
+
+fn required<T, E>(outcome: Result<T, E>, message: String) -> T {
+    match outcome {
+        Result::Ok(value) => { return value; }
+        Result::Err(_) => { assert_true(false, message); }
+    }
+    return required(outcome, message);
+}
+fn accepted(outcome: WriteResult) -> Unit {
+    match outcome {
+        WriteResult::Ok => {}
+        WriteResult::Err(error) => { assert_true(false, error); }
+    }
+}
+fn round_trip(store: dyn services::FileStore, file: path::Path) -> Unit effects { io, state } {
+    assert_true(required(store.publish(file, text::Bytes(data: "Vela")), "publish"), "committed");
+    let bytes = required(store.read(file, 4), "read");
+    assert_true(bytes.data == "Vela", "exact file contents");
+    match store.read(file, 3) {
+        Result::Err(error) => {
+            match error {
+                fs::Error::Limit(limit) => { assert_true(limit == 3, "read limit"); }
+                fs::Error::InvalidPath(_) => { assert_true(false, "unexpected path error"); }
+                fs::Error::Encoding(_) => { assert_true(false, "unexpected encoding error"); }
+                fs::Error::Io(_, _) => { assert_true(false, "unexpected I/O error"); }
+                fs::Error::Cleanup(_, _) => { assert_true(false, "unexpected cleanup error"); }
+            }
+        }
+        Result::Ok(_) => { assert_true(false, "oversized input"); }
+    }
+}
+fn stream(file: String) -> Unit effects { io, state } {
+    match stream_open(file, 3) {
+        StreamResult::Limit => {}
+        StreamResult::Ok(handle) => { accepted(stream_close(handle)); assert_true(false, "open limit"); }
+        StreamResult::Err(error) => { assert_true(false, error); }
+    }
+    match stream_open(file, 4) {
+        StreamResult::Err(error) => { assert_true(false, error); }
+        StreamResult::Limit => { assert_true(false, "exact size"); }
+        StreamResult::Ok(handle) => {
+            let alias = handle;
+            match stream_next(handle, 2) {
+                ReadResult::Ok(bytes) => { assert_true(bytes == "Ve", "first chunk"); }
+                ReadResult::Limit => { assert_true(false, "first chunk limit"); }
+                ReadResult::Err(error) => { assert_true(false, error); }
+            }
+            match stream_next(alias, 2) {
+                ReadResult::Ok(bytes) => { assert_true(bytes == "la", "shared position"); }
+                ReadResult::Limit => { assert_true(false, "second chunk limit"); }
+                ReadResult::Err(error) => { assert_true(false, error); }
+            }
+            accepted(stream_close(alias));
+            match stream_close(handle) {
+                WriteResult::Ok => { assert_true(false, "repeated close"); }
+                WriteResult::Err(_) => {}
+            }
+            match stream_next(handle, 1) {
+                ReadResult::Ok(_) => { assert_true(false, "closed stream"); }
+                ReadResult::Limit => { assert_true(false, "closed stream limit"); }
+                ReadResult::Err(_) => {}
+            }
+        }
+    }
+}
+fn run(runner: dyn services::Processes, command: services::Command) -> Int effects { io, process, state } {
+    return required(runner.run(command), "process result").code;
+}
+fn sample(clock: dyn services::Clock, entropy: dyn services::Entropy) -> Int effects { io, state } {
+    let now = required(clock.now_ms(), "clock result");
+    let value = required(entropy.next_u32(), "entropy result");
+    assert_true(value >= 0 && value <= 4294967295, "u32 range");
+    return now;
+}
+fn main() -> Unit effects { args, io, process, state } {
+    var dir = "";
+    match temp_dir(".") {
+        StringResult::Ok(folder) => { dir = folder; }
+        StringResult::Err(error) => { assert_true(false, error); }
+    }
+    let file = path::Path(value: dir + "/data.txt");
+    let fake_file = path::Path(value: dir + "/fake.txt");
+    round_trip(dyn services::FileStore(services::memory_files()), fake_file);
+    match file_identity(fake_file.value) {
+        StringResult::Ok(identity) => { assert_true(identity == "", "fake does not touch OS"); }
+        StringResult::Err(error) => { assert_true(false, error); }
+    }
+    round_trip(dyn services::FileStore(services::os_files()), file);
+    stream(file.value);
+    let argv = list_new<String>();
+    match arg(0) {
+        StringResult::Ok(child) => { list_push(argv, child); }
+        StringResult::Err(error) => { assert_true(false, error); }
+    }
+    list_push(argv, "echo");
+    list_push(argv, "service child");
+    let command = services::Command(argv: argv, cwd: path::Path(value: dir), stdout: path::Path(value: dir + "/stdout"), stderr: path::Path(value: dir + "/stderr"), timeout_ms: 3000);
+    let outcomes = list_new<Result<process::Completed, process::Error>>();
+    list_push(outcomes, Result<process::Completed, process::Error>::Ok(process::Completed(code: 7)));
+    assert_true(run(dyn services::Processes(services::scripted_processes(outcomes)), command) == 7, "scripted process");
+    match file_identity(command.stdout.value) {
+        StringResult::Ok(identity) => { assert_true(identity == "", "fake does not create process output"); }
+        StringResult::Err(error) => { assert_true(false, error); }
+    }
+    assert_true(run(dyn services::Processes(services::os_processes()), command) == 17, "OS process");
+    let values = list_new<Int>();
+    list_push(values, 12345);
+    let clock = dyn services::Clock(services::scripted_clock(values));
+    let entropy = dyn services::Entropy(services::scripted_entropy(values));
+    list_set(values, 0, 0);
+    assert_true(sample(clock, entropy) == 12345, "script snapshot");
+    match clock.now_ms() {
+        Result::Err(error) => {
+            match error {
+                services::ObservationError::Exhausted => {}
+                services::ObservationError::System(_) => { assert_true(false, "unexpected system error"); }
+                services::ObservationError::InvalidEntropy(_) => { assert_true(false, "unexpected entropy error"); }
+            }
+        }
+        Result::Ok(_) => { assert_true(false, "clock must be exhausted"); }
+    }
+    assert_true(sample(dyn services::Clock(services::os_clock()), dyn services::Entropy(services::os_entropy())) > 0, "OS clock");
+    assert_true(services::random_step(1).value == 48271 && services::random_step(48271).value == 182605794, "PRNG sequence");
+    accepted(remove_file(command.stdout.value));
+    accepted(remove_file(command.stderr.value));
+    accepted(remove_file(file.value));
+    accepted(remove_file(dir + "/child.txt"));
+    accepted(remove_dir(dir));
+    print("services passed");
+}

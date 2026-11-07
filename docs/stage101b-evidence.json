@@ -1,0 +1,20 @@
+{
+  "stage": "1.0.1b",
+  "compiler_version": "1.0.0-dev.2",
+  "compiler_sha256": "74cf101b5cf873bff94762620ba497d39b7c021779baec6fd0cf45bfbd5a7ac0",
+  "native_passed": 1185,
+  "native_failed": 0,
+  "native_skipped": 0,
+  "compiler_generations": 3,
+  "c_fixed_point": true,
+  "bundler_fixed_point": true,
+  "cache_observability": 9,
+  "incremental_regression": 9,
+  "pulsedeck_tooling": 4,
+  "mcp_setup_and_handshake": "passed including task_group/async_io",
+  "documentation_links": 349,
+  "platform": "Windows x64 MSVC",
+  "unperformed": [
+    "Linux runtime cache matrix"
+  ]
+}

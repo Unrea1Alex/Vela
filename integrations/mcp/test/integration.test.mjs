@@ -32,9 +32,72 @@ test('MCP native equivalence, bounds, lifecycle and 1000-request gate', {timeout
  await client.connect(transport);
  try {
   const tools=await client.listTools();
-  check('five tools with input/output schemas',tools.tools.length===5&&tools.tools.every(t=>t.inputSchema&&t.outputSchema));
+  check('seven tools with input/output schemas',tools.tools.length===7&&tools.tools.every(t=>t.inputSchema&&t.outputSchema));
   const context=await call('vela_get_context');
   check('context fingerprint',context.status==='ok'&&context.compiler_id.length===64&&context.data.quickstart.includes('list_new'));
+  const compilerVersion=execFileSync(path.join(root,'bin/velac.exe'),['--version'],{encoding:'utf8'}).split(' ')[1];
+  check('context reports pinned compiler version',context.data.version===compilerVersion);
+  if(compilerVersion.startsWith('0.10.')){
+    await fs.writeFile(path.join(workspace,'counter.vela'),'pub opaque struct Counter { count: Int }\npub fn make() -> Counter { return Counter(count: 7); }\n');
+    const opaque='import "counter.vela" as api;\nfn main() -> Int { let x = api::make(); return 0; }\n';
+    await fs.writeFile(path.join(workspace,'opaque.vela'),opaque);
+    const index=await call('vela_query',{path:'opaque.vela'});
+    check('opaque source index',index.status==='ok'&&index.data.native.definitions.some(d=>d.name==='Counter'&&d.opaque===true)&&index.data.native.definitions.some(d=>d.name==='count'&&d.visibility==='module'));
+    const forbidden=await call('vela_check',{path:'opaque.vela',text:'import "counter.vela" as api;\nfn main() -> Int { let x = api::Counter(count: 7); return 0; }\n'});
+    check('opaque constructor rejected through MCP',forbidden.status==='rejected'&&forbidden.data.native.diagnostics[0].code==='E232'&&forbidden.data.native.diagnostics[0].details.reason==='opaque_constructor');
+  }
+  if(/^0\.10\.0(?:-dev\.(?:[3-9]|\d{2,}))?$/.test(compilerVersion)){
+    const library='pub opaque struct Box<T> { value: T }\nimpl<T> Box<T> { pub fn get(self: Box<T>) -> T { return self.value; } }\npub fn box<T>(value:T) -> Box<T> { return Box<T>(value:value); }\n';
+    const app='import "box.vela" as api;\nfn main() -> Int { let x = api::box(21); return x.get() + api::Box<Int>::get(x); }\n';
+    await fs.writeFile(path.join(workspace,'box.vela'),library);
+    await fs.writeFile(path.join(workspace,'methods.vela'),app);
+    const index=await call('vela_query',{path:'methods.vela'});
+    assert.equal(index.status,'ok');
+    const method=index.data.native.definitions.find(d=>d.method===true&&d.name==='get');
+    check('both method call forms resolve to one declaration',!!method&&index.data.native.references.filter(r=>r.id===method.id&&r.role==='call').length===2);
+    const preview=await call('vela_plan',{path:'methods.vela',kind:'rename',snapshot_id:index.snapshot_id,revision:index.data.native.revision,
+      document:method.range.document,byte:method.range.start.byte,new_name:'fetch'});
+    check('method rename preview covers declaration and both calls',preview.status==='ok'&&preview.data.native.changes.reduce((n,d)=>n+d.edits.length,0)===3&&await fs.readFile(path.join(workspace,'methods.vela'),'utf8')===app);
+  }
+  if(/^0\.10\.0(?:-dev\.(?:[4-9]|\d{2,}))?$/.test(compilerVersion)){
+    const source='interface Reader { fn get(self: Self) -> Int effects { io }; }\nstruct One {}\nimpl Reader for One { fn get(self: One) -> Int { return 1; } }\nfn fetch<T: Reader>(x: T) -> Int effects { io } { return Reader::get(x); }\nfn main() -> Int effects { io } { return fetch(One()); }\n';
+    await fs.writeFile(path.join(workspace,'interface.vela'),source);
+    const query=await call('vela_query',{path:'interface.vela'});
+    assert.equal(query.status,'ok');
+    const declaration=query.data.native.definitions.find(d=>d.name==='fetch');
+    const reference=query.data.native.references.find(r=>r.id===declaration.id&&r.role==='call');
+    check('interface template and concrete call report distinct analysis status',declaration.analysis_status==='checked_constraints'&&reference.analysis_status==='checked_instance');
+    const operation=query.data.native.definitions.find(d=>d.name==='get'&&!d.analysis_status);
+    const plan=await call('vela_plan',{path:'interface.vela',kind:'rename',snapshot_id:query.snapshot_id,
+      revision:query.data.native.revision,document:operation.range.document,byte:operation.range.start.byte,new_name:'lookup'});
+    check('interface operation rename includes implementation and call',plan.status==='ok'&&plan.data.native.changes[0].edits.length===3);
+  }
+  if(/^0\.10\.0(?:-dev\.(?:[5-9]|\d{2,}))?$/.test(compilerVersion)){
+    const file='callables.vela';
+    const source='fn apply<T, effect E>(f: fn(T) -> T effects E, x: T) -> T effects E { return f(x); }\nfn main() -> Int { let offset = 2; return apply(fn [offset](x: Int) -> Int { return x + offset; }, 40); }\n';
+    await fs.writeFile(path.join(workspace,file),source);
+    const query=await call('vela_query',{path:file});
+    check('effect-polymorphic callable checked through MCP',query.status==='ok'&&query.data.native.definitions.some(d=>d.name==='apply'&&d.analysis_status==='checked_constraints'));
+    const capture=query.data.native.definitions.find(d=>d.name==='offset');
+    const rename=await call('vela_plan',{path:file,kind:'rename',snapshot_id:query.snapshot_id,
+      revision:query.data.native.revision,document:capture.range.document,byte:capture.range.start.byte,new_name:'delta'});
+    check('closure capture rename covers declaration, capture list and body',rename.status==='ok'&&rename.data.native.changes[0].edits.length===3);
+    const fmt=await call('vela_format',{path:file});
+    check('closure format round trip',(await call('vela_check',{path:file,text:fmt.data.text})).status==='ok');
+    const rejected=await call('vela_check',{path:file,text:source.replace('fn [offset]','fn []')});
+    check('missing explicit capture reported through MCP',rejected.status==='rejected'&&rejected.data.native.diagnostics[0].code==='E238'&&rejected.data.native.diagnostics[0].details.reason==='capture_missing');
+  }
+  if(/^0\.10\.0(?:-dev\.(?:[6-9]|\d{2,}))?$/.test(compilerVersion)){
+    const file='dynamic.vela';
+    const source='interface Reader { fn get(self: Self) -> Int; }\nstruct One {}\nimpl Reader for One { fn get(self: One) -> Int { return 42; } }\nfn main() -> Int { let reader = dyn Reader(One()); return reader.get() + Reader::get(reader); }\n';
+    await fs.writeFile(path.join(workspace,file),source);
+    const query=await call('vela_query',{path:file});
+    assert.equal(query.status,'ok');
+    const operation=query.data.native.definitions.find(d=>d.name==='get'&&!d.analysis_status);
+    check('both dynamic call forms identify the interface operation',query.data.native.references.filter(r=>r.role==='call'&&r.id===operation.id).length===2);
+    const rejected=await call('vela_check',{path:file,text:source.replace('dyn Reader(One())','dyn Reader(dyn Reader(One()))')});
+    check('explicit repacking rejected through MCP',rejected.status==='rejected'&&rejected.data.native.diagnostics[0].code==='E237'&&rejected.data.native.diagnostics[0].details.reason==='dynamic_repack');
+  }
   const resources=await client.listResources();
   check('version-matched help resources',resources.resources.length===11 && resources.resources.some(r=>r.uri==='vela://help/idioms') && resources.resources.some(r=>r.uri==='vela://help/numbers') && resources.resources.some(r=>r.uri==='vela://help/stdlib') && resources.resources.some(r=>r.uri==='vela://help/testing') && resources.resources.some(r=>r.uri==='vela://help/ffi'));
   const resource=await client.readResource({uri:'vela://help/builtins'});
@@ -55,6 +118,24 @@ test('MCP native equivalence, bounds, lifecycle and 1000-request gate', {timeout
   check('manifest overlay rejected',invalidOverlay.status==='invalid_input');
   const symbols=await call('vela_symbols',{path:'main.vela'});
   check('symbols include original source',symbols.status==='ok'&&symbols.data.native.functions[0].source===path.join(workspace,'main.vela'));
+  const semantic='fn inc(n:Int)->Int{return n+1;}\nfn main()->Int{let tag="🧭";return inc(41);}\n';
+  await fs.writeFile(path.join(workspace,'main.vela'),semantic);
+  const focus={path:'main.vela',line:1,character:semantic.split('\n')[1].indexOf('inc')};
+  const query=await call('vela_query',{path:'main.vela',at:focus});
+  const cliQuery=JSON.parse(execFileSync(path.join(root,'bin/velac.exe'),['query',path.join(workspace,'main.vela'),
+    '--at',path.join(workspace,'main.vela'),String(focus.line),String(focus.character)],{encoding:'utf8'}));
+  assert.deepEqual(query.data.native,cliQuery);
+  check('native semantic CLI parity',query.status==='ok'&&query.data.native.references[0].type==='Int');
+  const request={path:'main.vela',kind:'rename',snapshot_id:query.snapshot_id,revision:query.data.native.revision,
+    document:0,byte:query.data.native.references[0].range.start.byte,new_name:'increment'};
+  const preview=await call('vela_plan',request);
+  check('rename preview validated without writes',preview.status==='ok'&&preview.data.native.changes[0].edits.length===2&&
+    await fs.readFile(path.join(workspace,'main.vela'),'utf8')===semantic);
+  const wrongRevision=await call('vela_plan',{...request,revision:'0'.repeat(64)});
+  check('native stale revision rejected',wrongRevision.status==='rejected'&&wrongRevision.data.native.diagnostics[0].code==='E231');
+  await fs.writeFile(path.join(workspace,'main.vela'),semantic.replace(/\n/g,'\r\n'));
+  check('raw snapshot changes invalidate plans',(await call('vela_plan',request)).status==='source_changed');
+  await fs.writeFile(path.join(workspace,'main.vela'),source);
   for(const input of ['../secret.vela','C:/secret.vela','@unknown','main.vela:stream']){
    check('reject path '+input,(await call('vela_check',{path:input})).status==='invalid_input');
   }

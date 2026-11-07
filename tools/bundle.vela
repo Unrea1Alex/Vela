@@ -1,4 +1,4 @@
-// This bootstrap tool deliberately uses the 0.2 subset, so the frozen seed can build it.
+// This tool uses the bootstrap subset and the recovery seed's SHA-256 builtin.
 fn value(r: StringResult) -> String effects { io, process } {
     match r {
         StringResult::Ok(s) => {
@@ -78,7 +78,7 @@ fn validate_catalog(data: String) -> Unit effects { state, io, process } {
     let rows = split(data, 10);
     let names = strings_new();
     var i = 0;
-    let abis = split("plain;located;int_result;int32_result;float_result;read_result;process_result;string_result;write_result;print;format;list_new;list_len;list_get;list_set;list_push;list_truncate;dict_new;dict_len;dict_has;dict_get;dict_get_or;dict_set;dict_remove", 59);
+    let abis = split("plain;located;noreturn;int_result;int32_result;float_result;read_result;stream_result;spawn_result;fiber_result;callback_result;process_result;string_result;write_result;print;format;list_new;list_len;list_get;list_set;list_push;list_truncate;dict_new;dict_len;dict_has;dict_get;dict_get_or;dict_set;dict_remove", 59);
     let allowed_effects = split("io;args;state;process", 59);
     while i < strings_len(rows) {
         var row = strings_get(rows, i);
@@ -164,7 +164,10 @@ fn main() -> Int effects { args, io, state, process } {
         }
         i = i + 1;
     }
-    let embedded = str_concat(str_concat(str_concat("pub fn builtin_source() -> String { return ", literal(catalog)), "; }\npub fn runtime_source() -> String { return "), str_concat(literal(value(read_file(str_concat(root, "/vela/backends/runtime.h")))), "; }\n"));
+    let runtime = value(read_file(str_concat(root, "/vela/backends/runtime.h")));
+    let fingerprint = sha256(str_concat(strings_join(parts, ""), str_concat(sha256(catalog), sha256(runtime))));
+    let embed_sources = str_concat(str_concat(str_concat("pub fn builtin_source() -> String { return ", literal(catalog)), "; }\npub fn runtime_source() -> String { return "), str_concat(literal(runtime), "; }\n"));
+    let embedded = str_concat(embed_sources, str_concat(str_concat("pub fn compiler_fingerprint() -> String { return \"", fingerprint), "\"; }\n"));
     strings_push(parts, compiler_body(embedded));
     let output = strings_join(parts, "");
     // Temporary sibling and replacement keep the existing bundle intact on errors.

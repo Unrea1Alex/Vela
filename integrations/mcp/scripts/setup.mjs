@@ -26,7 +26,7 @@ const skillSource=await fs.access(path.join(packageRoot,'agent/vela-app/SKILL.md
 const files=new Map([[configPath,data],
  [path.join(workspace,'vela-codex.mjs'),'import {start} from '+JSON.stringify(pathToFileURL(path.join(packageRoot,'scripts/connection.mjs')).href)+';\nawait start('+JSON.stringify(configPath)+');\n'],
  [path.join(workspace,'.agents/skills/vela-app/SKILL.md'),await fs.readFile(path.join(skillSource,'SKILL.md'),'utf8')]]);
-for(const name of ['text','path','collections','json','cli','config','fs','process','testing']) {
+for(const name of ['text','path','collections','json','cli','config','fs','process','testing','result','lines','services','replay','event_loop','tasks','task_group','async_io','gui','http','http_server']) {
  files.set(path.join(workspace,'vela-stdlib',name+'.vela'),await fs.readFile(path.join(toolchain,'std',name+'.vela'),'utf8'));
 }
 const section='[mcp_servers.vela]\ncommand = '+tomlString(process.execPath)+'\nargs = ['+tomlString(server)+', "--config", '+tomlString(configPath)+']\nrequired = true\nstartup_timeout_sec = '+(execution?180:30)+'\ntool_timeout_sec = '+(execution?180:40)+'\n';

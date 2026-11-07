@@ -11,8 +11,9 @@ APIs or infer semantics from another language. Keep a small compilable example.
 Use vela_check after edits. If context advertises execution, use vela_build,
 vela_test and vela_run with the issued artifact_id; otherwise use the host CLI
 when authorized. Add tests with explicit expected behavior and
-report exactly which checks ran. Preserve the process-region memory model and
+report exactly which checks ran. Use the documented tracing heap and
 explicit effects. Use a manifest and explicit imports for multi-file projects.
-An MCP artifact_id identifies the built executable. Generated files stay private
-to execution in 0.7.0; use authorized native CLI execution to save an output file.
+An MCP artifact_id identifies the built executable. For a generated file, request
+its name in vela_run outputs, write it to ../export/NAME inside the run, then read
+the output_id, check the hash and explicitly save it through the host.
 Roadmap proposals are not available syntax or library functions.

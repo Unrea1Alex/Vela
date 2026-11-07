@@ -1,0 +1,103 @@
+import "../../std/event_loop.vela" as loop;
+import "../../std/tasks.vela" as tasks;
+fn must<T>(value: Result<T, loop::Error>) -> T {
+    match value {
+        Result::Ok(found) => {
+            return found;
+        }
+        Result::Err(_) => {
+            assert_true(false, "task operation failed");
+        }
+    }
+    return must(value);
+}
+fn tick(scheduler: loop::Loop<String>, now: Int) -> Unit effects { io, process, state } {
+    let turn = must(loop::tick(scheduler, now));
+}
+async fn nested(trace: List<String>, label: String, delay: Int) -> String effects { state } {
+    let dynamic_text = "payload " + label;
+    defer {
+        list_push(trace, "inner " + label);
+    }
+    await sleep_ms(delay);
+    list_push(trace, "resumed " + label);
+    return dynamic_text;
+}
+struct Receiver {
+    payload: String
+}
+impl Receiver {
+    async fn evaluate(self: Receiver) -> String effects { state } {
+        await sleep_ms(2);
+        return self.payload;
+    }
+}
+fn submit_receiver(scheduler: loop::Loop<String>) -> loop::Task<String> effects { io, process,
+    state } {
+    let receiver = Receiver(payload: "retained " + to_string(42));
+    let action = async fn [ receiver ]() -> String effects { state } {
+        return await receiver.evaluate();
+    };
+    return must(tasks::submit(scheduler, 10, action));
+}
+fn submit(scheduler: loop::Loop<String>, trace: List<String>, label: String, delay: Int,
+    deadline: Int) -> loop::Task<String> effects { io, process, state } {
+    let action = async fn [ trace, label, delay ]() -> String effects { state } {
+        defer {
+            list_push(trace, "outer " + label);
+        }
+        let value = await nested(trace, label, delay);
+        return value + " done";
+    };
+    return must(tasks::submit(scheduler, deadline, action));
+}
+fn outcome(task: loop::Task<String>) -> String effects { state } {
+    return match loop::outcome(task) {
+        Option::None => "pending",
+        Option::Some(value) => match value {
+            loop::Outcome::Done(text) => text,
+            loop::Outcome::Failed(error) => error,
+            loop::Outcome::Cancelled => "cancelled",
+            loop::Outcome::TimedOut => "timed out"
+        }
+    };
+}
+fn main() -> Int effects { io, process, state } {
+    let scheduler = must(loop::create<String>(0));
+    let trace = list_new<String>();
+    let a = submit(scheduler, trace, "A", 5, 10);
+    tick(scheduler, 0);
+    if platform() != "windows" {
+        assert_true(outcome(a) == "typed tasks require Windows", "unsupported platform");
+        print("typed tasks unsupported");
+        return 0;
+    }
+    let b = submit(scheduler, trace, "B", 6, 10);
+    tick(scheduler, 0);
+    assert_true(outcome(a) == "pending" && outcome(b) == "pending", "both tasks suspended");
+    assert_true(loop::cancel(b), "cancel suspended B");
+    tick(scheduler, 1);
+    assert_true(outcome(b) == "cancelled", "cancellation published");
+    tick(scheduler, 5);
+    assert_true(outcome(a) == "payload A done", "retained stack and captures");
+    assert_true(list_len(trace) == 5, "cleanup count");
+    assert_true(list_get(trace, 0) == "inner B" && list_get(trace, 1) == "outer B" && list_get(
+        trace, 2) == "resumed A" && list_get(trace, 3) == "inner A" && list_get(trace, 4)
+        == "outer A", "LIFO unwind and ordinary return");
+    let c = submit(scheduler, trace, "C", 10, 2);
+    tick(scheduler, 5);
+    tick(scheduler, 7);
+    assert_true(outcome(c) == "timed out", "deadline unwinds");
+    assert_true(list_get(trace, 5) == "inner C" && list_get(trace, 6) == "outer C",
+        "deadline cleanup");
+    let d = submit(scheduler, trace, "D", 10, 2);
+    assert_true(loop::cancel(d), "cancel before start");
+    tick(scheduler, 7);
+    assert_true(outcome(d) == "cancelled" && list_len(trace) == 7, "no unregistered cleanup");
+    let receiver = submit_receiver(scheduler);
+    tick(scheduler, 7);
+    tick(scheduler, 9);
+    assert_true(outcome(receiver) == "retained 42", "receiver remains live on its suspended stack");
+    print("typed tasks passed");
+    return 0;
+}

@@ -1,0 +1,147 @@
+import "model.vela";
+import "core.vela";
+import "types.vela";
+import "parser.vela";
+import "semantic.vela";
+import "callables.vela";
+import "errors.vela";
+
+pub fn suspension_pattern(effect_spec: String) -> String effects { state } {
+    let parts = split_text(effect_spec, 43);
+    var pattern = to_string(effect_pattern_constant(effect_spec) + 16);
+    for i in 1 .. list_len(parts) { pattern = pattern + "+" + list_get(parts, i); }
+    return pattern;
+}
+pub fn require_await_call(c: Context, suspending: Bool, span: Span) -> Unit effects { state, io, process } {
+    if !suspending { return; }
+    let ctl = list_get(c.control, 0);
+    if ctl.await_site.start != span.start || ctl.await_site.end != span.end || span.start == span.end {
+        bad(c, "E240", "A suspending call requires explicit await.", span);
+    }
+}
+pub fn check_await(c: Context, syntax: SyntaxExpr) -> ExprId effects { state, io, process } {
+    var ctl = list_get(c.control, 0);
+    if !ctl.in_async || ctl.in_contract || ctl.in_defer {
+        bad(c, "E240", "await is only allowed in an async body outside contracts and defer.", syntax.span);
+    }
+    let operand = ast_expr(c, syntax.left);
+    if operand.kind == 7 {
+        let target = ast_expr(c, operand.left);
+        if target.qualifier == "" && target.text == "sleep_ms" {
+            if list_len(operand.arguments) != 1 || list_len(operand.type_arguments) != 0 {
+                bad(c, "E210", "sleep_ms expects one positional delay.", operand.span);
+            }
+            let delay = list_get(operand.arguments, 0);
+            if delay.label != "" { bad(c, "E210", "sleep_ms expects a positional delay.", operand.span); }
+            require_callable_effects(c, 4, ctl.allowed_effects, syntax.span);
+            var sleep = expression_record(124, syntax.span, unit_type());
+            sleep.left = check_expr(c, delay.value);
+            require_type(c, checked_expr(c, sleep.left).type_id, int_type(), operand.span);
+            return add_expr(c, sleep);
+        }
+    }
+    let saved = ctl.await_site;
+    ctl.await_site = operand.span;
+    list_set(c.control, 0, ctl);
+    let value = check_expr(c, syntax.left);
+    ctl = list_get(c.control, 0);
+    ctl.await_site = saved;
+    list_set(c.control, 0, ctl);
+    let checked = checked_expr(c, value);
+    var valid = false;
+    if checked.kind == 107 { valid = symbol_info(c, checked.symbol).suspending; }
+    if checked.kind == 119 {
+        valid = has_bit(type_info(c, checked_expr(c, checked.left).type_id).call_effect_mask, 16);
+    }
+    if !valid { bad(c, "E240", "await requires a suspending call.", syntax.span); }
+    var result_value = expression_record(123, syntax.span, checked.type_id);
+    result_value.left = value;
+    return add_expr(c, result_value);
+}
+
+struct CheckWork {
+    functions: Dict<SymbolId, Int>,
+    visited: Dict<SymbolId, Bool>,
+    queue: List<SymbolId>,
+    entry: Span
+}
+fn blocking(c: Context, work: CheckWork, span: Span, reason: String) -> Unit effects { state, io, process } {
+    var details = empty_details();
+    details.reason = "blocking_async_call";
+    list_push(details.related, RelatedLocation(message: "Suspending body starts here.", span: work.entry));
+    fail_details(c, "E241", reason, span, details);
+}
+fn check_target(c: Context, work: CheckWork, id: SymbolId, span: Span) -> Unit effects { state, io, process } {
+    let sig = symbol_info(c, id);
+    if sig.foreign_library != "" {
+        blocking(c, work, span, "Foreign call may block a suspending body: " + sig.foreign_name);
+    }
+    if sig.builtin {
+        if sig.abi == "noreturn" { return; }
+        if has_bit(sig.effect_mask, 1) || has_bit(sig.effect_mask, 8) {
+            blocking(c, work, span, "Synchronous OS operation in a suspending call graph: " + sig.name);
+        }
+        return;
+    }
+    if !dict_has(work.functions, id) {
+        blocking(c, work, span, "Unresolved call target may block a suspending body.");
+    }
+    if !dict_has(work.visited, id) {
+        dict_set(work.visited, id, true);
+        list_push(work.queue, id);
+    }
+}
+fn check_value(c: Context, work: CheckWork, id: ExprId) -> Unit effects { state, io, process } {
+    if !has_expr(id) { return; }
+    let value = checked_expr(c, id);
+    if value.kind == 107 { check_target(c, work, value.symbol, value.span); }
+    if value.kind == 122 { blocking(c, work, value.span, "Dynamic dispatch may block a suspending body."); }
+    if value.kind == 119 {
+        let target = checked_expr(c, value.left);
+        if target.kind == 118 || target.kind == 120 {
+            check_target(c, work, target.symbol, value.span);
+        } else if !has_bit(type_info(c, target.type_id).call_effect_mask, 16) {
+            blocking(c, work, value.span, "Unknown synchronous callable may block a suspending body.");
+        }
+    }
+    check_value(c, work, value.left);
+    check_value(c, work, value.right);
+    for argument in value.arguments { check_value(c, work, argument); }
+    for arm in value.arms { check_value(c, work, arm.value); }
+}
+fn check_body(c: Context, work: CheckWork, body: List<StmtId>) -> Unit effects { state, io, process } {
+    for id in body {
+        let stmt = checked_stmt(c, id);
+        check_value(c, work, stmt.value);
+        check_value(c, work, stmt.target);
+        check_body(c, work, stmt.yes);
+        check_body(c, work, stmt.no);
+        for arm in stmt.arms { check_body(c, work, arm.body); }
+    }
+}
+pub fn check_suspension_graph(c: Context) -> Unit effects { state, io, process } {
+    var needed = false;
+    for function in c.functions {
+        if symbol_info(c, function.symbol).suspending { needed = true; break; }
+    }
+    if !needed { return; }
+    let index = dict_new<SymbolId, Int>();
+    for i in 0 .. list_len(c.functions) {
+        dict_set(index, list_get(c.functions, i).symbol, i);
+    }
+    for entry in c.functions {
+        if symbol_info(c, entry.symbol).suspending {
+            let work = CheckWork(functions: index, visited: dict_new<SymbolId, Bool>(),
+                queue: list_new<SymbolId>(), entry: entry.span);
+            check_target(c, work, entry.symbol, entry.span);
+            var i = 0;
+            while i < list_len(work.queue) {
+                let function = list_get(c.functions, dict_get(index, list_get(work.queue, i)));
+                for pre in function.preconditions { check_value(c, work, pre); }
+                for post in function.postconditions { check_value(c, work, post); }
+                check_body(c, work, function.body);
+                i = i + 1;
+            }
+        }
+    }
+}

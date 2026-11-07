@@ -1,0 +1,28 @@
+{
+  "stage": "1.0.1e",
+  "compiler_version": "1.0.0-dev.5",
+  "compiler_sha256": "d4cf26e2d7c614de235bbcc0c8e3560c89291d388ea10a0386181245b72551c6",
+  "native_passed": 1212,
+  "native_failed": 0,
+  "native_skipped": 0,
+  "compiler_generations": 3,
+  "c_fixed_point": true,
+  "bundler_fixed_point": true,
+  "isolated_original_and_formatted_checks": 22,
+  "negative_cases": 10,
+  "enum_gc_stress": "passed",
+  "pulsedeck_named": 11,
+  "pulsedeck_network": 21,
+  "actual_ui": "6/6 completed | 3 healthy; saved dev.5 report; window closed; no app/curl processes; report only",
+  "mcp_setup": "passed including installed HTTP API, enum equality, preserved config and real SDK handshake",
+  "test_harness_fix": "Copy enum helper modules into isolated fixture directory; initial gate interrupted; 22 focused checks and complete verify rerun passed",
+  "platform": "Windows x64 MSVC",
+  "unperformed": [
+    "Linux release matrix",
+    "fresh desktop agent discovery",
+    "physical multi-monitor transition"
+  ],
+  "next_milestone": "1.0.2 API freeze",
+  "documentation_links": 601,
+  "compatibility_fingerprints": 63
+}

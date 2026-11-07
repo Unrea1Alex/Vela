@@ -5,10 +5,13 @@ import "modules.vela";
 import "driver.vela";
 import "parser.vela";
 import "errors.vela";
+import "artifacts.vela";
 pub struct NativeDependency {
     name: String,
     path: String,
-    relative: String
+    relative: String,
+    target: String,
+    data: String
 }
 pub struct Project {
     manifest: String,
@@ -17,6 +20,7 @@ pub struct Project {
     entry: String,
     dependencies: List<ProjectDependency>,
     natives: List<NativeDependency>,
+    assets: List<Resource>,
     tests: List<String>
 }
 pub fn project_split(text: String, separator: Int) -> List<String> effects { state } {
@@ -72,8 +76,18 @@ pub fn project_is_manifest(path: String) -> Bool {
     let n = str_len(path);
     return n >= 6 && str_slice(path, n - 6, n) == ".vproj" || n >= 12 && str_slice(path, n - 12, n) == "vela.project" && (n == 12 || str_byte(path, n - 13) == 47 || str_byte(path, n - 13) == 92);
 }
+fn project_artifact(value: Result<String, String>, manifest: String, json_mode: Bool) -> String
+    effects { state, io, process } {
+    match value {
+        Result::Ok(data) => { return data; }
+        Result::Err(message) => {
+            project_fail(manifest, "E225", message, json_mode);
+            panic(message);
+        }
+    }
+}
 pub fn project_load(input: String, json_mode: Bool) -> Project effects { state, io, process } {
-    var p = Project(manifest: "", text: "", name: "", entry: input, dependencies: list_new<ProjectDependency>(), natives: list_new<NativeDependency>(), tests: list_new<String>());
+    var p = Project(manifest: "", text: "", name: "", entry: input, dependencies: list_new<ProjectDependency>(), natives: list_new<NativeDependency>(), assets: list_new<Resource>(), tests: list_new<String>());
     if !project_is_manifest(input) {
         return p;
     }
@@ -84,6 +98,7 @@ pub fn project_load(input: String, json_mode: Bool) -> Project effects { state, 
         project_fail(input, "E225", "Manifest exceeds 1 MiB.", json_mode);
     }
     var header = false;
+    var artifact_size = 0;
     for line in project_split(p.text, 10) {
         if line != ""&& str_byte(line, 0) != 35 {
             let fields = project_split(line, 124);
@@ -116,7 +131,7 @@ pub fn project_load(input: String, json_mode: Bool) -> Project effects { state, 
                     }
                 }
                 list_push(p.dependencies, ProjectDependency(alias: alias, path: io_value(absolute_path(parent_path(input) + "/" + path)), relative: path));
-            } else if kind == "native" && list_len(fields) == 3 {
+            } else if kind == "native" && (list_len(fields) == 3 || list_len(fields) == 6) {
                 let name = list_get(fields, 1);
                 let path = list_get(fields, 2);
                 if !foreign_library_name(name) || !project_relative(path, false) || list_len(p.natives) >= 128 {
@@ -125,7 +140,38 @@ pub fn project_load(input: String, json_mode: Bool) -> Project effects { state, 
                 for previous in p.natives {
                     if path_key(previous.name) == path_key(name) { project_fail(input, "E225", "Duplicate native library.", json_mode); }
                 }
-                list_push(p.natives, NativeDependency(name: name, path: io_value(absolute_path(parent_path(input) + "/" + path)), relative: path));
+                var target = "";
+                var data = "";
+                var full = io_value(absolute_path(artifact_join(parent_path(input), path)));
+                if list_len(fields) == 6 {
+                    target = list_get(fields, 3);
+                    if target != "windows-x64" || platform() != "windows" || list_get(fields, 4) != "1"
+                        || list_get(fields, 5) != "shared" {
+                        project_fail(input, "E225", "Unsupported native target, ABI or artifact kind.", json_mode);
+                    }
+                    full = project_artifact(artifact_source(input, path), input, json_mode);
+                    data = project_artifact(artifact_bytes(full), input, json_mode);
+                    if !windows_x64_dll(data) {
+                        project_fail(input, "E225", "Expected a Windows x64 PE DLL.", json_mode);
+                    }
+                    artifact_size = artifact_size + str_len(data);
+                }
+                list_push(p.natives, NativeDependency(name: name, path: full, relative: path, target: target, data: data));
+            } else if kind == "resource" && list_len(fields) == 3 {
+                let name = list_get(fields, 1);
+                let relative = list_get(fields, 2);
+                if !asset_name(name) || list_len(p.assets) >= 128 {
+                    project_fail(input, "E225", "Invalid resource destination.", json_mode);
+                }
+                for asset in p.assets {
+                    if assets_collide(asset.name, name) {
+                        project_fail(input, "E225", "Colliding resource destinations.", json_mode);
+                    }
+                }
+                let path = project_artifact(artifact_source(input, relative), input, json_mode);
+                let data = project_artifact(artifact_bytes(path), input, json_mode);
+                artifact_size = artifact_size + str_len(data);
+                list_push(p.assets, Resource(name: name, relative: relative, path: path, data: data));
             } else if kind == "test" && list_len(fields) == 2 {
                 let path = list_get(fields, 1);
                 if !project_relative(path, true) || list_len(p.tests) >= 128 {
@@ -140,6 +186,9 @@ pub fn project_load(input: String, json_mode: Bool) -> Project effects { state, 
                 list_push(p.tests, absolute);
             } else {
                 project_fail(input, "E225", "Unknown, duplicate or malformed manifest field: " + kind, json_mode);
+            }
+            if artifact_size > 67108864 {
+                project_fail(input, "E225", "Explicit artifacts exceed 64 MiB.", json_mode);
             }
         }
     }
@@ -163,12 +212,20 @@ pub fn project_lock_text(p: Project, json_mode: Bool) -> String effects { state,
         strings_push(lines, "dep|" + dep.alias + "|" + dep.relative + "|" + sha256(strings_join(graph, "")) + "\n");
     }
     for native in p.natives {
-        strings_push(lines, "native|" + native.name + "|" + native.relative + "|" + sha256(io_value(read_file(native.path))) + "\n");
+        let prefix = "native|" + native.name + "|" + native.relative + "|";
+        if native.target == "" {
+            strings_push(lines, prefix + sha256(io_value(read_file(native.path))) + "\n");
+        } else {
+            strings_push(lines, prefix + native.target + "|1|shared|" + sha256(native.data) + "\n");
+        }
+    }
+    for asset in p.assets {
+        strings_push(lines, "resource|" + asset.name + "|" + asset.relative + "|" + sha256(asset.data) + "\n");
     }
     return strings_join(lines, "");
 }
 pub fn project_verify_lock(p: Project, json_mode: Bool) -> Unit effects { state, io, process } {
-    if list_len(p.dependencies) == 0 && list_len(p.natives) == 0 {
+    if list_len(p.dependencies) == 0 && list_len(p.natives) == 0 && list_len(p.assets) == 0 {
         return;
     }
     let expected = project_lock_text(p, json_mode);
@@ -215,6 +272,11 @@ pub fn project_write_lock(p: Project, json_mode: Bool) -> Int effects { state, i
             project_fail(lock, "E226", "Lock must not overwrite native input.", json_mode);
         }
     }
+    for asset in p.assets {
+        if path_key(lock) == path_key(asset.path) || identity != "" && identity == io_value(file_identity(asset.path)) {
+            project_fail(lock, "E226", "Lock must not overwrite resource input.", json_mode);
+        }
+    }
     write_atomic(lock, project_lock_text(p, json_mode));
     if json_mode {
         print("{\"schema_version\":1,\"ok\":true,\"lock\":" + json_string(lock) + "}");
@@ -222,24 +284,4 @@ pub fn project_write_lock(p: Project, json_mode: Bool) -> Int effects { state, i
         print("Locked: " + p.manifest);
     }
     return 0;
-}
-pub fn stage_native(natives: List<NativeDependency>, directory: String) -> Result<Bool, String> effects { state, io, process } {
-    // Preflight every destination before writing any companion.
-    for native in natives {
-        let destination = directory + "/" + native.name;
-        let identity = from_string(file_identity(destination))?;
-        let data = from_string(read_file(native.path))?;
-        if identity != "" {
-            if from_string(read_file(destination))? != data {
-                return Result<Bool, String>::Err("Conflicting native output: " + destination);
-            }
-        }
-    }
-    for native in natives {
-        let destination = directory + "/" + native.name;
-        if from_string(file_identity(destination))? == "" {
-            let saved = write_atomic_result(destination, from_string(read_file(native.path))?)?;
-        }
-    }
-    return Result<Bool, String>::Ok(true);
 }

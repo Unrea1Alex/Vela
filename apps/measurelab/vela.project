@@ -10,4 +10,3 @@ dep|fs|vela-stdlib/fs.vela
 dep|cli|vela-stdlib/cli.vela
 dep|collections|vela-stdlib/collections.vela
 dep|testing|vela-stdlib/testing.vela
-native|measurelab-math.dll|native/measurelab-math.dll

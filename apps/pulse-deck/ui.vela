@@ -1,0 +1,19 @@
+import "../../std/gui.vela" as ui;
+import "model.vela" as model;
+pub fn open() -> Result<ui::Window, String> effects { io, process, state } {
+    let buttons = list_new<ui::Button>();
+    list_push(buttons, ui::Button(id: 101, label: "Run checks"));
+    list_push(buttons, ui::Button(id: 102, label: "Save JSON"));
+    list_push(buttons, ui::Button(id: 104, label: "About"));
+    list_push(buttons, ui::Button(id: 105, label: "Cancel"));
+    list_push(buttons, ui::Button(id: 103, label: "Close"));
+    return ui::open(ui::Config(title: "PulseDeck | Vela " + model::language_version(),
+        caption: "Concurrent service checks, independent deadlines, safe cancellation", width: 660,
+        height: 376, read_only: true, text_limit: 16384, buttons: buttons, close_id: 103,
+        changed_id: 0));
+}
+pub fn buttons(window: ui::Window, busy: Bool, cancelling: Bool) -> Bool effects { io, process,
+    state } {
+    return ui::enabled(window, 101, !busy) && ui::enabled(window, 102, !busy) && ui::enabled(window,
+        105, busy && !cancelling);
+}

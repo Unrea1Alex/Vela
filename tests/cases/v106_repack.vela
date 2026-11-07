@@ -1,0 +1,4 @@
+interface Reader {}
+struct File {}
+impl Reader for File {}
+fn main() -> Unit { let reader = dyn Reader(File()); let another = dyn Reader(reader); }

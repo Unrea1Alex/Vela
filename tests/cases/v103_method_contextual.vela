@@ -1,0 +1,2 @@
+fn impl(impl: Int) -> Int { return impl; }
+fn main() -> Int { return impl(0); }

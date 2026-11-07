@@ -1,0 +1,3 @@
+fn main() -> Unit effects { state } {
+    await sleep_ms(1);
+}

@@ -1,7 +1,8 @@
 # Native formatter
 
-Status: implemented and verified in 0.4.4, 2026-11-04. Native verify: 439/439;
-[196-file idempotence/byte checks](../stage04-formatter-evidence.json).
+The formatter was introduced in 0.4.4. See the
+[historical 196-file checks](../stage04-formatter-evidence.json)
+and the [0.9 validation](../VALIDATION-0.9.md).
 
 `velac fmt SOURCE` emits canonical UTF-8 to stdout, without modifying the file.
 `--check` emits no source, returns 0 for exact canonical bytes or 1 if formatting
@@ -18,10 +19,13 @@ This OS primitive lets fmt stdout match file bytes without changing print semant
 Canonical layout uses four spaces, LF, a final newline for nonempty input,
 block indentation and one statement per line; effect sets remain inline.
 Struct/enum members are split across lines; member/variant access remains compact.
-Generic bracket spacing is context-dependent in 0.7.0; some forms remain spaced.
-Long expressions and expression-match branches may remain on one line. The current
-formatter does not enforce a line-width limit, reorder declarations or remove code.
-Roadmap 0.9.8 plans consistent spacing and wrapping after a separate layout contract.
+The parser marks generic brackets and expression-match arm separators.
+Nested and module-qualified generic arguments have compact brackets and spaces
+after commas; comparison operators keep their spaces. Match arms with a comma
+end a line. For other lines the formatter aims for 100 UTF-8 bytes, wrapping
+at argument/parameter separators, before binary operators or after openings and
+assignment/arm markers. Continuations indent four additional spaces. Indivisible
+tokens, comments and lines occupied by a multiline raw string can exceed the target.
 
 The TimeLog application check found spaced generic return types before `effects`,
 `requires` and `ensures`. The fix recognizes these suffixes, including an intervening

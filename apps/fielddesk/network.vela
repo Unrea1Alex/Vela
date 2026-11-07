@@ -1,0 +1,110 @@
+import "../../std/config.vela" as config;
+import "../../std/event_loop.vela" as loop;
+import "../../std/http.vela" as http;
+import "../../std/path.vela" as path;
+import "../../std/process.vela" as process;
+import "../../std/result.vela" as result;
+import "../../std/text.vela" as text;
+pub struct Endpoint {
+    transport: dyn http::Transport,
+    request: http::Request,
+    executable: path::Path,
+    trust: Option<path::Path>
+}
+pub fn error(value: http::Error) -> String {
+    return match value {
+        http::Error::InvalidEndpoint => "Invalid HTTP endpoint",
+        http::Error::InvalidLimit => "Invalid HTTP limit",
+        http::Error::InvalidHeaders => "invalid headers",
+        http::Error::InvalidBody => "invalid body",
+        http::Error::InvalidTransport => "Curl and CA paths must be absolute",
+        http::Error::Schedule(_) => "Cannot schedule HTTP request",
+        http::Error::Connect(code) => f"HTTP connection failed ({code:d})",
+        http::Error::Tls(code) => f"TLS verification or handshake failed ({code:d})",
+        http::Error::Transfer(code) => f"HTTP transfer failed ({code:d})",
+        http::Error::Protocol => "Invalid HTTP response",
+        http::Error::Limit => "HTTP response exceeds the byte limit",
+        http::Error::TimedOut => "HTTP deadline expired",
+        http::Error::Cancelled => "HTTP request cancelled",
+        http::Error::Pending => "HTTP request is pending",
+        http::Error::Closed => "HTTP exchange is closed",
+        http::Error::Storage(message) => "HTTP staging: " + message
+    };
+}
+pub fn clock() -> Result<Int, String> effects { io } {
+    return match monotonic_millis() {
+        IntResult::Ok(value) => Result<Int, String>::Ok(value),
+        IntResult::Err(message) => Result<Int, String>::Err(message)
+    };
+}
+pub fn endpoint(scheme: http::Scheme, host: String, port: Int, target: String, timeout: Int,
+    curl: String, ca: String) -> Result<Endpoint, String> {
+    var trust = Option<path::Path>::None;
+    if ca != "" {
+        trust = Option<path::Path>::Some(path::Path(value: ca));
+    }
+    let transport = result::map_error(http::curl(path::Path(value: curl), trust), error)?;
+    let request = result::map_error(http::get(scheme, host, port, target, timeout, 4096), error)?;
+    return Result<Endpoint, String>::Ok(Endpoint(transport: dyn http::Transport(transport),
+        request: request, executable: path::Path(value: curl), trust: trust));
+}
+pub fn parse(data: String) -> Result<Endpoint, String> effects { state } {
+    let cfg = result::explain(config::parse(data), "Invalid endpoint JSON")?;
+    let scheme = result::explain(config::string(cfg, "scheme"), "Missing endpoint scheme")?;
+    var protocol = http::Scheme::Http;
+    if scheme == "https" {
+        protocol = http::Scheme::Https;
+    } else if scheme != "http" {
+        return Result<Endpoint, String>::Err("Endpoint scheme must be http or https");
+    }
+    let host = result::explain(config::string(cfg, "host"), "Missing endpoint host")?;
+    let port = result::explain(config::integer(cfg, "port"), "Missing endpoint port")?;
+    let target = result::explain(config::string(cfg, "target"), "Missing endpoint target")?;
+    let timeout = result::explain(config::integer(cfg, "timeout_ms"),
+        "Missing endpoint timeout_ms")?;
+    let curl = result::explain(config::string(cfg, "curl"), "Missing endpoint curl")?;
+    let ca = result::explain(config::string(cfg, "ca_file"), "Use empty ca_file for system trust")?;
+    return endpoint(protocol, host, port, target, timeout, curl, ca);
+}
+pub fn body(response: http::Response) -> Result<String, String> {
+    if response.status != 200 {
+        return Result<String, String>::Err(f"HTTP status {response.status:d}");
+    }
+    let decoded = result::explain(text::decode(response.body), "Invalid UTF-8 response")?;
+    for i in 0 .. str_len(decoded.data) {
+        if str_byte(decoded.data, i) == 0 {
+            return Result<String, String>::Err("NUL byte in response");
+        }
+    }
+    return Result<String, String>::Ok(decoded.data);
+}
+pub fn start(value: Endpoint, scheduler: loop::Loop<process::Completed>,
+    directory: path::Path) -> Result<http::Exchange, String> effects { io, state } {
+    let transport = value.transport;
+    return result::map_error(transport.start(scheduler, value.request, directory), error);
+}
+fn wait_for(scheduler: loop::Loop<process::Completed>, exchange: http::Exchange) -> Result<String,
+    String> effects { io, process, state } {
+    while true {
+        let turn = result::explain(loop::tick(scheduler, clock()?), "Cannot tick HTTP loop")?;
+        match result::map_error(http::poll(exchange), error)? {
+            Option::Some(response) => {
+                return body(response);
+            }
+            Option::None => {}
+        }
+    }
+    return Result<String, String>::Err("Unexpected HTTP loop exit");
+}
+pub fn fetch(port: Int, target: String, directory: path::Path) -> Result<String,
+    String> effects { io, state, process } {
+    let curl = env("SystemRoot") + "/System32/curl.exe";
+    let value = endpoint(http::Scheme::Http, "127.0.0.1", port, target, 1500, curl, "")?;
+    let scheduler = result::explain(loop::create<process::Completed>(clock()?),
+        "Cannot create HTTP loop")?;
+    let exchange = start(value, scheduler, directory)?;
+    let outcome = wait_for(scheduler, exchange);
+    let released = result::map_error(http::release(exchange), error)?;
+    let closed = result::explain(loop::shutdown(scheduler), "Cannot close HTTP loop")?;
+    return outcome;
+}

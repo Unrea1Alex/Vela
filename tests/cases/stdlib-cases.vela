@@ -1,12 +1,73 @@
 import "../../tools/test.vela";
+fn process_tree(s: Suite, exe: String) -> Outcome effects { state, io, process } {
+    let args = command(env("VELA_CC"));
+    for flag in split("/nologo|/std:c11|/MT|/O2", 124) { strings_push(args, flag); }
+    strings_push(args, "/Fo" + s.dir + "/process-tree.obj");
+    strings_push(args, "/Fe" + exe);
+    strings_push(args, s.root + "/tests/stdlib/process-tree.c");
+    return invoke(s, args, 30000);
+}
 pub fn stdlib_checks(suite: Suite) -> Suite effects { state, io, process } {
     var s = suite;
-    let dir = s.dir + "/stdlib 😀";
-    done(make_dir(dir));
     let child = s.dir + "/stdlib-child.exe";
-    let executable = s.dir + "/stdlib.exe";
     let child_build = build(s, s.root + "/tests/stdlib/child.vela", child);
     s = record(s, "stdlib_child_build", child_build.code == 0, child_build.out + child_build.err);
+    for name in split("decode|builder|services|json-budget|replay|event-loop|tasks|task-group|group-process|http-api", 124) {
+        let program = s.dir + "/stdlib-" + name + ".exe";
+        let compile = build(s, s.root + "/tests/stdlib/" + name + ".vela", program);
+        if compile.code != 0 {
+            s = record(s, "stdlib_" + name, false, compile.out + compile.err);
+            continue;
+        }
+        let args = command(program);
+        if name == "services" { strings_push(args, child); }
+        if name == "group-process" { strings_push(args, child); strings_push(args, s.dir); }
+        let run = invoke(s, args, 10000);
+        var expected = "builder passed\n";
+        if name == "decode" { expected = "JSON decode passed\n"; }
+        if name == "services" { expected = "services passed\n"; }
+        if name == "replay" { expected = "replay passed\n"; }
+        if name == "event-loop" { expected = "event loop passed\n"; }
+        if name == "task-group" { expected = "task groups passed\n"; if platform() != "windows" { expected = "task groups host passed\n"; } }
+        if name == "http-api" { expected = "HTTP API passed\n"; }
+        if name == "group-process" { expected = "group process passed\n"; if platform() != "windows" { expected = "group process unsupported\n"; } }
+        if name == "tasks" {
+            expected = "typed tasks passed\n";
+            if platform() != "windows" { expected = "typed tasks unsupported\n"; }
+        }
+        if name == "json-budget" {
+            expected = "ok\nJSON byte limit exceeded (5)\nJSON depth limit exceeded (0)\nJSON node limit exceeded (1)\nInvalid JSON limits\n$.ok: expected boolean\n";
+        }
+        s = record(s, "stdlib_" + name, run.code == 0 && run.out == expected && run.err == "", run.out + run.err);
+    }
+    let dir = s.dir + "/stdlib 😀";
+    done(make_dir(dir));
+    let async_program = s.dir + "/stdlib-async-process.exe";
+    let async_build = build(s, s.root + "/tests/stdlib/async-process.vela", async_program);
+    if async_build.code != 0 || child_build.code != 0 {
+        s = record(s, "stdlib_async_process", false, async_build.out + async_build.err);
+    } else {
+        let async_args = command(async_program);
+        strings_push(async_args, child);
+        strings_push(async_args, dir);
+        var async_expected = "async process passed\n";
+        var fixture_ok = true;
+        if platform() == "windows" {
+            let tree = s.dir + "/process-tree.exe";
+            let tree_build = process_tree(s, tree);
+            fixture_ok = tree_build.code == 0;
+            s = record(s, "stdlib_process_tree_build", fixture_ok, tree_build.out + tree_build.err);
+            strings_push(async_args, tree);
+        } else {
+            async_expected = "async process unsupported\n";
+        }
+        if fixture_ok {
+            let async_run = invoke(s, async_args, 20000);
+            s = record(s, "stdlib_async_process", async_run.code == 0 && async_run.out == async_expected
+                && async_run.err == "", async_run.out + async_run.err);
+        }
+    }
+    let executable = s.dir + "/stdlib.exe";
     let built = build(s, s.root + "/tests/stdlib/main.vela", executable);
     s = record(s, "stdlib_build", built.code == 0, built.out + built.err);
     if child_build.code == 0 && built.code == 0 {

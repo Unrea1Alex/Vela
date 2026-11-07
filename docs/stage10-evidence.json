@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "version": "0.10.0",
+  "platform": "Windows x64/MSVC",
+  "compiler_sha256": "2381631bce2ad6824c563cbae1f67227fc0dfa103a830ec50745ef7349893be5",
+  "recovery_c_sha256": "56ed8e343792857043dc475789549117797e6da4984980eb475b9e6e07c593d8",
+  "bootstrap_driver_version": "0.10.0-dev.10",
+  "native_worktree": { "passed": 1144, "failed": 0, "skipped": 0 },
+  "native_clean": { "passed": 1144, "failed": 0, "skipped": 0 },
+  "fixed_points": { "compiler_c": true, "source_bundle": true, "clean": true },
+  "independent_c_recovery_byte_identical": true,
+  "nested_calls": { "executed_depth": 150, "stdout": "42", "rejected_depth": 220, "diagnostic": "E101" },
+  "notes": {
+    "compiler": "0.10.0",
+    "named_passed": 2,
+    "system_only_path_gui_exit": 0,
+    "exe_sha256": "3cc141b329f9795e78bd5a6f1c2041a0453c67bcf308b6d41e725d1bef175d42",
+    "dll_sha256": "335d478f4cf9e42d860201a7b5087f19be44765edf68857e69eeb608116b59fd"
+  },
+  "mcp": {
+    "sdk_suites_passed": 3,
+    "sequential_requests": 1000,
+    "cancellations": 25,
+    "working_set_bytes": [84803584, 137064448],
+    "handles": [216, 216],
+    "streaming_pin_buffer_bytes": 65536,
+    "execution_checks": 26,
+    "isolation_checks": 26,
+    "fault_checks": 9,
+    "new_codex_agent_passed": true,
+    "skill_disk_read": false,
+    "skill_automatically_supplied": true
+  },
+  "delivery": {
+    "native": "vela-0.10.0-windows-x64.zip",
+    "mcp": "vela-mcp-0.10.0.zip",
+    "sha256_sums": "SHA256SUMS-0.10.0.txt"
+  }
+}

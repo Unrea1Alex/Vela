@@ -1,0 +1,30 @@
+import "../../tools/test.vela";
+pub fn cache_checks(suite: Suite) -> Suite effects { io, process, state } {
+    var s = suite;
+    let source = s.dir + "/cache-main.vela";
+    done(write_file(source, "fn main() -> Int { return 7; }\n"));
+    let args = compiler_command(s, "check", source);
+    strings_push(args, "--cache"); strings_push(args, s.dir + "/cache-records");
+    strings_push(args, "--cache-report"); strings_push(args, "--json");
+    let cold = invoke(s, args, 15000);
+    let warm = invoke(s, args, 15000);
+    s = record(s, "cache_cold_visible_miss", cold.code == 0 && contains(cold.err,
+        "\"layer\":\"check-v1\",\"status\":\"miss\"") && contains(cold.out,"\"ok\":true"), cold.out + cold.err);
+    s = record(s, "cache_warm_visible_hit", warm.code == 0 && contains(warm.err,
+        "\"layer\":\"check-v1\",\"status\":\"hit\"") && warm.out == cold.out, warm.out + warm.err);
+    done(write_file(source, "fn main() -> Int { return true; }\n"));
+    let invalidated = invoke(s, args, 15000);
+    s = record(s, "cache_source_invalidates", invalidated.code == 1 && contains(invalidated.out,
+        "E201") && !contains(invalidated.err,"\"layer\":\"check-v1\",\"status\":\"hit\""), invalidated.out + invalidated.err);
+    done(write_file(source, "fn main() -> Int { return 7; }\n"));
+    let bad = compiler_command(s, "check", source);
+    strings_push(bad, "--cache"); strings_push(bad, source);
+    let unavailable = invoke(s, bad, 15000);
+    s = record(s, "cache_unavailable_fallback", unavailable.code == 0 && contains(unavailable.err,
+        "\"status\":\"unavailable\""), unavailable.out + unavailable.err);
+    let missing = compiler_command(s, "check", source);
+    strings_push(missing, "--cache");
+    let rejected = invoke(s, missing, 15000);
+    return record(s, "cache_missing_argument", rejected.code == 2 && contains(rejected.err,
+        "requires a directory"), rejected.out + rejected.err);
+}

@@ -1,0 +1,5 @@
+interface Reader { fn read(self: Self) -> Int; }
+interface Writer {}
+struct File {}
+impl Writer for File {}
+fn main() -> Int { return Reader::read(dyn Writer(File())); }

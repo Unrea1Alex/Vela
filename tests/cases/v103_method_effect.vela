@@ -1,0 +1,3 @@
+struct Example {}
+impl Example { fn announce(self: Example) -> Int effects { io } { print(1); return 0; } }
+fn main() -> Int { return Example().announce(); }

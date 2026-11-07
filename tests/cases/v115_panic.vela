@@ -1,0 +1,9 @@
+fn failed<T>(message: String) -> T effects { process } {
+    panic(message);
+}
+fn main() -> Int effects { io, process } {
+    defer {
+        print("cleanup");
+    }
+    return failed<Int>("generic failure");
+}

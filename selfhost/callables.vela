@@ -1,0 +1,300 @@
+import "model.vela";
+import "core.vela";
+import "types.vela";
+import "generics.vela";
+import "interfaces.vela";
+import "semantic.vela";
+import "modules.vela";
+import "query.vela";
+import "parser.vela";
+import "suspension.vela";
+
+pub fn effect_argument_pattern(name: String) -> Bool {
+    return str_len(name) >= 4 && str_slice(name, 0, 4) == "@fx:";
+}
+pub fn parse_effect_pattern(c: Context) -> String effects { state, io, process } {
+    if !accept(c, "effects") { return "0"; }
+    if !accept(c, "{") {
+        let variable = identifier(c);
+        return "0+" + variable.text;
+    }
+    let variables = dict_new<String, Bool>();
+    let terms = strings_new();
+    var mask = 0;
+    var more = !at(c, "}");
+    while more {
+        let token = identifier(c);
+        if dict_has(variables, token.text) { bad(c, "E100", "Duplicate effect.", token.span); }
+        dict_set(variables, token.text, true);
+        let bit = effect_bit(token.text);
+        if bit == 0 { strings_push(terms, "+" + token.text); }
+        else { mask = mask + bit; }
+        more = accept(c, ",") && !at(c, "}");
+    }
+    let close = expect(c, "}");
+    return to_string(mask) + strings_join(terms, "");
+}
+pub fn effect_pattern_constant(pattern: String) -> Int effects { state } {
+    return match parse_int(list_get(split_text(pattern, 43), 0)) {
+        IntResult::Ok(value) => value, IntResult::Err(_) => 0
+    };
+}
+pub fn validate_effect_names(c: Context, pattern: String, parameters: List<TypeParameter>, span: Span) -> Unit effects { state, io, process } {
+    let terms = split_text(pattern, 43);
+    for i in 1 .. list_len(terms) {
+        let name = list_get(terms, i);
+        var found = false;
+        for parameter in parameters {
+            if parameter.name == name && parameter.bound == "$effect" { found = true; }
+        }
+        if !found { bad(c, "E206", "Unknown effect: " + name, span); }
+    }
+}
+pub fn effect_error(c: Context, name: String, reason: String, span: Span, declaration: Span) -> Unit effects { state, io, process } {
+    var details = empty_details();
+    details.reason = reason;
+    details.effect_parameter = name;
+    if declaration.end > declaration.start {
+        list_push(details.related, RelatedLocation(message: "Effect parameter declared here.", span: declaration));
+    }
+    fail_details(c, "E239", "Invalid effect argument for " + name + ": " + reason, span, details);
+}
+pub fn union_effects(first: Int, second: Int) -> Int {
+    var result_mask = first;
+    var bit = 1;
+    while bit <= 8 {
+        if !has_bit(first, bit) && has_bit(second, bit) { result_mask = result_mask + bit; }
+        bit = bit * 2;
+    }
+    return result_mask;
+}
+pub fn effect_argument(c: Context, mask: Int) -> TypeId effects { state } {
+    let name = "@fx:" + to_string(mask);
+    let found = find_type(c, name);
+    if has_type(found) { return found; }
+    var value = type_record(81, name, empty_span());
+    value.call_effect_mask = mask;
+    return add_type(c, value);
+}
+pub fn resolve_effect_pattern(c: Context, pattern: String, mapping: Dict<String, TypeId>, span: Span) -> Int effects { state, io, process } {
+    let terms = split_text(pattern, 43);
+    var mask = effect_pattern_constant(pattern);
+    for i in 1 .. list_len(terms) {
+        let variable = list_get(terms, i);
+        if !dict_has(mapping, variable) { bad(c, "E206", "Unknown effect: " + variable, span); }
+        let id = dict_get(mapping, variable);
+        if type_kind(c, id) != 81 { effect_error(c, variable, "effect_argument_kind", span, empty_span()); }
+        mask = union_effects(mask, type_info(c, id).call_effect_mask);
+    }
+    return mask;
+}
+pub fn direct_effect_parameter(c: Context, pattern: String, span: Span) -> String effects { state, io, process } {
+    let base = list_get(type_parts(pattern), 0);
+    if !callable_pattern(base) { return ""; }
+    let effects_pattern = str_slice(base, 4, str_len(base));
+    let terms = split_text(effects_pattern, 43);
+    if list_len(terms) == 1 { return ""; }
+    let variable = list_get(terms, 1);
+    if list_len(terms) != 2 || effect_pattern_constant(effects_pattern) % 16 != 0 {
+        effect_error(c, variable, "effect_parameter_shape", span, empty_span());
+    }
+    return variable;
+}
+
+pub fn callable_pattern(name: String) -> Bool {
+    return str_len(name) >= 4 && str_slice(name, 0, 4) == "@fn:";
+}
+pub fn callable_type(c: Context, types: List<TypeId>, mask: Int, span: Span) -> TypeId effects { state, io, process } {
+    let name = instance_name(c, "@fn:" + to_string(mask), types);
+    let found = find_type(c, name);
+    if has_type(found) { return found; }
+    var info = type_record(80, name, span);
+    info.arguments = types;
+    info.call_effect_mask = mask;
+    return add_type(c, info);
+}
+pub fn resolve_callable_type(c: Context, parts: List<String>, mapping: Dict<String, TypeId>, span: Span) -> TypeId effects { state, io, process } {
+    let prefix = list_get(parts, 0);
+    let mask = resolve_effect_pattern(c, str_slice(prefix, 4, str_len(prefix)), mapping, span);
+    let types = list_new<TypeId>();
+    for i in 1 .. list_len(parts) {
+        list_push(types, resolve_pattern(c, list_get(parts, i), mapping, span));
+    }
+    return callable_type(c, types, mask, span);
+}
+pub fn matching_callable_shape(c: Context, actual: TypeId, expected: TypeId) -> Bool effects { state, io, process } {
+    if type_kind(c, actual) != 80 || type_kind(c, expected) != 80 { return false; }
+    if has_bit(type_info(c, actual).call_effect_mask, 16) != has_bit(type_info(c, expected).call_effect_mask, 16) {
+        return false;
+    }
+    let got = type_info(c, actual).arguments;
+    let wanted = type_info(c, expected).arguments;
+    if list_len(got) != list_len(wanted) { return false; }
+    for i in 0 .. list_len(got) {
+        if list_get(got, i) != list_get(wanted, i) { return false; }
+    }
+    return true;
+}
+pub fn require_callable_effects(c: Context, required: Int, allowed: Int, span: Span) -> Unit effects { state, io, process } {
+    if effects_subset(required, allowed) { return; }
+    var details = empty_details();
+    details.callee = "callable";
+    details.required_effects = required;
+    details.allowed_effects = allowed;
+    var bit = 1;
+    while bit <= 8 {
+        if !effects_subset(bit, allowed) && effects_subset(bit, required) {
+            details.missing_effects = details.missing_effects + bit;
+        }
+        bit = bit * 2;
+    }
+    fail_details(c, "E209", "Callable effects exceed the allowed effects.", span, details);
+}
+pub fn unify_callable_pattern(c: Context, parts: List<String>, actual: TypeId, mapping: Dict<String, TypeId>, span: Span) -> Unit effects { state, io, process } {
+    let info = type_info(c, actual);
+    if info.kind != 80 || list_len(parts) != list_len(info.arguments) + 1 {
+        if info.parameter_name != "" { bound_error(c, actual, "", "callable argument", span); }
+        bad(c, "E201", "Callable parameter or result shape differs.", span);
+    }
+    for i in 0 .. list_len(info.arguments) {
+        unify_pattern(c, list_get(parts, i + 1), list_get(info.arguments, i), mapping, span);
+    }
+}
+pub fn callable_from_function(c: Context, id: SymbolId, span: Span) -> ExprId effects { state, io, process } {
+    let signature = symbol_info(c, id);
+    if signature.builtin || signature.foreign_library != "" || signature.interface_operation {
+        bad(c, "E238", "Only a checked Vela function can become a callable value.", span);
+    }
+    let types = list_new<TypeId>();
+    list_push(types, signature.type_id);
+    for parameter in signature.parameters { list_push(types, symbol_info(c, parameter).type_id); }
+    var mask = signature.effect_mask;
+    if signature.suspending { mask = mask + 16; }
+    var value = expression_record(118, span, callable_type(c, types, mask, span));
+    value.symbol = id;
+    return add_expr(c, value);
+}
+pub fn named_callable(c: Context, name: String, syntax: SyntaxExpr) -> ExprId effects { state, io, process } {
+    let canonical = module_global_name(c, name, syntax.span);
+    var target = find_symbol(c, c.signatures, canonical);
+    if !has_symbol(target) { bad(c, "E203", "Unknown binding.", syntax.span); }
+    let signature = symbol_info(c, target);
+    if signature.template_index >= 0 {
+        let arguments = list_new<TypeId>();
+        for argument in syntax.type_arguments { list_push(arguments, resolve_type(c, argument, syntax.span)); }
+        target = instantiate_function(c, target, arguments, syntax.span);
+    } else if list_len(syntax.type_arguments) != 0 {
+        bad(c, "E210", "Function value does not take type arguments.", syntax.span);
+    }
+    return callable_from_function(c, target, syntax.span);
+}
+pub fn checked_indirect_call(c: Context, callee: ExprId, syntax: SyntaxExpr) -> ExprId effects { state, io, process } {
+    let info = type_info(c, checked_expr(c, callee).type_id);
+    if info.kind != 80 {
+        if info.parameter_name != "" { bound_error(c, checked_expr(c, callee).type_id, "", "call", syntax.span); }
+        bad(c, "E201", "Expression is not callable.", syntax.span);
+    }
+    if list_len(syntax.arguments) + 1 != list_len(info.arguments) {
+        bad(c, "E210", "Incorrect callable argument count.", syntax.span);
+    }
+    require_await_call(c, has_bit(info.call_effect_mask, 16), syntax.span);
+    require_callable_effects(c, info.call_effect_mask % 16, list_get(c.control, 0).allowed_effects, syntax.span);
+    var call = expression_record(119, syntax.span, list_get(info.arguments, 0));
+    call.left = callee;
+    for i in 0 .. list_len(syntax.arguments) {
+        let argument = list_get(syntax.arguments, i);
+        if argument.label != "" { bad(c, "E210", "Callable arguments are positional.", syntax.span); }
+        let value = check_expr(c, argument.value);
+        require_type(c, checked_expr(c, value).type_id, list_get(info.arguments, i + 1), ast_expr(c, argument.value).span);
+        list_push(call.arguments, value);
+    }
+    return add_expr(c, call);
+}
+pub fn capture_error(c: Context, reason: String, name: String, message: String, span: Span, declaration: Span) -> Unit effects { state, io, process } {
+    var details = empty_details();
+    details.reason = reason;
+    details.capture = name;
+    if declaration.end > declaration.start {
+        list_push(details.related, RelatedLocation(message: "Captured binding declared here.", span: declaration));
+    }
+    fail_details(c, "E238", message, span, details);
+}
+pub fn check_closure(c: Context, syntax: SyntaxExpr) -> ExprId effects { state, io, process } {
+    let closure = list_get(c.syntax_closures, syntax.closure_index);
+    let mask = resolve_effect_pattern(c, closure.effect_pattern, list_get(c.control, 0).type_mapping, syntax.span);
+    let result_type = resolve_type(c, closure.return_name, syntax.span);
+    var signature = symbol_record(73, "@closure", result_type, syntax.span);
+    signature.suspending = closure.suspending;
+    signature.effect_mask = mask;
+    let symbol = add_symbol(c, signature);
+    let types = list_new<TypeId>();
+    list_push(types, result_type);
+    let captures = list_new<SymbolId>();
+    let parameters = list_new<SymbolId>();
+    let sources = list_new<SymbolId>();
+    let seen = dict_new<String, Bool>();
+    for capture in closure.captures {
+        let source = lookup(c, capture.name, capture.span);
+        if !has_symbol(source) { bad(c, "E203", "Unknown captured binding: " + capture.name, capture.span); }
+        let declaration = symbol_info(c, source);
+        if dict_has(seen, capture.name) {
+            capture_error(c, "capture_duplicate", capture.name, "Duplicate capture.", capture.span, declaration.span);
+        }
+        dict_set(seen, capture.name, true);
+        list_push(sources, source);
+        record_query_use(c, capture.span, source, declaration.type_id, "reference");
+    }
+    var saved = list_get(c.control, 0);
+    var control = saved;
+    control.scope_base = list_len(c.scopes);
+    control.return_type = result_type;
+    control.allowed_effects = mask;
+    control.loop_depth = 0;
+    control.in_contract = false;
+    control.in_defer = false;
+    control.in_async = closure.suspending;
+    control.await_site = empty_span();
+    list_set(c.control, 0, control);
+    push_scope(c);
+    for i in 0 .. list_len(closure.captures) {
+        let capture = list_get(closure.captures, i);
+        let source = list_get(sources, i);
+        let binding = bind(c, capture.name, symbol_info(c, source).type_id, false, capture.span, false);
+        var info = symbol_info(c, binding);
+        info.capture_origin = source;
+        set_symbol(c, binding, info);
+        list_push(captures, binding);
+    }
+    for parameter in closure.parameters {
+        if dict_has(seen, parameter.name) {
+            capture_error(c, "capture_parameter", parameter.name, "Parameter conflicts with a capture.", parameter.span, empty_span());
+        }
+        let type_id = resolve_type(c, parameter.annotation, parameter.span);
+        list_push(types, type_id);
+        list_push(parameters, bind(c, parameter.name, type_id, false, parameter.span, false));
+    }
+    let result_binding = bind(c, "result", result_type, false, syntax.span, true);
+    let body = check_block(c, closure.body, false);
+    if !block_returns(c, body) {
+        if result_type != unit_type() { bad(c, "E208", "Closure may reach its end without returning.", syntax.span); }
+        var ret = statement_record(132, syntax.span);
+        ret.value = add_expr(c, expression_record(109, syntax.span, unit_type()));
+        ret.returns = true;
+        list_push(body, add_stmt(c, ret));
+    }
+    pop_scope(c);
+    saved.type_instances = list_get(c.control, 0).type_instances;
+    list_set(c.control, 0, saved);
+    list_push(c.functions, CheckedFunction(captures: captures, symbol: symbol, parameters: parameters, result_binding: result_binding,
+        preconditions: list_new<ExprId>(), postconditions: list_new<ExprId>(), body: body, span: syntax.span));
+    var callable_mask = mask;
+    if closure.suspending { callable_mask = callable_mask + 16; }
+    var expression = expression_record(120, syntax.span, callable_type(c, types, callable_mask, syntax.span));
+    expression.symbol = symbol;
+    for source in sources {
+        var value = expression_record(104, syntax.span, symbol_info(c, source).type_id);
+        value.symbol = source;
+        list_push(expression.arguments, add_expr(c, value));
+    }
+    return add_expr(c, expression);
+}

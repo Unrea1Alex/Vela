@@ -1,9 +1,10 @@
 # Native bootstrap tools
 
-The four tracked Windows x64 executables are the verified Vela 0.7.0 compiler,
-development driver, bundler and test runner. They let a clone start with the
-same compiler bytes as the MCP compatibility manifest. Their SHA-256 hashes
-are listed in [publication validation](../docs/github-publication-evidence.json).
+The tracked Windows x64 executables are the working Vela compiler,
+development driver, bundler, test runner and LSP server. They let a clone start with the
+same compiler bytes as the [MCP compatibility manifest](../integrations/mcp/compatibility.json).
+See the [roadmap](../docs/ROADMAP.md) for the current development stage and
+historical release validation.
 
 To bootstrap without these executables, compile the standalone
 [C recovery seed](../bootstrap/README.md) with MSVC and run native verification.

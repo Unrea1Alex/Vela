@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "workspace": "E:\\Temp\\vela-execution-onboarding-mHkADv",
+  "exit": 0,
+  "native_mcp_calls": [
+    {
+      "server": "vela",
+      "tool": "vela_get_context",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_check",
+      "status": "failed",
+      "result_status": "rejected"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_get_help",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_check",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_build",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_test",
+      "status": "completed",
+      "result_status": "ok"
+    },
+    {
+      "server": "vela",
+      "tool": "vela_run",
+      "status": "completed",
+      "result_status": "ok"
+    }
+  ],
+  "skill_path": "",
+  "skill_disk_read": false,
+  "skill_activation": "Client automatically supplies activated skill instructions; disk reading is recorded separately.",
+  "notes": "Skill-file read denied by policy at E:\\Temp\\vela-execution-onboarding-mHkADv\\.agents\\skills\\vela-app\\SKILL.md; used automatically supplied instructions instead. Native Vela 0.10.0 help consulted. Deliberate missing capture rejected with E238 at main.vela:3:59; corrected with [offset]. Final unsaved overlay passed check, build, and both named tests. Run exited 0 with exact stdout \"22\\r\\n42\\r\\n\" and empty stderr. No workspace files written.",
+  "stdout": "22\n42",
+  "passed": true
+}

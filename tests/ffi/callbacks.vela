@@ -1,0 +1,76 @@
+extern "fixture.dll" fn resource(value: Int) -> ForeignHandle effects { state, process };
+extern "fixture.dll" fn save_callback(owner: ForeignHandle,
+    callback: CallbackHandle) -> Unit effects { state, process };
+extern "fixture.dll" fn invoke_saved(value: Int) -> Int effects { state, process };
+extern "fixture.dll" fn callback_other_thread() -> Int effects { state, process };
+extern "fixture.dll" fn release_count() -> Int effects { state, process };
+struct Registration {
+    owner: ForeignHandle,
+    handle: CallbackHandle
+}
+fn installed() -> Registration effects { state, process } {
+    let owner = resource(17);
+    let aliases = list_new<CallbackHandle>();
+    let seed = 39;
+    let action = fn [ seed, aliases ](value: Int) -> Int effects { state, process } {
+        if value == -1 {
+            match ffi_callback_cancel(list_get(aliases, 0)) {
+                WriteResult::Err(_) => {
+                    return 99;
+                }
+                WriteResult::Ok => {
+                    return 0;
+                }
+            }
+        }
+        if value == 0 {
+            assert_true(1.0 + 1.1102230246251565e-16 == 1.0, "Vela rounding");
+            return seed;
+        }
+        return invoke_saved(value - 1) + 1;
+    };
+    match ffi_callback_register(owner, action) {
+        CallbackResult::Ok(handle) => {
+            list_push(aliases, handle);
+            save_callback(owner, handle);
+            return Registration(owner: owner, handle: handle);
+        }
+        CallbackResult::Err(error) => {
+            assert_true(false, error);
+        }
+    }
+    return installed();
+}
+fn closed(outcome: WriteResult) -> Unit {
+    match outcome {
+        WriteResult::Ok => {}
+        WriteResult::Err(error) => {
+            assert_true(false, error);
+        }
+    }
+}
+fn rejected(outcome: WriteResult) -> Unit {
+    match outcome {
+        WriteResult::Err(_) => {}
+        WriteResult::Ok => {
+            assert_true(false, "expected rejection");
+        }
+    }
+}
+fn main() -> Unit effects { io, state, process } {
+    let registration = installed();
+    let keep = list_new<Int>();
+    list_push(keep, 1);
+    assert_true(invoke_saved(3) == 42, "retained capture and reentrant callback");
+    assert_true(invoke_saved(-1) == 99, "cancel rejected while active");
+    assert_true(invoke_saved(32) == -71, "nested callback depth limit");
+    assert_true(callback_other_thread() == 2, "worker cannot invoke Vela");
+    rejected(ffi_close(registration.owner, "release_resource"));
+    assert_true(release_count() == 0, "owner destructor blocked");
+    closed(ffi_callback_cancel(registration.handle));
+    rejected(ffi_callback_cancel(registration.handle));
+    assert_true(invoke_saved(0) == -101, "stale native descriptor is rejected");
+    closed(ffi_close(registration.owner, "release_resource"));
+    assert_true(release_count() == 1, "owner destructor called once");
+    print("callbacks passed");
+}

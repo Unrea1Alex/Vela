@@ -1,0 +1,4 @@
+interface Empty {}
+struct Foo<T> { value: T }
+impl Empty for Foo<Int> {}
+fn main() -> Int { return 0; }

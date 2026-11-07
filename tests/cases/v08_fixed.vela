@@ -1,0 +1,29 @@
+fn fixed(n: Float64, digits: Int) -> String {
+    match float_to_fixed(n, digits) {
+        StringResult::Ok(text) => { return text; }
+        StringResult::Err(error) => { assert_true(false, error); return ""; }
+    }
+}
+fn reject(digits: Int) -> Unit {
+    match float_to_fixed(1.0, digits) {
+        StringResult::Ok(_) => { assert_true(false, "invalid precision"); }
+        StringResult::Err(_) => {}
+    }
+}
+fn main() -> Unit effects { io } {
+    assert_true(fixed(2.125, 2) == "2.12", "even lower");
+    assert_true(fixed(2.375, 2) == "2.38", "even upper");
+    assert_true(fixed(-2.125, 2) == "-2.12", "negative tie");
+    assert_true(fixed(1.999, 2) == "2.00", "carry");
+    assert_true(fixed(2.5, 0) == "2", "zero precision");
+    assert_true(fixed(-0.0, 2) == "-0.00", "signed zero");
+    assert_true(fixed(-0.000001, 2) == "-0.00", "negative rounded zero");
+    assert_true(fixed(0.000000000000000001, 18) == "0.000000000000000001", "maximum precision");
+    assert_true(fixed(1e20, 2) == "100000000000000000000.00", "large fixed value");
+    assert_true(fixed(1.0 / 0.0, 2) == "inf", "infinity");
+    assert_true(fixed(-1.0 / 0.0, 0) == "-inf", "negative infinity");
+    assert_true(fixed(0.0 / 0.0, 2) == "nan", "NaN");
+    reject(-1);
+    reject(19);
+    print("fixed passed");
+}

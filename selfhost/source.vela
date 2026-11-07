@@ -1,4 +1,5 @@
 import "core.vela";
+import "model.vela";
 import "errors.vela";
 import "driver.vela";
 pub fn utf8_width(byte: Int) -> Int {
@@ -101,7 +102,7 @@ pub fn source_error(message: String, json_mode: Bool) -> Unit effects { state, i
     }
     exit(2);
 }
-pub fn source_text_result(path: String) -> Result<String, String> effects { state, io, process } {
+pub fn source_inside_boundary(path: String) -> Bool effects { state, io, process } {
     let boundary = env("VELA_SOURCE_ROOT");
     if boundary != "" {
         let root = path_key(io_value(absolute_path(boundary)));
@@ -111,7 +112,19 @@ pub fn source_text_result(path: String) -> Result<String, String> effects { stat
             prefix = root + "\\";
         }
         if str_len(absolute) <= str_len(prefix) || str_slice(absolute, 0, str_len(prefix)) != prefix {
-            return Result<String, String>::Err("Source path escapes VELA_SOURCE_ROOT.");
+            return false;
+        }
+    }
+    return true;
+}
+pub fn query_source_text(path: String, overlays: List<QueryOverlay>) -> Result<String, String> effects { state, io, process } {
+    if !source_inside_boundary(path) {
+        return Result<String, String>::Err("Source path escapes VELA_SOURCE_ROOT.");
+    }
+    if list_len(overlays) > 0 {
+        let key = path_key(path);
+        for overlay in overlays {
+            if path_key(overlay.path) == key { return Result<String, String>::Ok(overlay.code); }
         }
     }
     let code = from_string(read_file(path))?;
@@ -119,6 +132,9 @@ pub fn source_text_result(path: String) -> Result<String, String> effects { stat
         return Result<String, String>::Err("Source is not valid UTF-8.");
     }
     return Result<String, String>::Ok(normalized(code));
+}
+pub fn source_text_result(path: String) -> Result<String, String> effects { state, io, process } {
+    return query_source_text(path, list_new<QueryOverlay>());
 }
 pub fn load_source(path: String, json_mode: Bool) -> String effects { state, io, process } {
     match source_text_result(path) {

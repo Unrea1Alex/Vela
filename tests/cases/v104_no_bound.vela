@@ -1,0 +1,4 @@
+interface Read { fn read(self: Self) -> Int; }
+interface Other {}
+fn invalid<T: Other>(x: T) -> Int { return Read::read(x); }
+fn main() -> Int { return 0; }

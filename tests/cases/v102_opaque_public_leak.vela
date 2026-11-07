@@ -1,0 +1,4 @@
+struct Secret { value: Int }
+pub opaque struct Counter { secret: Secret }
+pub fn leak(x: Counter) -> List<Secret> effects { state } { return list_new<Secret>(); }
+fn main() -> Int { return 0; }

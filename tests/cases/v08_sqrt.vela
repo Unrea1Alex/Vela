@@ -1,0 +1,26 @@
+fn value(r: FloatResult) -> Float64 {
+    match r {
+        FloatResult::Ok(x) => { return x; }
+        FloatResult::Err(error) => { assert_true(false, error); return 0.0; }
+    }
+}
+fn rejected(x: Float64) -> Unit {
+    match float_sqrt(x) {
+        FloatResult::Ok(_) => { assert_true(false, "square root domain"); }
+        FloatResult::Err(_) => {}
+    }
+}
+fn main() -> Unit effects { io } {
+    assert_true(value(float_sqrt(81.0)) == 9.0, "exact square");
+    let irrational = value(float_sqrt(2.0));
+    assert_true(irrational > 1.41421356237309 && irrational < 1.41421356237310, "sqrt(2)");
+    let tiny = value(parse_float("4.9406564584124654e-324"));
+    assert_true(value(float_sqrt(tiny)) > tiny, "subnormal root");
+    assert_true(value(float_sqrt(value(parse_float("1e300")))) == value(parse_float("1e150")), "large root");
+    assert_true(float_to_string(value(float_sqrt(-0.0))) == "-0", "signed zero");
+    assert_true(value(float_sqrt(1.0 / 0.0)) == 1.0 / 0.0, "positive infinity");
+    rejected(-1.0);
+    rejected(-1.0 / 0.0);
+    rejected(0.0 / 0.0);
+    print("sqrt passed");
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "stage": "0.10.7",
+  "compiler": "0.10.0-dev.7",
+  "compiler_sha256": "b3b689c39077d4eda9c9efd597eed642ed87683fed598977bad953355c0d4e1b",
+  "bootstrap_driver_version": "0.10.0-dev.6",
+  "recovery_c_sha256": "8611c0212a94fc214f886f0c800efb3690b78e081715ec6185328e0e5eecc45e",
+  "native": { "passed": 1133, "failed": 0, "skipped": 0 },
+  "fixed_point": true,
+  "bundler_fixed_point": true,
+  "mcp_sdk_suites_passed": 3,
+  "service_checks": { "os_and_fake": true, "fake_no_os_effects": true, "scripted_clock_and_entropy": true, "pure_prng": true, "forced_gc": true },
+  "route_audit": { "named_passed": 8, "cli_passed": 10, "byte_chunks": true, "alias_and_close": true },
+  "source_lens": {
+    "named_passed": 7,
+    "cli_passed": 33,
+    "index_bytes": 909293,
+    "index_nodes": 71634,
+    "default_limit_rejected": 65536,
+    "explicit_limit_accepted": 131072,
+    "report_bytes": 222892,
+    "demo_sha256": "467ca95f8abf66ffa28590d384e54f497d42d080fa5e095aa3692ec532f9f622"
+  },
+  "next_item": "0.10.8"
+}

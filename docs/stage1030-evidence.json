@@ -1,0 +1,14 @@
+{
+  "stage": "1.0.3",
+  "version": "1.0.0-rc.2",
+  "native": 1212,
+  "failed": 0,
+  "skipped": 0,
+  "compiler_generations": 3,
+  "c_fixed_point": true,
+  "bundler_fixed_point": true,
+  "stable_snapshot": "84 files unchanged",
+  "migration": "passed; legacy Response rejected E210",
+  "mcp_setup": "passed",
+  "compiler_sha256": "43d01436b2abee7cb7819fd7bf2e5353bcda49f9860e00aa672cf643a7a5ca17"
+}

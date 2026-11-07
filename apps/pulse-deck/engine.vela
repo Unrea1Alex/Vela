@@ -1,0 +1,156 @@
+import "model.vela" as model;
+import "../../std/task_group.vela" as group;
+import "../../std/async_io.vela" as aio;
+import "../../std/event_loop.vela" as loop;
+import "../../std/http.vela" as http;
+import "../../std/path.vela" as path;
+import "../../std/result.vela" as result;
+pub struct Run {
+    rows: List<model::Row>,
+    owner: group::Group,
+    tasks: List<group::Task<model::Row>>,
+    cleanups: List<Int>,
+    peak: List<Int>,
+    cancelled: List<Bool>
+}
+pub fn now() -> Result<Int, String> effects { io } {
+    return match monotonic_millis() {
+        IntResult::Ok(value) => Result<Int, String>::Ok(value),
+        IntResult::Err(message) => Result<Int, String>::Err(message)
+    };
+}
+fn error(value: aio::Error<http::Error>) -> String {
+    return match value {
+        aio::Error::Operation(error) => model::http_error(error),
+        aio::Error::Queue(_) => "Request queue unavailable",
+        aio::Error::TimedOut => "deadline exceeded",
+        aio::Error::Cancelled => "cancelled",
+        aio::Error::Cleanup(message) => "cleanup: " + message,
+        aio::Error::Driver(message) => message
+    };
+}
+pub fn create(settings: model::Settings, transport: dyn http::Transport, directory: path::Path,
+    demo_port: Int) -> Result<Run, String> effects { io, process, state } {
+    let owner = result::explain(group::create(now()?, settings.concurrency),
+        "Cannot create task group")?;
+    let run = Run(rows: list_new<model::Row>(), owner: owner,
+        tasks: list_new<group::Task<model::Row>>(), cleanups: list_new<Int>(),
+        peak: list_new<Int>(), cancelled: list_new<Bool>());
+    list_push(run.peak, 0);
+    list_push(run.cancelled, false);
+    for index in 0 .. list_len(settings.endpoints) {
+        let entry = list_get(settings.endpoints, index);
+        let rows = run.rows;
+        let cleanups = run.cleanups;
+        list_push(rows, model::row(entry.name, model::State::Queued, "Waiting for warm-up / slot",
+            0));
+        let action = async fn [ entry, index, transport, directory, demo_port, rows, cleanups ](
+            scope: group::Scope) -> model::Row effects { state } {
+            defer {
+                list_push(cleanups, index);
+            }
+            await sleep_ms(entry.delay);
+            let started = group::time(scope);
+            list_set(rows, index, model::row(entry.name, model::State::Running, "GET in progress",
+                0));
+            match model::request(entry, demo_port) {
+                Result::Err(message) => {
+                    return model::row(entry.name, model::State::Error, message, 0);
+                }
+                Result::Ok(request) => {
+                    let answer = await aio::fetch(scope, transport, request, directory,
+                        entry.timeout);
+                    return match answer {
+                        Result::Ok(response) => model::response(entry, response, group::time(scope)
+                            - started),
+                        Result::Err(reason) => model::row(entry.name, model::State::Error, error(
+                            reason), group::time(scope) - started)
+                    };
+                }
+            }
+        };
+        match group::spawn(owner, 140000, action) {
+            Result::Err(_) => {
+                close(run);
+                return Result<Run, String>::Err("Cannot schedule check");
+            }
+            Result::Ok(task) => {
+                list_push(run.tasks, task);
+            }
+        }
+    }
+    return Result<Run, String>::Ok(run);
+}
+pub fn cancel(run: Run) -> Unit effects { state } {
+    list_set(run.cancelled, 0, true);
+    let requested = group::shutdown(run.owner);
+}
+pub fn tick(run: Run, clock: Int) -> Result<Bool, String> effects { io, process, state } {
+    let idle = result::explain(group::tick(run.owner, clock), "Cannot advance task group")?;
+    list_set(run.peak, 0, group::peak(run.owner));
+    var done = true;
+    for index in 0 .. list_len(run.tasks) {
+        let row = list_get(run.rows, index);
+        if !model::terminal(row) {
+            match group::task_outcome(list_get(run.tasks, index)) {
+                Option::None => {
+                    done = false;
+                }
+                Option::Some(outcome) => {
+                    let result_row = match outcome {
+                        loop::Outcome::Done(value) => value,
+                        loop::Outcome::Failed(message) => model::row(row.name, model::State::Error,
+                            message, 0),
+                        loop::Outcome::TimedOut => model::row(row.name, model::State::Error,
+                            "Task deadline exceeded", 0),
+                        loop::Outcome::Cancelled => model::row(row.name, model::State::Cancelled,
+                            "Cancelled; children drained", 0)
+                    };
+                    list_set(run.rows, index, result_row);
+                }
+            }
+        }
+    }
+    return Result<Bool, String>::Ok(done && idle);
+}
+pub fn close(run: Run) -> Unit effects { io, process, state } {
+    let requested = group::shutdown(run.owner);
+    var idle = false;
+    while !idle {
+        match now() {
+            Result::Err(message) => {
+                panic(message);
+            }
+            Result::Ok(clock) => {
+                match group::tick(run.owner, clock) {
+                    Result::Ok(done) => {
+                        idle = done;
+                    }
+                    Result::Err(_) => {
+                        panic("Cannot drain task group");
+                    }
+                }
+            }
+        }
+        if !idle {
+            let slept = host_sleep(1);
+        }
+    }
+    for failure in group::cleanup_errors(run.owner) {
+        eprint("Cleanup: " + failure.message);
+    }
+}
+pub fn code(run: Run) -> Int effects { state } {
+    if list_len(group::cleanup_errors(run.owner)) > 0 {
+        return 2;
+    }
+    if list_get(run.cancelled, 0) {
+        return 3;
+    }
+    for row in run.rows {
+        if row.state != model::State::Healthy {
+            return 1;
+        }
+    }
+    return 0;
+}

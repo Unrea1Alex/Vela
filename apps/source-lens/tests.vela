@@ -1,0 +1,98 @@
+import "graph.vela" as graph;
+import "report.vela" as report;
+import "@testing" as t;
+fn empty() -> String {
+    return """{"schema_version":1,"ok":true,"revision":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","documents":[{"id":7,"path":"пусто 🌿.vela"}],"definitions":[],"references":[],"imports":[]}""";
+}
+test "empty library and noncontiguous document ID" effects { state } {
+    match graph::parse(empty()) {
+        Result::Ok(g) => {
+            t::equal(list_len(g.functions), 0, "empty library");
+            t::equal(graph::path(g, 7), "пусто 🌿.vela", "Unicode path");
+            t::is_ok(report::render(g), "empty report");
+        }
+        Result::Err(error) => {
+            assert_true(false, error);
+        }
+    }
+}
+test "HTML escape does not allow injected markup" effects { state } {
+    match report::escape("<script>\"&'</script>") {
+        Result::Ok(value) => {
+            t::equal(value, "&lt;script&gt;&quot;&amp;&#39;&lt;/script&gt;",
+                "escape all delimiters");
+        }
+        Result::Err(error) => {
+            assert_true(false, error);
+        }
+    }
+}
+test "schema and malformed JSON rejection" effects { state } {
+    t::is_err(graph::parse("{}"), "missing schema");
+    t::is_err(graph::parse("{\"schema_version\":2}"), "future schema");
+    t::is_err(graph::parse("{\"schema_version\":1,\"ok\":false}"), "failed analysis");
+    t::is_err(graph::parse("{"), "incomplete JSON");
+    t::is_err(graph::parse(str_from_byte(255)), "invalid UTF-8");
+}
+test "revision rejects nonhex input" effects { state } {
+    t::is_err(graph::parse(
+        """{"schema_version":1,"ok":true,"revision":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}"""),
+        "not a SHA");
+}
+test "builtin identity requires a nonempty name" {
+    t::equal(graph::is_builtin("builtin:print"), true, "builtin");
+    t::equal(graph::is_builtin("builtin:"), false, "empty builtin");
+    t::equal(graph::is_builtin("0:1:function"), false, "ordinary function");
+}
+fn sample() -> String {
+    return """{
+"schema_version":1,"ok":true,"revision":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+"documents":[{"id":0,"path":"main.vela"}],
+"definitions":[
+ {"id":"a","name":"main","kind":"function","type":"Int","effects":["state"],"range":{"document":0,"start":{"line":0,"character":3,"byte":3},"end":{"line":0,"character":7,"byte":7}}},
+ {"id":"b","name":"keep","kind":"function","type":"","effects":[],"range":{"document":0,"start":{"line":1,"character":7,"byte":30},"end":{"line":1,"character":11,"byte":34}}}],
+"references":[
+ {"id":"b","caller":"a","role":"call","type":"Int","range":{"document":0,"start":{"line":0,"character":20,"byte":20},"end":{"line":0,"character":24,"byte":24}}},
+ {"id":"b","caller":"a","role":"call","type":"String","range":{"document":0,"start":{"line":0,"character":20,"byte":20},"end":{"line":0,"character":24,"byte":24}}}],
+"imports":[]}
+""";
+}
+test "generic instances count as one site and retain both inferred types" effects { state } {
+    match graph::parse(sample()) {
+        Result::Err(error) => {
+            assert_true(false, error);
+        }
+        Result::Ok(g) => {
+            t::equal(list_len(g.functions), 2, "two functions");
+            t::equal(list_len(g.calls), 1, "one call site");
+            t::equal(graph::call_count(g, "b", true), 1, "incoming");
+            t::equal(graph::call_count(g, "a", false), 1, "outgoing");
+            t::equal(strings_join(list_get(g.functions, 1).types, " | "), "Int | String",
+                "inferred result types");
+        }
+    }
+}
+test "render is repeatable after builder cleanup" effects { state } {
+    match graph::parse(sample()) {
+        Result::Err(error) => {
+            assert_true(false, error);
+        }
+        Result::Ok(g) => {
+            match report::render(g) {
+                Result::Err(error) => {
+                    assert_true(false, error);
+                }
+                Result::Ok(first) => {
+                    match report::render(g) {
+                        Result::Err(error) => {
+                            assert_true(false, error);
+                        }
+                        Result::Ok(second) => {
+                            t::equal(first.data, second.data, "same bytes after defer");
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

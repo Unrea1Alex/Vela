@@ -1,0 +1,20 @@
+fn main() -> Int effects { io } {
+    match host_sleep(-1) {
+        WriteResult::Ok => {
+            return 1;
+        }
+        WriteResult::Err(message) => {
+            assert_true(message == "host_sleep requires 0..1000 ms", "negative sleep");
+        }
+    }
+    match host_sleep(1001) {
+        WriteResult::Ok => {
+            return 1;
+        }
+        WriteResult::Err(_) => {}
+    }
+    return match host_sleep(1) {
+        WriteResult::Ok => 0,
+        WriteResult::Err(_) => 1
+    };
+}

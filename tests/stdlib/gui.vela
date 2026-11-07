@@ -1,0 +1,46 @@
+import "../../std/gui.vela" as gui;
+fn must<T>(value: Result<T, String>) -> T effects { process } {
+    match value {
+        Result::Ok(found) => {
+            return found;
+        }
+        Result::Err(error) => {
+            panic(error);
+        }
+    }
+}
+fn rejected<T>(value: Result<T, String>) -> Bool {
+    return match value {
+        Result::Ok(_) => false,
+        Result::Err(_) => true
+    };
+}
+fn main() -> Int effects { io, process, state } {
+    let buttons = list_new<gui::Button>();
+    list_push(buttons, gui::Button(id: 101, label: "Save"));
+    list_push(buttons, gui::Button(id: 103, label: "Close"));
+    var config = gui::Config(title: "Vela GUI lifecycle", caption: "Unicode", width: 420,
+        height: 260, read_only: false, text_limit: 64, buttons: buttons, close_id: 103,
+        changed_id: 106);
+    list_push(buttons, gui::Button(id: 103, label: "Duplicate"));
+    assert_true(rejected(gui::open(config)), "duplicate button ID rejected before open");
+    list_truncate(buttons, 2);
+    for cycle in 0 .. 3 {
+        let window = must(gui::open(config));
+        assert_true(gui::set_text(window, "Москва · αβ\r\nстрока 2"), "set Unicode");
+        assert_true(must(gui::snapshot(window)) == "Москва · αβ\r\nстрока 2",
+            "Unicode snapshot");
+        assert_true(!gui::set_text(window, "bad" + str_from_byte(0)), "NUL rejected");
+        assert_true(gui::enabled(window, 101, false), "button disable");
+        assert_true(!gui::enabled(window, 999, true), "unknown button rejected");
+        assert_true(list_len(must(gui::pump(window, 0))) == 0,
+            "programmatic edits suppress changed event");
+        let copy = window;
+        let closed = must(gui::close(window));
+        let again = must(gui::close(copy));
+        assert_true(!gui::set_text(copy, "closed") && rejected(gui::snapshot(copy)) && rejected(
+            gui::pump(copy, 0)), "shared closed owner");
+    }
+    print("GUI library passed");
+    return 0;
+}

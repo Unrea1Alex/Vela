@@ -1,0 +1,210 @@
+import "task_group.vela" as group;
+import "event_loop.vela" as loop;
+import "http.vela" as http;
+import "path.vela" as path;
+import "process.vela" as process;
+pub enum Error<E> {
+    Queue(group::Error),
+    Operation(E),
+    Cancelled,
+    TimedOut,
+    Cleanup(String),
+    Driver(String)
+}
+fn completed<T, E>(value: group::Completion<T, E>) -> Result<T, Error<E>> {
+    match value.cleanup {
+        Result::Err(message) => {
+            return Result<T, Error<E>>::Err(Error<E>::Cleanup(message));
+        }
+        Result::Ok(_) => {}
+    }
+    return match value.outcome {
+        group::Outcome::Done(value) => Result<T, Error<E>>::Ok(value),
+        group::Outcome::Failed(error) => Result<T, Error<E>>::Err(Error<E>::Operation(error)),
+        group::Outcome::Cancelled => Result<T, Error<E>>::Err(Error<E>::Cancelled),
+        group::Outcome::TimedOut => Result<T, Error<E>>::Err(Error<E>::TimedOut),
+        group::Outcome::InvalidDelay => Result<T, Error<E>>::Err(Error<E>::Driver("Invalid delay"))
+    };
+}
+fn queue<T, E>(value: Result<group::Ticket<T, E>, group::Error>) -> Result<group::Ticket<T, E>,
+    Error<E>> {
+    return match value {
+        Result::Ok(ticket) => Result<group::Ticket<T, E>, Error<E>>::Ok(ticket),
+        Result::Err(error) => Result<group::Ticket<T, E>, Error<E>>::Err(Error<E>::Queue(error))
+    };
+}
+fn idle(value: Result<loop::Turn, loop::Error>) -> Bool {
+    return match value {
+        Result::Err(_) => false,
+        Result::Ok(turn) => match turn {
+            loop::Turn::Idle => true,
+            loop::Turn::Dispatched => false,
+            loop::Turn::Waiting(_) => false
+        }
+    };
+}
+pub async fn fetch(scope: group::Scope, transport: dyn http::Transport, request: http::Request,
+    directory: path::Path, timeout: Int) -> Result<http::Response,
+    Error<http::Error>> effects { state } {
+    let schedulers = list_new<loop::Loop<process::Completed>>();
+    let exchanges = list_new<http::Exchange>();
+    let resume = fn [ scope, transport, request, directory, schedulers,
+        exchanges ]() -> group::Step<http::Response, http::Error> effects { io, process, state } {
+        if list_len(schedulers) == 0 {
+            match loop::create<process::Completed>(group::time(scope)) {
+                Result::Err(_) => {
+                    return group::Step<http::Response, http::Error>::Failed(http::Error::Storage(
+                        "Cannot create worker loop"));
+                }
+                Result::Ok(scheduler) => {
+                    list_push(schedulers, scheduler);
+                }
+            }
+            match transport.start(list_get(schedulers, 0), request, directory) {
+                Result::Err(error) => {
+                    return group::Step<http::Response, http::Error>::Failed(error);
+                }
+                Result::Ok(exchange) => {
+                    list_push(exchanges, exchange);
+                }
+            }
+        }
+        let scheduler = list_get(schedulers, 0);
+        let turn = loop::tick(scheduler, group::time(scope));
+        match http::poll(list_get(exchanges, 0)) {
+            Result::Err(error) => {
+                return group::Step<http::Response, http::Error>::Failed(error);
+            }
+            Result::Ok(value) => {
+                return match value {
+                    Option::None => group::Step<http::Response, http::Error>::Wait(1),
+                    Option::Some(answer) => group::Step<http::Response, http::Error>::Done(answer)
+                };
+            }
+        }
+    };
+    let stop = fn [ scope, schedulers, exchanges ]() -> Bool effects { io, process, state } {
+        for exchange in exchanges {
+            let requested = http::cancel(exchange);
+        }
+        for scheduler in schedulers {
+            let closed = loop::shutdown(scheduler);
+            if !idle(loop::tick(scheduler, group::time(scope))) {
+                return false;
+            }
+        }
+        return true;
+    };
+    let cleanup = fn [ schedulers, exchanges ]() -> Result<Bool, String> effects { io, state } {
+        for exchange in exchanges {
+            match http::release(exchange) {
+                Result::Ok(_) => {}
+                Result::Err(error) => {
+                    return Result<Bool, String>::Err(match error {
+                        http::Error::Storage(message) => message,
+                        http::Error::Pending => "HTTP still pending",
+                        http::Error::InvalidEndpoint => "invalid endpoint",
+                        http::Error::InvalidLimit => "invalid limit",
+                        http::Error::InvalidHeaders => "invalid headers",
+                        http::Error::InvalidBody => "invalid body",
+                        http::Error::InvalidTransport => "invalid transport",
+                        http::Error::Schedule(_) => "schedule",
+                        http::Error::Connect(_) => "connect",
+                        http::Error::Tls(_) => "tls",
+                        http::Error::Transfer(_) => "transfer",
+                        http::Error::Protocol => "protocol",
+                        http::Error::Limit => "limit",
+                        http::Error::TimedOut => "timeout",
+                        http::Error::Cancelled => "cancelled",
+                        http::Error::Closed => "closed"
+                    });
+                }
+            }
+        }
+        for scheduler in schedulers {
+            let closed = loop::shutdown(scheduler);
+        }
+        return Result<Bool, String>::Ok(true);
+    };
+    let ticket = queue(group::post(scope, timeout, resume, stop, cleanup))?;
+    defer {
+        let cancelled = group::cancel(ticket);
+    }
+    return completed(await group::wait(ticket));
+}
+pub async fn run_process(scope: group::Scope, argv: List<String>, cwd: path::Path,
+    stdout: path::Path, stderr: path::Path, timeout: Int) -> Result<process::Completed,
+    Error<process::ScheduleError>> effects { state } {
+    let schedulers = list_new<loop::Loop<process::Completed>>();
+    let jobs = list_new<loop::Task<process::Completed>>();
+    // Snapshot the caller's mutable argv before yielding.
+    let arguments = list_new<String>();
+    for value in argv {
+        list_push(arguments, value);
+    }
+    let resume = fn [ scope, arguments, cwd, stdout, stderr, timeout, schedulers,
+        jobs ]() -> group::Step<process::Completed, process::ScheduleError> effects { io, process,
+        state } {
+        if list_len(schedulers) == 0 {
+            match loop::create<process::Completed>(group::time(scope)) {
+                Result::Err(error) => {
+                    return group::Step<process::Completed, process::ScheduleError>::Failed(
+                        process::ScheduleError::Loop(error));
+                }
+                Result::Ok(scheduler) => {
+                    list_push(schedulers, scheduler);
+                }
+            }
+            match process::schedule(list_get(schedulers, 0), arguments, cwd, stdout, stderr,
+                timeout) {
+                Result::Err(error) => {
+                    return group::Step<process::Completed, process::ScheduleError>::Failed(error);
+                }
+                Result::Ok(job) => {
+                    list_push(jobs, job);
+                }
+            }
+        }
+        let turn = loop::tick(list_get(schedulers, 0), group::time(scope));
+        match loop::outcome(list_get(jobs, 0)) {
+            Option::None => {
+                return group::Step<process::Completed, process::ScheduleError>::Wait(1);
+            }
+            Option::Some(value) => {
+                return match value {
+                    loop::Outcome::Done(done) => group::Step<process::Completed,
+                        process::ScheduleError>::Done(done),
+                    loop::Outcome::Failed(message) => group::Step<process::Completed,
+                        process::ScheduleError>::Failed(process::ScheduleError::Command(
+                        process::Error::Launch(message))),
+                    loop::Outcome::TimedOut => group::Step<process::Completed,
+                        process::ScheduleError>::Failed(process::ScheduleError::Command(
+                        process::Error::TimedOut)),
+                    loop::Outcome::Cancelled => group::Step<process::Completed,
+                        process::ScheduleError>::Failed(process::ScheduleError::Command(
+                        process::Error::Launch("Cancelled")))
+                };
+            }
+        }
+    };
+    let stop = fn [ scope, schedulers ]() -> Bool effects { io, process, state } {
+        for scheduler in schedulers {
+            let closed = loop::shutdown(scheduler);
+            if !idle(loop::tick(scheduler, group::time(scope))) {
+                return false;
+            }
+        }
+        return true;
+    };
+    let cleanup = fn [ schedulers ]() -> Result<Bool, String> effects { state } {
+        for scheduler in schedulers {
+            let closed = loop::shutdown(scheduler);
+        }
+        return Result<Bool, String>::Ok(true);
+    };
+    let ticket = queue(group::post(scope, timeout, resume, stop, cleanup))?;
+    defer {
+        let cancelled = group::cancel(ticket);
+    }
+    return completed(await group::wait(ticket));
+}

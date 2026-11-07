@@ -1,17 +1,16 @@
-# Vela MCP 0.7.0
+# Vela MCP
 
 Optional local integration. Native build/bootstrap/verify and applications do
-not require this package. Requires Node.js 24+, the matching native Vela 0.7
-delivery, and an MCP client. No remote server or credentials are used by the
+not require this package. Requires Node.js 24+, the native compiler and documentation
+pinned by [compatibility.json](compatibility.json), and an MCP client. No remote server or credentials are used by the
 adapter. Analysis does not execute user programs or the C compiler.
 
 Unpack the separate MCP archive, run `npm ci --omit=dev` in its root. Compiled
 `dist` is included. For development use `npm ci`, `npm run build`, `npm test`.
 The lock fixes the official SDK and all dependencies. Native Windows delivery
 is tested; other platforms are not declared supported by the Windows gate.
-Included language documents, source examples and historical reports are reference
-material. Run their native compiler/bootstrap commands from the separate native
-installation, which contains the full compiler sources and recovery seed.
+Language help and examples are read from the matching native installation.
+That installation also contains the compiler sources and recovery seed.
 
 Recommended setup (run from this package, use an existing application directory):
 
@@ -68,10 +67,11 @@ Copy `agent/vela-app` into the application's `.agents/skills` directory and adap
 `agent/AGENTS.template.md` as its AGENTS.md. In this repository they reside in
 `integrations/agent`. Ask the agent to call vela_get_context before writing Vela.
 
-Tools: vela_get_context, vela_get_help, vela_check, vela_format, vela_symbols.
+Tools: vela_get_context, vela_get_help, vela_check, vela_format, vela_symbols,
+vela_query and vela_plan.
 The help topic `idioms` is an executable example of enums, distinct IDs, generics,
 Result, contracts and interpolation, tested with the matching compiler.
-Version 0.7 also provides `numbers`, `stdlib`, `testing` and `ffi`. Setup copies the matching
+Help also provides `numbers`, `stdlib`, `testing` and `ffi`. Setup copies the matching
 ordinary Vela modules into workspace/vela-stdlib; all dependencies then remain
 inside the snapshot boundary. Existing differing library files require review
 and are never silently overwritten. Release 0.6 archives remain unchanged.
@@ -80,6 +80,15 @@ can check a draft even when its editor cannot write files. The overlay affects
 only the snapshot and never replaces a manifest or a workspace file.
 Help is also available as resources at vela://help/TOPIC. Format returns text;
 apply the proposed replacement through the host editor.
+Use `vela_query` for definitions, references, direct calls and types/effects.
+Its optional `at` uses a workspace-relative path and zero-based UTF-16 coordinates.
+`vela_plan` takes that query's `snapshot_id` and native `revision` to preview
+a rename or formatting edit. It rechecks the proposed source and writes nothing.
+Inspect `data.native.scope.excluded_test_roots` when planning a project rename.
+The native CLI supports pages for large indexes.
+Projects with declared `resource` rows build and run through the local CLI.
+MCP execution accepts legacy DLL rows and explicit Windows x64 ABI 1 shared
+rows subject to the same host SHA-256 allowlist.
 
 Optional Windows execution uses a prepared private MSVC/SDK cache and LPAC/Job
 supervisor. Run the preparation command from this MCP package (or from
@@ -102,15 +111,16 @@ and releases its lock even if the client forcibly terminates the Node server.
 Legacy stale lock files require review; setup never silently takes over an active cache.
 
 Build/test accept the same path/text/overlay_path inputs. Build returns artifact_id;
-run accepts that ID, args and timeout_ms only. Artifacts retain the effective snapshot
+run accepts that ID, args, timeout_ms and optional outputs. Artifacts retain the effective snapshot
 and expire after 30 minutes; edits require rebuilding. Default run timeout is 5 s,
 maximum 30 s; build/test 120 s, one execution at a time. Outputs are bounded and
 returned as UTF-8 or explicitly encoded hex. Execution has no network access and
-cannot write the original project. Files created by applications are disposable,
-not automatically exported. artifact_id identifies a built executable; 0.7.0 has
-no generated-file retrieval tool. A saved report currently requires the authorized
-native CLI. Explicit file artifacts are planned in ROADMAP 0.9.9, with a separate
-contract and host-controlled saving; this is not an available capability.
+cannot write the original project. To export a report, request
+`outputs: ["report.html"]` and pass `../export/report.html` to the application.
+An exit-zero run returns the output's ID, MIME, size and SHA-256. Use
+`vela_read_output` to retrieve base64 chunks, verify the hash and save explicitly
+in the client. See the [output artifact contract](../../docs/contracts/MCP-OUTPUT-ARTIFACTS.md).
+The executable `artifact_id` is distinct from an `output_id`.
 Native manifests require host-reviewed hashes in
 execution.native_allowlist, empty by default. No arbitrary shell/flags/environment.
 See [execution contract](../../docs/contracts/MCP-EXECUTION.md) for exact limits,
@@ -125,14 +135,20 @@ configuration's workspace selection, reconnect and inspect vela_get_context.
 A fingerprint mismatch is intentional even when version strings agree.
 Do not edit hashes to force compatibility. scripts/pin.mjs is a release-maintainer
 operation after native/docs verification, not an end-user repair command.
-Documentation in the working tree was corrected after the 0.7.0 archives were
-created. Its documentation pins differ; the compiler bytes/version are unchanged.
-Keep native documents and the MCP compatibility manifest from the same verified
-revision. Existing archives retain their original contents and matching manifest.
+For the released 0.11.0 use matching native and MCP archives. The working tree
+targets the 1.0.0-dev series; it is not a new release archive. Setup also delivers
+`task_group.vela`, `async_io.vela` and `gui.vela`, alongside `event_loop.vela`,
+`tasks.vela` and the extended HTTP modules. The development skill and native help
+describe awaitable operations, GUI ownership and payloadless enum equality.
+
+Optional Windows execution tests require a prepared execution cache and a trusted
+ABI fixture. Build it with `scripts/build-test-fixture.ps1 -NativeRoot ABSOLUTE_NATIVE`,
+set `VELA_TEST_FFI_FIXTURE` to its printed DLL path, `VELA_TEST_NATIVE_ROOT` to that
+native installation and optionally `VELA_TEST_EVIDENCE_DIR` to an output directory;
+then run `npm run test:execution`. Run hosts sharing one execution cache serially:
+its exclusive lease intentionally prevents a second execution host from starting.
 
 Malformed JSON returns a JSON-RPC parse error. Bad UTF-8 or oversized protocol
-lines close the connection. Language errors remain native structured diagnostics;
-timeout/cancellation/limits/toolchain failures have separate status values.
-Cancellation/disconnect terminates owned analysis children and removes snapshots.
-Analysis relies on a checked, link-free snapshot. Optional execution additionally
-uses OS isolation; it is not inferred from effects or an ordinary temporary cwd.
+lines close the connection. Language errors remain native structured diagnostics.
+Timeout, cancellation, limits and toolchain failures have separate status values.
+Cancellation and disconnect terminate owned analysis children and remove snapshots.

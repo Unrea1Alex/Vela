@@ -1,0 +1,132 @@
+import "../../std/json.vela" as json;
+import "../../std/result.vela" as result;
+import "../../std/text.vela" as text;
+pub type SampleId = distinct Int;
+pub opaque struct Sample {
+    sample_id: SampleId,
+    station_name: String,
+    raw_value: Float64,
+    is_accepted: Bool
+}
+pub opaque struct Settings {
+    report_title: String,
+    threshold: Float64,
+    gain: Float64,
+    offset: Float64
+}
+pub enum Band {
+    Normal,
+    Alert
+}
+pub interface Measured {
+    fn reading(self: Self) -> Float64;
+}
+impl Measured for Sample {
+    fn reading(self: Sample) -> Float64 {
+        return self.raw_value;
+    }
+}
+impl Sample {
+    pub fn id(self: Sample) -> SampleId {
+        return self.sample_id;
+    }
+    pub fn station(self: Sample) -> String {
+        return self.station_name;
+    }
+    pub fn value(self: Sample) -> Float64 {
+        return self.raw_value;
+    }
+    pub fn accepted(self: Sample) -> Bool {
+        return self.is_accepted;
+    }
+    pub fn calibrated(self: Sample, settings: Settings) -> Sample {
+        return Sample(sample_id: self.sample_id, station_name: self.station_name,
+            raw_value: self.raw_value * settings.gain + settings.offset,
+            is_accepted: self.is_accepted);
+    }
+}
+impl Settings {
+    pub fn title(self: Settings) -> String {
+        return self.report_title;
+    }
+    pub fn limit(self: Settings) -> Float64 {
+        return self.threshold;
+    }
+    pub fn band(self: Settings, value: Float64) -> Band {
+        if value > self.threshold {
+            return Band::Alert;
+        }
+        return Band::Normal;
+    }
+}
+pub fn decoded<T>(value: Result<T, json::At<json::DecodeCause>>) -> Result<T, String> {
+    return result::map_error(value, json::describe);
+}
+fn number(root: json::Cursor, key: String) -> Result<Float64, String> effects { state } {
+    return decoded(json::as_number(decoded(json::field(root, key))?, json::IntegerMode::Exact));
+}
+fn label(value: String, limit: Int, location: String) -> Result<String, String> {
+    if str_len(value) < 1 || str_len(value) > limit || text::invalid_offset(value) >= 0 {
+        return Result<String, String>::Err(location + ": invalid label length or UTF-8");
+    }
+    for i in 0 .. str_len(value) {
+        if str_byte(value, i) < 32 || str_byte(value, i) == 127 {
+            return Result<String, String>::Err(location + ": control character");
+        }
+    }
+    return Result<String, String>::Ok(value);
+}
+fn bounded(data: String) -> Result<json::Cursor, String> effects { state } {
+    match json::parse_with_limits(data, json::Limits(bytes: 4096, depth: 8, nodes: 32)) {
+        Result::Ok(value) => {
+            return Result<json::Cursor, String>::Ok(json::root(value));
+        }
+        Result::Err(_) => {
+            return Result<json::Cursor, String>::Err("$: invalid JSON or JSON budget exceeded");
+        }
+    }
+}
+pub fn settings(data: String) -> Result<Settings, String> effects { state } {
+    let root = bounded(data)?;
+    for member in decoded(json::as_object(root))? {
+        if member.name != "title" && member.name != "limit" && member.name != "gain" && member.name
+            != "offset" {
+            return Result<Settings, String>::Err("$: unexpected field " + member.name);
+        }
+    }
+    let title = label(decoded(json::as_string(decoded(json::field(root, "title"))?))?, 160,
+        "$.title")?;
+    let limit = number(root, "limit")?;
+    let gain = number(root, "gain")?;
+    let offset = number(root, "offset")?;
+    if limit < 0.0 || limit > 100000000.0 {
+        return Result<Settings, String>::Err("$.limit: out of range");
+    }
+    if gain < -100.0 || gain > 100.0 {
+        return Result<Settings, String>::Err("$.gain: out of range");
+    }
+    if offset < -1000000.0 || offset > 1000000.0 {
+        return Result<Settings, String>::Err("$.offset: out of range");
+    }
+    return Result<Settings, String>::Ok(Settings(report_title: title, threshold: limit, gain: gain,
+        offset: offset));
+}
+pub fn sample(data: String, sequence: Int) -> Result<Sample,
+    String> effects { state } requires sequence > 0;
+{
+    let root = bounded(data)?;
+    for member in decoded(json::as_object(root))? {
+        if member.name != "station" && member.name != "value" && member.name != "accepted" {
+            return Result<Sample, String>::Err("$: unexpected field " + member.name);
+        }
+    }
+    let station = label(decoded(json::as_string(decoded(json::field(root, "station"))?))?, 96,
+        "$.station")?;
+    let value = number(root, "value")?;
+    let accepted = decoded(json::as_bool(decoded(json::field(root, "accepted"))?))?;
+    if value < -1000000.0 || value > 1000000.0 {
+        return Result<Sample, String>::Err("$.value: out of range");
+    }
+    return Result<Sample, String>::Ok(Sample(sample_id: SampleId(sequence), station_name: station,
+        raw_value: value, is_accepted: accepted));
+}

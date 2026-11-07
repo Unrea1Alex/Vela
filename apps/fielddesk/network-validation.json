@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "transport": "Vela http with supervised curl",
+  "checks": [
+    {
+      "name": "200-replay",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "404",
+      "status": "passed",
+      "exit_code": 2
+    },
+    {
+      "name": "body-limit",
+      "status": "passed",
+      "exit_code": 2
+    },
+    {
+      "name": "timeout",
+      "status": "passed",
+      "exit_code": 2
+    },
+    {
+      "name": "invalid-utf8",
+      "status": "passed",
+      "exit_code": 2
+    },
+    {
+      "name": "invalid-path",
+      "status": "passed",
+      "exit_code": 2
+    },
+    {
+      "name": "invalid-port",
+      "status": "passed",
+      "exit_code": 2
+    },
+    {
+      "name": "refused",
+      "status": "passed",
+      "exit_code": 2
+    }
+  ],
+  "public_network": false,
+  "tls": false,
+  "replay_http_fetches": 1
+}

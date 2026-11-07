@@ -1,0 +1,2 @@
+fn invalid<effect E>(f: fn() -> Int effects E) -> Int { return f(); }
+fn main() -> Int { return 0; }

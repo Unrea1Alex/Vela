@@ -1,0 +1,11 @@
+vela-project|1
+name|source_lens
+entry|main.vela
+test|tests.vela
+dep|json|vela-stdlib/json.vela
+dep|result|vela-stdlib/result.vela
+dep|text|vela-stdlib/text.vela
+dep|fs|vela-stdlib/fs.vela
+dep|path|vela-stdlib/path.vela
+dep|cli|vela-stdlib/cli.vela
+dep|testing|vela-stdlib/testing.vela

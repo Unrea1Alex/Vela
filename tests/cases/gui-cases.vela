@@ -1,0 +1,38 @@
+import "../../tools/test.vela";
+pub fn gui_checks(suite: Suite) -> Suite effects { io, process, state } {
+    var s = suite;
+    if platform() != "windows" {
+        return s;
+    }
+    for variant in 0 .. 2 {
+        let args = command(env("VELA_CC"));
+        for flag in split("/nologo|/std:c11|/MT|/O2|/utf-8", 124) {
+            strings_push(args, flag);
+        }
+        var name = "gui-layout";
+        var extension = ".exe";
+        var source = "tests/ffi/gui-layout.c";
+        if variant == 0 {
+            strings_push(args, "/LD");
+            name = "vela-gui";
+            extension = ".dll";
+            source = "native/gui/adapter.c";
+        }
+        strings_push(args, "/Fo" + s.dir + "/" + name + ".obj");
+        strings_push(args, "/Fe" + s.dir + "/" + name + extension);
+        strings_push(args, s.root + "/" + source);
+        strings_push(args, "/link");
+        strings_push(args, "/IMPLIB:" + s.dir + "/" + name + ".lib");
+        strings_push(args, "user32.lib");
+        strings_push(args, "gdi32.lib");
+        let compiled = invoke(s, args, 30000);
+        s = record(s, "gui_native_" + name, compiled.code == 0, compiled.out + compiled.err);
+    }
+    let layout = invoke(s, command(s.dir + "/gui-layout.exe"), 10000);
+    s = record(s, "gui_dpi_events", layout.code == 0 && layout.out == "GUI layout passed\n",
+        layout.out + layout.err);
+    let built = build(s, s.root + "/tests/stdlib/gui.vela", s.dir + "/gui-library.exe");
+    let ran = invoke(s, command(s.dir + "/gui-library.exe"), 10000);
+    return record(s, "gui_library_ownership", built.code == 0 && ran.code == 0 && ran.out
+        == "GUI library passed\n", built.err + ran.out + ran.err);
+}

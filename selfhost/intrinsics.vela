@@ -18,6 +18,10 @@ pub fn emit_builtin(c: Context, n: CheckedExpr, args: StringList) -> String effe
     let abi = sig.abi;
     let t = n.type_id;
     let loc = location(c, n.span);
+    if abi == "noreturn" {
+        strings_push(args, loc);
+        return cc_call("v_user_" + sig.name, args);
+    }
     if abi == "print" || abi == "format" {
         let original = checked_expr(c, list_get(n.arguments, 0)).type_id;
         let scalar = scalar_type(c, original);
@@ -40,8 +44,12 @@ pub fn emit_builtin(c: Context, n: CheckedExpr, args: StringList) -> String effe
         return cc_call("v_int_to_string", args);
     }
     if str_len(abi) >= 5 && str_slice(abi, 0, 5) == "list_" {
+        var intrinsic = abi;
         if abi == "list_new" {
-            strings_push(args, "sizeof(" + ctype(c, list_get(type_info(c, t).arguments, 0)) +")");
+            let element = list_get(type_info(c, t).arguments, 0);
+            strings_push(args, "sizeof(" + ctype(c, element) +")");
+            strings_push(args, gc_visitor(c, element));
+            intrinsic = "list_new_traced";
         }
         if abi == "list_push" {
             strings_set(args, 1, "&" + strings_get(args, 1));
@@ -50,13 +58,14 @@ pub fn emit_builtin(c: Context, n: CheckedExpr, args: StringList) -> String effe
             strings_set(args, 2, "&" + strings_get(args, 2));
         }
         strings_push(args, loc);
-        let code = cc_call("v_" + abi, args);
+        let code = cc_call("v_" + intrinsic, args);
         if abi == "list_get" {
             return "*(" + ctype(c, t) + "*)" + code;
         }
         return code;
     }
     if str_len(abi) >= 5 && str_slice(abi, 0, 5) == "dict_" {
+        var intrinsic = abi;
         if abi == "dict_new" {
             let types = type_info(c, t).arguments;
             let scalar = scalar_type(c, list_get(types, 0));
@@ -69,6 +78,9 @@ pub fn emit_builtin(c: Context, n: CheckedExpr, args: StringList) -> String effe
                 kind = 3;
             }
             strings_push(args, num(kind));
+            strings_push(args, gc_visitor(c, scalar));
+            strings_push(args, gc_visitor(c, list_get(types, 1)));
+            intrinsic = "dict_new_traced";
         } else if abi != "dict_len" {
             let collection = checked_expr(c, list_get(n.arguments, 0)).type_id;
             let key_type = list_get(type_info(c, collection).arguments, 0);
@@ -82,11 +94,21 @@ pub fn emit_builtin(c: Context, n: CheckedExpr, args: StringList) -> String effe
             }
         }
         strings_push(args, loc);
-        let code = cc_call("v_" + abi, args);
+        let code = cc_call("v_" + intrinsic, args);
         if abi == "dict_get" || abi == "dict_get_or" {
             return "*(" + ctype(c, t) + "*)" + code;
         }
         return code;
+    }
+    if abi == "callback_result" {
+        let closure = strings_get(args, 1);
+        strings_set(args, 1, closure + ".code");
+        strings_push(args, closure + ".environment");
+    }
+    if abi == "fiber_result" {
+        let closure = strings_get(args, 0);
+        strings_set(args, 0, closure + ".code");
+        strings_push(args, closure + ".environment");
     }
     if abi != "plain" && abi != "int_result" {
         strings_push(args, loc);
@@ -104,11 +126,15 @@ pub fn emit_builtin(c: Context, n: CheckedExpr, args: StringList) -> String effe
     if abi == "float_result" { code = "v_float_result(" + code + ")"; }
     if abi == "int32_result" { code = "v_int32_result(" + code + ")"; }
     if abi == "read_result" { code = "v_read_result(" + code + ")"; }
+    if abi == "stream_result" { code = "v_stream_open_result(" + code + ")"; }
+    if abi == "spawn_result" || abi == "fiber_result" { code = "v_spawn_result_value(" + code + ")"; }
+    if abi == "callback_result" { code = "v_callback_result_value(" + code + ")"; }
     if abi == "process_result" { code = "v_process_result_value(" + code + ")"; }
     return code;
 }
 pub fn foreign_ctype(c: Context, t: TypeId) -> String effects { state, io, process } {
     if t == foreign_handle_type() { return "void*"; }
+    if t == callback_handle_type() { return "const VelaCallback*"; }
     if t == string_type() { return "VelaBytes"; }
     if t == bool_type() { return "int32_t"; }
     if t == unit_type() { return "void"; }
@@ -124,6 +150,8 @@ pub fn emit_foreign(c: Context, n: CheckedExpr, args: StringList) -> String effe
         strings_push(types, foreign_ctype(c, t));
         if t == foreign_handle_type() {
             strings_set(args, i, raw_temp(c, "void*", "v_foreign_unwrap(" + strings_get(args, i) + ", " + library + ", " + loc + ")"));
+        } else if t == callback_handle_type() {
+            strings_set(args, i, raw_temp(c, "const VelaCallback*", "v_callback_require(" + strings_get(args, i) + ", " + library + ", " + loc + ")"));
         } else if t == string_type() {
             strings_set(args, i, "(VelaBytes){" + strings_get(args, i) + ".data, (uint64_t)" + strings_get(args, i) + ".length}");
         }

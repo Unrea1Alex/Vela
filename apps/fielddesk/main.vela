@@ -1,0 +1,227 @@
+import "gui.vela" as gui;
+import "model.vela" as model;
+import "network.vela" as network;
+import "report.vela" as report;
+import "workflow.vela" as workflow;
+import "../../std/cli.vela" as cli;
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+import "../../std/result.vela" as result;
+import "../../std/services.vela" as services;
+fn usage() -> String {
+    return "FieldDesk 1 / Vela 1.0.0\nfielddesk.exe CONFIG.json INPUT.ndjson OUTPUT.html [--replay-check] [--fail-on-alert]\nfielddesk.exe --demo OUTPUT.html [--replay-check] [--fail-on-alert]\nfielddesk.exe --demo OUTPUT.html --local-port PORT [--http-path /measurements]\nfielddesk.exe --gui [OUTPUT.html] [--endpoint ENDPOINT.json] [--settings CONFIG.json]\nfielddesk.exe --verify-report REPORT.html";
+}
+fn absolute(value: String) -> Result<path::Path, String> effects { io } {
+    let checked = result::explain(path::checked(value), "Invalid path")?;
+    return match absolute_path(checked.value) {
+        StringResult::Ok(name) => result::explain(path::checked(name), "Invalid absolute path"),
+        StringResult::Err(error) => Result<path::Path, String>::Err(error)
+    };
+}
+fn identity(value: String) -> Result<String, String> effects { io } {
+    return match file_identity(value) {
+        StringResult::Ok(id) => Result<String, String>::Ok(id),
+        StringResult::Err(error) => Result<String, String>::Err(error)
+    };
+}
+fn distinct_paths(paths: List<path::Path>) -> Result<Bool, String> effects { io, state } {
+    for i in 0 .. list_len(paths) {
+        let left = list_get(paths, i).value;
+        let left_id = identity(left)?;
+        for j in 0 .. i {
+            let right = list_get(paths, j).value;
+            if left == right || (left_id != "" && left_id == identity(right)?) {
+                return Result<Bool, String>::Err("Paths alias each other: " + left);
+            }
+        }
+    }
+    return Result<Bool, String>::Ok(true);
+}
+fn verify(file: String) -> Result<Int, String> effects { io } {
+    let data = result::map_error(fs::read_bytes(absolute(file)?, 1048576),
+        workflow::file_error)?.data;
+    let prefix = "<!doctype html>";
+    let suffix = "<!-- fielddesk-complete --></body></html>\n";
+    if str_len(data) < str_len(prefix) + str_len(suffix) {
+        return Result<Int, String>::Err("Incomplete FieldDesk report");
+    }
+    if str_slice(data, 0, str_len(prefix)) != prefix || str_slice(data, str_len(data) - str_len(
+        suffix), str_len(data)) != suffix {
+        return Result<Int, String>::Err("Invalid FieldDesk report envelope");
+    }
+    print("fielddesk-report-ok " + sha256(data));
+    return Result<Int, String>::Ok(0);
+}
+fn work() -> Result<Int, String> effects { args, io, process, state } {
+    let specs = list_new<cli::Spec>();
+    list_push(specs, cli::Spec(name: "help", takes_value: false));
+    list_push(specs, cli::Spec(name: "demo", takes_value: false));
+    list_push(specs, cli::Spec(name: "gui", takes_value: false));
+    list_push(specs, cli::Spec(name: "endpoint", takes_value: true));
+    list_push(specs, cli::Spec(name: "settings", takes_value: true));
+    list_push(specs, cli::Spec(name: "replay-check", takes_value: false));
+    list_push(specs, cli::Spec(name: "fail-on-alert", takes_value: false));
+    list_push(specs, cli::Spec(name: "verify-report", takes_value: false));
+    list_push(specs, cli::Spec(name: "local-port", takes_value: true));
+    list_push(specs, cli::Spec(name: "http-path", takes_value: true));
+    let options = result::explain(cli::current(specs), usage())?;
+    if dict_has(options.options, "help") {
+        print(usage());
+        return Result<Int, String>::Ok(0);
+    }
+    let demo = dict_has(options.options, "demo");
+    let graphical = dict_has(options.options, "gui");
+    let checking = dict_has(options.options, "verify-report");
+    let replay_check = dict_has(options.options, "replay-check");
+    let fail_alert = dict_has(options.options, "fail-on-alert");
+    let count = list_len(options.positional);
+    let local = dict_has(options.options, "local-port");
+    let configured = dict_has(options.options, "endpoint");
+    let custom_settings = dict_has(options.options, "settings");
+    if (configured || custom_settings) && !graphical {
+        return Result<Int, String>::Err("--endpoint and --settings require --gui");
+    }
+    if (local && (!demo || graphical || checking)) || (dict_has(options.options, "http-path")
+        && !local) {
+        return Result<Int, String>::Err(
+            "Local HTTP requires --demo OUTPUT --local-port PORT [--http-path /measurements]");
+    }
+    if checking {
+        if count != 1 || demo || graphical || replay_check || fail_alert {
+            return Result<Int, String>::Err(usage());
+        }
+        return verify(list_get(options.positional, 0));
+    }
+    let executable = result::explain(path::executable(), "Cannot locate executable")?;
+    let folder = result::explain(path::resource_base(), "Cannot locate resources")?;
+    let adapter = result::explain(path::join(folder, path::Path(value: "vela-gui.dll")),
+        "Invalid adapter path")?;
+    let shipped_settings = result::explain(path::join(folder, path::Path(
+        value: "assets/settings.json")), "Invalid packaged settings path")?;
+    if graphical || arg_count() == 0 {
+        if count > 1 || demo || replay_check || fail_alert {
+            return Result<Int, String>::Err(usage());
+        }
+        var destination = "fielddesk-report.html";
+        if count == 1 {
+            destination = list_get(options.positional, 0);
+        }
+        let output = absolute(destination)?;
+        let directory = result::explain(path::parent(output), "Invalid report directory")?;
+        let protected = list_new<path::Path>();
+        list_push(protected, executable);
+        list_push(protected, adapter);
+        list_push(protected, shipped_settings);
+        list_push(protected, output);
+        var endpoint = Option<network::Endpoint>::None;
+        if configured {
+            let file = absolute(dict_get(options.options, "endpoint"))?;
+            list_push(protected, file);
+            let data = result::map_error(fs::read_bytes(file, 16384), workflow::file_error)?;
+            let remote = network::parse(data.data)?;
+            list_push(protected, absolute(remote.executable.value)?);
+            match remote.trust {
+                Option::None => {}
+                Option::Some(certificate) => {
+                    list_push(protected, absolute(certificate.value)?);
+                }
+            }
+            endpoint = Option<network::Endpoint>::Some(remote);
+        }
+        var settings_file = shipped_settings;
+        if custom_settings {
+            settings_file = absolute(dict_get(options.options, "settings"))?;
+            if settings_file.value != shipped_settings.value {
+                list_push(protected, settings_file);
+            }
+        }
+        let separate = distinct_paths(protected)?;
+        let settings_data = result::map_error(fs::read_bytes(settings_file, 16384),
+            workflow::file_error)?;
+        let shown = gui::show(gui::Options(output: output, directory: directory,
+            settings: model::settings(settings_data.data)?, endpoint: endpoint))?;
+        return Result<Int, String>::Ok(0);
+    }
+    if (demo && count != 1) || (!demo && count != 3) {
+        return Result<Int, String>::Err(usage());
+    }
+    var config = path::Path(value: "@demo-settings");
+    var input = path::Path(value: "@demo-data");
+    var destination = list_get(options.positional, 0);
+    if !demo {
+        config = absolute(list_get(options.positional, 0))?;
+        input = absolute(list_get(options.positional, 1))?;
+        destination = list_get(options.positional, 2);
+    }
+    let output = absolute(destination)?;
+    let stdout = absolute(destination + ".worker.out")?;
+    let stderr = absolute(destination + ".worker.err")?;
+    let paths = list_new<path::Path>();
+    list_push(paths, output);
+    list_push(paths, stdout);
+    list_push(paths, stderr);
+    list_push(paths, executable);
+    list_push(paths, adapter);
+    list_push(paths, shipped_settings);
+    if !demo {
+        list_push(paths, config);
+        list_push(paths, input);
+    }
+    let separate = distinct_paths(paths)?;
+    let argv = list_new<String>();
+    list_push(argv, executable.value);
+    list_push(argv, "--verify-report");
+    list_push(argv, output.value);
+    let command = services::Command(argv: argv, cwd: absolute(".")?, stdout: stdout, stderr: stderr,
+        timeout_ms: 5000);
+    let request = workflow::Paths(config: config, input: input, output: output, worker: command);
+    var files = dyn services::FileStore(services::os_files());
+    if demo {
+        if local {
+            var port = 0;
+            match parse_int(dict_get(options.options, "local-port")) {
+                IntResult::Ok(value) => {
+                    port = value;
+                }
+                IntResult::Err(_) => {
+                    return Result<Int, String>::Err("Invalid local port");
+                }
+            }
+            let endpoint = dict_get_or(options.options, "http-path", "/measurements");
+            let directory = result::explain(path::parent(output), "Invalid report directory")?;
+            files = dyn services::FileStore(workflow::source_files(files, network::fetch(port,
+                endpoint, directory)?));
+        } else {
+            files = dyn services::FileStore(workflow::demo_files(files));
+        }
+    }
+    let live = workflow::live(files, dyn services::Processes(services::os_processes()),
+        dyn services::Clock(services::os_clock()), dyn services::Entropy(services::os_entropy()));
+    let product = workflow::run(dyn workflow::Exchange(live), request, !demo && !replay_check)?;
+    if replay_check {
+        let playback = workflow::playback(workflow::transcript(live));
+        let repeated = workflow::run(dyn workflow::Exchange(playback), request, false)?;
+        let complete = workflow::finish(playback)?;
+        if repeated.html != product.html {
+            return Result<Int, String>::Err("Replay produced different report bytes");
+        }
+        print("Replay verified: identical report, all requests consumed");
+    }
+    print(report::summary(product.analysis));
+    print("Report: " + output.value);
+    if fail_alert && product.analysis.stats.alerts > 0 {
+        return Result<Int, String>::Ok(3);
+    }
+    return Result<Int, String>::Ok(0);
+}
+fn main() -> Int effects { args, io, process, state } {
+    match work() {
+        Result::Ok(code) => {
+            return code;
+        }
+        Result::Err(error) => {
+            eprint(error);
+            return 2;
+        }
+    }
+}

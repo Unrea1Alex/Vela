@@ -1,0 +1,4 @@
+/bin/
+*.worker.out
+*.worker.err
+/fielddesk-report.html

@@ -1,0 +1,7 @@
+vela-project|1
+name|pulsedeck
+entry|main.vela
+test|tests.vela
+native|vela-gui.dll|bin/vela-gui.dll|windows-x64|1|shared
+native|vela-http-server.dll|bin/vela-http-server.dll|windows-x64|1|shared
+resource|assets/demo.json|demo.json

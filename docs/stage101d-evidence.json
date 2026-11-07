@@ -1,0 +1,24 @@
+{
+  "stage": "1.0.1d",
+  "compiler_version": "1.0.0-dev.4",
+  "compiler_sha256": "ce74f9289937923390179507f00af030a35e47889ebaa1c4d5ce233bb6f63e36",
+  "native_passed": 1190,
+  "native_failed": 0,
+  "native_skipped": 0,
+  "compiler_generations": 3,
+  "c_fixed_point": true,
+  "bundler_fixed_point": true,
+  "http_client_checks": 19,
+  "http_server_checks": 16,
+  "http_api_gc_stress": "passed",
+  "pulsedeck_named": 10,
+  "pulsedeck_network": 21,
+  "fielddesk_network": 8,
+  "mcp_setup": "passed: delivered HTTP modules, URL/method/header/server constructors, real handshake",
+  "documentation_links": 576,
+  "connection_reuse": "explicitly deferred after 1.0; isolated curl process and closed server socket per exchange",
+  "unperformed": [
+    "Linux network adapters unsupported",
+    "connection pooling and persistent transport benchmarks"
+  ]
+}

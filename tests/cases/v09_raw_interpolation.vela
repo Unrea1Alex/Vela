@@ -1,0 +1,3 @@
+fn main() -> Unit {
+    let text = f"""no interpolation""";
+}

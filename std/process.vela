@@ -1,5 +1,6 @@
 import "text.vela" as text;
 import "path.vela" as path;
+import "event_loop.vela" as loop;
 pub enum Error {
     InvalidArgument(Int),
     InvalidPath(path::Error),
@@ -10,6 +11,16 @@ pub enum Error {
 }
 pub struct Completed {
     code: Int
+}
+pub enum ScheduleError {
+    Command(Error),
+    Loop(loop::Error)
+}
+struct Prepared {
+    args: StringList,
+    directory: String,
+    stdout: String,
+    stderr: String
 }
 fn os_string(value: String) -> Bool {
     if text::invalid_offset(value) >= 0 {
@@ -48,18 +59,19 @@ fn identity(value: String) -> Result<String, Error> effects { io } {
         }
     }
 }
-pub fn run(argv: List<String>, cwd: path::Path, stdout: path::Path, stderr: path::Path, timeout_ms: Int) -> Result<Completed, Error> effects { state, io, process } {
+fn prepare(argv: List<String>, cwd: path::Path, stdout: path::Path, stderr: path::Path,
+    timeout_ms: Int) -> Result<Prepared, Error> effects { state, io } {
     if list_len(argv) == 0 || list_get(argv, 0) == "" {
-        return Result<Completed, Error>::Err(Error::InvalidArgument(0));
+        return Result<Prepared, Error>::Err(Error::InvalidArgument(0));
     }
     if timeout_ms < 1 || timeout_ms > 2147483647 {
-        return Result<Completed, Error>::Err(Error::InvalidTimeout);
+        return Result<Prepared, Error>::Err(Error::InvalidTimeout);
     }
     let args = strings_new();
     for i in 0 .. list_len(argv) {
         let value = list_get(argv, i);
         if !os_string(value) {
-            return Result<Completed, Error>::Err(Error::InvalidArgument(i));
+            return Result<Prepared, Error>::Err(Error::InvalidArgument(i));
         }
         strings_push(args, value);
     }
@@ -67,14 +79,20 @@ pub fn run(argv: List<String>, cwd: path::Path, stdout: path::Path, stderr: path
     let out = absolute(stdout)?;
     let err = absolute(stderr)?;
     if out == err {
+        return Result<Prepared, Error>::Err(Error::OutputAlias);
+    }
+    return Result<Prepared, Error>::Ok(Prepared(args: args, directory: directory, stdout: out,
+        stderr: err));
+}
+pub fn run(argv: List<String>, cwd: path::Path, stdout: path::Path, stderr: path::Path,
+    timeout_ms: Int) -> Result<Completed, Error> effects { state, io, process } {
+    let ready = prepare(argv, cwd, stdout, stderr, timeout_ms)?;
+    let out_id = identity(ready.stdout)?;
+    let err_id = identity(ready.stderr)?;
+    if out_id != "" && out_id == err_id {
         return Result<Completed, Error>::Err(Error::OutputAlias);
     }
-    let out_id = identity(out)?;
-    let err_id = identity(err)?;
-    if out_id != ""&& out_id == err_id {
-        return Result<Completed, Error>::Err(Error::OutputAlias);
-    }
-    match process_run_at(args, directory, out, err, timeout_ms) {
+    match process_run_at(ready.args, ready.directory, ready.stdout, ready.stderr, timeout_ms) {
         ProcessResult::Exited(code) => {
             return Result<Completed, Error>::Ok(Completed(code: code));
         }
@@ -85,4 +103,116 @@ pub fn run(argv: List<String>, cwd: path::Path, stdout: path::Path, stderr: path
             return Result<Completed, Error>::Err(Error::Launch(message));
         }
     }
+}
+fn start(ready: Prepared,
+    operation: List<Option<ForeignHandle>>) -> loop::Step<Completed> effects { io, process,
+    state } {
+    match process_spawn(ready.args, ready.directory, ready.stdout, ready.stderr) {
+        SpawnResult::Ok(handle) => {
+            list_set(operation, 0, Option<ForeignHandle>::Some(handle));
+            return loop::Step<Completed>::Wait(5);
+        }
+        SpawnResult::Err(message) => {
+            return loop::Step<Completed>::Failed(message);
+        }
+    }
+}
+fn close_operation(handle: ForeignHandle,
+    operation: List<Option<ForeignHandle>>) -> WriteResult effects { state, process } {
+    let status = process_close(handle);
+    match status {
+        WriteResult::Ok => {
+            list_set(operation, 0, Option<ForeignHandle>::None);
+        }
+        WriteResult::Err(_) => {}
+    }
+    return status;
+}
+fn poll(handle: ForeignHandle,
+    operation: List<Option<ForeignHandle>>) -> loop::Step<Completed> effects { state, process } {
+    match process_poll(handle) {
+        IntResult::Err(message) => {
+            return loop::Step<Completed>::Failed(message);
+        }
+        IntResult::Ok(code) => {
+            if code == -1 {
+                return loop::Step<Completed>::Wait(5);
+            }
+            match close_operation(handle, operation) {
+                WriteResult::Ok => {
+                    return loop::Step<Completed>::Done(Completed(code: code));
+                }
+                WriteResult::Err(message) => {
+                    return loop::Step<Completed>::Failed(message);
+                }
+            }
+        }
+    }
+}
+fn stop_operation(operation: List<Option<ForeignHandle>>) -> Bool effects { state, process } {
+    match list_get(operation, 0) {
+        Option::None => {
+            return true;
+        }
+        Option::Some(handle) => {
+            match process_cancel(handle) {
+                WriteResult::Err(_) => {
+                    return false;
+                }
+                WriteResult::Ok => {}
+            }
+            // Close itself checks Job drain without waiting.
+            return match close_operation(handle, operation) {
+                WriteResult::Ok => true,
+                WriteResult::Err(_) => false
+            };
+        }
+    }
+}
+pub fn schedule(scheduler: loop::Loop<Completed>, argv: List<String>, cwd: path::Path,
+    stdout: path::Path, stderr: path::Path, timeout_ms: Int) -> Result<loop::Task<Completed>,
+    ScheduleError> effects { io, state } {
+    if list_len(argv) > 1024 {
+        return Result<loop::Task<Completed>, ScheduleError>::Err(ScheduleError::Command(
+            Error::InvalidArgument(1024)));
+    }
+    var bytes = 0;
+    for i in 0 .. list_len(argv) {
+        let length = str_len(list_get(argv, i));
+        if length > 32767 - bytes {
+            return Result<loop::Task<Completed>, ScheduleError>::Err(ScheduleError::Command(
+                Error::InvalidArgument(i)));
+        }
+        bytes = bytes + length;
+    }
+    let prepared = match prepare(argv, cwd, stdout, stderr, timeout_ms) {
+        Result::Ok(value) => Result<Prepared, ScheduleError>::Ok(value),
+        Result::Err(error) => Result<Prepared, ScheduleError>::Err(ScheduleError::Command(error))
+    };
+    let ready = prepared?;
+    match absolute(path::Path(value: strings_get(ready.args, 0))) {
+        Result::Ok(executable) => {
+            strings_set(ready.args, 0, executable);
+        }
+        Result::Err(error) => {
+            return Result<loop::Task<Completed>, ScheduleError>::Err(ScheduleError::Command(error));
+        }
+    }
+    let operation = list_new<Option<ForeignHandle>>();
+    list_push(operation, Option<ForeignHandle>::None);
+    let resume = fn [ ready, operation ]() -> loop::Step<Completed> effects { io, process, state } {
+        return match list_get(operation, 0) {
+            Option::None => start(ready, operation),
+            Option::Some(handle) => poll(handle, operation)
+        };
+    };
+    let stop = fn [ operation ]() -> Bool effects { state, process } {
+        return stop_operation(operation);
+    };
+    let cleanup = fn [ ]() -> Unit {};
+    return match loop::submit(scheduler, timeout_ms, resume, stop, cleanup) {
+        Result::Ok(task) => Result<loop::Task<Completed>, ScheduleError>::Ok(task),
+        Result::Err(error) => Result<loop::Task<Completed>, ScheduleError>::Err(ScheduleError::Loop(
+            error))
+    };
 }

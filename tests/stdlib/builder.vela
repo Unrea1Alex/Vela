@@ -1,0 +1,57 @@
+import "../../std/text.vela" as text;
+
+fn limit<T>(outcome: Result<T, text::Error>) -> Unit {
+    match outcome {
+        Result::Ok(_) => { assert_true(false, "expected builder limit"); }
+        Result::Err(error) => {
+            match error {
+                text::Error::Limit => {}
+                text::Error::InvalidUtf8(_) => { assert_true(false, "unexpected UTF-8 error"); }
+                text::Error::InvalidSlice => { assert_true(false, "unexpected slice error"); }
+                text::Error::InvalidCodepoint => { assert_true(false, "unexpected codepoint error"); }
+            }
+        }
+    }
+}
+fn examples() -> Result<Bool, text::Error> effects { state } {
+    limit(text::builder(-1));
+    limit(text::builder(16777217));
+    let empty = text::builder(0)?;
+    let empty_append = text::append(empty, text::Bytes(data: ""))?;
+    limit(text::append(empty, text::Bytes(data: "x")));
+    assert_true(text::finish_bytes(empty).data == "", "empty result");
+
+    let b = text::builder(5)?;
+    let alias = b;
+    let first = text::append(b, text::Bytes(data: str_slice("😀", 0, 2)))?;
+    match text::finish_text(b) {
+        Result::Ok(_) => { assert_true(false, "incomplete UTF-8"); }
+        Result::Err(error) => {
+            match error {
+                text::Error::InvalidUtf8(offset) => { assert_true(offset == 0, "invalid offset"); }
+                text::Error::InvalidSlice => { assert_true(false, "unexpected slice"); }
+                text::Error::InvalidCodepoint => { assert_true(false, "unexpected codepoint"); }
+                text::Error::Limit => { assert_true(false, "unexpected limit"); }
+            }
+        }
+    }
+    let rest = text::append(alias, text::Bytes(data: str_slice("😀", 2, 4)))?;
+    let nul = text::append(b, text::Bytes(data: "\0"))?;
+    limit(text::append(alias, text::Bytes(data: "x")));
+    let saved = text::finish_text(b)?;
+    assert_true(saved.data == "😀\0", "combined UTF-8 and NUL");
+    for i in 0 .. 250 {
+        text::reset(alias);
+        let added = text::append(b, text::Bytes(data: "x" + to_string(i)))?;
+        let value = text::finish_text(b)?;
+        assert_true(value.data == "x" + to_string(i), "finish after reset");
+    }
+    assert_true(saved.data == "😀\0", "finished result is independent");
+    return Result<Bool, text::Error>::Ok(true);
+}
+fn main() -> Unit effects { state, io } {
+    match examples() {
+        Result::Ok(_) => { print("builder passed"); }
+        Result::Err(_) => { assert_true(false, "builder returned an unexpected error"); }
+    }
+}

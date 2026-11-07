@@ -1,0 +1,4 @@
+interface Reader { fn read(self: Self) -> Int effects { io }; }
+struct File {}
+impl Reader for File { fn read(self: File) -> Int { return 0; } }
+fn main() -> Int { return dyn Reader(File()).read(); }

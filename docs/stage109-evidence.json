@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "stage": "0.10.9",
+  "compiler": "0.10.0-dev.9",
+  "compiler_sha256": "78117ef442585abc8524c6c867d1fcd71ee46932de765604790a87c5b3227f46",
+  "bootstrap_driver_version": "0.10.0-dev.8",
+  "recovery_c_sha256": "7e7ed2a773d46bc732410e216e66e5d226d79c14367dd44dfa61826b66dd98e0",
+  "native": { "passed": 1142, "failed": 0, "skipped": 0 },
+  "fixed_point": true,
+  "bundler_fixed_point": true,
+  "forced_gc_collections": 491,
+  "ffi": ["retained_environment", "reentrant_callback", "depth_limit", "worker_rejection", "rounding_restore", "cancel_active_rejected", "closed_descriptor", "destructor_once"],
+  "rejections": ["E209", "E228", "E201"],
+  "mcp_sdk_suites_passed": 3,
+  "next_item": "0.10.10"
+}

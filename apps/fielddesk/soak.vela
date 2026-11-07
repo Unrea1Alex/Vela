@@ -1,0 +1,43 @@
+import "analyze.vela" as analyze;
+import "model.vela" as model;
+import "report.vela" as report;
+import "demo.vela" as demo;
+fn run(repeats: Int) -> Result<Int, String> effects { state, io } {
+    let config = model::settings(demo::config())?;
+    let expected = report::html(analyze::memory(demo::data(), config, 1)?, config, 1000, 42)?;
+    for i in 0 .. repeats {
+        scope {
+            let data = analyze::memory(demo::data(), config, 7)?;
+            let html = report::html(data, config, 1000, 42)?;
+            assert_true(html == expected, "repeat changed report");
+        }
+    }
+    print(f"soak-ok {repeats:d}");
+    return Result<Int, String>::Ok(0);
+}
+fn main() -> Int effects { args, state, io } {
+    var repeats = 20;
+    if arg_count() != 0 {
+        match arg_int(0) {
+            IntResult::Ok(value) => {
+                repeats = value;
+            }
+            IntResult::Err(error) => {
+                eprint(error);
+                return 2;
+            }
+        }
+    }
+    if repeats < 1 || repeats > 1000 {
+        return 2;
+    }
+    match run(repeats) {
+        Result::Ok(code) => {
+            return code;
+        }
+        Result::Err(error) => {
+            eprint(error);
+            return 2;
+        }
+    }
+}

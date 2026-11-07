@@ -1,0 +1,2 @@
+async fn bad(callback: fn() -> Int) -> Int { return callback(); }
+fn main() -> Int { return 0; }

@@ -15,6 +15,7 @@ node_modules/
 .idea/
 .env
 .env.*
+/apps/*/bin/
 *.log
 *.err
 *.obj
@@ -30,3 +31,4 @@ vela-codex.mjs
 !/bin/vela-dev.exe
 !/bin/vela-bundle.exe
 !/bin/vela-test.exe
+!/bin/vela-lsp.exe

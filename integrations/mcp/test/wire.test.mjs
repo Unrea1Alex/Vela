@@ -21,7 +21,7 @@ test('modern protocol, cancellation, reconnect and malformed wire', {timeout:600
   const client=new Client({name:'vela-wire',version:'1'},modern?{versionNegotiation:{mode:{pin:'2026-07-28'}}}:{});
   const transport=new StdioClientTransport(params);transport.stderr.on('data',()=>{});
   await client.connect(transport);
-  assert.equal((await client.listTools()).tools.length,5);
+  assert.equal((await client.listTools()).tools.length,7);
   assert.equal((await client.callTool({name:'vela_get_context',arguments:{}})).structuredContent.status,'ok');
   evidence.wire.push(modern?'2026-07-28':'2025-11-25');
   for(let i=0;i<3;i++){

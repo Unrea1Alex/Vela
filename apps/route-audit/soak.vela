@@ -1,0 +1,34 @@
+import "audit.vela" as audit;
+import "../../std/text.vela" as text;
+
+fn repeat_audit(repetitions: Int) -> Result<Int, String> effects { state } {
+    let source = audit::explain(text::builder(65536), "Cannot initialize sample log")?;
+    let row = "{\"name\":\"Trial\",\"jump_limit_m\":5,\"points\":[[0,0],[3,4],[9,12]]}\n";
+    for i in 0 .. 256 {
+        let added = audit::explain(text::append(source, text::Bytes(data: row)), "Sample log overflow")?;
+    }
+    let input = text::finish_bytes(source).data;
+    for i in 0 .. repetitions {
+        let batch = audit::run(input)?;
+        if batch.routes != 256 || batch.jumps != 256 {
+            return Result<Int, String>::Err("Unexpected audit counts");
+        }
+    }
+    return Result<Int, String>::Ok(repetitions * 256);
+}
+
+fn main() -> Int effects { args, state, io } {
+    var repetitions = 0;
+    match arg_int(0) {
+        IntResult::Ok(count) => { repetitions = count; }
+        IntResult::Err(_) => {}
+    }
+    if repetitions < 1 || repetitions > 512 {
+        eprint("Specify 1..512 repetitions");
+        return 2;
+    }
+    match repeat_audit(repetitions) {
+        Result::Ok(routes) => { print(f"routes={routes:d}"); return 0; }
+        Result::Err(error) => { eprint(error); return 2; }
+    }
+}

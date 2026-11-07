@@ -1,0 +1,47 @@
+import "method-owner.vela" as api;
+struct Meter { count: Int, notes: List<Int> }
+impl Meter {
+    pub fn tick(self: Meter, a: Int, b: Int) -> Meter effects { io, state }
+    requires a == 1;
+    ensures result.count == 2;
+    {
+        print("body");
+        var copy = self;
+        copy.count = self.count + a;
+        list_push(copy.notes, b);
+        return copy;
+    }
+    fn stop(self: Meter, a: Int, b: Int, c: Int) -> Unit effects { io } { print("unexpected body"); }
+}
+enum State { Ready }
+impl State { fn ready(self: State) -> Bool { return true; } }
+type Key = distinct Int;
+impl Key { fn read(self: Key) -> Int { return self.value; } }
+fn receiver(value: Meter) -> Meter effects { io } { print("receiver"); return value; }
+fn mark(label: String, value: Int) -> Int effects { io } { print(label); return value; }
+fn fail() -> Result<Int, Int> effects { io } {
+    print("b");
+    return Result<Int, Int>::Err(7);
+}
+fn attempt(original: Meter) -> Result<Int, Int> effects { io } {
+    defer { print("cleanup"); }
+    receiver(original).stop(mark("a", 1), fail()?, mark("unexpected c", 0));
+    return Result<Int, Int>::Ok(0);
+}
+fn take_value() -> Int { return 100; }
+fn main() -> Int effects { io, state } {
+    let original = Meter(count: 1, notes: list_new<Int>());
+    let copy = receiver(original).tick(mark("a", 1), mark("b", 9));
+    print(f"{original.count:d},{copy.count:d},{list_get(original.notes, 0):d}");
+    match attempt(original) {
+        Result::Ok(_) => { return 1; }
+        Result::Err(code) => { print(code); }
+    }
+    let bucket = api::bucket("hello" + "!");
+    print(bucket.take_value());
+    print(api::Bucket<String>::take_value(bucket));
+    print(State::Ready.ready());
+    print(Key::read(Key(42)));
+    print(take_value());
+    return 0;
+}

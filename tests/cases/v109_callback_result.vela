@@ -1,0 +1,2 @@
+extern "fixture.dll" fn forge_callback() -> CallbackHandle effects { state, process };
+fn main() -> Unit {}

@@ -1,0 +1,10 @@
+{"station":"Лесная 🌲","value":18,"accepted":true}
+{"station":"Лесная 🌲","value":20,"accepted":true}
+{"station":"Лесная 🌲","value":22,"accepted":true}
+{"station":"Причал","value":24,"accepted":true}
+{"station":"Причал","value":28,"accepted":true}
+{"station":"Причал","value":32,"accepted":true}
+{"station":"Обсерватория","value":10,"accepted":true}
+{"station":"Обсерватория","value":14,"accepted":true}
+{"station":"Обсерватория","value":18,"accepted":true}
+{"station":"Причал","value":999,"accepted":false}

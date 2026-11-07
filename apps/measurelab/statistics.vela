@@ -1,5 +1,4 @@
 import "@collections" as collections;
-extern "measurelab-math.dll" fn measurelab_sqrt(value: Float64) -> Float64 effects { state, process };
 pub struct Summary {
     count: Int,
     mean: Float64,
@@ -9,7 +8,7 @@ pub struct Summary {
     minimum: Float64,
     maximum: Float64
 }
-pub fn analyze(values: List<Float64>) -> Result<Summary, String> effects { state, process } {
+pub fn analyze(values: List<Float64>) -> Result<Summary, String> effects { state } {
     let size = list_len(values);
     if size < 1 || size > 256 {
         return Result<Summary, String>::Err("Expected 1..256 samples");
@@ -33,19 +32,14 @@ pub fn analyze(values: List<Float64>) -> Result<Summary, String> effects { state
         median = (list_get(ordered, mid - 1) + median) / 2.0;
     }
     let rank = (95 * size + 99) / 100 - 1;
-    match ffi_load("measurelab-math.dll") {
-        WriteResult::Ok => {}
-        WriteResult::Err(error) => {
-            return Result<Summary, String>::Err("Cannot load math adapter: " + error);
-        }
-    }
     var variance = m2 / float_from_int(size);
     if variance < 0.0 {
         variance = 0.0;
     }
-    let deviation = measurelab_sqrt(variance);
-    if !float_is_finite(deviation) {
-        return Result<Summary, String>::Err("Math adapter returned a nonfinite value");
+    var deviation = 0.0;
+    match float_sqrt(variance) {
+        FloatResult::Ok(value) => { deviation = value; }
+        FloatResult::Err(error) => { return Result<Summary, String>::Err(error); }
     }
     return Result<Summary, String>::Ok(Summary(count: size, mean: mean, median: median, p95: list_get(ordered, rank), deviation: deviation, minimum: list_get(ordered, 0), maximum: list_get(ordered, size - 1)));
 }

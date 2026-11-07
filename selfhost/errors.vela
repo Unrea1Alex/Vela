@@ -18,6 +18,9 @@ pub fn propagation_family(c: Context, id: TypeId) -> String effects { state, io,
 }
 pub fn check_propagation(c: Context, syntax: SyntaxExpr) -> ExprId effects { state, io, process } {
     let ctl = list_get(c.control, 0);
+    if ctl.in_defer {
+        bad(c, "E229", "Propagation is not allowed in a deferred block.", syntax.span);
+    }
     if ctl.in_contract {
         bad(c, "E218", "Propagation is not allowed in contracts.", syntax.span);
     }

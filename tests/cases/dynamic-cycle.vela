@@ -1,0 +1,20 @@
+interface Reader { fn length(self: Self) -> Int effects { state }; }
+opaque struct Node { next: List<dyn Reader> }
+impl Reader for Node {
+    fn length(self: Node) -> Int effects { state } { return list_len(self.next); }
+}
+fn cycle() -> dyn Reader effects { state } {
+    let next = list_new<dyn Reader>();
+    let node = dyn Reader(Node(next: next));
+    list_push(next, node);
+    return node;
+}
+fn main() -> Unit effects { args, io, state } {
+    let live = cycle();
+    var count = 10;
+    if arg_count() > 0 { count = 1000; }
+    for i in 0 .. count { assert_true(cycle().length() == 1, "live cycle"); }
+    let trigger = list_new<Int>();
+    assert_true(list_len(trigger) == 0, "allocation");
+    print(live.length());
+}

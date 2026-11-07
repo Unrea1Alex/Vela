@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "application": "PulseDeck 1.0",
+  "vela": "Vela 1.0.0 (self-hosted)",
+  "platform": "win32",
+  "checks": [
+    {
+      "name": "parallel independent results",
+      "code": 0,
+      "elapsed_ms": 914,
+      "peak": 3
+    },
+    {
+      "name": "binary Unicode empty and expected status",
+      "code": 0,
+      "elapsed_ms": 203,
+      "peak": 3
+    },
+    {
+      "name": "HTTP failure and redirect",
+      "code": 1,
+      "elapsed_ms": 137,
+      "peak": 2
+    },
+    {
+      "name": "declared and chunked body limits",
+      "code": 1,
+      "elapsed_ms": 168,
+      "peak": 2
+    },
+    {
+      "name": "truncated body",
+      "code": 1,
+      "elapsed_ms": 123,
+      "peak": 1
+    },
+    {
+      "name": "deadline with independent success",
+      "code": 1,
+      "elapsed_ms": 495,
+      "peak": 2
+    },
+    {
+      "name": "cancel active and queued",
+      "code": 3,
+      "elapsed_ms": 401,
+      "peak": 1
+    },
+    {
+      "name": "cancel keeps completed results",
+      "code": 3,
+      "elapsed_ms": 481,
+      "peak": 2
+    },
+    {
+      "name": "trusted HTTPS",
+      "code": 0,
+      "elapsed_ms": 142,
+      "peak": 1
+    },
+    {
+      "name": "untrusted HTTPS",
+      "code": 1,
+      "elapsed_ms": 121,
+      "peak": 1
+    },
+    {
+      "name": "TLS hostname mismatch",
+      "code": 1,
+      "elapsed_ms": 138,
+      "peak": 1
+    },
+    {
+      "name": "missing curl executable",
+      "code": 1,
+      "elapsed_ms": 79,
+      "peak": 1
+    },
+    {
+      "name": "invalid concurrency",
+      "code": 2
+    },
+    {
+      "name": "duplicate names",
+      "code": 2
+    },
+    {
+      "name": "invalid target",
+      "code": 2
+    },
+    {
+      "name": "invalid warmup",
+      "code": 2
+    },
+    {
+      "name": "oversized endpoint list",
+      "code": 2
+    },
+    {
+      "name": "invalid port zero",
+      "code": 2
+    },
+    {
+      "name": "invalid byte limit",
+      "code": 2
+    },
+    {
+      "name": "invalid timeout",
+      "code": 2
+    },
+    {
+      "name": "relative curl path",
+      "code": 2
+    }
+  ],
+  "passed": 21,
+  "failed": 0,
+  "real_server_peak": 3
+}

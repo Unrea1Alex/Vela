@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "lsp": {
+    "hover": true,
+    "references": 3,
+    "versioned_edits": 3,
+    "native_plan_parity": true,
+    "rename_applied": false
+  },
+  "mcp": {
+    "transport": "official SDK / local stdio",
+    "native_tools_in_this_chat": false,
+    "calls": [
+      "vela_get_context",
+      "vela_get_help",
+      "vela_get_help",
+      "vela_check",
+      "vela_query",
+      "vela_plan",
+      "vela_test",
+      "vela_build",
+      "vela_run",
+      "vela_read_output"
+    ],
+    "rename_preview_files": 3,
+    "named_tests": 7,
+    "output": {
+      "bytes": 20922,
+      "sha256": "467ca95f8abf66ffa28590d384e54f497d42d080fa5e095aa3692ec532f9f622",
+      "saved_explicitly": "report-mcp.html",
+      "identical_to_native": true
+    }
+  }
+}

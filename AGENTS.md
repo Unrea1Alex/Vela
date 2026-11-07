@@ -23,7 +23,7 @@
 - New features need observable behavior tests, including rejection/error cases where appropriate.
 - Document semantic changes in `docs/LANGUAGE.md`; update `docs/ARCHITECTURE.md` when changing phase boundaries.
 - Do not silently expand the memory model. Specify ownership/lifetimes before adding dynamic allocations or references.
-- The current model is the process region in `docs/MEMORY.md`; list reads/writes require `state`.
+- Follow the precise tracing model in `docs/MEMORY.md` and preserve bootstrap compatibility. List reads/writes require `state`.
 - Edit authored selfhost/*.vela files, not the generated selfhost/compiler.vela bundle. `tools/bundle.vela` reads `selfhost/sources.list`; `.\vela-dev.cmd bundle` regenerates the bundle.
 - Add builtin signatures, effects, generic patterns and ABI classifications only in `vela/builtins.def`. Keep the Python reference reader and native catalog reader compatible with that format.
 - Tests live in `tests/cases/` plus `tools/test.vela`. Add explicit expected outputs/rejection codes; do not use compiler output as its own test oracle.

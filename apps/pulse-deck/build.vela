@@ -1,0 +1,59 @@
+import "../../tools/test.vela" as test;
+fn adapter(suite: test::Suite, source: String, name: String,
+    libraries: String) -> Bool effects { io, process, state } {
+    let args = test::command(env("VELA_CC"));
+    for flag in test::split("/nologo|/std:c11|/LD|/MT|/O2|/fp:strict|/utf-8|/W3", 124) {
+        strings_push(args, flag);
+    }
+    strings_push(args, "/Fo" + suite.dir + "/" + name + ".obj");
+    strings_push(args, "/Fe" + suite.dir + "/" + name + ".dll");
+    strings_push(args, suite.root + "/" + source);
+    strings_push(args, "/link");
+    strings_push(args, "/IMPLIB:" + suite.dir + "/" + name + ".lib");
+    for lib in test::split(libraries, 124) {
+        strings_push(args, lib);
+    }
+    let built = test::invoke(suite, args, 30000);
+    if built.code != 0 {
+        eprint(built.out + built.err);
+        return false;
+    }
+    return true;
+}
+fn main() -> Int effects { io, process, state } {
+    if platform() != "windows" || env("VELA_CC_KIND") != "msvc" {
+        eprint("Use Windows x64 / MSVC");
+        return 2;
+    }
+    let root = test::value(absolute_path("."));
+    test::done(make_dir(root + "/build"));
+    test::done(make_dir(root + "/build/pulse-deck-cache"));
+    let output = root + "/apps/pulse-deck/bin";
+    test::done(make_dir(output));
+    let suite = test::Suite(root: root, compiler: root + "/bin/velac.exe", dir: output, passed: 0,
+        failed: 0);
+    if !adapter(suite, "native/gui/adapter.c", "vela-gui", "user32.lib|gdi32.lib") {
+        return 2;
+    }
+    if !adapter(suite, "native/http-server/adapter.c", "vela-http-server", "ws2_32.lib") {
+        return 2;
+    }
+    let project = root + "/apps/pulse-deck/vela.project";
+    let locked = test::invoke(suite, test::compiler_command(suite, "lock", project), 30000);
+    if locked.code != 0 {
+        eprint(locked.out + locked.err);
+        return 2;
+    }
+    let args = test::compiler_command(suite, "build", project);
+    strings_push(args, "-o");
+    strings_push(args, output + "/pulse-deck.exe");
+    strings_push(args, "--cache");
+    strings_push(args, root + "/build/pulse-deck-cache");
+    let built = test::invoke(suite, args, 120000);
+    if built.code != 0 {
+        eprint(built.out + built.err);
+        return 2;
+    }
+    print(output + "/pulse-deck.exe");
+    return 0;
+}

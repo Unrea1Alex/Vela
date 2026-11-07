@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "milestone": "0.11.2",
+  "compiler": "0.11.0-dev.2",
+  "platform": "Windows x64/MSVC",
+  "compiler_sha256": "dc191aefca833d5c56c85d8ccb35345b1cbd7966c52b0982ae850c3dd899f975",
+  "native": {
+    "passed": 1162,
+    "compiler_fixed_point": true,
+    "skipped": 0,
+    "log": "build/stage112/verify-client.log",
+    "bundler_fixed_point": true,
+    "failed": 0
+  },
+  "http_client": {
+    "gate": "tests/network/http-client-gate.mjs",
+    "engine": "curl/libcurl 8.22.0 Schannel",
+    "passed": 13
+  },
+  "http_server": {
+    "body_bytes": 1048576,
+    "concurrent": true,
+    "gate": "tests/network/http-server-gate.mjs",
+    "passed": 9
+  },
+  "scope": [
+    "Windows client HTTP and HTTPS",
+    "Windows IPv4 loopback HTTP server"
+  ]
+}

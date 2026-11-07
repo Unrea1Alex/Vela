@@ -38,6 +38,8 @@ pub fn lex_range(c: Context, begin: Int, limit: Int) -> Unit effects { state, io
                 i = i + 1;
             }
             list_push(c.comments, Token(kind: 55, text: str_slice(s, start, i), span: Span(start: start, end: i)));
+        } else if b == 102 && raw_delimiter(s, i + 1, limit) {
+            fail(c, "E001", "Raw strings do not support interpolation.", i, i + 4);
         } else if b == 102 && i + 1 < limit && str_byte(s, i + 1) == 34 {
             i = interpolation_end(c, i);
             kind = 56;
@@ -69,6 +71,18 @@ pub fn lex_range(c: Context, begin: Int, limit: Int) -> Unit effects { state, io
                 if i == exponent_start { fail(c, "E001", "Expected exponent digits.", start, i); }
             }
             value = str_slice(s, start, i);
+        } else if raw_delimiter(s, i, limit) {
+            i = i + 3;
+            let content = i;
+            while i + 2 < limit && !raw_delimiter(s, i, limit) {
+                i = i + 1;
+            }
+            if !raw_delimiter(s, i, limit) {
+                fail(c, "E001", "Unterminated raw string literal.", start, start + 3);
+            }
+            value = str_slice(s, content, i);
+            i = i + 3;
+            kind = 58;
         } else if b == 34 {
             i = i + 1;
             let parts = strings_new();
@@ -117,7 +131,7 @@ pub fn lex_range(c: Context, begin: Int, limit: Int) -> Unit effects { state, io
                 i = i + 2;
                 kind = 53;
                 value = pair;
-            } else if contains_byte("(){}:.,;=+-*/%!<>?", b) {
+            } else if contains_byte("(){}[]:.,;=+-*/%!<>?", b) {
                 i = i + 1;
                 kind = 53;
                 value = str_slice(s, start, i);
@@ -130,6 +144,9 @@ pub fn lex_range(c: Context, begin: Int, limit: Int) -> Unit effects { state, io
         }
     }
     list_push(c.tokens, Token(kind: 54, text: "<eof>", span: Span(start: i, end: i)));
+}
+pub fn raw_delimiter(s: String, i: Int, limit: Int) -> Bool {
+    return i + 2 < limit && str_byte(s, i) == 34 && str_byte(s, i + 1) == 34 && str_byte(s, i + 2) == 34;
 }
 pub fn quoted_end(c: Context, start: Int) -> Int effects { state, io, process } {
     let s = c.source_text;
@@ -164,6 +181,8 @@ pub fn interpolation_hole_end(c: Context, start: Int) -> Int effects { state, io
         }
         if b == 102 && i + 1 < str_len(s) && str_byte(s, i + 1) == 34 {
             i = interpolation_end(c, i);
+        } else if raw_delimiter(s, i, str_len(s)) {
+            fail(c, "E001", "Raw strings are not allowed in interpolation holes.", i, i + 3);
         } else if b == 34 {
             i = quoted_end(c, i);
         } else {

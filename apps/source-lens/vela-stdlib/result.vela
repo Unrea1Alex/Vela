@@ -1,0 +1,12 @@
+pub fn map_error<T, E, F, effect Eff>(value: Result<T, E>, transform: fn(
+    E) -> F effects Eff) -> Result<T, F> effects Eff {
+    return match value {
+        Result::Ok(item) => Result<T, F>::Ok(item),
+        Result::Err(error) => Result<T, F>::Err(transform(error))
+    };
+}
+pub fn explain<T, E>(value: Result<T, E>, message: String) -> Result<T, String> {
+    return map_error(value, fn [ message ](error: E) -> String {
+        return message;
+    });
+}

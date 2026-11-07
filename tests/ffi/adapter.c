@@ -26,3 +26,35 @@ VELA_FFI_EXPORT void *null_resource(void) { return NULL; }
 VELA_FFI_EXPORT int64_t resource_value(void *p) { return p ? *(int64_t*)p : -1; }
 VELA_FFI_EXPORT void release_resource(void *p) { ++destroyed; free(p); fesetround(FE_DOWNWARD); }
 VELA_FFI_EXPORT int64_t release_count(void) { return destroyed; }
+
+#include <windows.h>
+static const VelaCallback *saved_callback;
+VELA_FFI_EXPORT void save_callback(void *owner, const VelaCallback *callback) {
+    if (owner && callback && callback->version == VELA_CALLBACK_VERSION) saved_callback = callback;
+}
+VELA_FFI_EXPORT int64_t invoke_saved(int64_t input) {
+    int64_t output = -1;
+    int32_t status;
+    if (!saved_callback) return -100;
+    fesetround(FE_UPWARD);
+    status = saved_callback->invoke(saved_callback->token, input, &output);
+    if (fegetround() != FE_UPWARD) return -999;
+    if (status && output != -1) return -998;
+    return status ? -100 - status : output;
+}
+static DWORD WINAPI invoke_on_worker(void *ignored) {
+    int64_t output = -1;
+    int32_t status;
+    (void)ignored;
+    status = saved_callback->invoke(saved_callback->token, 0, &output);
+    return output == -1 ? (DWORD)status : 999;
+}
+VELA_FFI_EXPORT int64_t callback_other_thread(void) {
+    DWORD status = 999;
+    HANDLE worker = CreateThread(NULL, 0, invoke_on_worker, NULL, 0, NULL);
+    if (!worker) return status;
+    WaitForSingleObject(worker, INFINITE);
+    GetExitCodeThread(worker, &status);
+    CloseHandle(worker);
+    return status;
+}

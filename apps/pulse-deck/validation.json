@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "date": "2026-11-07",
+  "application": "PulseDeck 1.0",
+  "compiler": "Vela 0.11.0 (self-hosted)",
+  "compiler_sha256": "d42a53036cff19d8a9b6aa57ec27420a5a92764e7f69a3e66003c881239afebc",
+  "compiler_runtime_changed": false,
+  "platform": "Windows x64 / MSVC",
+  "status": "verified",
+  "curl": "8.22.0 / Schannel",
+  "named_tests": {"passed": 10, "failed": 0, "command": "vela.cmd test apps/pulse-deck/vela.project --json"},
+  "network": {"passed": 21, "failed": 0, "evidence": "network-validation.json", "real_overlapping_requests": 3},
+  "tooling": {"passed": 4, "failed": 0, "evidence": "tooling-validation.json", "cold_check_ms": 172, "warm_check_ms": 39},
+  "delivery": {"passed": 5, "failed": 0, "evidence": "delivery-validation.json"},
+  "gui": {
+    "method": "computer-use sky: native window screenshots, accessibility, observed input actions",
+    "final_executable_sha256": "af63c9ba6f6d4aa5ef72bdb144f6bd3924e48381cc6d7de198073f9bec226c14",
+    "checks": [
+      "offline demo displays healthy, HTTP failures and byte limit",
+      "Unicode label and UTF-8 response",
+      "window responds to About with two HTTPS requests pending",
+      "Cancel drains both active HTTPS requests and keeps completed results",
+      "Save JSON updates the report",
+      "Run checks works after cancellation",
+      "Close during two active HTTPS requests drains and closes the window",
+      "final executable repeat: cancel, restart, close, reports retained",
+      "no curl processes or exchange staging remain after cancellation/close"
+    ],
+    "cancel_evidence": "gui-cancel-report.json",
+    "close_evidence": "gui-close-report.json",
+    "final_windows_remaining": 0
+  },
+  "skill_validation": "quick_validate.py: Skill is valid!",
+  "documentation": {"files": 89, "links": 548, "missing": 0, "evidence": "docs-validation.json"},
+  "mcp": {"passed": 5, "failed": 0, "skipped": 0, "requests_in_lifecycle_gate": 1000, "duration_ms": 139666.8841, "pinned_files": 56, "fingerprint_mismatches": 0, "command": "npm test --prefix integrations/mcp"},
+  "format_checks": "project, build.vela and debug-build.vela passed",
+  "diff_check": "git -c core.whitespace=cr-at-eol diff --check passed",
+  "roadmap": ["1.0.1a", "1.0.1b", "1.0.1c", "1.0.1d", "1.0.1e"],
+  "not_performed": [
+    "Full compiler verify: no compiler/runtime semantics changed; existing compiler hash retained",
+    "Linux GUI/network application support",
+    "Separate fresh Windows OS and multiple DPI scales",
+    "Long-duration load/soak and public internet service checks",
+    "Interactive debugger stepping",
+    "Cold independent agent onboarding and MCP isolated execution of this GUI app"
+  ],
+  "publication": "local artifacts only; no commit, push or release publication"
+}

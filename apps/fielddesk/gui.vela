@@ -1,0 +1,302 @@
+import "../../std/gui.vela" as ui;
+import "analyze.vela" as analyze;
+import "model.vela" as model;
+import "demo.vela" as demo;
+import "network.vela" as network;
+import "report.vela" as report;
+import "workflow.vela" as workflow;
+import "../../std/path.vela" as path;
+import "../../std/event_loop.vela" as loop;
+import "../../std/http.vela" as http;
+import "../../std/process.vela" as process;
+import "../../std/result.vela" as result;
+import "../../std/services.vela" as services;
+import "../../std/text.vela" as text;
+pub enum Event {
+    Analyze,
+    Export,
+    Close,
+    Fetch,
+    Cancel,
+    Changed
+}
+pub struct Options {
+    output: path::Path,
+    directory: path::Path,
+    settings: model::Settings,
+    endpoint: Option<network::Endpoint>
+}
+struct Transfer {
+    exchange: http::Exchange,
+    started: Int,
+    cancelled: Bool,
+    edited: Bool
+}
+pub fn enqueue(events: List<Event>, code: Int) -> Int effects { state } {
+    if list_len(events) >= 64 {
+        return 1;
+    }
+    if code == 101 {
+        list_push(events, Event::Analyze);
+    } else if code == 102 {
+        list_push(events, Event::Export);
+    } else if code == 103 {
+        list_push(events, Event::Close);
+    } else if code == 104 {
+        list_push(events, Event::Fetch);
+    } else if code == 105 {
+        list_push(events, Event::Cancel);
+    } else if code == 106 {
+        list_push(events, Event::Changed);
+    } else {
+        return 1;
+    }
+    return 0;
+}
+fn action(window: ui::Window, config: model::Settings, output: path::Path,
+    export: Bool) -> Result<String, String> effects { io, process, state } {
+    let data = analyze::memory(ui::snapshot(window)?, config, 8192)?;
+    if !export {
+        return Result<String, String>::Ok(report::summary(data));
+    }
+    let clock = dyn services::Clock(services::os_clock());
+    let entropy = dyn services::Entropy(services::os_entropy());
+    let timestamp = result::explain(clock.now_ms(), "Clock unavailable")?;
+    let seed = result::explain(entropy.next_u32(), "Entropy unavailable")?;
+    let html = report::html(data, config, timestamp, services::random_step(seed).value)?;
+    let files = dyn services::FileStore(services::os_files());
+    let committed = result::map_error(files.publish(output, text::Bytes(data: html)),
+        workflow::file_error)?;
+    if !committed {
+        return Result<String, String>::Err("Report was not committed");
+    }
+    return Result<String, String>::Ok("Exported: " + output.value + "\n" + report::summary(data));
+}
+fn windows_lines(value: String) -> Result<String, String> effects { state } {
+    let parts = strings_new();
+    var previous = -1;
+    for i in 0 .. str_len(value) {
+        let byte = str_byte(value, i);
+        if byte == 10 && previous != 13 {
+            strings_push(parts, "\r");
+        }
+        strings_push(parts, str_from_byte(byte));
+        previous = byte;
+    }
+    let normalized = strings_join(parts, "");
+    if str_len(normalized) > 4096 {
+        return Result<String, String>::Err("Editor exceeds 4096 UTF-8 bytes after CRLF conversion");
+    }
+    return Result<String, String>::Ok(normalized);
+}
+fn status(window: ui::Window, message: String) -> Result<Bool, String> effects { io, process,
+    state } {
+    if !ui::status(window, message) {
+        return Result<Bool, String>::Err("Cannot update status");
+    }
+    return Result<Bool, String>::Ok(true);
+}
+fn ready(window: ui::Window, options: Options, transfer: Transfer,
+    response: http::Response) -> Result<String, String> effects { io, process, state } {
+    if transfer.cancelled {
+        return Result<String, String>::Ok("Load cancelled.");
+    }
+    if transfer.edited {
+        return Result<String, String>::Ok("Editor changed during load. Your edits were kept.");
+    }
+    let data = windows_lines(network::body(response)?)?;
+    let checked = analyze::memory(data, options.settings, 8192)?;
+    if !ui::set_text(window, data) {
+        return Result<String, String>::Err("Cannot update editor");
+    }
+    return Result<String, String>::Ok(
+        "Measurements loaded. Analyze or export to update the summary.");
+}
+fn buttons(window: ui::Window, options: Options, active: List<Transfer>) -> Result<Bool,
+    String> effects { io, process, state } {
+    let configured = match options.endpoint {
+        Option::Some(_) => 1,
+        Option::None => 0
+    };
+    let count = list_len(active);
+    var cancelling = 0;
+    if count > 0 && list_get(active, 0).cancelled {
+        cancelling = 1;
+    }
+    if !(ui::enabled(window, 101, count == 0) && ui::enabled(window, 102, count == 0)
+        && ui::enabled(window, 104, configured == 1 && count == 0) && ui::enabled(window, 105, count
+        > 0 && cancelling == 0)) {
+        return Result<Bool, String>::Err("Cannot update buttons");
+    }
+    return Result<Bool, String>::Ok(true);
+}
+fn message(window: ui::Window, value: Result<String, String>) -> Result<Bool, String> effects { io,
+    process, state } {
+    return status(window, match value {
+        Result::Ok(text) => text,
+        Result::Err(error) => "Error: " + error
+    });
+}
+fn start_load(window: ui::Window, options: Options, scheduler: loop::Loop<process::Completed>,
+    active: List<Transfer>, endpoint: network::Endpoint) -> Result<Bool, String> effects { io,
+    process, state } {
+    let now = network::clock()?;
+    let turn = result::explain(loop::tick(scheduler, now), "Cannot drive network loop")?;
+    match network::start(endpoint, scheduler, options.directory) {
+        Result::Err(error) => {
+            return status(window, "Error: " + error);
+        }
+        Result::Ok(exchange) => {
+            list_push(active, Transfer(exchange: exchange, started: now, cancelled: false,
+                edited: false));
+            let changed = buttons(window, options, active)?;
+            return status(window, "Loading measurements…");
+        }
+    }
+}
+fn finish_load(window: ui::Window, options: Options, active: List<Transfer>, transfer: Transfer,
+    value: Result<String, String>) -> Result<Bool, String> effects { io, process, state } {
+    let released = result::map_error(http::release(transfer.exchange), network::error)?;
+    list_truncate(active, 0);
+    let changed = buttons(window, options, active)?;
+    if transfer.cancelled {
+        return status(window, "Load cancelled.");
+    }
+    return message(window, value);
+}
+fn update(window: ui::Window, options: Options, active: List<Transfer>, now: Int) -> Result<Bool,
+    String> effects { io, process, state } {
+    let transfer = list_get(active, 0);
+    match http::poll(transfer.exchange) {
+        Result::Err(error) => {
+            return finish_load(window, options, active, transfer, Result<String, String>::Err(
+                network::error(error)));
+        }
+        Result::Ok(value) => {
+            match value {
+                Option::Some(response) => {
+                    let outcome = ready(window, options, transfer, response);
+                    return finish_load(window, options, active, transfer, outcome);
+                }
+                Option::None => {
+                    if transfer.cancelled {
+                        return status(window, "Cancelling load…");
+                    }
+                    return status(window, f"Loading measurements… {now - transfer.started:d} ms");
+                }
+            }
+        }
+    }
+}
+fn interact(window: ui::Window, events: List<Event>, options: Options,
+    scheduler: loop::Loop<process::Completed>, active: List<Transfer>) -> Result<Bool,
+    String> effects { io, process, state } {
+    if !ui::set_text(window, windows_lines(demo::data())?) {
+        return Result<Bool, String>::Err("Cannot initialize window");
+    }
+    let initialized = buttons(window, options, active)?;
+    while true {
+        for code in ui::pump(window, 25)? {
+            let queued = enqueue(events, code);
+        }
+        for event in events {
+            match event {
+                Event::Close => {
+                    return Result<Bool, String>::Ok(true);
+                }
+                Event::Changed => {
+                    if list_len(active) > 0 {
+                        var transfer = list_get(active, 0);
+                        transfer.edited = true;
+                        list_set(active, 0, transfer);
+                    } else {
+                        let changed = status(window,
+                            "Edited. Analyze or export to update the summary.")?;
+                    }
+                }
+                Event::Fetch => {
+                    if list_len(active) == 0 {
+                        match options.endpoint {
+                            Option::None => {}
+                            Option::Some(endpoint) => {
+                                let started = start_load(window, options, scheduler, active,
+                                    endpoint)?;
+                            }
+                        }
+                    }
+                }
+                Event::Cancel => {
+                    if list_len(active) > 0 {
+                        var transfer = list_get(active, 0);
+                        let requested = http::cancel(transfer.exchange);
+                        transfer.cancelled = true;
+                        list_set(active, 0, transfer);
+                        let changed = buttons(window, options, active)?;
+                    }
+                }
+                Event::Analyze => {
+                    if list_len(active) == 0 {
+                        let updated = message(window, action(window, options.settings,
+                            options.output, false))?;
+                    }
+                }
+                Event::Export => {
+                    if list_len(active) == 0 {
+                        let updated = message(window, action(window, options.settings,
+                            options.output, true))?;
+                    }
+                }
+            }
+        }
+        list_truncate(events, 0);
+        if list_len(active) > 0 {
+            let now = network::clock()?;
+            let turn = result::explain(loop::tick(scheduler, now), "Cannot drive network loop")?;
+            let updated = update(window, options, active, now)?;
+        }
+    }
+    return Result<Bool, String>::Err("Unexpected GUI exit");
+}
+fn drain(scheduler: loop::Loop<process::Completed>, active: List<Transfer>) -> Result<Bool,
+    String> effects { io, process, state } {
+    if list_len(active) > 0 {
+        let exchange = list_get(active, 0).exchange;
+        let cancelled = http::cancel(exchange);
+        while http::pending(exchange) {
+            let turn = result::explain(loop::tick(scheduler, network::clock()?),
+                "Cannot drain HTTP loop")?;
+        }
+        let released = result::map_error(http::release(exchange), network::error)?;
+    }
+    return result::explain(loop::shutdown(scheduler), "Cannot close network loop");
+}
+fn completed(value: WriteResult) -> Result<Bool, String> {
+    return match value {
+        WriteResult::Ok => Result<Bool, String>::Ok(true),
+        WriteResult::Err(error) => Result<Bool, String>::Err(error)
+    };
+}
+fn registered(window: ui::Window, options: Options) -> Result<Bool, String> effects { io, process,
+    state } {
+    let scheduler = result::explain(loop::create<process::Completed>(network::clock()?),
+        "Cannot create network loop")?;
+    let active = list_new<Transfer>();
+    let events = list_new<Event>();
+    let outcome = interact(window, events, options, scheduler, active);
+    let drained = drain(scheduler, active)?;
+    return outcome;
+}
+pub fn show(options: Options) -> Result<Bool, String> effects { io, process, state } {
+    let buttons = list_new<ui::Button>();
+    list_push(buttons, ui::Button(id: 101, label: "Analyze"));
+    list_push(buttons, ui::Button(id: 102, label: "Export"));
+    list_push(buttons, ui::Button(id: 104, label: "Load HTTPS"));
+    list_push(buttons, ui::Button(id: 105, label: "Cancel"));
+    list_push(buttons, ui::Button(id: 103, label: "Close"));
+    let window = ui::open(ui::Config(title: "FieldDesk — журнал измерений",
+        caption: "Measurements / UTF-8 editor", width: 660, height: 376, read_only: false,
+        text_limit: 4096, buttons: buttons, close_id: 103, changed_id: 106))?;
+    let outcome = registered(window, options);
+    let closed = ui::close(window)?;
+    return outcome;
+}

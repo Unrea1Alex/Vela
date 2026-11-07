@@ -1,0 +1,7 @@
+fn register(owner: ForeignHandle) -> CallbackResult effects { state, process } {
+    return ffi_callback_register(owner, fn [](value: Int) -> Int effects { io } {
+        print(value);
+        return value;
+    });
+}
+fn main() -> Unit {}

@@ -1,0 +1,4 @@
+fn main() -> Int effects { process } {
+    panic("terminal");
+    return 0;
+}

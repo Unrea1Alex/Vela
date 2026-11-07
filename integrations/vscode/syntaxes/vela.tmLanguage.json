@@ -1,0 +1,170 @@
+{
+  "name": "Vela",
+  "scopeName": "source.vela",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#declarations" },
+    { "include": "#code" }
+  ],
+  "repository": {
+    "comments": {
+      "match": "(//).*$",
+      "name": "comment.line.double-slash.vela",
+      "captures": {
+        "1": { "name": "punctuation.definition.comment.vela" }
+      }
+    },
+    "declarations": {
+      "patterns": [
+        {
+          "match": "\\b(fn)[ \\t]+([A-Za-z_][A-Za-z0-9_]*)\\b",
+          "captures": {
+            "1": { "name": "storage.type.function.vela" },
+            "2": { "name": "entity.name.function.vela" }
+          }
+        },
+        {
+          "match": "\\b(enum|struct|type)[ \\t]+([A-Za-z_][A-Za-z0-9_]*)\\b",
+          "captures": {
+            "1": { "name": "storage.type.vela" },
+            "2": { "name": "entity.name.type.vela" }
+          }
+        },
+        {
+          "match": "\\b(?:extern|test)\\b(?=[ \\t]*\")",
+          "name": "storage.type.vela"
+        },
+        {
+          "match": "\\b(?:scope|defer)\\b(?=[ \\t]*\\{)",
+          "name": "keyword.control.vela"
+        },
+        {
+          "begin": "\\b(effects)\\s*(\\{)",
+          "end": "\\}|(?=\\S)",
+          "applyEndPatternLast": true,
+          "beginCaptures": {
+            "1": { "name": "keyword.other.contract.vela" },
+            "2": { "name": "punctuation.section.block.begin.vela" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.section.block.end.vela" }
+          },
+          "patterns": [
+            { "include": "#comments" },
+            { "match": "\\b(?:io|args|state|process)\\b", "name": "support.constant.effect.vela" },
+            { "match": ",", "name": "punctuation.separator.vela" }
+          ]
+        }
+      ]
+    },
+    "code": {
+      "patterns": [
+        { "include": "#strings" },
+        { "match": "\\b(?:import|as|for|in|break|continue|return|if|else|while|match)\\b", "name": "keyword.control.vela" },
+        { "match": "\\b(?:pub|distinct)\\b", "name": "storage.modifier.vela" },
+        { "match": "\\b(?:fn|enum|struct|type|let|var)\\b", "name": "storage.type.vela" },
+        { "match": "\\b(?:effects|requires|ensures)\\b", "name": "keyword.other.contract.vela" },
+        { "match": "\\b(?:true|false)\\b", "name": "constant.language.boolean.vela" },
+        {
+          "match": "\\b(?:Bool|Dict|Float64|FloatResult|ForeignHandle|Int|Int32|Int32Result|IntList|IntResult|List|Option|ProcessResult|ReadResult|Result|String|StringList|StringResult|Unit|WriteResult)\\b",
+          "name": "support.type.vela"
+        },
+        {
+          "match": "\\b[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b",
+          "name": "constant.numeric.vela"
+        },
+        { "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b(?=[ \\t]*\\()", "name": "entity.name.function.call.vela" },
+        { "match": "->|=>|==|!=|<=|>=|&&|\\|\\||[-+*/%!<>?=]|\\.\\.=|\\.\\.", "name": "keyword.operator.vela" },
+        { "match": "::|\\.", "name": "punctuation.accessor.vela" },
+        { "match": "[:,;]", "name": "punctuation.separator.vela" },
+        { "match": "[(){}]", "name": "punctuation.section.vela" }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.triple.vela",
+          "begin": "\"\"\"",
+          "end": "\"\"\""
+        },
+        {
+          "name": "string.quoted.double.interpolated.vela",
+          "begin": "\\bf\"",
+          "end": "\"|(?=$)",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.string.begin.vela" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.string.end.vela" }
+          },
+          "patterns": [
+            { "include": "#escapes" },
+            { "match": "\\{\\{|\\}\\}", "name": "constant.character.escape.vela" },
+            { "include": "#interpolation" },
+            { "match": "\\}", "name": "invalid.illegal.interpolation-brace.vela" }
+          ]
+        },
+        {
+          "name": "string.quoted.double.vela",
+          "begin": "\"",
+          "end": "\"|(?=$)",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.string.begin.vela" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.string.end.vela" }
+          },
+          "patterns": [
+            { "include": "#escapes" }
+          ]
+        }
+      ]
+    },
+    "escapes": {
+      "patterns": [
+        { "match": "\\\\[nrt0\"\\\\]", "name": "constant.character.escape.vela" },
+        { "match": "\\\\[^\\n]?", "name": "invalid.illegal.escape.vela" }
+      ]
+    },
+    "interpolation": {
+      "name": "meta.interpolation.vela",
+      "begin": "\\{",
+      "end": "\\}|(?=$)",
+      "beginCaptures": {
+        "0": { "name": "punctuation.section.interpolation.begin.vela" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.section.interpolation.end.vela" }
+      },
+      "patterns": [
+        {
+          "match": "(:)[ \\t]*(d|s|b|display)(?=[ \\t]*\\})",
+          "captures": {
+            "1": { "name": "punctuation.separator.format.vela" },
+            "2": { "name": "constant.other.format.vela" }
+          }
+        },
+        { "include": "#interpolation-expression" }
+      ]
+    },
+    "interpolation-expression": {
+      "patterns": [
+        { "match": "//.*$", "name": "invalid.illegal.comment-in-interpolation.vela" },
+        {
+          "begin": "\\{",
+          "end": "\\}|(?=$)",
+          "beginCaptures": {
+            "0": { "name": "punctuation.section.block.begin.vela" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.section.block.end.vela" }
+          },
+          "patterns": [
+            { "include": "#interpolation-expression" }
+          ]
+        },
+        { "include": "#code" }
+      ]
+    }
+  }
+}

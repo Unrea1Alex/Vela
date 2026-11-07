@@ -1,0 +1,134 @@
+import "model.vela";
+import "projects.vela";
+import "driver.vela";
+import "embedded.vela";
+import "core.vela";
+pub struct Cache {
+    directory: String,
+    report: Bool
+}
+pub fn cache_event(cache: Cache, phase: String, layer: String, status: String, reason: String,
+    key: String, message: String, warning: Bool) -> Unit effects { io, state } {
+    if !cache.report && !warning { return; }
+    eprint("{\"schema_version\":1,\"kind\":\"cache\",\"phase\":" + json_string(phase)
+        + ",\"layer\":" + json_string(layer) + ",\"status\":" + json_string(status)
+        + ",\"reason\":" + json_string(reason) + ",\"directory\":" + json_string(cache.directory)
+        + ",\"key\":" + json_string(key) + ",\"message\":" + json_string(message) + "}");
+}
+pub fn cache_prepare(directory: String, report: Bool) -> Cache effects { io, state } {
+    let cache = Cache(directory: directory, report: report);
+    if directory == "" {
+        cache_event(cache, "directory", "all", "disabled", "not_requested", "", "", false);
+        return cache;
+    }
+    match make_dir(directory) {
+        WriteResult::Ok => {
+            cache_event(cache, "directory", "all", "ready", "available", "", "", false);
+            return cache;
+        }
+        WriteResult::Err(message) => {
+            cache_event(cache, "directory", "all", "unavailable", "create_failed", "", message, true);
+            return Cache(directory: "", report: report);
+        }
+    }
+}
+// The file name binds the record to its input key. The header checks integrity.
+pub fn cache_read(cache: Cache, key: String, layer: String) -> Option<String> effects { io, state } {
+    if cache.directory == "" {
+        return Option<String>::None;
+    }
+    let prefix = "VLC1\n" + key + "\n";
+    var reason = "corrupt";
+    var message = "";
+    match read_file_bounded(cache.directory + "/vela-cache-v1-" + key, 67108864) {
+        ReadResult::Ok(value) => {
+            if str_len(value) >= 135 && str_slice(value, 0, 70) == prefix && str_byte(value, 134)
+                == 10 {
+                let body = str_slice(value, 135, str_len(value));
+                if sha256(body) == str_slice(value, 70, 134) {
+                    return Option<String>::Some(body);
+                }
+            }
+        }
+        ReadResult::Limit => { reason = "limit"; }
+        ReadResult::Err(error) => { reason = "read_error"; message = error; }
+    }
+    cache_event(cache, "read", layer, "miss", reason, key, message, false);
+    return Option<String>::None;
+}
+pub fn cache_store(cache: Cache, key: String, body: String, layer: String) -> Unit effects { io, state } {
+    if cache.directory == "" {
+        return;
+    }
+    if str_len(body) > 67108729 {
+        cache_event(cache, "write", layer, "skipped", "limit", key, "", false);
+        return;
+    }
+    let record = "VLC1\n" + key + "\n" + sha256(body) + "\n" + body;
+    match write_atomic_result(cache.directory + "/vela-cache-v1-" + key, record) {
+        Result::Ok(_) => { cache_event(cache, "write", layer, "stored", "published", key, "", false); }
+        Result::Err(message) => { cache_event(cache, "write", layer, "failed", "write_error", key, message, true); }
+    }
+}
+pub fn import_cache_key(code: String) -> String {
+    return sha256("imports-v1\n" + compiler_fingerprint() + sha256(code));
+}
+pub fn encode_imports(specs: List<ImportSpec>) -> String effects { state } {
+    let parts = strings_new();
+    for spec in specs {
+        strings_push(parts, spec.path + "\n" + spec.alias + "\n" + to_string(spec.span.start) + "\n"
+            + to_string(spec.span.end) + "\n");
+    }
+    return strings_join(parts, "");
+}
+pub fn decode_imports(value: String, length: Int) -> Option<List<ImportSpec>> effects { state } {
+    let fields = project_split(value, 10);
+    let count = list_len(fields);
+    if count % 4 != 1 || list_get(fields, count - 1) != "" {
+        return Option<List<ImportSpec>>::None;
+    }
+    let imports = list_new<ImportSpec>();
+    var previous = 0;
+    for row in 0 .. count / 4 {
+        let i = row * 4;
+        let path = list_get(fields, i);
+        if path == "" {
+            return Option<List<ImportSpec>>::None;
+        }
+        var begin = -1;
+        var finish = -1;
+        match parse_int(list_get(fields, i + 2)) {
+            IntResult::Ok(n) => {
+                begin = n;
+            }
+            IntResult::Err(_) => {}
+        }
+        match parse_int(list_get(fields, i + 3)) {
+            IntResult::Ok(n) => {
+                finish = n;
+            }
+            IntResult::Err(_) => {}
+        }
+        if begin < previous || finish <= begin || finish > length {
+            return Option<List<ImportSpec>>::None;
+        }
+        list_push(imports, ImportSpec(path: path, alias: list_get(fields, i + 1), span: Span(
+            start: begin, end: finish)));
+        previous = finish;
+    }
+    return Option<List<ImportSpec>>::Some(imports);
+}
+pub fn analysis_cache_key(c: Context, p: Project, kind: String) -> String effects { state } {
+    let parts = strings_new();
+    strings_push(parts, compiler_fingerprint());
+    strings_push(parts, kind);
+    strings_push(parts, sha256(p.text));
+    for unit in c.source_units {
+        strings_push(parts, sha256(unit.path) + sha256(unit.name) + sha256(unit.code));
+    }
+    for edge in c.imports {
+        strings_push(parts, f"{edge.owner:d}:{edge.target:d}:{edge.span.start:d}:{edge.span.end:d}:"
+            + sha256(edge.alias));
+    }
+    return sha256(strings_join(parts, "\n"));
+}

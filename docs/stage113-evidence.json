@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "milestone": "0.11.3",
+  "compiler": "Vela 0.11.0-dev.2 (self-hosted)",
+  "compiler_sha256": "e3e089fc40cdaf329c5df5ef84156605f59045cea64c5cb576ba4b31a58ab95c",
+  "bootstrap": {
+    "bundler_fixed_point": true,
+    "generations": 3,
+    "compiler_fixed_point": true,
+    "log": "build/stage113/bootstrap-retry.log"
+  },
+  "fielddesk": {
+    "win32_live": [
+      "local HTTPS with fixture CA",
+      "mixed LF and CRLF in Unicode response",
+      "two records, mean 41.00",
+      "progress visible and action buttons disabled during response",
+      "Unicode typed in editor during transfer",
+      "late response preserved edits",
+      "HTTP 404 preserved edits",
+      "cancel closed connection",
+      "close drained connection and process",
+      "previous report preserved and staging removed"
+    ],
+    "named_tests": 17,
+    "http_checks": 8,
+    "display": "current Windows desktop scaling",
+    "gaps": [
+      "other DPI settings",
+      "other operating systems"
+    ],
+    "cli_checks": 19,
+    "executable_sha256": "5b7a38b0d6f53f13ee7cd7befe564eb54bb347dcf02edf8fdc1b74384c60c7ea"
+  }
+}

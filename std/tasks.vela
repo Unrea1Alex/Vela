@@ -1,0 +1,99 @@
+import "event_loop.vela" as loop;
+pub async fn wait_for<T>(job: loop::Task<T>) -> loop::Outcome<T> effects { state } {
+    while true {
+        match loop::outcome(job) {
+            Option::Some(value) => {
+                return value;
+            }
+            Option::None => {
+                await sleep_ms(1);
+            }
+        }
+    }
+    return loop::Outcome<T>::Failed("Task wait ended unexpectedly");
+}
+struct Driver<T> {
+    entry: async fn() -> Unit effects { io, state, process },
+    outcome: List<Option<T>>,
+    handles: List<ForeignHandle>
+}
+fn close<T>(driver: Driver<T>, handle: ForeignHandle) -> WriteResult effects { process, state } {
+    let answer = fiber_close(handle);
+    match answer {
+        WriteResult::Ok => {
+            list_truncate(driver.handles, 0);
+        }
+        WriteResult::Err(_) => {}
+    }
+    return answer;
+}
+fn finish<T>(driver: Driver<T>, handle: ForeignHandle) -> loop::Step<T> effects { process, state } {
+    match close(driver, handle) {
+        WriteResult::Err(message) => {
+            return loop::Step<T>::Failed(message);
+        }
+        WriteResult::Ok => {}
+    }
+    return match list_get(driver.outcome, 0) {
+        Option::Some(value) => loop::Step<T>::Done(value),
+        Option::None => loop::Step<T>::Failed("Task finished without a value")
+    };
+}
+fn step<T>(driver: Driver<T>) -> loop::Step<T> effects { io, process, state } {
+    if list_len(driver.handles) == 0 {
+        match fiber_open(driver.entry) {
+            SpawnResult::Err(message) => {
+                return loop::Step<T>::Failed(message);
+            }
+            SpawnResult::Ok(handle) => {
+                list_push(driver.handles, handle);
+            }
+        }
+    }
+    let handle = list_get(driver.handles, 0);
+    match fiber_step(handle) {
+        IntResult::Err(message) => {
+            return loop::Step<T>::Failed(message);
+        }
+        IntResult::Ok(delay) => {
+            if delay == -1 {
+                return finish(driver, handle);
+            }
+            return loop::Step<T>::Wait(delay);
+        }
+    }
+}
+fn stop<T>(driver: Driver<T>) -> Bool effects { io, process, state } {
+    if list_len(driver.handles) == 0 {
+        return true;
+    }
+    let handle = list_get(driver.handles, 0);
+    match fiber_cancel(handle) {
+        WriteResult::Err(_) => {
+            return false;
+        }
+        WriteResult::Ok => {}
+    }
+    return match close(driver, handle) {
+        WriteResult::Ok => true,
+        WriteResult::Err(_) => false
+    };
+}
+pub fn submit<T>(scheduler: loop::Loop<T>, timeout: Int, action: async fn() -> T effects { io,
+    state, process }) -> Result<loop::Task<T>, loop::Error> effects { io, process, state } {
+    let outcomes = list_new<Option<T>>();
+    list_push(outcomes, Option<T>::None);
+    let entry = async fn [ action, outcomes ]() -> Unit effects { io, state, process } {
+        let value = await action();
+        list_set(outcomes, 0, Option<T>::Some(value));
+    };
+    let driver = Driver<T>(entry: entry, outcome: outcomes, handles: list_new<ForeignHandle>());
+    let resume = fn [ driver ]() -> loop::Step<T> effects { io, process, state } {
+        return step(driver);
+    };
+    let cancel = fn [ driver ]() -> Bool effects { io, process, state } {
+        return stop(driver);
+    };
+    let cleanup = fn [ ]() -> Unit {};
+    return loop::submit(scheduler, timeout, resume, cancel, cleanup);
+}

@@ -14,7 +14,8 @@ pub struct Document {
 }
 pub fn explain<T, E>(value: Result<T, E>, message: String) -> Result<T, String> {
     return match value {
-        Result::Ok(v) => Result<T, String>::Ok(v), Result::Err(_) => Result<T, String>::Err(message)
+        Result::Ok(v) => Result<T, String>::Ok(v),
+        Result::Err(_) => Result<T, String>::Err(message)
     };
 }
 fn names(a: String, b: String) -> List<String> effects { state } {
@@ -24,36 +25,13 @@ fn names(a: String, b: String) -> List<String> effects { state } {
     return fields;
 }
 pub fn number(value: json::Value) -> Result<Float64, String> {
-    match value {
-        json::Value::Integer(n) => {
-            return Result<Float64, String>::Ok(float_from_int(n));
-        }
-        json::Value::Number(n) => {
-            if float_is_finite(n) {
-                return Result<Float64, String>::Ok(n);
-            }
-        }
-        json::Value::Null => {}
-        json::Value::Boolean(_) => {}
-        json::Value::StringValue(_) => {}
-        json::Value::Array(_) => {}
-        json::Value::Object(_) => {}
-    }
-    return Result<Float64, String>::Err("Expected a finite number");
+    return decoded(json::as_number(json::root(value), json::IntegerMode::Exact));
 }
-fn array(value: json::Value) -> Result < List<json::Value>, String > {
-    match value {
-        json::Value::Array(items) => {
-            return Result < List<json::Value>, String >::Ok(items);
-        }
-        json::Value::Null => {}
-        json::Value::Boolean(_) => {}
-        json::Value::Integer(_) => {}
-        json::Value::Number(_) => {}
-        json::Value::StringValue(_) => {}
-        json::Value::Object(_) => {}
-    }
-    return Result < List<json::Value>, String >::Err("Expected an array");
+fn decoded<T>(outcome: Result<T, json::At<json::DecodeCause>>) -> Result<T, String> {
+    return match outcome {
+        Result::Ok(value) => Result<T, String>::Ok(value),
+        Result::Err(error) => Result<T, String>::Err(json::describe(error))
+    };
 }
 fn label(value: String, limit: Int) -> Result<String, String> {
     let trimmed = explain(text::trim(text::Text(data: value)), "Invalid UTF-8 text")?.data;
@@ -67,46 +45,55 @@ fn label(value: String, limit: Int) -> Result<String, String> {
     }
     return Result<String, String>::Ok(trimmed);
 }
-fn scenario(value: json::Value) -> Result<Scenario, String> effects { state } {
-    let cfg = explain(config::from_value(value), "Scenario must be an object")?;
+fn scenario(c: json::Cursor) -> Result<Scenario, String> effects { state } {
+    let cfg = explain(config::from_value(c.value), c.path + ": expected scenario object")?;
     let fields = names("name", "unit");
     list_push(fields, "baseline");
     list_push(fields, "budget");
     list_push(fields, "samples");
-    let allowed = explain(config::allow_only(cfg, fields), "Unknown scenario field")?;
-    let name = label(explain(config::string(cfg, "name"), "name must be text")?, 160)?;
-    let unit = label(explain(config::string(cfg, "unit"), "unit must be text")?, 24)?;
-    let baseline = number(explain(config::required(cfg, "baseline"), "Missing baseline")?)?;
-    let budget = number(explain(config::required(cfg, "budget"), "Missing budget")?)?;
-    if baseline < 0.000001 || baseline > 1000000000.0 || budget < 0.000001 || budget > 1000000000.0 {
+    let allowed = explain(config::allow_only(cfg, fields), c.path + ": unknown scenario field")?;
+    let name = label(decoded(json::as_string(decoded(json::field(c, "name"))?))?, 160)?;
+    let unit = label(decoded(json::as_string(decoded(json::field(c, "unit"))?))?, 24)?;
+    let baseline = decoded(json::as_number(decoded(json::field(c, "baseline"))?,
+        json::IntegerMode::Exact))?;
+    let budget = decoded(json::as_number(decoded(json::field(c, "budget"))?,
+        json::IntegerMode::Exact))?;
+    if baseline < 0.000001 || baseline > 1000000000.0 || budget < 0.000001 || budget
+        > 1000000000.0 {
         return Result<Scenario, String>::Err("baseline and budget must be in 1e-6..1e9");
     }
-    let values = array(explain(config::required(cfg, "samples"), "Missing samples")?)?;
+    let sample_cursor = decoded(json::field(c, "samples"))?;
+    let values = decoded(json::as_array(sample_cursor))?;
     if list_len(values) == 0 || list_len(values) > 256 {
         return Result<Scenario, String>::Err("Expected 1..256 samples");
     }
     let samples = list_new<Float64>();
-    for item in values {
-        let n = number(item)?;
+    for i in 0 .. list_len(values) {
+        let sample = decoded(json::item(sample_cursor, i))?;
+        let n = decoded(json::as_number(sample, json::IntegerMode::Exact))?;
         if n < 0.0 || n > 1000000000.0 {
-            return Result<Scenario, String>::Err("Samples must be in 0..1e9");
+            return Result<Scenario, String>::Err(sample.path + ": samples must be in 0..1e9");
         }
         list_push(samples, n);
     }
-    return Result<Scenario, String>::Ok(Scenario(name: name, unit: unit, baseline: baseline, budget: budget, samples: samples));
+    return Result<Scenario, String>::Ok(Scenario(name: name, unit: unit, baseline: baseline,
+        budget: budget, samples: samples));
 }
 pub fn parse(data: String) -> Result<Document, String> effects { state } {
-    let cfg = explain(config::parse(data), "Invalid JSON object (UTF-8, duplicate keys and finite numbers required)")?;
-    let allowed = explain(config::allow_only(cfg, names("title", "scenarios")), "Unknown document field")?;
-    let title = label(explain(config::string(cfg, "title"), "title must be text")?, 240)?;
-    let values = array(explain(config::required(cfg, "scenarios"), "Missing scenarios")?)?;
+    let c = decoded(json::decode(data))?;
+    let cfg = explain(config::from_value(c.value), "$: expected document object")?;
+    let allowed = explain(config::allow_only(cfg, names("title", "scenarios")),
+        "Unknown document field")?;
+    let title = label(decoded(json::as_string(decoded(json::field(c, "title"))?))?, 240)?;
+    let scenario_cursor = decoded(json::field(c, "scenarios"))?;
+    let values = decoded(json::as_array(scenario_cursor))?;
     if list_len(values) == 0 || list_len(values) > 12 {
         return Result<Document, String>::Err("Expected 1..12 scenarios");
     }
     let scenarios = list_new<Scenario>();
     let seen = dict_new<String, Bool>();
-    for item in values {
-        let s = scenario(item)?;
+    for i in 0 .. list_len(values) {
+        let s = scenario(decoded(json::item(scenario_cursor, i))?)?;
         if dict_has(seen, s.name) {
             return Result<Document, String>::Err("Duplicate scenario name: " + s.name);
         }

@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "stage": "0.10.5",
+  "compiler": "0.10.0-dev.5",
+  "compiler_sha256": "ea2de52a2211c7b5f8f05bde5c6cdda0c2821c3ad17670292a413af59cd257af",
+  "bootstrap_driver_version": "0.10.0-dev.4",
+  "recovery_c_sha256": "dea5929fcf788ae2f6eccaa32fb53a5b6dbdae4ef729e04f29f1420977f0c0b3",
+  "native": { "passed": 1110, "failed": 0, "skipped": 0 },
+  "fixed_point": true,
+  "bundler_fixed_point": true,
+  "cycle_gc_stress": {
+    "repetitions": [10, 1000],
+    "collections": [178, 15029],
+    "peak_bytes": [640, 640],
+    "retained_bytes": [408, 408]
+  },
+  "route_audit": { "named_passed": 8, "cli_passed": 10, "exact_nested_error": true },
+  "source_lens": { "named_passed": 7, "cli_passed": 31, "exact_html": true, "exact_json_path": true },
+  "lsp": { "capture_rename_edits": 3, "native_parity": true, "callable_hover": true },
+  "mcp": { "sdk_suites_passed": 3, "capture_rename": true, "format_round_trip": true },
+  "deep_parentheses_check_and_fmt": "E101",
+  "remaining_release_checks": [
+    "Long nested call chains can overflow the host stack in both dev.4 and dev.5",
+    "Clean delivery, independent C recovery and new-agent acceptance"
+  ],
+  "next_item": "0.10.6"
+}

@@ -171,3 +171,38 @@ pub fn pad_zero(n: Int, width: Int) -> Result<Text, Error> {
     }
     return Result<Text, Error>::Ok(Text(data: prefix + number));
 }
+pub struct Builder {
+    fragments: StringList,
+    used: IntList,
+    limit: Int
+}
+pub fn builder(limit: Int) -> Result<Builder, Error> effects { state } {
+    if limit < 0 || limit > 16777216 {
+        return Result<Builder, Error>::Err(Error::Limit);
+    }
+    let used = ints_new();
+    ints_push(used, 0);
+    return Result<Builder, Error>::Ok(Builder(fragments: strings_new(), used: used, limit: limit));
+}
+pub fn append(b: Builder, fragment: Bytes) -> Result<Bool, Error> effects { state } {
+    let size = str_len(fragment.data);
+    let used = ints_get(b.used, 0);
+    if size > b.limit - used {
+        return Result<Bool, Error>::Err(Error::Limit);
+    }
+    if size != 0 {
+        strings_push(b.fragments, fragment.data);
+        ints_set(b.used, 0, used + size);
+    }
+    return Result<Bool, Error>::Ok(true);
+}
+pub fn finish_bytes(b: Builder) -> Bytes effects { state } {
+    return Bytes(data: strings_join(b.fragments, ""));
+}
+pub fn finish_text(b: Builder) -> Result<Text, Error> effects { state } {
+    return decode(finish_bytes(b));
+}
+pub fn reset(b: Builder) -> Unit effects { state } {
+    strings_truncate(b.fragments, 0);
+    ints_set(b.used, 0, 0);
+}

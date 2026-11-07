@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "stage": "0.10.10",
+  "compiler": "0.10.0-dev.10",
+  "compiler_sha256": "2cc5a5b7a3be203da9a8e97bc2c417a67b62f03ed4b2286cae112b83a229d4529",
+  "bootstrap_driver_version": "0.10.0-dev.9",
+  "native": { "passed": 1142, "failed": 0, "skipped": 0 },
+  "fixed_point": true,
+  "bundler_fixed_point": true,
+  "notes": {
+    "visual_build_compiler": "0.10.0-dev.9",
+    "named_passed": 2,
+    "real_windows": 3,
+    "close_exit": 0,
+    "demo_exit": 0,
+    "demo_created_file": false,
+    "unicode_save_sha256": "84dba852069e4eb0d295fde892d2966acc822152b826cc97b2376ded81561fb4",
+    "unicode_load": true,
+    "oversize_visible_error_and_unchanged_editor": true,
+    "forced_gc": true,
+    "peak_managed_bytes": 6614,
+    "retained_managed_bytes": 200
+  },
+  "next_item": "0.10.11"
+}

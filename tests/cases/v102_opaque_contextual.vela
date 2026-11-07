@@ -1,0 +1,3 @@
+fn opaque(opaque: Int) -> Int { return opaque; }
+struct Example { opaque: Int }
+fn main() -> Int { return opaque(Example(opaque: 0).opaque); }

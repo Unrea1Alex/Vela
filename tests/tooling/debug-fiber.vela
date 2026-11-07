@@ -1,0 +1,25 @@
+import "../../std/event_loop.vela" as loop;
+import "../../std/tasks.vela" as tasks;
+fn must<T, E>(outcome: Result<T, E>) -> T effects { process } {
+    match outcome {
+        Result::Ok(value) => {
+            return value;
+        }
+        Result::Err(_) => {
+            panic("task setup failed");
+        }
+    }
+}
+async fn suspended() -> Int effects { state, process } {
+    await sleep_ms(1);
+    panic("fiber failure");
+}
+fn main() -> Int effects { io, state, process } {
+    let scheduler = must(loop::create<Int>(0));
+    let task = must(tasks::submit(scheduler, 10, async fn [ ]() -> Int effects { state, process } {
+        return await suspended();
+    }));
+    let first = must(loop::tick(scheduler, 0));
+    let second = must(loop::tick(scheduler, 1));
+    return 3;
+}

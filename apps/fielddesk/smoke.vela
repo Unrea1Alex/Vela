@@ -1,0 +1,25 @@
+import "workflow.vela" as workflow;
+import "model.vela" as model;
+import "analyze.vela" as analyze;
+import "demo.vela" as demo;
+fn main() -> Int effects { state, io } {
+    match model::settings(demo::config()) {
+        Result::Err(error) => {
+            eprint(error);
+            return 2;
+        }
+        Result::Ok(config) => {
+            match analyze::memory(demo::data(), config, 1) {
+                Result::Err(error) => {
+                    eprint(error);
+                    return 2;
+                }
+                Result::Ok(data) => {
+                    print(
+                        f"count={data.stats.count:d} excluded={data.excluded:d} alerts={data.stats.alerts:d}");
+                    return 0;
+                }
+            }
+        }
+    }
+}

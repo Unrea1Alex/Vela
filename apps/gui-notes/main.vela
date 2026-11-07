@@ -1,0 +1,155 @@
+import "../../std/gui.vela" as ui;
+import "ui.vela" as form;
+import "model.vela" as model;
+import "../../std/cli.vela" as cli;
+import "../../std/path.vela" as path;
+import "../../std/result.vela" as result;
+import "../../std/services.vela" as services;
+enum Event {
+    Load,
+    Save,
+    Close
+}
+fn completed(outcome: WriteResult) -> Result<Bool, String> {
+    return match outcome {
+        WriteResult::Ok => Result<Bool, String>::Ok(true),
+        WriteResult::Err(error) => Result<Bool, String>::Err(error)
+    };
+}
+fn save(note: model::Note, files: dyn services::FileStore,
+    window: ui::Window) -> Result<model::Note, String> effects { io, process, state } {
+    let next = model::edited(note, ui::snapshot(window)?)?;
+    let committed = model::save(next, files)?;
+    if !committed {
+        return Result<model::Note, String>::Err("Service did not commit note");
+    }
+    return Result<model::Note, String>::Ok(next);
+}
+fn interact(window: ui::Window, files: dyn services::FileStore,
+    initial: model::Note) -> Result<Bool, String> effects { io, process, state } {
+    var note = initial;
+    match model::load(note, files) {
+        Result::Ok(value) => {
+            note = value;
+        }
+        Result::Err(_) => {}
+    }
+    if !ui::set_text(window, model::contents(note)) {
+        return Result<Bool, String>::Err("Cannot display note");
+    }
+    let events = list_new<Event>();
+    while true {
+        for code in ui::pump(window, 50)? {
+            if code == 101 {
+                list_push(events, Event::Load);
+            } else if code == 102 {
+                list_push(events, Event::Save);
+            } else if code == 103 {
+                list_push(events, Event::Close);
+            }
+        }
+        for event in events {
+            var message = "";
+            match event {
+                Event::Close => {
+                    return Result<Bool, String>::Ok(true);
+                }
+                Event::Load => {
+                    match model::load(note, files) {
+                        Result::Ok(value) => {
+                            note = value;
+                            if !ui::set_text(window, model::contents(note)) {
+                                return Result<Bool, String>::Err("Cannot display note");
+                            }
+                            message = "Loaded";
+                        }
+                        Result::Err(error) => {
+                            message = "Load failed: " + error;
+                        }
+                    }
+                }
+                Event::Save => {
+                    match save(note, files, window) {
+                        Result::Ok(value) => {
+                            note = value;
+                            message = "Saved";
+                        }
+                        Result::Err(error) => {
+                            message = "Save failed: " + error;
+                        }
+                    }
+                }
+            }
+            if !ui::status(window, message) {
+                return Result<Bool, String>::Err("Cannot display status");
+            }
+        }
+        list_truncate(events, 0);
+    }
+    return Result<Bool, String>::Err("GUI loop ended unexpectedly");
+}
+fn show(title: String, files: dyn services::FileStore, initial: model::Note) -> Result<Bool,
+    String> effects { io, process, state } {
+    let window = form::open(title)?;
+    let outcome = interact(window, files, initial);
+    let closed = ui::close(window)?;
+    return outcome;
+}
+fn usage() -> String {
+    return "Usage: notes.exe FILE [--cycles N]\n       notes.exe --demo [--cycles N]";
+}
+fn work() -> Result<Int, String> effects { args, io, process, state } {
+    let specs = list_new<cli::Spec>();
+    list_push(specs, cli::Spec(name: "demo", takes_value: false));
+    list_push(specs, cli::Spec(name: "cycles", takes_value: true));
+    let options = result::explain(cli::current(specs), usage())?;
+    let demo = dict_has(options.options, "demo");
+    var cycles = 1;
+    if dict_has(options.options, "cycles") {
+        match parse_int(dict_get(options.options, "cycles")) {
+            IntResult::Ok(value) => {
+                cycles = value;
+            }
+            IntResult::Err(_) => {
+                cycles = 0;
+            }
+        }
+    }
+    var positional = 1;
+    if demo {
+        positional = 0;
+    }
+    if cycles < 1 || cycles > 10 || list_len(options.positional) != positional {
+        return Result<Int, String>::Err(usage());
+    }
+    var files = dyn services::FileStore(services::os_files());
+    var name = "note-demo.txt";
+    if demo {
+        files = dyn services::FileStore(services::memory_files());
+    } else {
+        name = list_get(options.positional, 0);
+    }
+    let file = result::explain(path::checked(name), "Invalid note path")?;
+    let note = model::empty(file);
+    if demo {
+        let example = model::edited(note, "Vela Notes — тестовая заметка")?;
+        let seeded = model::save(example, files)?;
+    }
+    for cycle in 1 ..= cycles {
+        let title = f"Vela Notes — {cycle:d}/{cycles:d}";
+        let opened = show(title, files, note)?;
+        print(f"Closed window {cycle:d}/{cycles:d}");
+    }
+    return Result<Int, String>::Ok(0);
+}
+fn main() -> Int effects { args, io, process, state } {
+    match work() {
+        Result::Ok(code) => {
+            return code;
+        }
+        Result::Err(error) => {
+            eprint(error);
+            return 2;
+        }
+    }
+}

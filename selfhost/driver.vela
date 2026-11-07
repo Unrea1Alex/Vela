@@ -11,6 +11,9 @@ import "semantic.vela";
 import "errors.vela";
 import "emitter.vela";
 import "formatter.vela";
+import "query.vela";
+import "incremental.vela";
+import "artifacts.vela";
 pub fn io_value(r: StringResult) -> String effects { io, process } {
     return io_result(from_string(r), "");
 }
@@ -32,16 +35,18 @@ pub fn symbol_index(c: Context) -> String effects { state, io, process } {
         let id = list_get(c.type_order, i);
         let t = type_info(c, id);
         if t.kind == 77 {
-            strings_push(distincts, "{\"name\":" + json_string(t.name) + ",\"base\":" + json_string(type_name(c, t.base)) + "}");
+            strings_push(distincts, "{\"name\":" + json_string(t.name) + ",\"base\":" + json_string(display_type(c, t.base)) + "}");
         } else if t.kind == 76 {
+            var opacity = "";
+            if t.opaque { opacity = "\"opaque\":true,"; }
             let fields = strings_new();
             var j = 0;
             while j < list_len(t.fields) {
                 let field = symbol_info(c, list_get(t.fields, j));
-                strings_push(fields, "{\"name\":" + json_string(field.name) + ",\"type\":" + json_string(type_name(c, field.type_id)) + "}");
+                strings_push(fields, "{\"name\":" + json_string(field.name) + ",\"type\":" + json_string(display_type(c, field.type_id)) + "}");
                 j = j + 1;
             }
-            strings_push(records, "{\"name\":" + json_string(t.name) + ",\"fields\":[" + strings_join(fields,",") + "]}");
+            strings_push(records, "{" + opacity + "\"name\":" + json_string(t.name) + ",\"fields\":[" + strings_join(fields,",") + "]}");
         } else {
             let variants = strings_new();
             var j = 0;
@@ -50,7 +55,7 @@ pub fn symbol_index(c: Context) -> String effects { state, io, process } {
                 let fields = strings_new();
                 var k = 0;
                 while k < list_len(v.parameters) {
-                    strings_push(fields, json_string(type_name(c, symbol_info(c, list_get(v.parameters, k)).type_id)));
+                    strings_push(fields, json_string(display_type(c, symbol_info(c, list_get(v.parameters, k)).type_id)));
                     k = k + 1;
                 }
                 strings_push(variants, "{\"name\":" + json_string(v.name) + ",\"fields\":[" + strings_join(fields,",") + "]}");
@@ -66,6 +71,7 @@ pub fn symbol_index(c: Context) -> String effects { state, io, process } {
     while i < list_len(c.functions) {
         let f = list_get(c.functions, i);
         let sig = symbol_info(c, f.symbol);
+        if sig.name == "@closure" { i = i + 1; continue; }
         var test_name = "";
         for declaration in c.bound_functions {
             if declaration.name == sig.name {
@@ -81,10 +87,15 @@ pub fn symbol_index(c: Context) -> String effects { state, io, process } {
         var j = 0;
         while j < list_len(f.parameters) {
             let b = symbol_info(c, list_get(f.parameters, j));
-            strings_push(params, "{\"name\":" + json_string(b.name) + ",\"type\":" + json_string(type_name(c, b.type_id)) + "}");
+            strings_push(params, "{\"name\":" + json_string(b.name) + ",\"type\":" + json_string(display_type(c, b.type_id)) + "}");
             j = j + 1;
         }
-        strings_push(functions, "{\"source\":" + json_string(filename_at(c, f.span.start)) + ",\"module_id\":" + to_string(source_unit_at(c, f.span.start)) + ",\"name\":" + json_string(sig.name) + ",\"parameters\":[" + strings_join(params,",") + "],\"returns\":" + json_string(type_name(c, sig.type_id)) + ",\"effects\":" + effect_json(sig.effect_mask) + ",\"line\":" + num(line_at(c, f.span.start)) + ",\"contracts\":{\"verification\":\"runtime\",\"requires\":" + num(list_len(f.preconditions)) + ",\"ensures\":" + num(list_len(f.postconditions)) + "}}");
+        var method = "";
+        if sig.method_span.end > 0 {
+            method = "\"method\":true,";
+            if !sig.method_exported { method = method + "\"visibility\":\"module\","; }
+        }
+        strings_push(functions, "{" + method + "\"source\":" + json_string(filename_at(c, f.span.start)) + ",\"module_id\":" + to_string(source_unit_at(c, f.span.start)) + ",\"name\":" + json_string(sig.name) + ",\"parameters\":[" + strings_join(params,",") + "],\"returns\":" + json_string(display_type(c, sig.type_id)) + ",\"effects\":" + effect_json(sig.effect_mask) + ",\"line\":" + num(line_at(c, f.span.start)) + ",\"contracts\":{\"verification\":\"runtime\",\"requires\":" + num(list_len(f.preconditions)) + ",\"ensures\":" + num(list_len(f.postconditions)) + "}}");
         i = i + 1;
     }
     for sig_id in c.signatures {
@@ -93,9 +104,9 @@ pub fn symbol_index(c: Context) -> String effects { state, io, process } {
             let params = strings_new();
             for id in sig.parameters {
                 let parameter = symbol_info(c, id);
-                strings_push(params, "{\"name\":" + json_string(parameter.name) + ",\"type\":" + json_string(type_name(c, parameter.type_id)) + "}");
+                strings_push(params, "{\"name\":" + json_string(parameter.name) + ",\"type\":" + json_string(display_type(c, parameter.type_id)) + "}");
             }
-            strings_push(functions, "{\"source\":" + json_string(filename_at(c, sig.span.start)) + ",\"module_id\":" + to_string(source_unit_at(c, sig.span.start)) + ",\"name\":" + json_string(sig.name) + ",\"parameters\":[" + strings_join(params, ",") + "],\"returns\":" + json_string(type_name(c, sig.type_id)) + ",\"effects\":" + effect_json(sig.effect_mask) + ",\"line\":" + num(line_at(c, sig.span.start)) + ",\"foreign\":{\"library\":" + json_string(sig.foreign_library) + ",\"symbol\":" + json_string(sig.foreign_name) + "}}");
+            strings_push(functions, "{\"source\":" + json_string(filename_at(c, sig.span.start)) + ",\"module_id\":" + to_string(source_unit_at(c, sig.span.start)) + ",\"name\":" + json_string(sig.name) + ",\"parameters\":[" + strings_join(params, ",") + "],\"returns\":" + json_string(display_type(c, sig.type_id)) + ",\"effects\":" + effect_json(sig.effect_mask) + ",\"line\":" + num(line_at(c, sig.span.start)) + ",\"foreign\":{\"library\":" + json_string(sig.foreign_library) + ",\"symbol\":" + json_string(sig.foreign_name) + "}}");
         }
     }
     let modules = strings_new();
@@ -199,9 +210,10 @@ pub fn write_atomic(path: String, code: String) -> Unit effects { state, io, pro
     let success = io_result(write_atomic_result(path, code), false);
 }
 pub fn build_or_run(code: String, output_path: String, arguments: StringList, running: Bool) -> Int effects { state, io, process } {
-    return build_or_run_native(code, output_path, arguments, running, list_new<NativeDependency>());
+    return build_or_run_native(code, output_path, arguments, running, list_new<NativeDependency>(), list_new<Resource>());
 }
-pub fn build_or_run_native(code: String, output_path: String, arguments: StringList, running: Bool, natives: List<NativeDependency>) -> Int effects { state, io, process } {
+pub fn build_or_run_native(code: String, output_path: String, arguments: StringList, running: Bool,
+    natives: List<NativeDependency>, assets: List<Resource>) -> Int effects { state, io, process } {
     var parent = "";
     if !running {
         parent = parent_path(output_path);
@@ -218,7 +230,7 @@ pub fn build_or_run_native(code: String, output_path: String, arguments: StringL
     if status == 0 {
         var destination = parent_path(output_path);
         if running { destination = dir; }
-        match stage_native(natives, destination) {
+        match stage_artifacts(natives, assets, destination) {
             Result::Ok(_) => {}
             Result::Err(message) => { eprint(message); status = 2; }
         }
@@ -248,6 +260,7 @@ pub fn build_or_run_native(code: String, output_path: String, arguments: StringL
     ignored_write(remove_file(exe));
     if running {
         for native in natives { ignored_write(remove_file(dir + "/" + native.name)); }
+        unstage_assets(assets, dir);
     }
     ignored_write(remove_dir(dir));
     if status < 0 || status > 255 {
@@ -256,22 +269,46 @@ pub fn build_or_run_native(code: String, output_path: String, arguments: StringL
     }
     return status;
 }
+pub fn checked_output(input: String, source_name: String, json_mode: Bool) -> Int effects { io, state } {
+    if json_mode {
+        print(cat(cat("{\"schema_version\":1,\"ok\":true,\"diagnostics\":[],\"source\":", json_string(source_name)), "}"));
+    } else {
+        print(cat("OK: ", input));
+    }
+    return 0;
+}
+pub fn generated_output(command: String, generated: String, output_path: String, arguments: StringList,
+    p: Project) -> Int effects { io, state, process } {
+    if command == "emit-c" {
+        if output_path == "" {
+            print(generated);
+        } else {
+            write_atomic(output_path, generated);
+        }
+        return 0;
+    }
+    return build_or_run_native(generated, output_path, arguments, command == "run", p.natives, p.assets);
+}
 pub fn main() -> Int effects { args, state, io, process } {
     if arg_count() == 1 {
         let option = io_value(arg(0));
         if option == "--version" {
-            print("Vela 0.7.0 (self-hosted)");
+            print("Vela 1.0.0 (self-hosted)");
             return 0;
         }
     }
     if arg_count() < 2 {
-        eprint("Usage: vela check|symbols|emit-c|build|run|test|fmt|lock SOURCE_OR_PROJECT [-o OUTPUT] [--json] [--check|--write] [-- ARGS]");
+        eprint("Usage: vela check|symbols|query|plan|emit-c|build|run|test|fmt|lock SOURCE_OR_PROJECT");
         return 2;
     }
     let command = io_value(arg(0));
     let input = io_value(arg(1));
+    if command == "query" || command == "plan" { return query_command(command, input); }
     var output_path = "";
     var source_name = "";
+    var cache_directory = "";
+    var cache_report = false;
+    var debug_codegen = false;
     var json_mode = false;
     let arguments = strings_new();
     var index = 2;
@@ -286,10 +323,18 @@ pub fn main() -> Int effects { args, state, io, process } {
             rest = true;
         } else if option == "--json" {
             json_mode = true;
+        } else if command == "emit-c" && option == "--debug" {
+            debug_codegen = true;
         } else if command == "fmt" && option == "--check" {
             format_check = true;
         } else if command == "fmt" && option == "--write" {
             format_write = true;
+        } else if option == "--cache" && (command == "check" || command == "emit-c" || command == "build") {
+            index = index + 1;
+            if index >= arg_count() { eprint("--cache requires a directory"); return 2; }
+            cache_directory = io_value(absolute_path(io_value(arg(index))));
+        } else if option == "--cache-report" && (command == "check" || command == "emit-c" || command == "build") {
+            cache_report = true;
         } else if option == "-o" || option == "--output" || option == "--source-name" {
             index = index + 1;
             let value = io_value(arg(index));
@@ -313,6 +358,10 @@ pub fn main() -> Int effects { args, state, io, process } {
     }
     if command == "fmt" && (output_path != ""|| (format_check && format_write) || strings_len(arguments) > 0) {
         eprint("Usage: velac fmt SOURCE [--check|--write]");
+        return 2;
+    }
+    if command == "build" && output_path == "" {
+        eprint("build requires -o OUTPUT");
         return 2;
     }
     let p = project_load(io_value(absolute_path(input)), json_mode);
@@ -346,7 +395,11 @@ pub fn main() -> Int effects { args, state, io, process } {
                     list_push(protected, unit.path);
                 }
             }
-            for native in p.natives { list_push(protected, native.path); }
+            for native in p.natives {
+                list_push(protected, native.path);
+                list_push(protected, artifact_join(parent_path(output_path), native.name));
+            }
+            for asset in p.assets { list_push(protected, asset.path); }
             for path in protected {
                 if path_key(output_path) == path_key(path) || target_id != ""&& target_id == io_value(file_identity(path)) {
                     eprint("Output must not overwrite project metadata.");
@@ -361,17 +414,41 @@ pub fn main() -> Int effects { args, state, io, process } {
             return 2;
         }
     }
+    let cache = cache_prepare(cache_directory, cache_report);
     let code = load_source(input_path, json_mode);
     var c = make_context(code, source_name, json_mode);
     if command != "fmt" {
-        c = project_module_context(input_path, source_name, code, json_mode, p.dependencies);
+        c = project_cached_context(input_path, source_name, code, json_mode, p.dependencies, list_new<QueryOverlay>(), cache);
     }
+    c.debug_codegen = debug_codegen;
     if output_path != "" {
         let output_identity = io_value(file_identity(output_path));
         for unit in c.source_units {
             if path_key(output_path) == path_key(unit.path) || (output_identity != ""&& output_identity == unit.identity) {
                 eprint("Output must not overwrite source.");
                 return 2;
+            }
+        }
+    }
+    var key = "";
+    var kind = "c-v1";
+    if command == "check" { kind = "check-v1"; }
+    if debug_codegen { kind = "debug-c-v1"; }
+    if cache.directory != "" {
+        key = analysis_cache_key(c, p, kind);
+        match cache_read(cache, key, kind) {
+            Option::None => {}
+            Option::Some(saved) => {
+                if command == "check" {
+                    if saved == "ok" {
+                        cache_event(cache, "read", kind, "hit", "reused", key, "", false);
+                        return checked_output(input, source_name, json_mode);
+                    }
+                    cache_event(cache, "read", kind, "miss", "invalid_check", key, "", false);
+                } else {
+                    cache_event(cache, "read", kind, "hit", "reused", key, "", false);
+                    return generated_output(command, saved, output_path, arguments, p);
+                }
             }
         }
     }
@@ -399,31 +476,16 @@ pub fn main() -> Int effects { args, state, io, process } {
         write_stdout(formatted);
         return 0;
     }
-    analyze(c);
+    analyze_mode(c, command != "symbols");
     if command == "check" {
-        if json_mode {
-            print(cat(cat("{\"schema_version\":1,\"ok\":true,\"diagnostics\":[],\"source\":", json_string(source_name)), "}"));
-        } else {
-            print(cat("OK: ", input));
-        }
-        return 0;
+        cache_store(cache, key, "ok", kind);
+        return checked_output(input, source_name, json_mode);
     }
     if command == "symbols" {
         print(symbol_index(c));
         return 0;
     }
     let generated = generate(c);
-    if command == "emit-c" {
-        if output_path == "" {
-            print(generated);
-        } else {
-            write_atomic(output_path, generated);
-        }
-        return 0;
-    }
-    if command == "build" && output_path == "" {
-        eprint("build requires -o OUTPUT");
-        return 2;
-    }
-    return build_or_run_native(generated, output_path, arguments, command == "run", p.natives);
+    cache_store(cache, key, generated, kind);
+    return generated_output(command, generated, output_path, arguments, p);
 }

@@ -1,0 +1,181 @@
+import "../../std/event_loop.vela" as loop;
+fn must<T>(value: Result<T, loop::Error>) -> T {
+    match value {
+        Result::Ok(found) => {
+            return found;
+        }
+        Result::Err(_) => {
+            assert_true(false, "unexpected loop error");
+        }
+    }
+    return must(value);
+}
+fn status(task: loop::Task<String>) -> String effects { state } {
+    return match loop::outcome(task) {
+        Option::None => "pending",
+        Option::Some(value) => match value {
+            loop::Outcome::Done(text) => text,
+            loop::Outcome::Failed(error) => error,
+            loop::Outcome::Cancelled => "cancelled",
+            loop::Outcome::TimedOut => "timed-out"
+        }
+    };
+}
+fn turn(value: loop::Turn) -> Int {
+    return match value {
+        loop::Turn::Dispatched => -1,
+        loop::Turn::Waiting(deadline) => deadline,
+        loop::Turn::Idle => -2
+    };
+}
+fn error_kind(value: loop::Error) -> Int {
+    return match value {
+        loop::Error::Clock => 0,
+        loop::Error::Timeout => 1,
+        loop::Error::Capacity => 2,
+        loop::Error::Busy => 3,
+        loop::Error::Closed => 4
+    };
+}
+fn no_work() -> loop::Step<String> {
+    assert_true(false, "cancelled task must not start");
+    return loop::Step<String>::Done("");
+}
+fn no_stop() -> Bool {
+    assert_true(false, "cancelled task must not stop");
+    return true;
+}
+fn no_cleanup() -> Unit {}
+fn tick(scheduler: loop::Loop<String>, now: Int) -> Int effects { io, process, state } {
+    return turn(must(loop::tick(scheduler, now)));
+}
+fn retain_capture(scheduler: loop::Loop<String>) -> loop::Task<String> effects { state } {
+    let payload = "survives " + to_string(123);
+    let steps = list_new<Int>();
+    list_push(steps, 0);
+    let resume = fn [ steps, payload ]() -> loop::Step<String> effects { state } {
+        if list_get(steps, 0) == 0 {
+            list_set(steps, 0, 1);
+            return loop::Step<String>::Wait(2);
+        }
+        return loop::Step<String>::Done(payload);
+    };
+    return must(loop::submit(scheduler, 10, resume, no_stop, no_cleanup));
+}
+fn check_capture() -> Unit effects { io, process, state } {
+    let scheduler = must(loop::create<String>(0));
+    let task = retain_capture(scheduler);
+    assert_true(tick(scheduler, 0) == -1 && tick(scheduler, 1) == 2, "capture waits");
+    assert_true(tick(scheduler, 2) == -1 && tick(scheduler, 2) == -2, "capture completes");
+    assert_true(status(task) == "survives 123", "task retains otherwise unreachable capture");
+}
+fn main() -> Int effects { io, process, state } {
+    check_capture();
+    let scheduler = must(loop::create<String>(100));
+    let log = list_new<String>();
+    let phase = list_new<Int>();
+    list_push(phase, 0);
+    let stopped = list_new<Int>();
+    list_push(stopped, 0);
+    let captured = "captured " + to_string(42);
+    let first = fn [ log, phase, captured ]() -> loop::Step<String> effects { state } {
+        list_push(log, captured);
+        if list_get(phase, 0) == 0 {
+            list_set(phase, 0, 1);
+            return loop::Step<String>::Wait(5);
+        }
+        return loop::Step<String>::Done(captured);
+    };
+    let stop = fn [ log, stopped ]() -> Bool effects { state } {
+        list_push(log, "stop");
+        list_set(stopped, 0, list_get(stopped, 0) + 1);
+        return list_get(stopped, 0) == 2;
+    };
+    let cleanup = fn [ log ]() -> Unit effects { state } {
+        list_push(log, "cleanup");
+    };
+    let other = fn [ log, scheduler ]() -> loop::Step<String> effects { io, process, state } {
+        match loop::tick(scheduler, 100) {
+            Result::Err(error) => {
+                assert_true(error_kind(error) == 3, "wrong reentry error");
+            }
+            Result::Ok(_) => {
+                assert_true(false, "reentry allowed");
+            }
+        }
+        list_push(log, "other");
+        return loop::Step<String>::Done("other");
+    };
+    let a = must(loop::submit(scheduler, 30, first, stop, cleanup));
+    let b = must(loop::submit(scheduler, 30, other, no_stop, no_cleanup));
+    let c = must(loop::submit(scheduler, 30, no_work, no_stop, cleanup));
+    assert_true(loop::cancel(c) && !loop::cancel(c), "idempotent request");
+    assert_true(tick(scheduler, 100) == -1, "run a");
+    assert_true(tick(scheduler, 100) == -1, "run b");
+    assert_true(tick(scheduler, 100) == -1, "cancel c");
+    assert_true(status(b) == "other" && status(c) == "cancelled", "terminal order");
+    assert_true(!loop::cancel(b), "terminal outcome cannot change");
+    assert_true(tick(scheduler, 100) == 105, "timer waits");
+    assert_true(loop::cancel(a), "request stop");
+    assert_true(tick(scheduler, 100) == -1 && status(a) == "pending", "stop not acknowledged");
+    let d = must(loop::submit(scheduler, 3, other, no_stop, no_cleanup));
+    assert_true(tick(scheduler, 100) == -1 && status(d) == "other", "independent progress");
+    assert_true(tick(scheduler, 100) == 101, "stop retry scheduled");
+    assert_true(tick(scheduler, 101) == -1 && status(a) == "cancelled", "stop acknowledged");
+    assert_true(tick(scheduler, 101) == -2, "idle");
+    assert_true(list_len(log) == 7, "cleanup only once");
+    assert_true(list_get(log, 0) == "captured 42" && list_get(log, 1) == "other" && list_get(log, 2)
+        == "cleanup" && list_get(log, 3) == "stop" && list_get(log, 4) == "other" && list_get(log,
+        5) == "stop" && list_get(log, 6) == "cleanup", "FIFO and cleanup trace");
+    let nap = fn [ ]() -> loop::Step<String> {
+        return loop::Step<String>::Wait(5);
+    };
+    let ack = fn [ ]() -> Bool {
+        return true;
+    };
+    let tie = must(loop::submit(scheduler, 5, nap, ack, cleanup));
+    assert_true(tick(scheduler, 101) == -1 && tick(scheduler, 105) == 106, "deadline scheduled");
+    assert_true(tick(scheduler, 106) == -1 && status(tie) == "timed-out", "deadline beats resume");
+    let late = must(loop::submit(scheduler, 1, no_work, no_stop, cleanup));
+    assert_true(tick(scheduler, 108) == -1 && status(late) == "timed-out", "no late launch");
+    let invalid = fn [ ]() -> loop::Step<String> {
+        return loop::Step<String>::Wait(-1);
+    };
+    let broken = must(loop::submit(scheduler, 5, invalid, ack, cleanup));
+    assert_true(tick(scheduler, 108) == -1 && status(broken) == "Invalid continuation delay",
+        "invalid delay stops safely");
+    match loop::tick(scheduler, 107) {
+        Result::Err(error) => {
+            assert_true(error_kind(error) == 0, "wrong clock error");
+        }
+        Result::Ok(_) => {
+            assert_true(false, "clock rollback accepted");
+        }
+    }
+    for i in 0 .. 128 {
+        let queued = must(loop::submit(scheduler, 30, no_work, no_stop, no_cleanup));
+    }
+    match loop::submit(scheduler, 30, no_work, no_stop, no_cleanup) {
+        Result::Err(error) => {
+            assert_true(error_kind(error) == 2, "wrong capacity error");
+        }
+        Result::Ok(_) => {
+            assert_true(false, "overflow accepted");
+        }
+    }
+    assert_true(must(loop::shutdown(scheduler)), "shutdown accepted");
+    for i in 0 .. 128 {
+        assert_true(tick(scheduler, 108) == -1, "drain");
+    }
+    assert_true(tick(scheduler, 108) == -2, "shutdown drained");
+    match loop::submit(scheduler, 30, no_work, no_stop, no_cleanup) {
+        Result::Err(error) => {
+            assert_true(error_kind(error) == 4, "wrong shutdown error");
+        }
+        Result::Ok(_) => {
+            assert_true(false, "closed loop accepted work");
+        }
+    }
+    print("event loop passed");
+    return 0;
+}

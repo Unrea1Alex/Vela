@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { Transform } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 import { Host, configSchema, limits, topics, HostError } from './host.js';
-import {Execution,executionLimits} from './execution.js';
+import {Execution,executionLimits,outputLimits} from './execution.js';
 
 const outputSchema = z.object({
   schema_version: z.literal(1), status: z.enum(['ok','rejected','toolchain_error','invalid_input','source_changed','cancelled','timeout','limit','incompatible']),
@@ -29,15 +29,15 @@ const basic = async (data: () => Record<string,unknown>) => {
   } catch (e) { return wrap({schema_version:1,status:'incompatible',compiler_id:host.compilerId,snapshot_id:'',data:{},message:String(e)}); }
 };
 function createServer() {
-  const server = new McpServer({ name: 'vela', version: '0.7.0' });
+  const server = new McpServer({ name: 'vela', version: host.compilerVersion });
   const annotations = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
   server.registerTool('vela_get_context', {
     description: 'Read this before writing Vela. Current compiler, syntax, limits and first working example.',
     inputSchema: z.object({}).strict(), outputSchema, annotations
-  }, async () => basic(() => ({version:'0.7.0',quickstart:host.docs.get('quickstart'),limits,
-    aliases:host.config.aliases,topics:Object.keys(topics),capabilities:['check','format','symbols','help',...(execution?.sandbox.ready?['build','test','run']:[])],
+  }, async () => basic(() => ({version:host.compilerVersion,quickstart:host.docs.get('quickstart'),limits,
+    aliases:host.config.aliases,topics:Object.keys(topics),capabilities:['check','format','symbols','help','query','plan',...(execution?.sandbox.ready?['build','test','run','read_output']:[])],
     execution:execution?.sandbox.ready??false,execution_reason:execution?.reason??'Execution backend is not configured.',
-    execution_limits:executionLimits})));
+    execution_limits:executionLimits,output_limits:outputLimits})));
   server.registerTool('vela_get_help', {
     description: 'Version-matched Vela language/project help or exact builtin catalog. Never guess APIs.',
     inputSchema: z.object({topic:z.enum(['quickstart','language','projects','modules','memory','builtins','idioms','numbers','stdlib','testing','ffi'])}).strict(),
@@ -54,17 +54,59 @@ function createServer() {
       try { return wrap(await promise); } finally {host.pending.delete(promise);}
     });
   }
+  const sourceFields={path:z.string().min(1).max(1024),text:z.string().max(2*1024*1024).optional(),
+    overlay_path:z.string().min(1).max(1024).optional()};
+  const id=z.string().regex(/^[a-f0-9]{64}$/);
+  server.registerTool('vela_query',{
+    description:'Native definitions, references, calls, types, effects and imports in the entry graph. Inspect scope.excluded_test_roots. Optionally focus at a zero-based UTF-16 position.',
+    inputSchema:z.object({...sourceFields,at:z.object({path:sourceFields.path,line:z.number().int().min(0),character:z.number().int().min(0)}).strict().optional()}).strict(),
+    outputSchema,annotations
+  },async ({path,text,overlay_path,at},ctx)=>{
+    const promise=host.analyze('query',path,ctx.mcpReq.signal,text,overlay_path,{at});
+    host.pending.add(promise);
+    try{return wrap(await promise);}finally{host.pending.delete(promise);}
+  });
+  const planFields={...sourceFields,snapshot_id:id,revision:id,document:z.number().int().min(0).max(255)};
+  server.registerTool('vela_plan',{
+    description:'Preview and recheck an edit on the exact vela_query snapshot. The preview covers the entry graph and reports excluded test roots. Source stays unchanged.',
+    inputSchema:z.discriminatedUnion('kind',[
+      z.object({...planFields,kind:z.literal('rename'),byte:z.number().int().min(0),new_name:z.string().min(1).max(256)}).strict(),
+      z.object({...planFields,kind:z.literal('format')}).strict()
+    ]),
+    outputSchema,annotations
+  },async (input,ctx)=>{
+    const {path,text,overlay_path,snapshot_id,revision,document}=input;
+    const plan={snapshot_id,revision,document,...(input.kind==='rename'?{byte:input.byte,new_name:input.new_name}:{})};
+    const promise=host.analyze('plan',path,ctx.mcpReq.signal,text,overlay_path,{plan});
+    host.pending.add(promise);
+    try{return wrap(await promise);}finally{host.pending.delete(promise);}
+  });
   if(execution?.sandbox.ready){
+    server.registerTool('vela_read_output',{
+      description:'Read a bounded base64 chunk of an explicitly exported run output. Verify SHA-256 before saving it yourself.',
+      inputSchema:z.object({output_id:id,offset:z.number().int().min(0).max(outputLimits.file_bytes).default(0),
+        length:z.number().int().min(1).max(outputLimits.chunk_bytes).default(outputLimits.chunk_bytes)}).strict(),
+      outputSchema,annotations
+    },async ({output_id,offset,length},ctx)=>{
+      try{
+        await host.verify();
+        if(ctx.mcpReq.signal.aborted)throw new HostError('cancelled','Request cancelled.');
+        return wrap(execution.readOutput(output_id,offset,length));
+      }catch(e){
+        return wrap({schema_version:1,status:e instanceof HostError?e.status:'toolchain_error',compiler_id:host.compilerId,snapshot_id:'',data:{},message:String(e)});
+      }
+    });
     for(const kind of ['build','test','run'] as const){
       const sourceSchema=z.object({path:z.string().min(1).max(1024),text:z.string().max(2*1024*1024).optional(),overlay_path:z.string().min(1).max(1024).optional()}).strict();
-      const runSchema=z.object({artifact_id:z.string().regex(/^[a-f0-9]{64}$/),args:z.array(z.string()).max(64).optional(),timeout_ms:z.number().int().min(1).max(30000).optional()}).strict();
+      const runSchema=z.object({artifact_id:id,args:z.array(z.string()).max(64).optional(),timeout_ms:z.number().int().min(1).max(30000).optional(),
+        outputs:z.array(z.string().min(1).max(72)).min(1).max(outputLimits.per_run).optional()}).strict();
       server.registerTool('vela_'+kind,{
         description:kind==='build'?'Build an isolated snapshot; return an opaque artifact_id without writing to the workspace.':
-          kind==='test'?'Compile and execute native tests in the OS sandbox.':'Run an artifact_id from vela_build in the OS sandbox, with no network access.',
+          kind==='test'?'Compile and execute native tests in the OS sandbox.':'Run an artifact_id in the OS sandbox. Optionally export declared files written under ../export/ after a successful run.',
         inputSchema:kind==='run'?runSchema:sourceSchema,outputSchema,
         annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:false,openWorldHint:false}
       },async(input:unknown,ctx:{mcpReq:{signal:AbortSignal}})=>{
-        const value=input as {path?:string;artifact_id?:string;text?:string;overlay_path?:string;args?:string[];timeout_ms?:number};
+        const value=input as {path?:string;artifact_id?:string;text?:string;overlay_path?:string;args?:string[];timeout_ms?:number;outputs?:string[]};
         const pending=execution.request(kind,(kind==='run'?value.artifact_id:value.path)!,ctx.mcpReq.signal,value);
         host.pending.add(pending);try{return wrap(await pending);}finally{host.pending.delete(pending);}
       });
@@ -72,7 +114,7 @@ function createServer() {
   }
   for (const topic of Object.keys(topics)) {
     const uri='vela://help/'+topic;
-    server.registerResource(topic,uri,{mimeType:'text/plain',description:'Vela 0.7 '+topic},async () => {
+    server.registerResource(topic,uri,{mimeType:'text/plain',description:'Vela '+host.compilerVersion+' '+topic},async () => {
       await host.verify();
       return {contents:[{uri,mimeType:'text/plain',text:host.docs.get(topic)!}]};
     });

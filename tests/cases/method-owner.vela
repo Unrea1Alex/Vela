@@ -1,0 +1,6 @@
+pub opaque struct Bucket<T> { entry: T }
+impl<U> Bucket<U> {
+    pub fn take_value(self: Bucket<U>) -> U { return self.entry; }
+    fn secret(self: Bucket<U>) -> U { return self.entry; }
+}
+pub fn bucket<T>(entry: T) -> Bucket<T> { return Bucket<T>(entry: entry); }

@@ -1,0 +1,42 @@
+import "../../tools/test.vela" as test;
+fn main() -> Int effects { io, process, state } {
+    if platform() != "windows" || env("VELA_CC_KIND") != "msvc" {
+        eprint("FieldDesk requires Windows x64 and MSVC.");
+        return 2;
+    }
+    let root = test::value(absolute_path("."));
+    let output = root + "/apps/fielddesk/bin";
+    test::done(make_dir(output));
+    let suite = test::Suite(root: root, compiler: root + "/bin/velac.exe", dir: output, passed: 0,
+        failed: 0);
+    let args = test::command(env("VELA_CC"));
+    for flag in test::split("/nologo|/std:c11|/LD|/MT|/O2|/fp:strict|/utf-8|/W3", 124) {
+        strings_push(args, flag);
+    }
+    strings_push(args, "/Fo" + output + "/adapter.obj");
+    strings_push(args, "/Fe" + output + "/vela-gui.dll");
+    strings_push(args, root + "/native/gui/adapter.c");
+    strings_push(args, "/link");
+    strings_push(args, "/IMPLIB:" + output + "/vela-gui.lib");
+    strings_push(args, "user32.lib");
+    strings_push(args, "gdi32.lib");
+    let adapter = test::invoke(suite, args, 30000);
+    if adapter.code != 0 {
+        eprint(adapter.out + adapter.err);
+        return 2;
+    }
+    let lock_args = test::compiler_command(suite, "lock", root + "/apps/fielddesk/vela.project");
+    let locked = test::invoke(suite, lock_args, 30000);
+    if locked.code != 0 {
+        eprint(locked.out + locked.err);
+        return 2;
+    }
+    let built = test::build(suite, root + "/apps/fielddesk/vela.project", output
+        + "/fielddesk.exe");
+    if built.code != 0 {
+        eprint(built.out + built.err);
+        return 2;
+    }
+    print(output + "/fielddesk.exe");
+    return 0;
+}

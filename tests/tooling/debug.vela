@@ -1,0 +1,28 @@
+fn failed<T>(message: String) -> T effects { process } {
+    panic(message);
+}
+fn leaf(value: Int) -> Int effects { io } {
+    defer {
+        print("cleanup leaf");
+    }
+    return value + 1;
+}
+fn branch(value: Int) -> Int effects { io } {
+    defer {
+        print("cleanup branch");
+    }
+    return leaf(value) + leaf(value + 1);
+}
+fn explode() -> Int effects { io, process } {
+    defer {
+        print("unreachable cleanup");
+    }
+    return failed<Int>("Ошибка Vela");
+}
+fn main() -> Int effects { args, io, process } {
+    if arg_count() > 0 {
+        return explode();
+    }
+    assert_true(branch(2) == 7, "profiled result");
+    return 0;
+}

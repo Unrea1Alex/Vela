@@ -1,0 +1,204 @@
+import "../../std/event_loop.vela" as loop;
+import "../../std/path.vela" as path;
+import "../../std/process.vela" as process;
+fn must<T, E>(value: Result<T, E>, message: String) -> T {
+    match value {
+        Result::Ok(found) => {
+            return found;
+        }
+        Result::Err(_) => {
+            assert_true(false, message);
+        }
+    }
+    return must(value, message);
+}
+fn value(result_value: StringResult) -> String {
+    return match result_value {
+        StringResult::Ok(text) => text,
+        StringResult::Err(_) => ""
+    };
+}
+fn now() -> Int effects { io } {
+    match monotonic_millis() {
+        IntResult::Ok(t) => {
+            return t;
+        }
+        IntResult::Err(error) => {
+            assert_true(false, error);
+        }
+    }
+    return -1;
+}
+fn argv(exe: String, mode: String, text: String) -> List<String> effects { state } {
+    let args = list_new<String>();
+    list_push(args, exe);
+    list_push(args, mode);
+    list_push(args, text);
+    return args;
+}
+fn dispatch(scheduler: loop::Loop<process::Completed>) -> Unit effects { io, process, state } {
+    let progress = must(loop::tick(scheduler, now()), "tick failed");
+}
+fn wait(scheduler: loop::Loop<process::Completed>,
+    task: loop::Task<process::Completed>) -> loop::Outcome<process::Completed> effects { io,
+    process, state } {
+    let deadline = now() + 8000;
+    while now() < deadline {
+        dispatch(scheduler);
+        match loop::outcome(task) {
+            Option::Some(done) => {
+                return done;
+            }
+            Option::None => {}
+        }
+    }
+    assert_true(false, "process never acknowledged termination");
+    return loop::Outcome<process::Completed>::Failed("timeout");
+}
+fn schedule(scheduler: loop::Loop<process::Completed>, args: List<String>, base: String,
+    label: String, deadline: Int) -> loop::Task<process::Completed> effects { state, io } {
+    return must(process::schedule(scheduler, args, path::Path(value: base), path::Path(value: base
+        + "/" + label + ".out"), path::Path(value: base + "/" + label + ".err"), deadline),
+        "schedule failed");
+}
+fn write_ok(status: WriteResult) -> Bool {
+    return match status {
+        WriteResult::Ok => true,
+        WriteResult::Err(_) => false
+    };
+}
+fn poll_code(handle: ForeignHandle) -> Int effects { process, state } {
+    match process_poll(handle) {
+        IntResult::Ok(code) => {
+            return code;
+        }
+        IntResult::Err(error) => {
+            assert_true(false, error);
+        }
+    }
+    return -2;
+}
+fn check_tree(exe: String, base: String) -> Unit effects { io, process, state } {
+    let args = strings_new();
+    strings_push(args, exe);
+    let output = base + "/async-tree.out";
+    let errors = base + "/async-tree.err";
+    assert_true(write_ok(write_file(output, "sentinel")), "create prior output");
+    match process_spawn(args, base, output, output) {
+        SpawnResult::Ok(_) => {
+            assert_true(false, "native launch accepted output alias");
+        }
+        SpawnResult::Err(_) => {}
+    }
+    assert_true(value(read_file(output)) == "sentinel", "alias truncated original output");
+    match process_spawn(args, base, output, errors) {
+        SpawnResult::Err(error) => {
+            assert_true(false, error);
+        }
+        SpawnResult::Ok(handle) => {
+            let deadline = now() + 5000;
+            while now() < deadline && value(read_file(output)) != "descendant ready\r\n" {}
+            assert_true(value(read_file(output)) == "descendant ready\r\n",
+                "descendant did not start");
+            assert_true(poll_code(handle) == -1, "live descendant keeps the Job pending");
+            assert_true(!write_ok(process_close(handle)), "live Job closed");
+            assert_true(!write_ok(ffi_close(handle, "ignored")), "process closed through FFI");
+            assert_true(write_ok(process_cancel(handle)) && write_ok(process_cancel(handle)),
+                "cancel Job twice");
+            let drain = now() + 5000;
+            while now() < drain && poll_code(handle) == -1 {}
+            assert_true(poll_code(handle) == 47, "leader status retained after descendant drain");
+            assert_true(write_ok(process_close(handle)), "close drained Job");
+            assert_true(!write_ok(process_close(handle)), "reject double close");
+        }
+    }
+}
+fn main() -> Int effects { args, io, process, state } {
+    let child = value(arg(0));
+    let base = value(arg(1));
+    let scheduler = must(loop::create<process::Completed>(now()), "create failed");
+    let task = schedule(scheduler, argv(child, "echo", "a \"quoted\" value 😀 \\"), base,
+        "async-echo", 5000);
+    let independent = schedule(scheduler, argv(child, "124", ""), base, "async-124", 5000);
+    if platform() != "windows" {
+        match wait(scheduler, task) {
+            loop::Outcome::Failed(error) => {
+                assert_true(error == "process_spawn requires Windows", error);
+            }
+            loop::Outcome::Done(_) => {
+                assert_true(false, "unsupported process launched");
+            }
+            loop::Outcome::Cancelled => {
+                assert_true(false, "unsupported launch cancelled");
+            }
+            loop::Outcome::TimedOut => {
+                assert_true(false, "unsupported launch timed out");
+            }
+        }
+        print("async process unsupported");
+        return 0;
+    }
+    match wait(scheduler, task) {
+        loop::Outcome::Done(completed) => {
+            assert_true(completed.code == 17, "child status");
+        }
+        loop::Outcome::Failed(error) => {
+            assert_true(false, error);
+        }
+        loop::Outcome::Cancelled => {
+            assert_true(false, "unexpected cancel");
+        }
+        loop::Outcome::TimedOut => {
+            assert_true(false, "unexpected timeout");
+        }
+    }
+    assert_true(value(read_file(base + "/child.txt")) == "child cwd", "explicit working directory");
+    assert_true(value(read_file(base + "/async-echo.out")) == "a \"quoted\" value 😀 \\\r\n",
+        "argv round trip");
+    match wait(scheduler, independent) {
+        loop::Outcome::Done(completed) => {
+            assert_true(completed.code == 124, "ordinary exit 124");
+        }
+        loop::Outcome::Failed(error) => {
+            assert_true(false, error);
+        }
+        loop::Outcome::Cancelled => {
+            assert_true(false, "unexpected cancel");
+        }
+        loop::Outcome::TimedOut => {
+            assert_true(false, "124 is not timeout");
+        }
+    }
+    let running = schedule(scheduler, argv(child, "loop", ""), base, "async-cancel", 5000);
+    dispatch(scheduler);
+    assert_true(loop::cancel(running), "cancel live worker");
+    match wait(scheduler, running) {
+        loop::Outcome::Cancelled => {}
+        loop::Outcome::Failed(error) => {
+            assert_true(false, error);
+        }
+        loop::Outcome::Done(_) => {
+            assert_true(false, "cancelled worker completed");
+        }
+        loop::Outcome::TimedOut => {
+            assert_true(false, "wrong cancel outcome");
+        }
+    }
+    let sleeping = schedule(scheduler, argv(child, "loop", ""), base, "async-timeout", 120);
+    dispatch(scheduler);
+    match wait(scheduler, sleeping) {
+        loop::Outcome::TimedOut => {}
+        loop::Outcome::Failed(error) => {
+            assert_true(false, error);
+        }
+        loop::Outcome::Done(_) => {
+            assert_true(false, "loop worker completed");
+        }
+        loop::Outcome::Cancelled => {
+            assert_true(false, "wrong timeout outcome");
+        }
+    }
+    check_tree(value(arg(2)), base);
+    print("async process passed");
+    return 0;
+}

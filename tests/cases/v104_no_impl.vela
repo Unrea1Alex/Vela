@@ -1,0 +1,4 @@
+interface Read { fn read(self: Self) -> Int; }
+struct Foo {}
+impl Foo { fn read(self: Foo) -> Int { return 1; } }
+fn main() -> Int { return Read::read(Foo()); }

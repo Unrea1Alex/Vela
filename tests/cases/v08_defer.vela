@@ -1,0 +1,33 @@
+fn action(ok: Bool) -> Result<Int, String> {
+    if ok { return Result<Int, String>::Ok(7); }
+    return Result<Int, String>::Err("unavailable");
+}
+
+fn sample(ok: Bool) -> Result<String, String> effects { io } {
+    defer { print("outer"); }
+    scope {
+        var message = "initial";
+        defer { print(message); }
+        defer { print("inner"); }
+        message = "changed";
+        for i in 0 .. 3 {
+            defer { print("iteration-" + to_string(i)); }
+            if i == 0 { continue; }
+            break;
+        }
+        let n = action(ok)?;
+        return Result<String, String>::Ok("value-" + to_string(n));
+    }
+}
+
+fn main() -> Unit effects { io } {
+    scope {
+        defer { print("fallthrough"); }
+    }
+    for i in 0 .. 2 {
+        match sample(i == 0) {
+            Result::Ok(value) => { print(value); }
+            Result::Err(error) => { print(error); }
+        }
+    }
+}

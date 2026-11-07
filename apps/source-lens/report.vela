@@ -1,0 +1,173 @@
+import "graph.vela" as graph;
+import "@text" as text;
+import "@result" as result;
+pub fn escape(value: String) -> Result<String, String> effects { state } {
+    let encoded = result::explain(text::html(text::Text(data: value)), "Invalid HTML text")?;
+    return Result<String, String>::Ok(encoded.data);
+}
+fn add(b: text::Builder, value: String) -> Result<Bool, String> effects { state } {
+    return result::explain(text::append(b, text::Bytes(data: value)), "Report exceeds 512 KiB");
+}
+fn header() -> String {
+    return """<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>SourceLens — карта проекта Vela</title>
+<style>
+:root{color-scheme:light;--ink:#182f2a;--muted:#61736c;--line:#d9e1d8;--paper:#f7f8f2;--mint:#d3f294}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.6 "Segoe UI",sans-serif}
+a{color:inherit;text-underline-offset:3px}button,input,select{font:inherit}code,.mono{font-family:Consolas,monospace}
+.wrap{max-width:1240px;margin:auto;padding:0 40px}.top{padding:23px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px}
+.brand{font-size:22px;font-weight:750;letter-spacing:-1px}.badge{font-size:12px;letter-spacing:1px;text-transform:uppercase}
+header{padding:54px 0 32px}h1{font-size:clamp(36px,5vw,60px);line-height:1.08;letter-spacing:-2.5px;margin:12px 0 18px;font-weight:600}
+.intro{max-width:760px;color:var(--muted);font-size:17px}h2{font-size:24px;letter-spacing:-.6px;font-weight:600;margin:0}h3{font-size:17px;margin:0;overflow-wrap:anywhere}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);margin:30px 0 44px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.metric{padding:20px 26px;border-right:1px solid var(--line)}.metric:last-child{border:0}.metric:first-child{background:var(--mint)}
+.metric strong{display:block;font-size:37px;line-height:1.2;font-weight:600}.metric span{font-size:13px;color:#4c6157}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px}.section-head p{margin:0;color:var(--muted);font-size:13px}
+.modules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:44px}.module{padding:20px;border:1px solid var(--line);border-radius:10px;background:white}
+.module small{color:var(--muted)}.path{overflow-wrap:anywhere;font:12px/1.6 Consolas,monospace;color:var(--muted);margin-top:8px}
+ul{padding-left:20px;margin:9px 0 0}.module li{font-size:13px}.filters{display:grid;grid-template-columns:2fr 1.4fr 1fr auto;gap:10px;margin-bottom:14px}
+input,select,button{border:1px solid #bbc9bc;border-radius:7px;background:white;color:var(--ink);padding:10px 12px;min-width:0}input:focus,select:focus,button:focus{outline:2px solid #568631;outline-offset:2px}
+button{cursor:pointer}.status{font-size:13px;color:var(--muted);margin-bottom:18px}.function{padding:22px 24px;border:1px solid var(--line);border-radius:10px;margin-bottom:12px;background:white;scroll-margin-top:20px}
+.function:target{border-color:#4f802f;box-shadow:0 0 0 2px #d3f294}.fn-head{display:flex;justify-content:space-between;gap:20px}.fn-head h3{font-family:Consolas,monospace;font-size:19px}.effects{display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap}
+.pill{font:12px/1.7 Consolas,monospace;padding:2px 8px;background:#eef3e6;border-radius:5px}.numbers{display:flex;gap:22px;margin-top:13px;font-size:13px;color:var(--muted)}
+details{margin-top:14px;border-top:1px solid #e8ece6;padding-top:10px;font-size:13px}summary{cursor:pointer}details li{overflow-wrap:anywhere}.empty{padding:28px;border:1px dashed var(--line);border-radius:10px}
+footer{margin:44px 0 32px;padding-top:22px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}.revision{overflow-wrap:anywhere}
+[hidden]{display:none!important}@media(max-width:720px){.wrap{padding:0 18px}header{padding-top:32px}.metrics{grid-template-columns:repeat(2,1fr)}.metric{border-bottom:1px solid var(--line)}.filters{grid-template-columns:1fr 1fr}.filters input{grid-column:1/-1}.fn-head{display:block}.effects{margin-top:10px}.section-head{display:block}}
+@media print{.filters{display:none}.function{break-inside:avoid}.wrap{max-width:none}body{background:white}}
+</style></head><body><div class="wrap">
+<div class="top"><div class="brand">SourceLens<span style="color:#6b914e"> /</span></div><div class="badge">Vela 0.9 · Semantic explorer</div></div>
+<header><div class="badge">Карта исходного кода</div><h1>Проект, который<br>можно прочитать.</h1>
+<p class="intro">Модули, функции и связи между ними — в одном снимке семантического анализа. Найдите точку входа, проследите вызовы, посмотрите эффекты.</p></header>
+<noscript><p>JavaScript выключен: доступен полный отчёт, поиск и фильтры не работают.</p></noscript>
+<div class="metrics">
+""";
+}
+fn footer() -> String {
+    return """
+</footer></div><script>
+const cards=[...document.querySelectorAll('.function')];
+const search=document.querySelector('#search'),moduleFilter=document.querySelector('#module'),effect=document.querySelector('#effect');
+function update(){
+ const q=search.value.trim().toLocaleLowerCase();let shown=0;
+ for(const card of cards){
+  const visible=(!q||card.textContent.toLocaleLowerCase().includes(q))&&(!moduleFilter.value||card.dataset.doc===moduleFilter.value)&&(!effect.value||card.dataset.effects.split(' ').includes(effect.value));
+  card.hidden=!visible;if(visible)shown++;
+ }
+ document.querySelector('#status').textContent=`Показано функций: ${shown} из ${cards.length}`;
+ document.querySelector('#empty').hidden=shown!==0;
+}
+function reset(){search.value='';moduleFilter.value='';effect.value='';update()}
+search.addEventListener('input',update);moduleFilter.addEventListener('change',update);effect.addEventListener('change',update);
+document.querySelector('#reset').addEventListener('click',reset);
+document.addEventListener('click',e=>{const link=e.target.closest('a[href^="#fn-"]');if(link)reset()});
+update();
+</script></body></html>
+""";
+}
+fn metric(b: text::Builder, value: Int, name: String) -> Result<Bool, String> effects { state } {
+    return add(b, f"<div class=\"metric\"><strong>{value:d}</strong><span>{name:s}</span></div>");
+}
+fn module_cards(b: text::Builder, g: graph::Graph) -> Result<Bool, String> effects { state } {
+    let head = add(b,
+        "</div><section><div class=\"section-head\"><h2>01 / Модули</h2><p>Импортирующий модуль → зависимость</p></div><div class=\"modules\">")?;
+    for doc in g.documents {
+        var functions = 0;
+        for f in g.functions {
+            if f.document == doc.id {
+                functions = functions + 1;
+            }
+        }
+        let start = add(b,
+            f"<article class=\"module\" id=\"doc-{doc.id:d}\"><small>МОДУЛЬ {doc.id:d} · ФУНКЦИЙ {functions:d}</small><div class=\"path\">{escape(doc.path)?:s}</div><ul>")?;
+        for edge in g.imports {
+            if edge.from == doc.id {
+                let link = add(b,
+                    f"<li><a href=\"#doc-{edge.to:d}\">{escape(edge.alias)?:s}</a> → модуль {edge.to:d}</li>")?;
+            }
+        }
+        let end = add(b, "</ul></article>")?;
+    }
+    return add(b, "</div></section>");
+}
+fn filters(b: text::Builder, g: graph::Graph) -> Result<Bool, String> effects { state } {
+    let head = add(b, """<section><div class="section-head"><h2>02 / Функции</h2><p>Места вызова, а не частота выполнения</p></div>
+<div class="filters"><input id="search" type="search" aria-label="Поиск функций" placeholder="Имя, тип, путь или вызываемая функция…">
+<select id="module" aria-label="Модуль"><option value="">Все модули</option>""")?;
+    for doc in g.documents {
+        let option = add(b,
+            f"<option value=\"{doc.id:d}\">{doc.id:d} · {escape(doc.path)?:s}</option>")?;
+    }
+    return add(b, """</select><select id="effect" aria-label="Эффект"><option value="">Все эффекты</option><option>io</option><option>state</option><option>args</option><option>process</option></select>
+<button id="reset" type="button">Сбросить</button></div><div id="status" class="status" role="status" aria-live="polite"></div>
+<p id="empty" class="empty" hidden>Совпадений нет. Измените запрос или сбросьте фильтры.</p>""");
+}
+fn call_target_link(g: graph::Graph, id: String) -> Result<String, String> effects { state } {
+    if graph::is_builtin(id) {
+        return Result<String, String>::Ok("<code>" + escape(str_slice(id, 8, str_len(id)))?
+            + "</code> <small>builtin</small>");
+    }
+    let index = dict_get(g.function_index, id);
+    return Result<String, String>::Ok(
+        f"<a href=\"#fn-{index:d}\"><code>{escape(list_get(g.functions, index).name)?:s}</code></a>");
+}
+fn function_card(b: text::Builder, g: graph::Graph, index: Int) -> Result<Bool,
+    String> effects { state } {
+    let f = list_get(g.functions, index);
+    let incoming = graph::call_count(g, f.id, true);
+    let outgoing = graph::call_count(g, f.id, false);
+    let start = add(b,
+        f"<article class=\"function\" id=\"fn-{index:d}\" data-doc=\"{f.document:d}\" data-effects=\"{strings_join(f.declared_effects, " "):s}\"><div class=\"fn-head\"><h3>{escape(f.name)?:s}</h3><div class=\"effects\">")?;
+    for j in 0 .. strings_len(f.declared_effects) {
+        let badge = add(b, "<span class=\"pill\">" + strings_get(f.declared_effects, j)
+            + "</span>")?;
+    }
+    if strings_len(f.declared_effects) == 0 {
+        let empty = add(b,
+            "<span class=\"pill\">эффекты не указаны в индексе</span>")?;
+    }
+    var types = strings_join(f.types, " | ");
+    if types == "" {
+        types = "тип без специализации не определён";
+    }
+    let location = add(b,
+        f"</div></div><div class=\"path\">{escape(graph::path(g, f.document))?:s}:{f.line + 1:d}:{f.character + 1:d}</div><div class=\"path\">→ {escape(types)?:s}</div><div class=\"numbers\"><span>Входящих: <b>{incoming:d}</b></span><span>Исходящих: <b>{outgoing:d}</b></span></div>")?;
+    if incoming + outgoing > 0 {
+        let detail = add(b,
+            "<details><summary>Показать связи и позиции</summary><ul>")?;
+        for call in g.calls {
+            if call.caller == f.id || call.target == f.id {
+                let row = add(b, "<li>" + call_target_link(g, call.caller)? + " → "
+                    + call_target_link(g, call.target)?
+                    + f" <span class=\"path\">(модуль {call.document:d}, {call.line + 1:d}:{call.character + 1:d})</span></li>")?;
+            }
+        }
+        let close = add(b, "</ul></details>")?;
+    }
+    return add(b, "</article>");
+}
+pub fn render(g: graph::Graph) -> Result<text::Text, String> effects { state } {
+    let b = result::explain(text::builder(524288), "Cannot create report builder")?;
+    scope {
+        defer {
+            text::reset(b);
+        }
+        let a = add(b, header())?;
+        let d = metric(b, list_len(g.documents), "модулей")?;
+        let f = metric(b, list_len(g.functions), "функций")?;
+        let c = metric(b, list_len(g.calls), "мест прямого вызова")?;
+        let i = metric(b, list_len(g.imports), "импортов")?;
+        let modules = module_cards(b, g)?;
+        let controls = filters(b, g)?;
+        for n in 0 .. list_len(g.functions) {
+            let card = function_card(b, g, n)?;
+        }
+        let note = add(b,
+            "</section><footer><p>SourceLens · создано приложением на Vela 0.9.0. Автономный отчёт без сетевых запросов.</p><p>Границы: только выбранный граф импортов; позиции — строка и UTF-16 столбец с 1. Это снимок, актуальность исходников не проверяется. Пустой список эффектов у неспециализированного generic не доказывает чистоту.</p><div class=\"revision mono\">Revision: "
+            + g.revision + "</div>")?;
+        let end = add(b, footer())?;
+        return result::explain(text::finish_text(b), "Cannot finish UTF-8 report");
+    }
+}

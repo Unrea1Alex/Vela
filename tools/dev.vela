@@ -140,16 +140,28 @@ fn main() -> Int effects { args, state, io, process } {
             return status;
         }
     }
+    build(previous, root + "/tools/lsp.vela", out + "/vela-lsp.exe", out + "/lsp-build");
     copy(previous, bin + "/velac.exe");
     copy(out + "/vela-test.exe", bin + "/vela-test.exe");
     copy(out + "/vela-bundle-final.exe", bin + "/vela-bundle.exe");
+    copy(out + "/vela-lsp.exe", bin + "/vela-lsp.exe");
     copy(out + "/vela-dev.exe", bin + "/vela-dev.next.exe");
-    let report = f"{{\"schema_version\":1,\"version\":\"0.7.0\",\"orchestrator\":\"Vela\",\"fixed_point\":true,\"bundler_fixed_point\":true,\"source_bytes\":{str_len(value(read_file(source_path))):d},\"tests_run\":{action == "verify":b}}}\n";
+    let version_args = command(previous);
+    strings_push(version_args, "--version");
+    run(version_args, out + "/compiler-version", 5000);
+    let banner = value(read_file(out + "/compiler-version.out"));
+    var end = 5;
+    while end < str_len(banner) && str_byte(banner, end) != 32 { end = end + 1; }
+    if str_len(banner) < 6 || str_slice(banner, 0, 5) != "Vela " || end == str_len(banner) {
+        eprint("Invalid compiler version banner"); return 1;
+    }
+    let version = str_slice(banner, 5, end);
+    let report = f"{{\"schema_version\":1,\"version\":\"{version:s}\",\"orchestrator\":\"Vela\",\"fixed_point\":true,\"bundler_fixed_point\":true,\"source_bytes\":{str_len(value(read_file(bundle_path))):d},\"tests_run\":{action == "verify":b}}}\n";
     done(write_file(out + "/bootstrap.json", report));
     done(write_file(root + "/docs/bootstrap-evidence.json", report));
     if action == "verify" {
         copy(out + "/tests.json", root + "/docs/test-evidence.json");
     }
-    print("Installed Vela 0.7.0. No Python was used.");
+    print("Installed Vela " + version + ". No Python was used.");
     return 0;
 }

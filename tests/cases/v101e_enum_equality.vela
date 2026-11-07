@@ -1,0 +1,50 @@
+import "enum-equality-owner.vela" as owner;
+import "enum-equality-owner.vela" as alias;
+enum State {
+    Queued,
+    Running,
+    Done
+}
+enum Only {
+    Value
+}
+enum Marker<T> {
+    First,
+    Last
+}
+fn same<T>(a: Marker<T>, b: Marker<T>) -> Bool {
+    return a == b;
+}
+fn equal<T>(a: T, b: T) -> Bool {
+    return a == b;
+}
+fn observed(trace: List<Int>, index: Int, value: State) -> State effects { state } {
+    list_push(trace, index);
+    return value;
+}
+fn main() -> Int effects { io, state } {
+    assert_true(State::Queued == State::Queued, "equal variant");
+    assert_true(State::Queued != State::Done, "different variants");
+    assert_true(!(State::Queued == State::Done) && !(State::Done != State::Done),
+        "inverse comparisons");
+    assert_true(Only::Value == Only::Value, "single variant");
+    assert_true(owner::State::Ready == alias::State::Ready, "same type through alias");
+    assert_true(owner::State::Ready != owner::State::Done, "imported variants");
+    assert_true(same(Marker<Int>::First, Marker<Int>::First), "generic enum equality");
+    assert_true(equal(State::Queued, State::Queued), "ordinary generic instance equality");
+    assert_true(!same(Marker<String>::First, Marker<String>::Last), "generic enum inequality");
+    let trace = list_new<Int>();
+    assert_true(observed(trace, 1, State::Running) == observed(trace, 2, State::Running),
+        "effectful equal");
+    assert_true(observed(trace, 3, State::Running) != observed(trace, 4, State::Done),
+        "effectful unequal");
+    let skipped_and = false && observed(trace, 5, State::Done) == observed(trace, 6, State::Done);
+    let skipped_or = true || observed(trace, 7, State::Done) != observed(trace, 8, State::Done);
+    assert_true(!skipped_and && skipped_or && list_len(trace) == 4,
+        "short circuit and exactly once");
+    for i in 0 .. 4 {
+        assert_true(list_get(trace, i) == i + 1, "left to right");
+    }
+    print("enum equality passed");
+    return 0;
+}

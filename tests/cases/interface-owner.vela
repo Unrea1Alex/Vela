@@ -1,0 +1,4 @@
+pub interface Reader { fn read(self: Self, key: String) -> String effects { io, state }; }
+pub opaque struct Memory { value: String }
+impl Reader for Memory { fn read(self: Memory, key: String) -> String { return self.value; } }
+pub fn memory(value: String) -> Memory { return Memory(value: value); }

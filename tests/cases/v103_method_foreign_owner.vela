@@ -1,0 +1,3 @@
+import "method-owner.vela" as api;
+impl<T> api::Bucket<T> {}
+fn main() -> Int { return 0; }

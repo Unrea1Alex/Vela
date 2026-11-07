@@ -1,11 +1,18 @@
-# Generic types and functions (0.5.1 contract)
+# Generic types and functions
 
-Status: verified in 0.5.2 (498 native checks); retained by 0.5.3 (539).
+Memory descriptions of the original version are historical. In 0.8,
+[the tracing heap](../MEMORY.md) governs managed values.
+
+Initial acceptance: 0.5.2 (498 native checks); retained by 0.5.3 (539).
+Later numeric and equality extensions are described below and in the language spec.
 
 Declarations use `fn identity<T>(value: T) -> T`, `struct Box<T> { value: T }`
 and `enum Maybe<T> { Some(T), None }`. Parameters are distinct names, optionally
-bounded by `Any` (default), `Scalar` (Int, Bool, String and their distinct wrappers),
-or `Number` (Int). Unknown bounds and duplicate or reserved parameter names fail.
+bounded by `Any` (default), `Scalar` (Int, Float64, Bool, String and their distinct wrappers),
+or `Number` (Int, Float64). Unknown bounds and duplicate or reserved parameter names fail.
+Payloadless enum equality from 1.0.0-dev.5 does not add enums to Scalar or Dict keys.
+Ordinary generic bodies are checked for each concrete instance: an eligible enum
+can use equality, an instance with payloads rejects. See [enum equality](ENUM-EQUALITY.md).
 Parameters may shadow user type names; primitive/prelude constructor names are
 reserved. The prelude's E parameter therefore does not conflict with a user enum E.
 Distinct declarations themselves are not generic in this version.
@@ -32,7 +39,7 @@ provide methods or change the existing operators. Effects remain concrete sets.
 
 Instances are cached before checking their dependencies. Recursion with unchanged
 arguments is permitted; direct value-layout cycles remain E204. Collection edges
-break layout cycles without changing the process-region lifetime model. Expansion
+break layout cycles; their managed values follow the current tracing heap. Expansion
 is bounded by 32 active generic type instantiations, 512 concrete generic types,
 and 512 generic function instances per compilation. A chain of newly instantiated
 function dependencies is limited to 32 (cached recursion does not extend it).
@@ -46,5 +53,5 @@ arity, missing arguments, nominal mismatch, body type/effect errors, direct layo
 cycles and growing recursion. Run original and formatted fixtures with the first
 and final compiler generations, plus the compiler/bundler fixed points.
 
-Future callable/effect parameters are specified separately in
-[RFC 0002](../rfcs/0002-generics-callables.md). They are not syntax accepted by 0.5.
+Callable/effect parameters were proposed in [RFC 0002](../rfcs/0002-generics-callables.md)
+and are implemented from 0.10.5; current rules are in [CALLABLES-EFFECTS](CALLABLES-EFFECTS.md).

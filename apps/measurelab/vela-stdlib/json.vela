@@ -418,3 +418,172 @@ pub fn stringify(value: Value) -> Result<String, Error> effects { state } {
     let success = emit_value(writer, value, 0)?;
     return Result<String, Error>::Ok(strings_join(writer.parts, ""));
 }
+pub struct At<E> {
+    path: String,
+    cause: E
+}
+pub enum DecodeCause {
+    Parse(Error),
+    Selector(Error),
+    Expected(String),
+    Missing,
+    Index,
+    NonFinite,
+    IntegerPrecision
+}
+pub enum IntegerMode {
+    Exact,
+    Round
+}
+pub struct Cursor {
+    value: Value,
+    path: String
+}
+pub fn with_path<T, E>(outcome: Result<T, E>, path: String) -> Result<T, At<E>> {
+    return match outcome {
+        Result::Ok(value) => Result<T, At<E>>::Ok(value),
+        Result::Err(cause) => Result<T, At<E>>::Err(At<E>(path: path, cause: cause))
+    };
+}
+fn decode_error<T>(path: String, cause: DecodeCause) -> Result<T, At<DecodeCause>> {
+    return Result<T, At<DecodeCause>>::Err(At<DecodeCause>(path: path, cause: cause));
+}
+pub fn root(value: Value) -> Cursor {
+    return Cursor(value: value, path: "$");
+}
+pub fn decode(data: String) -> Result<Cursor, At<DecodeCause>> effects { state } {
+    return match parse(data) {
+        Result::Ok(value) => Result<Cursor, At<DecodeCause>>::Ok(root(value)),
+        Result::Err(cause) => decode_error<Cursor>("$", DecodeCause::Parse(cause))
+    };
+}
+pub fn as_object(c: Cursor) -> Result<List<Member>, At<DecodeCause>> {
+    match c.value {
+        Value::Object(items) => { return Result<List<Member>, At<DecodeCause>>::Ok(items); }
+        Value::Null => {}
+        Value::Boolean(_) => {}
+        Value::Integer(_) => {}
+        Value::Number(_) => {}
+        Value::StringValue(_) => {}
+        Value::Array(_) => {}
+    }
+    return decode_error<List<Member>>(c.path, DecodeCause::Expected("object"));
+}
+pub fn as_array(c: Cursor) -> Result<List<Value>, At<DecodeCause>> {
+    match c.value {
+        Value::Array(items) => { return Result<List<Value>, At<DecodeCause>>::Ok(items); }
+        Value::Null => {}
+        Value::Boolean(_) => {}
+        Value::Integer(_) => {}
+        Value::Number(_) => {}
+        Value::StringValue(_) => {}
+        Value::Object(_) => {}
+    }
+    return decode_error<List<Value>>(c.path, DecodeCause::Expected("array"));
+}
+pub fn as_string(c: Cursor) -> Result<String, At<DecodeCause>> {
+    match c.value {
+        Value::StringValue(value) => { return Result<String, At<DecodeCause>>::Ok(value); }
+        Value::Null => {}
+        Value::Boolean(_) => {}
+        Value::Integer(_) => {}
+        Value::Number(_) => {}
+        Value::Array(_) => {}
+        Value::Object(_) => {}
+    }
+    return decode_error<String>(c.path, DecodeCause::Expected("string"));
+}
+pub fn as_int(c: Cursor) -> Result<Int, At<DecodeCause>> {
+    match c.value {
+        Value::Integer(value) => { return Result<Int, At<DecodeCause>>::Ok(value); }
+        Value::Null => {}
+        Value::Boolean(_) => {}
+        Value::Number(_) => {}
+        Value::StringValue(_) => {}
+        Value::Array(_) => {}
+        Value::Object(_) => {}
+    }
+    return decode_error<Int>(c.path, DecodeCause::Expected("integer"));
+}
+pub fn as_number(c: Cursor, integer_mode: IntegerMode) -> Result<Float64, At<DecodeCause>> {
+    match c.value {
+        Value::Integer(value) => {
+            let converted = float_from_int(value);
+            match integer_mode {
+                IntegerMode::Round => { return Result<Float64, At<DecodeCause>>::Ok(converted); }
+                IntegerMode::Exact => {
+                    match float_to_int(converted) {
+                        IntResult::Ok(back) => {
+                            if back == value { return Result<Float64, At<DecodeCause>>::Ok(converted); }
+                        }
+                        IntResult::Err(_) => {}
+                    }
+                }
+            }
+            return decode_error<Float64>(c.path, DecodeCause::IntegerPrecision);
+        }
+        Value::Number(value) => {
+            if !float_is_finite(value) { return decode_error<Float64>(c.path, DecodeCause::NonFinite); }
+            return Result<Float64, At<DecodeCause>>::Ok(value);
+        }
+        Value::Null => {}
+        Value::Boolean(_) => {}
+        Value::StringValue(_) => {}
+        Value::Array(_) => {}
+        Value::Object(_) => {}
+    }
+    return decode_error<Float64>(c.path, DecodeCause::Expected("number"));
+}
+fn identifier_path(name: String) -> Bool {
+    if str_len(name) == 0 { return false; }
+    for i in 0 .. str_len(name) {
+        let b = str_byte(name, i);
+        if !(b == 95 || (b >= 65 && b <= 90) || (b >= 97 && b <= 122) || (i > 0 && b >= 48 && b <= 57)) {
+            return false;
+        }
+    }
+    return true;
+}
+pub fn field(c: Cursor, name: String) -> Result<Cursor, At<DecodeCause>> effects { state } {
+    let members = as_object(c)?;
+    var path = c.path;
+    if identifier_path(name) {
+        path = path + "." + name;
+    } else {
+        match stringify(Value::StringValue(name)) {
+            Result::Ok(quoted) => { path = path + "[" + quoted + "]"; }
+            Result::Err(error) => { return decode_error<Cursor>(path, DecodeCause::Selector(error)); }
+        }
+    }
+    for member in members {
+        if member.name == name { return Result<Cursor, At<DecodeCause>>::Ok(Cursor(value: member.value, path: path)); }
+    }
+    return decode_error<Cursor>(path, DecodeCause::Missing);
+}
+pub fn item(c: Cursor, index: Int) -> Result<Cursor, At<DecodeCause>> effects { state } {
+    let values = as_array(c)?;
+    let path = c.path + "[" + to_string(index) + "]";
+    if index < 0 || index >= list_len(values) { return decode_error<Cursor>(path, DecodeCause::Index); }
+    return Result<Cursor, At<DecodeCause>>::Ok(Cursor(value: list_get(values, index), path: path));
+}
+fn error_detail(error: Error) -> String {
+    return match error {
+        Error::Syntax(offset, message) => "JSON byte " + to_string(offset) + ": " + message,
+        Error::Encoding(offset) => "invalid UTF-8 at byte " + to_string(offset),
+        Error::Limit => "JSON limit exceeded",
+        Error::NonFinite => "expected a finite number",
+        Error::Duplicate(name) => "duplicate JSON field: " + name
+    };
+}
+pub fn describe(error: At<DecodeCause>) -> String {
+    let detail = match error.cause {
+        DecodeCause::Parse(cause) => error_detail(cause),
+        DecodeCause::Selector(cause) => error_detail(cause),
+        DecodeCause::Expected(kind) => "expected " + kind,
+        DecodeCause::Missing => "missing field",
+        DecodeCause::Index => "array index out of range",
+        DecodeCause::NonFinite => "expected a finite number",
+        DecodeCause::IntegerPrecision => "integer is not exactly representable as Float64"
+    };
+    return error.path + ": " + detail;
+}

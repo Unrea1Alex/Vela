@@ -1,0 +1,3 @@
+struct Example<T> { value: T }
+impl Example<Int> {}
+fn main() -> Int { return 0; }

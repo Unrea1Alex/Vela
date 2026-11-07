@@ -1,0 +1,6 @@
+async fn bad() -> WriteResult effects { io } {
+    return host_sleep(1);
+}
+fn main() -> Int {
+    return 0;
+}

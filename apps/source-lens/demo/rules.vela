@@ -1,0 +1,16 @@
+pub enum Status { Ready, Review, Blocked }
+
+pub fn clamp(value: Int) -> Int {
+    if value < 0 { return 0; }
+    if value > 100 { return 100; }
+    return value;
+}
+pub fn grade(score: Int) -> Status {
+    if clamp(score) >= 90 { return Status::Ready; }
+    if clamp(score) >= 60 { return Status::Review; }
+    return Status::Blocked;
+}
+pub fn approved(value: Status) -> Bool {
+    return match value { Status::Ready => true, Status::Review => false, Status::Blocked => false };
+}
+pub fn keep<T>(value: T) -> T { return value; }

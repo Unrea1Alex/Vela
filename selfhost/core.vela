@@ -91,7 +91,7 @@ pub fn json_string(value: String) -> String effects { state } {
     return strings_join(parts, "");
 }
 pub fn empty_details() -> DiagnosticDetails effects { state } {
-    return DiagnosticDetails(expected_type: "", actual_type: "", callee: "", required_effects: 0, allowed_effects: 0, missing_effects: 0, missing_variants: list_new<String>(), related: list_new<RelatedLocation>());
+    return DiagnosticDetails(effect_parameter: "", capture: "", expected: "", actual: "", interface_name: "", implementor: "", type_parameter: "", operation: "", reason: "", owner: "", member: "", method: "", exposed_type: "", expected_type: "", actual_type: "", callee: "", required_effects: 0, allowed_effects: 0, missing_effects: 0, missing_variants: list_new<String>(), related: list_new<RelatedLocation>());
 }
 pub fn effect_names(mask: Int) -> StringList effects { state } {
     let items = strings_new();
@@ -123,6 +123,22 @@ pub fn span_json(c: Context, span: Span) -> String effects { state } {
 }
 pub fn details_json(details: DiagnosticDetails) -> String effects { state } {
     let items = strings_new();
+    if details.effect_parameter != "" { strings_push(items, "\"effect_parameter\":" + json_string(details.effect_parameter)); }
+    if details.capture != "" { strings_push(items, "\"capture\":" + json_string(details.capture)); }
+    if details.expected != "" { strings_push(items, "\"expected\":" + json_string(details.expected)); }
+    if details.actual != "" { strings_push(items, "\"actual\":" + json_string(details.actual)); }
+    if details.reason != "" { strings_push(items, "\"reason\":" + json_string(details.reason)); }
+    if details.owner != "" { strings_push(items, "\"owner\":" + json_string(details.owner)); }
+    if details.member != "" { strings_push(items, "\"member\":" + json_string(details.member)); }
+    if details.method != "" { strings_push(items, "\"method\":" + json_string(details.method)); }
+    if details.exposed_type != "" { strings_push(items, "\"type\":" + json_string(details.exposed_type)); }
+    if details.interface_name != "" { strings_push(items, "\"interface\":" + json_string(details.interface_name)); }
+    if details.implementor != "" { strings_push(items, "\"implementor\":" + json_string(details.implementor)); }
+    if details.type_parameter != "" { strings_push(items, "\"type_parameter\":" + json_string(details.type_parameter)); }
+    if details.operation != "" {
+        strings_push(items, "\"operation\":" + json_string(details.operation));
+        strings_push(items, "\"actual_type\":" + json_string(details.actual_type));
+    }
     if details.expected_type != "" {
         strings_push(items, "\"expected_type\":" + json_string(details.expected_type));
         strings_push(items, "\"actual_type\":" + json_string(details.actual_type));
@@ -171,6 +187,27 @@ pub fn fail(c: Context, code: String, message: String, start: Int, end: Int) -> 
 pub fn bad(c: Context, code: String, message: String, span: Span) -> Unit effects { state, io, process } {
     fail_details(c, code, message, span, empty_details());
 }
+pub fn method_error(c: Context, reason: String, owner: String, member: String, message: String, span: Span, related: Span) -> Unit effects { state, io, process } {
+    var details = empty_details();
+    details.reason = reason;
+    details.owner = owner;
+    details.method = member;
+    if related.end > related.start {
+        list_push(details.related, RelatedLocation(message: "Related declaration is here.", span: related));
+    }
+    fail_details(c, "E233", message, span, details);
+}
+pub fn interface_error(c: Context, code: String, reason: String, interface_name: String, implementor: String, method: String, message: String, span: Span, related: Span) -> Unit effects { state, io, process } {
+    var details = empty_details();
+    details.reason = reason;
+    details.interface_name = interface_name;
+    details.implementor = implementor;
+    details.method = method;
+    if related.end > related.start {
+        list_push(details.related, RelatedLocation(message: "Related interface or implementation declaration.", span: related));
+    }
+    fail_details(c, code, message, span, details);
+}
 pub fn duplicate(c: Context, message: String, span: Span, previous: Span) -> Unit effects { state, io, process } {
     let details = empty_details();
     if previous.end > previous.start {
@@ -202,8 +239,8 @@ pub fn make_context(code: String, name: String, json_mode: Bool) -> Context effe
         i = i + 1;
     }
     let control = list_new<Control>();
-    list_push(control, Control(loop_depth: 0, in_contract: false, instance_depth: 0, type_mapping: dict_new<String, TypeId>(), type_depth: 0, type_instances: 0, cursor: 0, previous_end: 0, depth: 0, return_type: no_type(), allowed_effects: 0, temporary: 0, function_index: 0));
+    list_push(control, Control(in_async: false, await_site: empty_span(), scope_base: 0, loop_depth: 0, in_contract: false, in_defer: false, instance_depth: 0, type_mapping: dict_new<String, TypeId>(), type_depth: 0, type_instances: 0, cursor: 0, previous_end: 0, depth: 0, return_type: no_type(), allowed_effects: 0, temporary: 0, function_index: 0));
     let units = list_new<SourceUnit>();
     list_push(units, SourceUnit(path: name, name: name, identity: "", code: code, start: 0, end: str_len(code), line_base: 0));
-    return Context(source_units: units, imports: list_new<ModuleImport>(), declarations: list_new<ModuleDeclaration>(), bound_types: list_new<SyntaxType>(), bound_functions: list_new<SyntaxFunction>(), loop_labels: list_new<String>(), instances: list_new<FunctionInstance>(), generic_functions: dict_new<String, SymbolId>(), source_text: code, source_name: name, json_mode: json_mode, lines: lines, output: strings_new(), tokens: list_new<Token>(), comments: list_new<Token>(), syntax_exprs: list_new<SyntaxExpr>(), syntax_stmts: list_new<SyntaxStmt>(), syntax_types: list_new<SyntaxType>(), syntax_functions: list_new<SyntaxFunction>(), expressions: list_new<CheckedExpr>(), statements: list_new<CheckedStmt>(), types: list_new<TypeInfo>(), symbols: list_new<Symbol>(), functions: list_new<CheckedFunction>(), signatures: list_new<SymbolId>(), scopes: list_new<List<SymbolId>>(), type_order: list_new<TypeId>(), control: control);
+    return Context(debug_codegen: false, query_mode: false, query_uses: list_new<QueryUse>(), query_types: list_new<SyntaxName>(), generic_tokens: dict_new<Int, Bool>(), arm_commas: dict_new<Int, Bool>(), source_units: units, imports: list_new<ModuleImport>(), declarations: list_new<ModuleDeclaration>(), bound_types: list_new<SyntaxType>(), bound_functions: list_new<SyntaxFunction>(), bound_interfaces: list_new<SyntaxInterface>(), bound_impls: list_new<SyntaxImpl>(), interface_operations: list_new<InterfaceOperation>(), loop_labels: list_new<String>(), loop_cleanup_depths: list_new<Int>(), cleanup_blocks: list_new<StmtId>(), instances: list_new<FunctionInstance>(), generic_functions: dict_new<String, SymbolId>(), source_text: code, source_name: name, json_mode: json_mode, lines: lines, output: strings_new(), tokens: list_new<Token>(), comments: list_new<Token>(), syntax_exprs: list_new<SyntaxExpr>(), syntax_stmts: list_new<SyntaxStmt>(), syntax_types: list_new<SyntaxType>(), syntax_impls: list_new<SyntaxImpl>(), syntax_closures: list_new<SyntaxClosure>(), syntax_interfaces: list_new<SyntaxInterface>(), syntax_functions: list_new<SyntaxFunction>(), expressions: list_new<CheckedExpr>(), statements: list_new<CheckedStmt>(), types: list_new<TypeInfo>(), symbols: list_new<Symbol>(), functions: list_new<CheckedFunction>(), signatures: list_new<SymbolId>(), scopes: list_new<List<SymbolId>>(), type_order: list_new<TypeId>(), control: control);
 }

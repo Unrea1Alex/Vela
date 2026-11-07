@@ -1,0 +1,16 @@
+fn both<T, effect E>(first: fn(T) -> T effects E, second: fn(T) -> T effects E, value: T) -> T effects E {
+    return second(first(value));
+}
+fn apply<T, effect E>(f: fn(T) -> T effects E, x: T) -> T effects E { return f(x); }
+fn output(x: Int) -> Int effects { io } { print(x); return x + 1; }
+fn stateful(x: Int) -> Int effects { state } { let l = list_new<Int>(); list_push(l, x); return list_get(l, 0) + 1; }
+fn pure(x: Int) -> Int { return x + 1; }
+fn mapper<effect E>() -> fn(Int) -> Int effects E { return pure; }
+fn main() -> Int effects { io, state } {
+    print(both(output, stateful, 10));
+    print(apply<Int, effects { io }>(pure, 20));
+    let explicit = apply<Int, effects { io }>;
+    print(explicit(output, 30));
+    print(mapper<effects {}>()(41));
+    return 0;
+}

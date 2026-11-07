@@ -1,0 +1,3 @@
+struct Example {}
+impl Example { fn read(self: Int) -> Int { return self; } }
+fn main() -> Int { return 0; }

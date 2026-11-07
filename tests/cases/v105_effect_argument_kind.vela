@@ -1,0 +1,3 @@
+fn apply<effect E>(f: fn() -> Int effects E) -> Int effects E { return f(); }
+fn pure() -> Int { return 0; }
+fn main() -> Int { return apply<Int>(pure); }

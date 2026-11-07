@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "app": "RouteAudit",
+  "toolchain": "Vela 0.8.0",
+  "platform": "Windows x64 / MSVC",
+  "status": "verified",
+  "named_tests": {
+    "passed": 8,
+    "failed": 0
+  },
+  "cli": {
+    "passed": 10,
+    "failed": 0,
+    "checks": [
+      "exact TSV and Unicode paths with a system-only PATH",
+      "jump gate publishes report then returns 3",
+      "exact report under forced collection",
+      "nested error preserves existing report",
+      "invalid UTF-8 rejected",
+      "2 MiB read bound",
+      "same path and hardlink leave input intact",
+      "missing destination directory",
+      "4096 accepted and 4097 rejected",
+      "help and invalid option"
+    ],
+    "stress_collections": 83905
+  },
+  "memory": [
+    {
+      "repetitions": 10,
+      "routes": 2560,
+      "collections": 27,
+      "peak_managed_bytes": 1049166,
+      "managed_bytes_before_teardown": 460135,
+      "elapsed_ms": 128
+    },
+    {
+      "repetitions": 80,
+      "routes": 20480,
+      "collections": 219,
+      "peak_managed_bytes": 1055814,
+      "managed_bytes_before_teardown": 816037,
+      "elapsed_ms": 615
+    }
+  ],
+  "formatter": {
+    "files": 5,
+    "idempotent": true,
+    "demo_sha256": "03f1b0d743fad274f3080ca330954664a8b9f6a134fde4300715e31157d7f26c",
+    "route_max_before": 104.0,
+    "route_max_after": 126.0
+  },
+  "demo": {
+    "routes": 3,
+    "jumps": 1,
+    "sha256": "03f1b0d743fad274f3080ca330954664a8b9f6a134fde4300715e31157d7f26c"
+  }
+}

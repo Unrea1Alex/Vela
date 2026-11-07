@@ -1,0 +1,16 @@
+import "../../std/json.vela" as json;
+fn diagnostic(data: String, limits: json::Limits) -> String effects { state } {
+    return match json::parse_with_limits(data, limits) {
+        Result::Ok(_) => "ok",
+        Result::Err(error) => json::describe_parse_error(error)
+    };
+}
+fn main() -> Unit effects { state, io } {
+    print(diagnostic("[true]", json::Limits(bytes: 6, depth: 1, nodes: 2)));
+    print(diagnostic("[true]", json::Limits(bytes: 5, depth: 1, nodes: 2)));
+    print(diagnostic("[true]", json::Limits(bytes: 6, depth: 0, nodes: 2)));
+    print(diagnostic("[true]", json::Limits(bytes: 6, depth: 1, nodes: 1)));
+    print(diagnostic("[true]", json::Limits(bytes: 6, depth: 1, nodes: 131073)));
+    let cursor = json::Cursor(value: json::Value::Integer(1), path: "$.ok");
+    print(match json::as_bool(cursor) { Result::Ok(_) => "ok", Result::Err(error) => json::describe(error) });
+}

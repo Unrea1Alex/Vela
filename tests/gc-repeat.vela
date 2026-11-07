@@ -1,0 +1,25 @@
+import "../selfhost/core.vela" as core;
+import "../selfhost/modules.vela" as modules;
+import "../selfhost/semantic.vela" as semantic;
+import "../selfhost/emitter.vela" as emitter;
+
+fn compile_once() -> Unit effects { state, io, process } {
+    let c = core::make_context("fn main() -> Int { return 7; }", "repeat.vela", false);
+    modules::parse_program(c);
+    semantic::analyze(c);
+    assert_true(list_len(c.functions) == 1, "one checked function");
+    let output = emitter::generate(c);
+    assert_true(str_len(output) > 4096, "standalone C output");
+}
+
+fn main() -> Int effects { args, state, io, process } {
+    match arg_int(0) {
+        IntResult::Ok(count) => {
+            if count < 1 || count > 2000 { return 2; }
+            for i in 0 .. count { compile_once(); }
+            print("compiled=" + to_string(count));
+            return 0;
+        }
+        IntResult::Err(_) => { return 2; }
+    }
+}

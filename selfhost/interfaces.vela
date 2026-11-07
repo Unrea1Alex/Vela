@@ -1,0 +1,298 @@
+import "model.vela";
+import "core.vela";
+import "modules.vela";
+import "types.vela";
+import "generics.vela";
+import "semantic.vela";
+import "parser.vela";
+import "callables.vela";
+import "dynamic.vela";
+
+pub fn find_interface(c: Context, name: String) -> Int effects { state } {
+    for i in 0 .. list_len(c.bound_interfaces) {
+        if list_get(c.bound_interfaces, i).name == name { return i; }
+    }
+    return -1;
+}
+pub fn contains_self(name: String) -> Bool effects { state } {
+    let parts = type_parts(name);
+    if list_get(parts, 0) == "Self" { return true; }
+    for i in 1 .. list_len(parts) {
+        if contains_self(list_get(parts, i)) { return true; }
+    }
+    return false;
+}
+pub fn bind_interfaces(c: Context) -> Unit effects { state, io, process } {
+    let no_parameters = list_new<TypeParameter>();
+    for syntax in c.syntax_interfaces {
+        let owner = source_unit_at(c, syntax.span.start);
+        let d = list_get(c.declarations, module_declaration(c, owner, syntax.name));
+        let operations = list_new<SyntaxOperation>();
+        let seen = dict_new<String, Span>();
+        for operation in syntax.operations {
+            if dict_has(seen, operation.name) {
+                interface_error(c, "E236", "interface_duplicate_method", syntax.name, "", operation.name, "Duplicate interface operation.", operation.span, dict_get(seen, operation.name));
+            }
+            dict_set(seen, operation.name, operation.span);
+            if list_len(operation.parameters) == 0 || list_get(operation.parameters, 0).name != "self" || list_get(operation.parameters, 0).annotation != "Self" {
+                interface_error(c, "E236", "interface_receiver", syntax.name, "", operation.name, "The first parameter must be self: Self.", operation.span, syntax.span);
+            }
+            if contains_self(operation.return_name) {
+                interface_error(c, "E236", "interface_signature", syntax.name, "", operation.name, "Self is allowed only as the receiver type.", operation.span, syntax.span);
+            }
+            var bound = operation;
+            bound.return_name = module_type_name(c, operation.return_name, no_parameters, operation.span, d.exported);
+            bound.parameters = list_new<SyntaxField>();
+            list_push(bound.parameters, list_get(operation.parameters, 0));
+            let parameter_names = dict_new<String, Bool>();
+            dict_set(parameter_names, "self", true);
+            for i in 1 .. list_len(operation.parameters) {
+                var parameter = list_get(operation.parameters, i);
+                if contains_self(parameter.annotation) || parameter.name == "_" || parameter.name == "result" || dict_has(parameter_names, parameter.name) {
+                    interface_error(c, "E236", "interface_signature", syntax.name, "", operation.name, "Invalid interface parameter.", parameter.span, operation.span);
+                }
+                dict_set(parameter_names, parameter.name, true);
+                parameter.annotation = module_type_name(c, parameter.annotation, no_parameters, parameter.span, d.exported);
+                list_push(bound.parameters, parameter);
+            }
+            list_push(operations, bound);
+        }
+        list_push(c.bound_interfaces, SyntaxInterface(name: d.canonical, operations: operations, span: syntax.span));
+    }
+}
+pub fn builtin_bound(bound: String) -> Bool {
+    return bound == "Any" || bound == "Scalar" || bound == "Number" || bound == "$effect";
+}
+pub fn bind_type_bounds(c: Context, parameters: List<TypeParameter>, exported: Bool) -> List<TypeParameter> effects { state, io, process } {
+    let items = list_new<TypeParameter>();
+    for original in parameters {
+        var parameter = original;
+        if !builtin_bound(parameter.bound) {
+            let name = module_type_name(c, parameter.bound, list_new<TypeParameter>(), parameter.span, exported);
+            if find_interface(c, name) < 0 {
+                bad(c, "E210", "Unknown type constraint: " + parameter.bound, parameter.span);
+            }
+            parameter.bound = name;
+        }
+        list_push(items, parameter);
+    }
+    return items;
+}
+pub fn implementation_method_name(implementation: SyntaxImpl, name: String) -> String {
+    return implementation.owner + "#" + implementation.interface_name + "#" + name;
+}
+pub fn effects_subset(actual: Int, allowed: Int) -> Bool {
+    var bit = 1;
+    while bit <= 8 {
+        if has_bit(actual, bit) && !has_bit(allowed, bit) { return false; }
+        bit = bit * 2;
+    }
+    return true;
+}
+pub fn interface_signature(parameters: List<SyntaxField>, result_type: String, effects_mask: Int) -> String effects { state } {
+    let types = list_new<String>();
+    for i in 1 .. list_len(parameters) { list_push(types, list_get(parameters, i).annotation); }
+    return "(" + join_text(types, ", ") + ") -> " + result_type + " effects " + effect_json(effects_mask);
+}
+pub fn interface_signature_error(c: Context, implementation: SyntaxImpl, operation: SyntaxOperation, method: SyntaxFunction, reason: String, message: String) -> Unit effects { state, io, process } {
+    var details = empty_details();
+    details.reason = reason;
+    details.interface_name = implementation.interface_name;
+    details.implementor = implementation.owner;
+    details.method = operation.name;
+    details.expected = interface_signature(operation.parameters, operation.return_name, operation.effect_mask);
+    details.actual = interface_signature(method.parameters, method.return_name, method.effect_mask);
+    list_push(details.related, RelatedLocation(message: "Interface operation declared here.", span: operation.span));
+    fail_details(c, "E236", message, method.name_span, details);
+}
+pub fn validate_interface_implementations(c: Context) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(c.bound_impls) {
+        let implementation = list_get(c.bound_impls, i);
+        if implementation.interface_name == "" { continue; }
+        let iface = list_get(c.bound_interfaces, find_interface(c, implementation.interface_name));
+        let methods = dict_new<String, SyntaxFunction>();
+        for method in c.bound_functions {
+            if method.impl_index == i { dict_set(methods, method.name, method); }
+        }
+        for operation in iface.operations {
+            let key = implementation_method_name(implementation, operation.name);
+            if !dict_has(methods, key) {
+                interface_error(c, "E236", "impl_missing_method", iface.name, implementation.owner, operation.name, "Missing interface operation: " + operation.name, implementation.span, operation.span);
+            }
+            let method = dict_get(methods, key);
+            let removed = dict_remove(methods, key);
+            var matches = method.return_name == operation.return_name && list_len(method.parameters) == list_len(operation.parameters);
+            if matches {
+                for p in 1 .. list_len(method.parameters) {
+                    if list_get(method.parameters, p).annotation != list_get(operation.parameters, p).annotation { matches = false; }
+                }
+            }
+            if !matches {
+                interface_signature_error(c, implementation, operation, method, "impl_signature", "Implementation signature differs from the interface.");
+            }
+            if !effects_subset(method.effect_mask, operation.effect_mask) {
+                interface_signature_error(c, implementation, operation, method, "impl_effects", "Implementation widens the interface effects.");
+            }
+            if list_len(method.preconditions) + list_len(method.postconditions) > 0 {
+                interface_error(c, "E236", "impl_contract", iface.name, implementation.owner, operation.name, "Interface implementation methods cannot add contracts.", method.name_span, operation.span);
+            }
+        }
+        if dict_len(methods) != 0 {
+            for method in c.bound_functions {
+                if method.impl_index == i && dict_has(methods, method.name) {
+                    let name = str_slice(c.source_text, method.name_span.start, method.name_span.end);
+                    interface_error(c, "E236", "impl_extra_method", iface.name, implementation.owner, name, "Operation is absent from the interface: " + name, method.name_span, iface.span);
+                }
+            }
+        }
+    }
+}
+pub fn lookup_implementation(c: Context, id: TypeId, interface_name: String) -> Int effects { state, io, process } {
+    let t = type_info(c, id);
+    var owner = t.name;
+    if t.template_index >= 0 { owner = list_get(c.bound_types, t.template_index).name; }
+    for i in 0 .. list_len(c.bound_impls) {
+        let impl = list_get(c.bound_impls, i);
+        if impl.owner == owner && impl.interface_name == interface_name { return i; }
+    }
+    return -1;
+}
+pub fn bound_error(c: Context, id: TypeId, interface_name: String, operation: String, span: Span) -> Unit effects { state, io, process } {
+    let t = type_info(c, id);
+    var details = empty_details();
+    details.reason = "unavailable_operation";
+    details.actual_type = t.name;
+    details.type_parameter = t.parameter_name;
+    details.interface_name = interface_name;
+    details.operation = operation;
+    if t.parameter_name != "" {
+        details.actual_type = t.parameter_name;
+        list_push(details.related, RelatedLocation(message: "Type parameter and its bound are declared here.", span: t.span));
+    }
+    fail_details(c, "E234", "Operation " + operation + " is unavailable for " + details.actual_type + ".", span, details);
+}
+pub fn install_interface_operations(c: Context) -> Unit effects { state, io, process } {
+    for interface in c.bound_interfaces {
+        for index in 0 .. list_len(interface.operations) {
+            let op = list_get(interface.operations, index);
+            var signature = symbol_record(73, interface.name + "::" + op.name, resolve_type(c, op.return_name, op.span), op.span);
+            signature.tag = index;
+            signature.method_span = op.span;
+            signature.method_exported = true;
+            signature.interface_operation = true;
+            signature.effect_mask = op.effect_mask;
+            list_push(signature.parameters, add_symbol(c, symbol_record(72, "self", no_type(), op.span)));
+            for i in 1 .. list_len(op.parameters) {
+                let p = list_get(op.parameters, i);
+                list_push(signature.parameters, add_symbol(c, symbol_record(72, p.name, resolve_type(c, p.annotation, p.span), p.span)));
+            }
+            list_push(c.interface_operations, InterfaceOperation(owner: interface.name, name: op.name, signature: add_symbol(c, signature)));
+        }
+    }
+}
+pub fn static_interface_call(c: Context, interface_name: String, syntax: SyntaxExpr) -> ExprId effects { state, io, process } {
+    let operation = interface_operation(c, interface_name, syntax.text, syntax.name_span);
+    if syntax.kind != 7 || list_len(syntax.arguments) == 0 {
+        bad(c, "E210", "An interface operation requires a call with a receiver.", syntax.name_span);
+    }
+    let first = list_get(syntax.arguments, 0);
+    if first.label != "" { bad(c, "E210", "Interface arguments are positional.", syntax.name_span); }
+    let receiver = check_expr(c, first.value);
+    let id = checked_expr(c, receiver).type_id;
+    let t = type_info(c, id);
+    let rest = list_new<SyntaxArgument>();
+    for i in 1 .. list_len(syntax.arguments) { list_push(rest, list_get(syntax.arguments, i)); }
+    if t.kind == 82 {
+        if t.base_name != interface_name {
+            dynamic_error(c, interface_name, "dynamic_conversion", "Receiver belongs to a different interface.", syntax.name_span);
+        }
+        return dynamic_call(c, operation, receiver, rest, syntax.span, syntax.name_span);
+    }
+    var target = operation;
+    if t.parameter_name != "" {
+        if t.constraint != interface_name { bound_error(c, id, interface_name, syntax.text, syntax.name_span); }
+    } else {
+        let impl_index = lookup_implementation(c, id, interface_name);
+        if impl_index < 0 { bound_error(c, id, interface_name, syntax.text, syntax.name_span); }
+        target = find_symbol(c, c.signatures, implementation_method_name(list_get(c.bound_impls, impl_index), syntax.text));
+        if symbol_info(c, target).template_index >= 0 {
+            target = instantiate_function(c, target, t.arguments, syntax.name_span);
+        }
+    }
+    let signature = symbol_info(c, operation);
+    var expression = expression_record(107, syntax.span, signature.type_id);
+    expression.arguments = check_arguments_with_receiver(c, rest, signature.parameters, receiver, syntax.span);
+    require_effects(c, operation, syntax.name_span);
+    expression.symbol = target;
+    expression.reference = operation;
+    return add_expr(c, expression);
+}
+
+// The symbolic pass uses the same checker and instance cache rules. Its types,
+// symbols and checked expressions are temporary and cannot reach emission.
+pub fn verify_interface_bounds(c: Context) -> Unit effects { state, io, process } {
+    let type_count = list_len(c.types);
+    let symbol_count = list_len(c.symbols);
+    let expression_count = list_len(c.expressions);
+    let statement_count = list_len(c.statements);
+    let function_count = list_len(c.functions);
+    var scratch = c;
+    scratch.query_mode = false;
+    scratch.instances = list_new<FunctionInstance>();
+    scratch.generic_functions = dict_new<String, SymbolId>();
+    scratch.control = list_new<Control>();
+    list_push(scratch.control, list_get(c.control, 0));
+    let checked = list_new<SymbolId>();
+    for signature in c.signatures {
+        let symbol = symbol_info(c, signature);
+        if symbol.template_index < 0 { continue; }
+        let syntax = list_get(c.bound_functions, symbol.template_index);
+        var constrained = false;
+        var effect_count = 0;
+        for parameter in syntax.type_parameters {
+            if !builtin_bound(parameter.bound) { constrained = true; }
+            if parameter.bound == "$effect" { effect_count = effect_count + 1; }
+        }
+        if !constrained && effect_count == 0 { continue; }
+        let formals = list_new<TypeId>();
+        for parameter in syntax.type_parameters {
+            if parameter.bound == "$effect" {
+                list_push(formals, no_type());
+                continue;
+            }
+            var abstract = type_record(79, "$" + to_string(symbol.template_index) + ":" + parameter.name, parameter.span);
+            abstract.constraint = parameter.bound;
+            abstract.parameter_name = parameter.name;
+            list_push(formals, add_type(scratch, abstract));
+        }
+        // For unions of masks, the all-zero case checks the constants. Each
+        // one-hot case checks the contribution of one variable for every bit.
+        for assignment in 0 ..= effect_count {
+            let types = list_new<TypeId>();
+            var variable = 0;
+            for formal in formals {
+                if has_type(formal) {
+                    list_push(types, formal);
+                } else {
+                    variable = variable + 1;
+                    var mask = 0;
+                    if assignment == variable { mask = 15; }
+                    list_push(types, effect_argument(scratch, mask));
+                }
+            }
+            let instance = instantiate_function(scratch, signature, types, syntax.span);
+        }
+        list_push(checked, signature);
+    }
+    check_function_instances(scratch);
+    list_truncate(c.types, type_count);
+    list_truncate(c.symbols, symbol_count);
+    list_truncate(c.expressions, expression_count);
+    list_truncate(c.statements, statement_count);
+    list_truncate(c.functions, function_count);
+    for signature in checked {
+        var symbol = symbol_info(c, signature);
+        symbol.constraints_checked = true;
+        set_symbol(c, signature, symbol);
+    }
+}

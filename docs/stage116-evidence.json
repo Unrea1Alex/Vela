@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "milestone": "0.11.6",
+  "version": "0.11.0",
+  "date": "2026-11-07",
+  "compiler_sha256": "d42a53036cff19d8a9b6aa57ec27420a5a92764e7f69a3e66003c881239afebc",
+  "recovery_c_sha256": "e8f0cfe305a1a78612a8cfa7e28ef6338548e639cdc2c0e54f5a21afb28c890d",
+  "windows": {
+    "bundler_fixed_point": true,
+    "fielddesk_http": 8,
+    "compiler_fixed_point": true,
+    "fielddesk_gui_resource": {
+      "cwd_independent": true,
+      "visible": "Accepted 9 | excluded 1 | alerts 1 | mean 20.67",
+      "relocated": true,
+      "limit": 30
+    },
+    "toolchain": "MSVC 19.44.35222.0 x64",
+    "http_server": 9,
+    "http_client": 13,
+    "verify_log": "build/stage116/verify.log",
+    "fielddesk_named": 17,
+    "c_recovery": "build/stage116/recovery.log",
+    "resources": [
+      "locked resource and identical existing destination",
+      "Unicode relocation independent of cwd and PATH",
+      "run and test stage and clean private resources",
+      "different destination preserves executable and resource",
+      "stale hash rejection and input protection",
+      "missing",
+      "source traversal",
+      "destination traversal",
+      "device name",
+      "case collision",
+      "prefix collision",
+      "native target",
+      "native ABI",
+      "native kind",
+      "native PE",
+      "source and destination link escape rejection"
+    ],
+    "native": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 1178,
+      "failed": 0,
+      "skipped": 0
+    },
+    "fielddesk_cli": 19,
+    "archive_relocation": {
+      "system_path": true,
+      "passed": true,
+      "fielddesk_child_verifier": true,
+      "separate_cwd": true,
+      "compiler": true
+    }
+  },
+  "linux": {
+    "relocation": true,
+    "resources": true,
+    "c_recovery": true,
+    "archive": "dist/vela-0.11.0-linux-x64-musl.tar.gz",
+    "sha256": "7b98a90e2a7cbb17f6439df05cbd17a32921195471048d308c509a10ebe4b814",
+    "log": "build/stage116/linux-release.log",
+    "toolchain": "GCC 14.2.0 and musl 1.2.5",
+    "compiler_fixed_point": true,
+    "environment": "fresh Alpine 3.22.8 x86_64 WSL2"
+  },
+  "unperformed": [
+    "fresh Windows OS install",
+    "additional desktop DPI scales",
+    "Linux GUI, Windows FFI and Windows network adapters"
+  ],
+  "mcp": {
+    "execution_gate": "not rerun for this package",
+    "test_groups": 5,
+    "packaged_doctor": true,
+    "sdk": "2.4.0",
+    "packaged_setup": true,
+    "requests": 1000,
+    "node": "24"
+  },
+  "artifacts": [
+    "dist/vela-0.11.0-windows-x64.zip",
+    "dist/vela-0.11.0-linux-x64-musl.tar.gz",
+    "dist/vela-mcp-0.11.0.zip",
+    "dist/fielddesk-1.0-vela-0.11.0-windows-x64.zip"
+  ],
+  "checksums": "dist/SHA256SUMS-0.11.0.txt"
+}

@@ -1,0 +1,255 @@
+import "model.vela" as model;
+import "analyze.vela" as analyze;
+import "demo.vela" as demo;
+import "gui.vela" as gui;
+import "report.vela" as report;
+import "workflow.vela" as workflow;
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+import "../../std/process.vela" as process;
+import "../../std/replay.vela" as replay;
+import "../../std/services.vela" as services;
+import "../../std/testing.vela" as testing;
+import "../../std/text.vela" as text;
+fn must<T>(outcome: Result<T, String>) -> T effects { process } {
+    match outcome {
+        Result::Ok(value) => {
+            return value;
+        }
+        Result::Err(error) => {
+            panic(error);
+        }
+    }
+}
+fn settings() -> model::Settings effects { state, process } {
+    return must(model::settings(demo::config()));
+}
+fn single(value: String) -> String {
+    return "{\"station\":\"A\",\"value\":" + value + ",\"accepted\":true}";
+}
+fn contains(value: String, needle: String) -> Bool {
+    for i in 0 ..= str_len(value) - str_len(needle) {
+        if str_slice(value, i, i + str_len(needle)) == needle {
+            return true;
+        }
+    }
+    return false;
+}
+fn error<T>(outcome: Result<T, String>) -> String effects { process } {
+    match outcome {
+        Result::Ok(_) => {
+            panic("Expected rejection");
+        }
+        Result::Err(message) => {
+            return message;
+        }
+    }
+}
+fn paths() -> workflow::Paths effects { state } {
+    let argv = list_new<String>();
+    list_push(argv, "verifier");
+    list_push(argv, "report.html");
+    return workflow::Paths(config: path::Path(value: "@demo-settings"), input: path::Path(
+        value: "@demo-data"), output: path::Path(value: "report.html"), worker: services::Command(
+        argv: argv, cwd: path::Path(value: "."), stdout: path::Path(value: "stdout"),
+        stderr: path::Path(value: "stderr"), timeout_ms: 5000));
+}
+fn live(store: dyn services::FileStore, code: Int) -> workflow::Live effects { state } {
+    let responses = list_new<Result<process::Completed, process::Error>>();
+    list_push(responses, Result<process::Completed, process::Error>::Ok(process::Completed(
+        code: code)));
+    let ticks = list_new<Int>();
+    list_push(ticks, 1793923200000);
+    let seeds = list_new<Int>();
+    list_push(seeds, 42);
+    return workflow::live(dyn services::FileStore(workflow::demo_files(store)),
+        dyn services::Processes(services::scripted_processes(responses)), dyn services::Clock(
+        services::scripted_clock(ticks)), dyn services::Entropy(services::scripted_entropy(seeds)));
+}
+test "known population statistics and excluded measurement" effects { state, process } {
+    let data = must(analyze::memory(demo::data(), settings(), 8192));
+    testing::equal(data.stats.count, 9, "count");
+    testing::equal(data.excluded, 1, "excluded");
+    testing::equal(data.stats.alerts, 2, "alerts");
+    testing::equal(list_len(data.stations), 3, "stations");
+    testing::close(data.stats.mean, 20.666666666666668, 0.00000001, "mean");
+    // Independent oracle: sqrt(4212 / 9 - (186 / 9)^2).
+    testing::close(data.stats.deviation, 6.39444203108362, 0.00000001, "population deviation");
+    testing::close(data.stats.minimum, 10.0, 0.0, "minimum");
+    testing::close(data.stats.maximum, 32.0, 0.0, "maximum");
+    testing::equal(list_get(data.stations, 0).name, "Лесная 🌲", "stable station order");
+}
+test "calibration closures and strict threshold" effects { state, process } {
+    let config = must(model::settings(
+        """{"title":"Calibration","limit":25,"gain":2,"offset":1}"""));
+    let data = must(analyze::memory(single("12") + "\n" + single("13"), config, 7));
+    testing::close(data.stats.mean, 26.0, 0.0, "calibrated mean");
+    testing::equal(data.stats.alerts, 1, "equal to threshold is normal");
+}
+test "UTF8 BOM CRLF and missing final newline at byte boundaries" effects { state, process } {
+    let data = str_from_byte(239) + str_from_byte(187) + str_from_byte(191) + "\r\n" + single("20")
+        + "\r\n" + """{"station":"Парк 🌳","value":30,"accepted":true}""";
+    let one = must(analyze::memory(data, settings(), 1));
+    let wide = must(analyze::memory(data, settings(), 8192));
+    testing::equal(must(report::html(one, settings(), 1, 2)), must(report::html(wide, settings(), 1,
+        2)), "identical chunk results");
+    testing::equal(one.stats.count, 2, "records");
+}
+test "malformed data retains physical line and field path" effects { state, process } {
+    let message = error(analyze::memory("\n" + single("10") + "\n" + single("\"bad\""), settings(),
+        3));
+    assert_true(contains(message, "line 3: $.value: expected number"), message);
+}
+test "schema rejects duplicate unknown missing and wrong boolean" effects { state } {
+    testing::is_err(model::sample("""{"station":"A","value":1,"value":2,"accepted":true}""", 1),
+        "duplicate");
+    testing::is_err(model::sample("""{"station":"A","value":1,"accepted":1}""", 1), "boolean");
+    testing::is_err(model::sample("""{"station":"A","value":1,"accepted":true,"extra":0}""", 1),
+        "unknown");
+    testing::is_err(model::sample("""{"station":"A","value":1}""", 1), "missing");
+}
+test "numeric and label boundaries" effects { state } {
+    testing::is_ok(model::sample(single("1000000"), 1), "upper inclusive");
+    testing::is_err(model::sample(single("1000001"), 1), "upper overflow");
+    testing::is_err(model::sample(single("1e999"), 1), "nonfinite");
+    testing::is_err(model::sample("""{"station":"A\u0000B","value":1,"accepted":true}""", 1),
+        "control label");
+    testing::is_err(model::settings("""{"title":"A","limit":1,"gain":101,"offset":0}"""),
+        "gain bound");
+}
+test "empty and fully excluded inputs fail" effects { state, process } {
+    testing::is_err(analyze::memory("\n\r\n", settings(), 1), "empty");
+    testing::is_err(analyze::memory("""{"station":"A","value":1,"accepted":false}""", settings(),
+        1), "excluded");
+}
+test "invalid UTF8 and line size rejected" effects { state, process } {
+    testing::is_err(analyze::memory(str_from_byte(255), settings(), 1), "encoding");
+    let chunks = strings_new();
+    for i in 0 .. 4097 {
+        strings_push(chunks, " ");
+    }
+    assert_true(contains(error(analyze::memory(strings_join(chunks, ""), settings(), 8192)),
+        "4096 bytes"), "line bound");
+}
+test "record and station budgets" effects { state, process } {
+    let chunks = strings_new();
+    for i in 0 .. 2049 {
+        strings_push(chunks, single("1") + "\n");
+    }
+    assert_true(contains(error(analyze::memory(strings_join(chunks, ""), settings(), 8192)),
+        "2048"), "record bound");
+    strings_truncate(chunks, 0);
+    for i in 0 .. 33 {
+        strings_push(chunks, "{\"station\":\"S" + to_string(i)
+            + "\",\"value\":1,\"accepted\":true}\n");
+    }
+    assert_true(contains(error(analyze::memory(strings_join(chunks, ""), settings(), 8192)),
+        "32 active stations"), "station bound");
+}
+test "HTML escapes input and remains self contained" effects { state, process } {
+    let config = must(model::settings(
+        """{"title":"<script>&\"","limit":25,"gain":1,"offset":0}"""));
+    let data = must(analyze::memory("""{"station":"<img src=x>","value":1,"accepted":true}""",
+        config, 1));
+    let html = must(report::html(data, config, 1, 2));
+    assert_true(contains(html, "&lt;script&gt;&amp;&quot;"), "title escaped");
+    assert_true(contains(html, "&lt;img src=x&gt;"), "station escaped");
+    assert_true(!contains(html, "<img src=x>"), "no HTML injection");
+    assert_true(!contains(html, "https://"), "no remote dependencies");
+}
+test "generic effect polymorphic transform supports state" effects { state } {
+    let source = list_new<Int>();
+    list_push(source, 1);
+    list_push(source, 2);
+    let seen = list_new<Int>();
+    let track = fn [ seen ](x: Int) -> String effects { state } {
+        list_push(seen, x);
+        return to_string(x);
+    };
+    let mapped = analyze::transform(source, track);
+    testing::equal(list_get(mapped, 1), "2", "generic result type");
+    testing::equal(list_len(seen), 2, "captured shared list");
+}
+test "record and replay complete workflow without repeated publication" effects { io, process,
+    state } {
+    let store = dyn services::FileStore(services::memory_files());
+    let recorded = live(store, 0);
+    let request = paths();
+    let original = must(workflow::run(dyn workflow::Exchange(recorded), request, false));
+    testing::is_ok(store.publish(request.output, text::Bytes(data: "sentinel")),
+        "replace memory output");
+    let playback = workflow::playback(workflow::transcript(recorded));
+    let repeated = must(workflow::run(dyn workflow::Exchange(playback), request, false));
+    testing::equal(repeated.html, original.html, "report bytes");
+    testing::is_ok(workflow::finish(playback), "all consumed");
+    match store.read(request.output, 1048576) {
+        Result::Ok(bytes) => {
+            testing::equal(bytes.data, "sentinel", "replay performed no write");
+        }
+        Result::Err(_) => {
+            assert_true(false, "Memory output missing");
+        }
+    }
+}
+test "replay rejects changed request and unfinished transcript" effects { io, process, state } {
+    let recorded = live(dyn services::FileStore(services::memory_files()), 0);
+    let product = must(workflow::run(dyn workflow::Exchange(recorded), paths(), false));
+    let playback = workflow::playback(workflow::transcript(recorded));
+    let exchange = dyn workflow::Exchange(playback);
+    assert_true(contains(error(exchange.request(replay::Request::Now)), "mismatch at 0"),
+        "wrong order");
+    testing::is_err(workflow::finish(playback), "sticky failure");
+    let unfinished = workflow::playback(workflow::transcript(recorded));
+    assert_true(contains(error(workflow::finish(unfinished)), "missing request at 0"),
+        "missing requests");
+}
+test "worker failure is explicit after publication" effects { io, process, state } {
+    let store = dyn services::FileStore(services::memory_files());
+    let recorded = live(store, 9);
+    let message = error(workflow::run(dyn workflow::Exchange(recorded), paths(), false));
+    assert_true(contains(message, "Report published; verifier exited 9"), message);
+    testing::is_ok(store.read(path::Path(value: "report.html"), 1048576),
+        "published report remains");
+}
+test "GUI typed event queue enforces capacity and rejects unknown codes" effects { state } {
+    let events = list_new<gui::Event>();
+    testing::equal(gui::enqueue(events, 999), 1, "unknown");
+    testing::equal(list_len(events), 0, "unknown not stored");
+    for i in 0 .. 64 {
+        testing::equal(gui::enqueue(events, 101), 0, "accepted");
+    }
+    testing::equal(gui::enqueue(events, 103), 1, "bounded queue");
+    list_truncate(events, 0);
+    testing::equal(gui::enqueue(events, 103), 0, "reusable queue");
+}
+struct ReadOnlyFiles {}
+impl services::FileStore for ReadOnlyFiles {
+    fn read(self: ReadOnlyFiles, file: path::Path, limit: Int) -> Result<text::Bytes, fs::Error> {
+        return Result<text::Bytes, fs::Error>::Err(fs::Error::Io(file.value, "missing"));
+    }
+    fn publish(self: ReadOnlyFiles, file: path::Path, bytes: text::Bytes) -> Result<Bool,
+        fs::Error> {
+        return Result<Bool, fs::Error>::Err(fs::Error::Io(file.value, "read only"));
+    }
+}
+test "publication failure remains typed through dynamic services" effects { io, process, state } {
+    let recorded = live(dyn services::FileStore(ReadOnlyFiles()), 0);
+    let message = error(workflow::run(dyn workflow::Exchange(recorded), paths(), false));
+    testing::equal(message, "report.html: read only", "file failure");
+    let playback = workflow::playback(workflow::transcript(recorded));
+    testing::equal(error(workflow::run(dyn workflow::Exchange(playback), paths(), false)), message,
+        "error replay");
+    testing::is_ok(workflow::finish(playback), "failed workflow consumed");
+}
+test "calibration settings table rejects invalid boundaries" effects { state, process } {
+    let cases = list_new<testing::Case<String, String>>();
+    list_push(cases, testing::Case<String, String>(name: "negative threshold",
+        input: """{"title":"A","limit":-1,"gain":1,"offset":0}""",
+        expected: "$.limit: out of range"));
+    list_push(cases, testing::Case<String, String>(name: "offset",
+        input: """{"title":"A","limit":1,"gain":1,"offset":1000001}""",
+        expected: "$.offset: out of range"));
+    for case in cases {
+        testing::equal(error(model::settings(case.input)), case.expected, case.name);
+    }
+}

@@ -1,5 +1,8 @@
 # Text, bytes and paths — staged 0.7 contract
 
+Memory descriptions of the original version are historical. In 0.8,
+[the tracing heap](../MEMORY.md) governs managed values.
+
 0.7.1 defines the migration; it does not silently change the existing String ABI.
 Legacy String and str_* operations still represent immutable bytes, permit NUL
 and use byte offsets. Existing compiler/tools and old builtin signatures remain

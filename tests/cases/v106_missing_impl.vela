@@ -1,0 +1,3 @@
+interface Reader {}
+struct File {}
+fn main() -> Unit { let reader = dyn Reader(File()); }

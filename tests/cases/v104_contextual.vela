@@ -1,0 +1,2 @@
+fn interface(interface: Int) -> Int { return interface; }
+fn main() -> Int { return interface(0); }

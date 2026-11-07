@@ -1,0 +1,2 @@
+interface Read { fn read(self: Self) -> List<Self>; }
+fn main() -> Int { return 0; }

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "milestone": "0.11.5",
+  "compiler": "0.11.0-dev.4",
+  "compiler_sha256": "9db1d0cd5150153516f4571f4c695d3be9564e25c864687d0368ccad789c86a1",
+  "platform": "Windows x64/MSVC",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1175,
+    "failed": 0,
+    "skipped": 0
+  },
+  "compiler_fixed_point": true,
+  "bundler_fixed_point": true,
+  "log": "build/stage115/verify.log",
+  "debug": {
+    "passed": 5,
+    "checks": [
+      "MSVC PDB Vela source path and profiled normal cleanup",
+      "generic panic, source location and nested stack",
+      "regular C export omits instrumentation",
+      "fiber isolation, cancellation cleanup and frame completion",
+      "panic through a native callback terminates with Vela frames"
+    ]
+  },
+  "fielddesk_named": 17,
+  "limits": [
+    "source positions and PDB verified without interactive stepping",
+    "inclusive timings count suspension"
+  ]
+}

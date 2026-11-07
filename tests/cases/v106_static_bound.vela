@@ -1,0 +1,5 @@
+interface Reader {}
+struct File {}
+impl Reader for File {}
+fn length<T: Reader>(reader: T) -> Int { return 0; }
+fn main() -> Int { return length(dyn Reader(File())); }

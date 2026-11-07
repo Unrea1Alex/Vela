@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "checks": [
+    {
+      "label": "cold",
+      "ms": 231,
+      "cache": "miss"
+    },
+    {
+      "label": "warm",
+      "ms": 53,
+      "cache": "hit"
+    }
+  ],
+  "cache_entries": 18,
+  "query": {
+    "pages": 7,
+    "records": 10349,
+    "scope": {
+      "root": "entry",
+      "excluded_test_roots": 1
+    }
+  },
+  "debug": {
+    "pdb_source": "engine.vela",
+    "awaitedHttp": [
+      {
+        "name": "@12::fetch",
+        "file": "G:\\Vela\\std\\async_io.vela",
+        "line": 46,
+        "column": 1,
+        "calls": 6,
+        "completed": 6,
+        "inclusive_us": 576654
+      }
+    ],
+    "report_cleanups": 6
+  },
+  "passed": 4,
+  "failed": 0
+}

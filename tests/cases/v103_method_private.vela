@@ -1,0 +1,2 @@
+import "method-owner.vela" as api;
+fn main() -> Int { return api::bucket(7).secret(); }

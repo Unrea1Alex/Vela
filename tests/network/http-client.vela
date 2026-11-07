@@ -1,0 +1,188 @@
+import "../../std/event_loop.vela" as loop;
+import "../../std/http.vela" as http;
+import "../../std/path.vela" as path;
+import "../../std/process.vela" as process;
+import "../../std/text.vela" as text;
+fn argument(index: Int) -> String effects { args } {
+    return match arg(index) {
+        StringResult::Ok(value) => value,
+        StringResult::Err(_) => ""
+    };
+}
+fn number(value: String) -> Int {
+    return match parse_int(value) {
+        IntResult::Ok(n) => n,
+        IntResult::Err(_) => 0
+    };
+}
+fn must<T, E>(value: Result<T, E>, message: String) -> T {
+    match value {
+        Result::Ok(found) => {
+            return found;
+        }
+        Result::Err(_) => {
+            assert_true(false, message);
+        }
+    }
+    return must(value, message);
+}
+fn clock() -> Int effects { io } {
+    match monotonic_millis() {
+        IntResult::Ok(value) => {
+            return value;
+        }
+        IntResult::Err(message) => {
+            assert_true(false, message);
+        }
+    }
+    return 0;
+}
+fn label(error: http::Error) -> String {
+    return match error {
+        http::Error::InvalidEndpoint => "endpoint",
+        http::Error::InvalidLimit => "invalid limit",
+        http::Error::InvalidHeaders => "invalid headers",
+        http::Error::InvalidBody => "invalid body",
+        http::Error::InvalidTransport => "transport",
+        http::Error::Schedule(_) => "schedule",
+        http::Error::Connect(_) => "connect",
+        http::Error::Tls(_) => "tls",
+        http::Error::Transfer(_) => "transfer",
+        http::Error::Protocol => "protocol",
+        http::Error::Limit => "limit",
+        http::Error::TimedOut => "timeout",
+        http::Error::Cancelled => "cancelled",
+        http::Error::Pending => "pending",
+        http::Error::Closed => "closed",
+        http::Error::Storage(message) => "storage " + message
+    };
+}
+fn await_result(scheduler: loop::Loop<process::Completed>, request: http::Exchange,
+    cancel_after: Int) -> Result<http::Response, http::Error> effects { io, process, state } {
+    let start = clock();
+    var cancellation_requested = false;
+    while clock() - start < 15000 {
+        let now = clock();
+        if cancel_after > 0 && now - start >= cancel_after && !cancellation_requested {
+            assert_true(http::cancel(request), "request cancellation");
+            cancellation_requested = true;
+        }
+        let turn = must(loop::tick(scheduler, now), "tick client");
+        match http::poll(request) {
+            Result::Err(error) => {
+                return Result<http::Response, http::Error>::Err(error);
+            }
+            Result::Ok(value) => {
+                match value {
+                    Option::Some(response) => {
+                        return Result<http::Response, http::Error>::Ok(response);
+                    }
+                    Option::None => {}
+                }
+            }
+        }
+    }
+    assert_true(false, "client never finished");
+    return Result<http::Response, http::Error>::Err(http::Error::TimedOut);
+}
+fn main() -> Int effects { args, io, process, state } {
+    assert_true(arg_count() == 9 || arg_count() == 10, "expected fixture arguments");
+    let directory = path::Path(value: argument(1));
+    var scheme = http::Scheme::Http;
+    if argument(2) == "https" {
+        scheme = http::Scheme::Https;
+    }
+    let ca_name = argument(3);
+    var ca = Option<path::Path>::None;
+    if ca_name != "" {
+        ca = Option<path::Path>::Some(path::Path(value: ca_name));
+    }
+    let scheduler = must(loop::create<process::Completed>(clock()), "create loop");
+    var request = must(http::from_url(argument(2) + "://" + argument(4) + ":" + argument(5)
+        + argument(6), number(argument(7)), 128), "create request");
+    if arg_count() == 10 {
+        var method = http::Method::Post;
+        if argument(9) == "head" {
+            method = http::Method::Head;
+        } else if argument(9) == "put" {
+            method = http::Method::Put;
+        } else if argument(9) == "delete" {
+            method = http::Method::Delete;
+        }
+        var body = "A" + str_from_byte(0) + str_from_byte(255) + "Я";
+        if argument(9) == "head" {
+            body = "";
+        }
+        request = must(http::with_method(request, method, text::Bytes(data: body)), "request body");
+        let headers = list_new<http::Header>();
+        list_push(headers, http::Header(name: "X-Fixture", value: "unchanged"));
+        list_push(headers, http::Header(name: "X-Empty", value: ""));
+        list_push(headers, http::Header(name: "Content-Type", value: "application/x-vela"));
+        request = must(http::with_headers(request, headers), "request headers");
+        list_set(headers, 0, http::Header(name: "X-Fixture", value: "mutated"));
+    }
+    let transport = dyn http::Transport(must(http::curl(path::Path(value: argument(0)), ca),
+        "configure curl"));
+    if arg_count() == 10 && argument(9) == "closed" {
+        let closed = must(loop::shutdown(scheduler), "close scheduler");
+        match transport.start(scheduler, request, directory) {
+            Result::Err(error) => {
+                assert_true(label(error) == "schedule", "failed start");
+            }
+            Result::Ok(_) => {
+                panic("accepted closed scheduler");
+            }
+        }
+        print("error=schedule");
+        return 0;
+    }
+    let pending = must(transport.start(scheduler, request, directory), "start request");
+    match http::release(pending) {
+        Result::Ok(_) => {
+            assert_true(false, "released a live transfer");
+        }
+        Result::Err(error) => {
+            assert_true(label(error) == "pending", "release rejected live transfer");
+        }
+    }
+    match await_result(scheduler, pending, number(argument(8))) {
+        Result::Err(error) => {
+            print("error=" + label(error));
+        }
+        Result::Ok(value) => {
+            print(f"status={value.status:d} " + sha256(value.body.data));
+        }
+    }
+    match http::release(pending) {
+        Result::Ok(released) => {
+            assert_true(released, "request released");
+        }
+        Result::Err(error) => {
+            assert_true(false, "release request: " + label(error));
+        }
+    }
+    assert_true(must(http::release(pending), "repeat release"), "release idempotent");
+    match http::poll(pending) {
+        Result::Ok(_) => {
+            assert_true(false, "read after release");
+        }
+        Result::Err(error) => {
+            assert_true(label(error) == "closed", "closed exchange rejected");
+        }
+    }
+    let answer = http::Response(status: 204, headers: text::Bytes(data: ""), body: text::Bytes(
+        data: ""));
+    let scripted = dyn http::Transport(http::scripted(Result<http::Response, http::Error>::Ok(
+        answer)));
+    let mock = must(scripted.start(scheduler, request, directory), "start scripted transport");
+    match must(http::poll(mock), "observe mock") {
+        Option::Some(value) => {
+            assert_true(value.status == 204, "scripted response");
+        }
+        Option::None => {
+            assert_true(false, "scripted response missing");
+        }
+    }
+    let released = must(http::release(mock), "release mock");
+    return 0;
+}

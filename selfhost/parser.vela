@@ -3,6 +3,9 @@ import "core.vela";
 import "lexer.vela";
 import "modules.vela";
 import "types.vela";
+import "interfaces.vela";
+import "callables.vela";
+import "suspension.vela";
 pub fn current(c: Context) -> Token effects { state } {
     return list_get(c.tokens, list_get(c.control, 0).cursor);
 }
@@ -27,11 +30,22 @@ pub fn accept(c: Context, value: String) -> Bool effects { state } {
     }
     return false;
 }
+fn async_fn_ahead(c: Context) -> Bool effects { state } {
+    if !at(c, "async") { return false; }
+    let index = list_get(c.control, 0).cursor + 1;
+    return index < list_len(c.tokens) && list_get(c.tokens, index).kind == 50
+        && list_get(c.tokens, index).text == "fn";
+}
 pub fn expect(c: Context, value: String) -> Token effects { state, io, process } {
     if !at(c, value) {
         bad(c, "E100", "Expected " + value, current(c).span);
     }
     return take(c);
+}
+pub fn generic_token(c: Context, value: String) -> Token effects { state, io, process } {
+    let token = expect(c, value);
+    dict_set(c.generic_tokens, token.span.start, true);
+    return token;
 }
 pub fn identifier(c: Context) -> Token effects { state, io, process } {
     let t = current(c);
@@ -65,33 +79,65 @@ pub fn precedence(op: String) -> Int {
     return -1;
 }
 pub fn parse_type(c: Context) -> String effects { state, io, process } {
-    let token = identifier(c);
-    enter(c, token.span);
-    var name = token.text;
-    while accept(c,"::") {
-        name = name +"::"+ identifier(c).text;
+    let suspending = async_fn_ahead(c);
+    if suspending { let marker = take(c); }
+    if at(c, "fn") {
+        let keyword_token = take(c);
+        enter(c, keyword_token.span);
+        let open = expect(c, "(");
+        let parameters = type_list(c, ")");
+        let arrow = expect(c, "->");
+        let result_type = parse_type(c);
+        var effects_pattern = parse_effect_pattern(c);
+        if suspending { effects_pattern = suspension_pattern(effects_pattern); }
+        var pattern = "@fn:" + effects_pattern + "<" + result_type;
+        for parameter in parameters { pattern = pattern + "," + parameter; }
+        leave(c);
+        return pattern + ">";
     }
-    if accept(c, "<") {
+    let first = identifier(c);
+    let dynamic = first.text == "dyn" && current(c).kind == 50 && !keyword(current(c).text);
+    var token = first;
+    if dynamic { token = identifier(c); }
+    enter(c, first.span);
+    var name = token.text;
+    var name_span = token.span;
+    while accept(c,"::") {
+        let member = identifier(c);
+        name = name +"::"+ member.text;
+        name_span = member.span;
+    }
+    if c.query_mode {
+        list_push(c.query_types, SyntaxName(name: name, span: name_span));
+    }
+    if at(c, "<") {
+        let open = generic_token(c, "<");
         let parts = strings_new();
         var more = true;
         while more {
             strings_push(parts, parse_type(c));
             more = accept(c,",");
         }
-        let close = expect(c, ">");
+        let close = generic_token(c, ">");
         name = name + "<" + strings_join(parts,",") + ">";
     }
     leave(c);
+    if dynamic { return "@dyn:" + name; }
     return name;
 }
 pub fn type_list(c: Context, end: String) -> List<String> effects { state, io, process } {
     let items = list_new<String>();
     var more = !at(c, end);
     while more {
-        list_push(items, parse_type(c));
+        if end == ">" && at(c, "effects") {
+            list_push(items, "@fx:" + to_string(parse_test_effects(c)));
+        } else {
+            list_push(items, parse_type(c));
+        }
         more = accept(c,",") && !at(c, end);
     }
-    let close = expect(c, end);
+    if end == ">" { let close = generic_token(c, end); }
+    else { let close = expect(c, end); }
     return items;
 }
 pub fn generic_call_ahead(c: Context) -> Bool effects { state } {
@@ -110,9 +156,10 @@ pub fn generic_call_ahead(c: Context) -> Bool effects { state } {
         } else if t.text == ">" {
             depth = depth - 1;
             if depth == 0 {
-                return list_get(c.tokens, i + 1).text == "("|| list_get(c.tokens, i + 1).text =="::";
+                let next = list_get(c.tokens, i + 1).text;
+                return next == "(" || next == "::" || next == ";" || next == ")" || next == "," || next == "}";
             }
-        } else if t.kind != 50 && t.text !="," && t.text !="::" {
+        } else if t.kind != 50 && t.text !="," && t.text !="::" && t.text != "(" && t.text != ")" && t.text != "->" && t.text != "{" && t.text != "}" {
             return false;
         }
         i = i + 1;
@@ -136,8 +183,20 @@ pub fn expressions(c: Context) -> List<SyntaxArgument> effects { state, io, proc
     return items;
 }
 pub fn expression(c: Context, minimum: Int) -> AstExprId effects { state, io, process } {
-    let t = take(c);
-    enter(c, t.span);
+    let token = take(c);
+    enter(c, token.span);
+    var left = no_ast_expr();
+    if token.kind == 53 && token.text == "(" {
+        left = expression(c, 0);
+        let close = expect(c, ")");
+    } else {
+        left = expression_atom(c, token);
+    }
+    let parsed = expression_suffix(c, left, minimum);
+    leave(c);
+    return parsed;
+}
+fn expression_atom(c: Context, t: Token) -> AstExprId effects { state, io, process } {
     var n = syntax_expression(0, t.span, t.text);
     var left = no_ast_expr();
     if t.kind == 51 {
@@ -146,7 +205,7 @@ pub fn expression(c: Context, minimum: Int) -> AstExprId effects { state, io, pr
         n.kind = 12;
     } else if t.kind == 56 {
         left = parse_interpolation(c, t);
-    } else if t.kind == 52 {
+    } else if t.kind == 52 || t.kind == 58 {
         n.kind = 3;
     } else if t.kind == 50 && (t.text == "true" || t.text == "false") {
         n.kind = 2;
@@ -154,9 +213,22 @@ pub fn expression(c: Context, minimum: Int) -> AstExprId effects { state, io, pr
         n.kind = 5;
         n.left = expression(c, 7);
         n.span = through_previous(c, t.span.start);
-    } else if t.kind == 53 && t.text == "(" {
-        left = expression(c, 0);
-        let close = expect(c,")");
+    } else if t.kind == 50 && t.text == "await" && current(c).kind == 50 && !keyword(current(c).text) {
+        n.kind = 17;
+        n.left = expression(c, 7);
+        n.span = through_previous(c, t.span.start);
+    } else if t.kind == 50 && (t.text == "fn" || (t.text == "async" && at(c, "fn"))) {
+        let suspending = t.text == "async";
+        if suspending { let marker = take(c); }
+        n.kind = 15;
+        n.closure_index = parse_closure(c, suspending);
+        n.span = through_previous(c, t.span.start);
+    } else if t.kind == 50 && t.text == "dyn" && current(c).kind == 50 && !keyword(current(c).text) {
+        n.kind = 16;
+        n.qualifier = parse_type(c);
+        let open = expect(c, "(");
+        n.arguments = expressions(c);
+        n.span = through_previous(c, t.span.start);
     } else if t.kind == 50 && t.text == "match" {
         n.kind = 9;
         n.left = expression(c, 0);
@@ -168,7 +240,7 @@ pub fn expression(c: Context, minimum: Int) -> AstExprId effects { state, io, pr
         var reading = true;
         while reading {
             if generic_call_ahead(c) {
-                let open = expect(c, "<");
+                let open = generic_token(c, "<");
                 n.type_arguments = type_list(c, ">");
             }
             if accept(c,"::") {
@@ -177,7 +249,9 @@ pub fn expression(c: Context, minimum: Int) -> AstExprId effects { state, io, pr
                     n.type_arguments = list_new<String>();
                 }
                 n.qualifier = path;
-                n.text = identifier(c).text;
+                let member = identifier(c);
+                n.text = member.text;
+                n.name_span = member.span;
                 path = path +"::"+ n.text;
             } else {
                 reading = false;
@@ -186,7 +260,7 @@ pub fn expression(c: Context, minimum: Int) -> AstExprId effects { state, io, pr
         n.span = through_previous(c, t.span.start);
         left = add_ast_expr(c, n);
         if generic_call_ahead(c) {
-            let open = expect(c, "<");
+            let open = generic_token(c, "<");
             n.type_arguments = type_list(c, ">");
         }
         if accept(c,"(") {
@@ -202,8 +276,18 @@ pub fn expression(c: Context, minimum: Int) -> AstExprId effects { state, io, pr
     if !has_ast_expr(left) {
         left = add_ast_expr(c, n);
     }
-    while at(c,".") || at(c,"?") {
-        if accept(c,"?") {
+    return left;
+}
+fn expression_suffix(c: Context, atom: AstExprId, minimum: Int) -> AstExprId effects { state, io, process } {
+    var left = atom;
+    while at(c,".") || at(c,"?") || at(c, "(") {
+        if accept(c, "(") {
+            var call = syntax_expression(14, ast_expr(c, left).span, "");
+            call.left = left;
+            call.arguments = expressions(c);
+            call.span = through_previous(c, call.span.start);
+            left = add_ast_expr(c, call);
+        } else if accept(c,"?") {
             var propagation = syntax_expression(10, through_previous(c, ast_expr(c, left).span.start),"?");
             propagation.left = left;
             left = add_ast_expr(c, propagation);
@@ -211,7 +295,13 @@ pub fn expression(c: Context, minimum: Int) -> AstExprId effects { state, io, pr
             let dot = expect(c,".");
             let field = identifier(c);
             var access = syntax_expression(8, Span(start: ast_expr(c, left).span.start, end: field.span.end), field.text);
+            access.name_span = field.span;
             access.left = left;
+            if accept(c, "(") {
+                access.kind = 13;
+                access.arguments = expressions(c);
+                access.span = through_previous(c, access.span.start);
+            }
             left = add_ast_expr(c, access);
         }
     }
@@ -223,7 +313,6 @@ pub fn expression(c: Context, minimum: Int) -> AstExprId effects { state, io, pr
         binary.right = right;
         left = add_ast_expr(c, binary);
     }
-    leave(c);
     return left;
 }
 pub fn name_fields(c: Context, end: String) -> List<SyntaxField> effects { state, io, process } {
@@ -257,7 +346,9 @@ pub fn statement(c: Context) -> AstStmtId effects { state, io, process } {
     if at(c, "let") || at(c, "var") {
         n.mutable = take(c).text == "var";
         n.kind = 30;
-        n.name = identifier(c).text;
+        let name = identifier(c);
+        n.name = name.text;
+        n.name_span = name.span;
         if accept(c,":") {
             n.annotation = parse_type(c);
         }
@@ -289,7 +380,9 @@ pub fn statement(c: Context) -> AstStmtId effects { state, io, process } {
         let semi = expect(c,";");
     } else if accept(c, "for") {
         n.kind = 41;
-        n.name = identifier(c).text;
+        let name = identifier(c);
+        n.name = name.text;
+        n.name_span = name.span;
         let in_token = expect(c, "in");
         n.value = expression(c, 0);
         if at(c, "..") || at(c, "..=") {
@@ -303,6 +396,10 @@ pub fn statement(c: Context) -> AstStmtId effects { state, io, process } {
     } else if accept(c, "while") {
         n.kind = 35;
         n.value = expression(c, 0);
+        n.yes = block(c);
+    } else if (at(c, "defer") || at(c, "scope")) && list_get(c.tokens, list_get(c.control, 0).cursor + 1).text == "{" {
+        n.kind = 43;
+        if take(c).text == "defer" { n.kind = 42; }
         n.yes = block(c);
     } else if accept(c, "match") {
         n.kind = 36;
@@ -348,6 +445,110 @@ pub fn effect_bit(name: String) -> Int {
 pub fn has_bit(mask: Int, bit: Int) -> Bool {
     return mask / bit % 2 == 1;
 }
+pub fn parse_function_body(c: Context, start: Int, exported: Bool, impl_index: Int, suspending: Bool) -> Unit effects { state, io, process } {
+    let name = identifier(c);
+    var type_parameters = parse_generic_parameters(c, true);
+    if impl_index >= 0 {
+        let implementation = list_get(c.syntax_impls, impl_index);
+        if list_len(type_parameters) != 0 {
+            method_error(c, "method_generic", implementation.owner, name.text, "Methods cannot declare their own generic parameters.", name.span, implementation.span);
+        }
+        type_parameters = implementation.parameters;
+    } else {
+        declare_module_name(c, name.text, exported, name.span);
+    }
+    let open = expect(c, "(");
+    let params = name_fields(c, ")");
+    let arrow = expect(c, "->");
+    let return_name = parse_type(c);
+    let effect_pattern = parse_effect_pattern(c);
+    validate_effect_names(c, effect_pattern, type_parameters, name.span);
+    let mask = effect_pattern_constant(effect_pattern);
+    let pre = list_new<AstExprId>();
+    let post = list_new<AstExprId>();
+    while at(c, "requires") || at(c, "ensures") {
+        let word = take(c).text;
+        let value = expression(c, 0);
+        let semi = expect(c, ";");
+        if word == "requires" { list_push(pre, value); }
+        else { list_push(post, value); }
+    }
+    let body = block(c);
+    list_push(c.syntax_functions, SyntaxFunction(suspending: suspending, effect_pattern: effect_pattern, impl_index: impl_index, method_exported: exported && impl_index >= 0, name_span: name.span, foreign_library: "", foreign_name: "", test_name: "", type_parameters: type_parameters, name: name.text, parameters: params, return_name: return_name, effect_mask: mask, preconditions: pre, postconditions: post, body: body, span: through_previous(c, start)));
+}
+pub fn parse_closure(c: Context, suspending: Bool) -> Int effects { state, io, process } {
+    let captures = list_new<SyntaxName>();
+    let open = expect(c, "[");
+    var more = !at(c, "]");
+    while more {
+        let name = identifier(c);
+        list_push(captures, SyntaxName(name: name.text, span: name.span));
+        more = accept(c, ",") && !at(c, "]");
+    }
+    let close = expect(c, "]");
+    let open_parameters = expect(c, "(");
+    let parameters = name_fields(c, ")");
+    let arrow = expect(c, "->");
+    let return_name = parse_type(c);
+    let effect_pattern = parse_effect_pattern(c);
+    let body = block(c);
+    let index = list_len(c.syntax_closures);
+    list_push(c.syntax_closures, SyntaxClosure(suspending: suspending, effect_pattern: effect_pattern, captures: captures, parameters: parameters, return_name: return_name, body: body));
+    return index;
+}
+pub fn parse_impl(c: Context, start: Int, exported: Bool) -> Unit effects { state, io, process } {
+    let parameters = parse_type_parameters(c);
+    var owner = parse_type(c);
+    var interface_name = "";
+    if accept(c, "for") {
+        interface_name = owner;
+        owner = parse_type(c);
+    }
+    let header = through_previous(c, start);
+    if exported {
+        if interface_name != "" {
+            interface_error(c, "E236", "impl_visibility", interface_name, owner, "", "An interface implementation has no visibility modifier.", header, empty_span());
+        }
+        method_error(c, "method_impl_visibility", owner, "", "Declare visibility on methods, not on impl.", header, empty_span());
+    }
+    let index = list_len(c.syntax_impls);
+    list_push(c.syntax_impls, SyntaxImpl(interface_name: interface_name, owner: owner, parameters: parameters, span: header));
+    let open = expect(c, "{");
+    while !at(c, "}") {
+        let member_start = current(c).span.start;
+        let visible = accept(c, "pub");
+        if visible && interface_name != "" {
+            interface_error(c, "E236", "impl_visibility", interface_name, owner, "", "Interface implementation methods have no visibility modifier.", current(c).span, header);
+        }
+        let suspending = async_fn_ahead(c);
+        if suspending {
+            if interface_name != "" { bad(c, "E240", "Interface implementations require synchronous methods.", current(c).span); }
+            let marker = take(c);
+        }
+        let word = expect(c, "fn");
+        parse_function_body(c, member_start, visible, index, suspending);
+    }
+    let close = expect(c, "}");
+}
+pub fn parse_interface(c: Context, exported: Bool) -> Unit effects { state, io, process } {
+    let name = identifier(c);
+    declare_module_name(c, name.text, exported, name.span);
+    let operations = list_new<SyntaxOperation>();
+    let open = expect(c, "{");
+    while !at(c, "}") {
+        let word = expect(c, "fn");
+        let method = identifier(c);
+        let open_parameters = expect(c, "(");
+        let parameters = name_fields(c, ")");
+        let arrow = expect(c, "->");
+        let return_name = parse_type(c);
+        let effects_mask = parse_test_effects(c);
+        let semi = expect(c, ";");
+        list_push(operations, SyntaxOperation(name: method.text, parameters: parameters, return_name: return_name, effect_mask: effects_mask, span: method.span));
+    }
+    let close = expect(c, "}");
+    list_push(c.syntax_interfaces, SyntaxInterface(name: name.text, operations: operations, span: name.span));
+}
 pub fn parse_module(c: Context) -> Unit effects { state, io, process } {
     let declared = dict_new<Int, Bool>();
     while current(c).kind != 54 {
@@ -362,11 +563,15 @@ pub fn parse_module(c: Context) -> Unit effects { state, io, process } {
         }
         dict_set(declared, owner, true);
         let exported = accept(c, "pub");
+        let opaque = accept(c, "opaque");
+        if opaque && !at(c, "struct") {
+            bad(c, "E100", "Expected struct after opaque.", current(c).span);
+        }
         if at(c, "enum") || at(c, "struct") || at(c, "type") {
             let word = take(c).text;
             let name = identifier(c);
             declare_module_name(c, name.text, exported, name.span);
-            var decl = SyntaxType(type_parameters: parse_type_parameters(c), kind: 70, name: name.text, base: "", fields: list_new<SyntaxField>(), variants: list_new<SyntaxVariant>(), span: name.span);
+            var decl = SyntaxType(opaque: opaque, type_parameters: parse_type_parameters(c), kind: 70, name: name.text, base: "", fields: list_new<SyntaxField>(), variants: list_new<SyntaxVariant>(), span: name.span);
             if word == "enum" {
                 let open = expect(c, "{");
                 var more = !at(c, "}");
@@ -416,47 +621,16 @@ pub fn parse_module(c: Context) -> Unit effects { state, io, process } {
             let mask = parse_test_effects(c);
             if !at(c, ";") { bad(c, "E228", "Foreign declarations end with ';' and have no contracts or body.", current(c).span); }
             let semi = expect(c, ";");
-            list_push(c.syntax_functions, SyntaxFunction(foreign_library: library.text, foreign_name: name.text, test_name: "", type_parameters: list_new<TypeParameter>(), name: name.text, parameters: params, return_name: return_name, effect_mask: mask, preconditions: list_new<AstExprId>(), postconditions: list_new<AstExprId>(), body: list_new<AstStmtId>(), span: through_previous(c, start)));
-        } else if accept(c, "fn") {
-            let name = identifier(c);
-            declare_module_name(c, name.text, exported, name.span);
-            let type_parameters = parse_type_parameters(c);
-            let open = expect(c,"(");
-            let params = name_fields(c,")");
-            let arrow = expect(c, "->");
-            let return_name = parse_type(c);
-            var mask = 0;
-            if accept(c, "effects") {
-                let opening = expect(c, "{");
-                var more = !at(c, "}");
-                while more {
-                    let e = identifier(c);
-                    let bit = effect_bit(e.text);
-                    if bit == 0 {
-                        bad(c, "E206", "Unknown effect.", e.span);
-                    }
-                    if has_bit(mask, bit) {
-                        bad(c, "E100", "Duplicate effect.", e.span);
-                    }
-                    mask = mask + bit;
-                    more = accept(c,",") && !at(c, "}");
-                }
-                let close = expect(c, "}");
-            }
-            let pre = list_new<AstExprId>();
-            let post = list_new<AstExprId>();
-            while at(c, "requires") || at(c, "ensures") {
-                let word = take(c).text;
-                let value = expression(c, 0);
-                let semi = expect(c,";");
-                if word == "requires" {
-                    list_push(pre, value);
-                } else {
-                    list_push(post, value);
-                }
-            }
-            let body = block(c);
-            list_push(c.syntax_functions, SyntaxFunction(foreign_library: "", foreign_name: "", test_name: "", type_parameters: type_parameters, name: name.text, parameters: params, return_name: return_name, effect_mask: mask, preconditions: pre, postconditions: post, body: body, span: through_previous(c, start)));
+            list_push(c.syntax_functions, SyntaxFunction(suspending: false, effect_pattern: "", impl_index: -1, method_exported: false, name_span: name.span, foreign_library: library.text, foreign_name: name.text, test_name: "", type_parameters: list_new<TypeParameter>(), name: name.text, parameters: params, return_name: return_name, effect_mask: mask, preconditions: list_new<AstExprId>(), postconditions: list_new<AstExprId>(), body: list_new<AstStmtId>(), span: through_previous(c, start)));
+        } else if accept(c, "interface") {
+            parse_interface(c, exported);
+        } else if accept(c, "impl") {
+            parse_impl(c, start, exported);
+        } else if async_fn_ahead(c) || at(c, "fn") {
+            let suspending = async_fn_ahead(c);
+            if suspending { let marker = take(c); }
+            let word = expect(c, "fn");
+            parse_function_body(c, start, exported, -1, suspending);
         } else if accept(c, "test") {
             let name = take(c);
             if exported || name.kind != 52 || str_len(name.text) == 0 || str_len(name.text) > 256 || contains_byte(name.text, 0) {
@@ -478,7 +652,7 @@ pub fn parse_module(c: Context) -> Unit effects { state, io, process } {
             declare_module_name(c, internal, false, name.span);
             let mask = parse_test_effects(c);
             let body = block(c);
-            list_push(c.syntax_functions, SyntaxFunction(foreign_library: "", foreign_name: "", test_name: name.text, type_parameters: list_new<TypeParameter>(), name: internal, parameters: list_new<SyntaxField>(), return_name: "Unit", effect_mask: mask, preconditions: list_new<AstExprId>(), postconditions: list_new<AstExprId>(), body: body, span: through_previous(c, start)));
+            list_push(c.syntax_functions, SyntaxFunction(suspending: false, effect_pattern: "", impl_index: -1, method_exported: false, name_span: name.span, foreign_library: "", foreign_name: "", test_name: name.text, type_parameters: list_new<TypeParameter>(), name: internal, parameters: list_new<SyntaxField>(), return_name: "Unit", effect_mask: mask, preconditions: list_new<AstExprId>(), postconditions: list_new<AstExprId>(), body: body, span: through_previous(c, start)));
         } else {
             bad(c, "E100", "Expected fn, enum, struct, type or test.", current(c).span);
         }
@@ -515,19 +689,28 @@ pub fn foreign_library_name(name: String) -> Bool {
     return true;
 }
 pub fn parse_type_parameters(c: Context) -> List<TypeParameter> effects { state, io, process } {
+    return parse_generic_parameters(c, false);
+}
+pub fn parse_generic_parameters(c: Context, effect_parameters: Bool) -> List<TypeParameter> effects { state, io, process } {
     let items = list_new<TypeParameter>();
-    if accept(c, "<") {
+    if at(c, "<") {
+        let open = generic_token(c, "<");
         var more = true;
         while more {
+            let next = list_get(c.tokens, list_get(c.control, 0).cursor + 1);
+            let is_effect = effect_parameters && at(c, "effect") && next.kind == 50;
+            if is_effect { let marker = take(c); }
             let name = identifier(c);
             var bound = "Any";
-            if accept(c,":") {
-                bound = identifier(c).text;
+            if is_effect {
+                bound = "$effect";
+            } else if accept(c,":") {
+                bound = parse_type(c);
             }
             list_push(items, TypeParameter(name: name.text, bound: bound, span: name.span));
             more = accept(c,",");
         }
-        let close = expect(c, ">");
+        let close = generic_token(c, ">");
     }
     return items;
 }
@@ -561,8 +744,10 @@ pub fn parse_arms(c: Context, value_mode: Bool) -> List<SyntaxArm> effects { sta
         } else {
             body = block(c);
         }
-        list_push(arms, SyntaxArm(value: value, owner: owner_name, variant: variant.text, names: names, body: body, span: through_previous(c, owner.span.start)));
+        list_push(arms, SyntaxArm(value: value, owner: owner_name, variant: variant.text, variant_span: variant.span, names: names, body: body, span: through_previous(c, owner.span.start)));
+        let separator = current(c);
         let comma = accept(c,",");
+        if value_mode && comma { dict_set(c.arm_commas, separator.span.start, true); }
         if value_mode && !comma && !at(c, "}") {
             bad(c, "E100", "Expected comma between expression arms.", current(c).span);
         }

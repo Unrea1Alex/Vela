@@ -1,0 +1,4 @@
+async fn bad() -> Unit effects { state } {
+    defer { await sleep_ms(1); }
+}
+fn main() -> Int { return 0; }

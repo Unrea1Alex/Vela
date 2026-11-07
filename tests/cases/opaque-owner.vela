@@ -1,0 +1,24 @@
+enum Storage { Value(Int), Empty }
+pub opaque struct Counter { storage: Storage, scalar: Int, values: List<String> }
+pub opaque struct Box<T> { value: T }
+pub opaque struct Empty {}
+pub struct Open { value: Int }
+pub fn create(n: Int) -> Counter effects { state } {
+    let items = list_new<String>();
+    list_push(items, "hidden" + to_string(n));
+    return Counter(storage: Storage::Value(n), scalar: 1, values: items);
+}
+pub fn number(c: Counter) -> Int {
+    return match c.storage { Storage::Value(value) => value, Storage::Empty => 0 };
+}
+pub fn scalar(c: Counter) -> Int { return c.scalar; }
+pub fn changed(c: Counter) -> Counter effects { state } {
+    var copy = c;
+    copy.scalar = 2;
+    list_push(copy.values, "9");
+    return copy;
+}
+pub fn first(c: Counter) -> String effects { state } { return list_get(c.values, 0); }
+pub fn shared(c: Counter) -> String effects { state } { return list_get(c.values, 1); }
+pub fn wrap<T>(value: T) -> Box<T> { return Box<T>(value: value); }
+pub fn unwrap<T>(box: Box<T>) -> T { return box.value; }

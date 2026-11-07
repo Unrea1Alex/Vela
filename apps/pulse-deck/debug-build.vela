@@ -1,0 +1,42 @@
+import "../../tools/test.vela" as test;
+fn main() -> Int effects { io, process, state } {
+    let root = test::value(absolute_path("."));
+    let app = root + "/apps/pulse-deck";
+    test::done(make_dir(app + "/work"));
+    let output = app + "/work/debug";
+    test::done(make_dir(output));
+    let suite = test::Suite(root: root, compiler: root + "/bin/velac.exe", dir: output, passed: 0,
+        failed: 0);
+    let args = test::compiler_command(suite, "emit-c", app + "/vela.project");
+    strings_push(args, "--debug");
+    strings_push(args, "-o");
+    strings_push(args, output + "/pulse.c");
+    let emitted = test::invoke(suite, args, 30000);
+    if emitted.code != 0 {
+        eprint(emitted.out + emitted.err);
+        return 2;
+    }
+    let cc = test::command(env("VELA_CC"));
+    for flag in test::split("/nologo|/std:c11|/TC|/utf-8|/MT|/Od|/Z7", 124) {
+        strings_push(cc, flag);
+    }
+    strings_push(cc, "/Fo" + output + "/pulse.obj");
+    strings_push(cc, "/Fe" + output + "/pulse-deck.exe");
+    strings_push(cc, output + "/pulse.c");
+    strings_push(cc, "/link");
+    strings_push(cc, "/DEBUG:FULL");
+    strings_push(cc, "/PDB:" + output + "/pulse.pdb");
+    let built = test::invoke(suite, cc, 120000);
+    if built.code != 0 {
+        eprint(built.out + built.err);
+        return 2;
+    }
+    for file in test::split("vela-gui.dll|vela-http-server.dll", 124) {
+        test::done(write_file(output + "/" + file, test::value(read_file(app + "/bin/" + file))));
+    }
+    test::done(make_dir(output + "/assets"));
+    test::done(write_file(output + "/assets/demo.json", test::value(read_file(app
+        + "/demo.json"))));
+    print(output + "/pulse-deck.exe");
+    return 0;
+}

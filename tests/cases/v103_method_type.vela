@@ -1,0 +1,3 @@
+struct Example<T> { value: T }
+impl<T> Example<T> { fn read(self: Example<T>) -> T { return self.value; } }
+fn main() -> Int { return Example<Int>::read(Example<String>(value: "bad")); }

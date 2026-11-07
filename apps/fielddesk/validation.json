@@ -1,0 +1,91 @@
+{
+  "gc_short": "vela gc: collections=1903730 peak=23442 bytes=0\r\n",
+  "cli_checks": [
+    {
+      "status": "passed",
+      "name": "streaming real files and child verifier"
+    },
+    {
+      "status": "passed",
+      "name": "replay real file workflow"
+    },
+    {
+      "status": "passed",
+      "name": "embedded demo without source files"
+    },
+    {
+      "status": "passed",
+      "name": "alert exit code after publication"
+    },
+    {
+      "status": "passed",
+      "name": "exact threshold does not alert"
+    },
+    {
+      "status": "passed",
+      "name": "bad data preserves previous report"
+    },
+    {
+      "status": "passed",
+      "name": "bad config preserves previous report"
+    },
+    {
+      "status": "passed",
+      "name": "input output alias rejected"
+    },
+    {
+      "status": "passed",
+      "name": "hard link alias rejected"
+    },
+    {
+      "status": "passed",
+      "name": "worker logs cannot overwrite input"
+    },
+    {
+      "status": "passed",
+      "name": "cannot overwrite executable or adapter"
+    },
+    {
+      "status": "passed",
+      "name": "missing input"
+    },
+    {
+      "status": "passed",
+      "name": "oversized file"
+    },
+    {
+      "status": "passed",
+      "name": "invalid UTF8"
+    },
+    {
+      "status": "passed",
+      "name": "invalid CLI flags"
+    },
+    {
+      "status": "passed",
+      "name": "publication into missing directory"
+    },
+    {
+      "status": "passed",
+      "name": "worker rejects incomplete envelope"
+    },
+    {
+      "status": "passed",
+      "name": "relocated path with spaces and Unicode on system PATH"
+    },
+    {
+      "status": "passed",
+      "name": "forced GC repeated analysis"
+    }
+  ],
+  "adapter_sha256": "2bc8a1c8d1d5b8ffaf26f2708912d6c071bc86889c7e9f3e53ee4c22f54d7484",
+  "gc_long": "vela gc: collections=12640050 peak=23442 bytes=0\r\n",
+  "resource_sha256": "29077c861a19aa35718e725e174c29e6ec0b9ffabb0538c44ba6b136ed39dc03",
+  "schema_version": 1,
+  "executable_sha256": "7731dfe0610ed990a16cb4400c71ce6caad52d8109cb199b2cb37a1578851fdd",
+  "named_tests": {
+    "failed": 0,
+    "passed": 17
+  },
+  "compiler": "1.0.0"
+}

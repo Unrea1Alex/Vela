@@ -1,0 +1,5 @@
+fn wrong(x: String) -> Int { return str_len(x); }
+fn main() -> Int {
+    let f: fn(Int) -> Int = wrong;
+    return f(0);
+}

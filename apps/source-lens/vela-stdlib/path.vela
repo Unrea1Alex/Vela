@@ -1,0 +1,83 @@
+import "text.vela" as text;
+pub struct Path {
+    value: String
+}
+pub enum Error {
+    Empty,
+    Nul,
+    Encoding(Int)
+}
+pub fn checked(value: String) -> Result<Path, Error> {
+    if value == "" {
+        return Result<Path, Error>::Err(Error::Empty);
+    }
+    let invalid = text::invalid_offset(value);
+    if invalid >= 0 {
+        return Result<Path, Error>::Err(Error::Encoding(invalid));
+    }
+    for i in 0 .. str_len(value) {
+        if str_byte(value, i) == 0 {
+            return Result<Path, Error>::Err(Error::Nul);
+        }
+    }
+    return Result<Path, Error>::Ok(Path(value: value));
+}
+fn separator(b: Int) -> Bool {
+    return b == 47 || (platform() == "windows" && b == 92);
+}
+pub fn absolute(value: Path) -> Result<Bool, Error> {
+    let valid = checked(value.value)?;
+    if separator(str_byte(valid.value, 0)) {
+        return Result<Bool, Error>::Ok(true);
+    }
+    return Result<Bool, Error>::Ok(platform() == "windows" && str_len(valid.value) >= 3 && str_byte(valid.value, 1) == 58 && separator(str_byte(valid.value, 2)));
+}
+pub fn parent(value: Path) -> Result<Path, Error> {
+    let valid = checked(value.value)?;
+    let raw = valid.value;
+    var end = str_len(raw);
+    var root = 0;
+    if separator(str_byte(raw, 0)) {
+        root = 1;
+    }
+    if platform() == "windows" && end >= 3 && str_byte(raw, 1) == 58 && separator(str_byte(raw, 2)) {
+        root = 3;
+    }
+    if platform() == "windows" && end >= 2 && separator(str_byte(raw, 0)) && separator(str_byte(raw, 1)) {
+        var at = 2;
+        while at < end && !separator(str_byte(raw, at)) {
+            at = at + 1;
+        }
+        if at < end {
+            at = at + 1;
+        }
+        while at < end && !separator(str_byte(raw, at)) {
+            at = at + 1;
+        }
+        root = at;
+        if at < end {
+            root = at + 1;
+        }
+    }
+    while end > root && separator(str_byte(raw, end - 1)) {
+        end = end - 1;
+    }
+    while end > root && !separator(str_byte(raw, end - 1)) {
+        end = end - 1;
+    }
+    while end > root && separator(str_byte(raw, end - 1)) {
+        end = end - 1;
+    }
+    if end == 0 {
+        return checked(".");
+    }
+    return checked(str_slice(raw, 0, end));
+}
+pub fn join(base: Path, child: Path) -> Result<Path, Error> {
+    let left = checked(base.value)?;
+    let right = checked(child.value)?;
+    if absolute(right)? {
+        return Result<Path, Error>::Ok(right);
+    }
+    return checked(left.value + "/" + right.value);
+}

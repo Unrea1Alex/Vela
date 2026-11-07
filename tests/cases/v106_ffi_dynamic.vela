@@ -1,0 +1,3 @@
+interface Reader {}
+extern "fixture.dll" fn test_interface(reader: dyn Reader) -> Unit effects { state, process };
+fn main() -> Unit {}

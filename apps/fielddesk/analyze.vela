@@ -1,0 +1,189 @@
+import "model.vela" as model;
+import "../../std/collections.vela" as collections;
+import "../../std/lines.vela" as lines;
+import "../../std/result.vela" as result;
+import "../../std/text.vela" as text;
+pub struct Batch<T> {
+    items: List<T>,
+    excluded: Int
+}
+pub struct Stats {
+    count: Int,
+    mean: Float64,
+    minimum: Float64,
+    maximum: Float64,
+    deviation: Float64,
+    alerts: Int
+}
+pub struct Station {
+    name: String,
+    stats: Stats
+}
+pub struct Analysis {
+    records: List<model::Sample>,
+    stations: List<Station>,
+    stats: Stats,
+    excluded: Int
+}
+pub fn transform<T, U, effect E>(values: List<T>, apply: fn(
+    T) -> U effects E) -> List<U> effects { state, E } {
+    let output = list_new<U>();
+    for value in values {
+        list_push(output, apply(value));
+    }
+    return output;
+}
+fn average(sum: Float64, count: Int) -> Float64 requires count > 0;
+ensures float_is_finite(result);
+{
+    return sum / float_from_int(count);
+}
+pub fn statistics<T: model::Measured>(values: List<T>, limit: Float64) -> Result<Stats,
+    String> effects { state } {
+    if list_len(values) == 0 {
+        return Result<Stats, String>::Err("No accepted measurements");
+    }
+    let first = model::Measured::reading(list_get(values, 0));
+    var minimum = first;
+    var maximum = first;
+    var sum = 0.0;
+    var alerts = 0;
+    for value in values {
+        let x = model::Measured::reading(value);
+        sum = sum + x;
+        if x < minimum {
+            minimum = x;
+        }
+        if x > maximum {
+            maximum = x;
+        }
+        if x > limit {
+            alerts = alerts + 1;
+        }
+    }
+    let count = list_len(values);
+    let mean = average(sum, count);
+    var squares = 0.0;
+    for value in values {
+        let delta = model::Measured::reading(value) - mean;
+        squares = squares + delta * delta;
+    }
+    var deviation = 0.0;
+    match float_sqrt(average(squares, count)) {
+        FloatResult::Ok(value) => {
+            deviation = value;
+        }
+        FloatResult::Err(error) => {
+            return Result<Stats, String>::Err(error);
+        }
+    }
+    return Result<Stats, String>::Ok(Stats(count: count, mean: mean, minimum: minimum,
+        maximum: maximum, deviation: deviation, alerts: alerts));
+}
+pub fn read<effect E>(pull: fn(Int) -> Result<String, String> effects E,
+    chunk: Int) -> Result<Batch<model::Sample>, String> effects { state, E } {
+    let reader = lines::reader(524288, 4096, chunk)?;
+    let entries = list_new<model::Sample>();
+    var total = 0;
+    var excluded = 0;
+    while true {
+        match lines::next(reader, pull)? {
+            Option::None => {
+                break;
+            }
+            Option::Some(line) => {
+                let trimmed = result::explain(text::trim(text::Text(data: line.data)),
+                    "Invalid text")?;
+                if trimmed.data != "" {
+                    total = total + 1;
+                    if total > 2048 {
+                        return Result<Batch<model::Sample>, String>::Err(
+                            "More than 2048 measurements");
+                    }
+                    let prefix = f"line {line.number:d}: ";
+                    let decorate = fn [ prefix ](why: String) -> String {
+                        return prefix + why;
+                    };
+                    let entry = result::map_error(model::sample(trimmed.data, total), decorate)?;
+                    if entry.accepted() {
+                        list_push(entries, entry);
+                    } else {
+                        excluded = excluded + 1;
+                    }
+                }
+            }
+        }
+    }
+    return Result<Batch<model::Sample>, String>::Ok(Batch<model::Sample>(items: entries,
+        excluded: excluded));
+}
+pub fn summarize(batch: Batch<model::Sample>, config: model::Settings) -> Result<Analysis,
+    String> effects { state } {
+    let calibrate = fn [ config ](entry: model::Sample) -> model::Sample {
+        return entry.calibrated(config);
+    };
+    let entries = transform(batch.items, calibrate);
+    let groups = dict_new<String, List<model::Sample>>();
+    let names = list_new<String>();
+    for entry in entries {
+        let name = entry.station();
+        if !dict_has(groups, name) {
+            if list_len(names) >= 32 {
+                return Result<Analysis, String>::Err("More than 32 active stations");
+            }
+            list_push(names, name);
+            dict_set(groups, name, list_new<model::Sample>());
+        }
+        list_push(dict_get(groups, name), entry);
+    }
+    let stations = list_new<Station>();
+    for name in collections::sort_strings(names) {
+        list_push(stations, Station(name: name, stats: statistics(dict_get(groups, name),
+            config.limit())?));
+    }
+    return Result<Analysis, String>::Ok(Analysis(records: entries, stations: stations,
+        stats: statistics(entries, config.limit())?, excluded: batch.excluded));
+}
+pub fn memory(data: String, config: model::Settings, chunk: Int) -> Result<Analysis,
+    String> effects { state } {
+    let position = list_new<Int>();
+    list_push(position, 0);
+    let pull = fn [ data, position ](limit: Int) -> Result<String, String> effects { state } {
+        let start = list_get(position, 0);
+        var end = start + limit;
+        if end > str_len(data) {
+            end = str_len(data);
+        }
+        list_set(position, 0, end);
+        return Result<String, String>::Ok(str_slice(data, start, end));
+    };
+    return summarize(read(pull, chunk)?, config);
+}
+pub fn file(name: String, config: model::Settings) -> Result<Analysis, String> effects { io,
+    state } {
+    match stream_open(name, 524288) {
+        StreamResult::Err(error) => {
+            return Result<Analysis, String>::Err(error);
+        }
+        StreamResult::Limit => {
+            return Result<Analysis, String>::Err("Input exceeds 524288 bytes");
+        }
+        StreamResult::Ok(handle) => {
+            let pull = fn [ handle ](limit: Int) -> Result<String, String> effects { io, state } {
+                return match stream_next(handle, limit) {
+                    ReadResult::Ok(data) => Result<String, String>::Ok(data),
+                    ReadResult::Err(error) => Result<String, String>::Err(error),
+                    ReadResult::Limit => Result<String, String>::Err("Stream chunk limit")
+                };
+            };
+            let batch = read(pull, 8192);
+            match stream_close(handle) {
+                WriteResult::Err(error) => {
+                    return Result<Analysis, String>::Err(error);
+                }
+                WriteResult::Ok => {}
+            }
+            return summarize(batch?, config);
+        }
+    }
+}

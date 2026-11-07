@@ -1,0 +1,2 @@
+struct Example {}
+fn main() -> Int { return Example().read(); }

@@ -1,5 +1,8 @@
 # Option, Result and expression matching (0.5.3)
 
+Memory descriptions of the original version are historical. In 0.8,
+[the tracing heap](../MEMORY.md) governs managed values.
+
 Status: verified in 0.5.3: 539 native checks and both fixed points.
 
 The catalog declares nominal prelude enums `Option<T> { Some(T), None }` and

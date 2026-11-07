@@ -1,0 +1,91 @@
+import "graph.vela" as graph;
+import "report.vela" as report;
+import "@cli" as cli;
+import "@fs" as fs;
+import "@path" as path;
+import "@result" as result;
+import "@json" as json;
+fn usage() -> String {
+    return "Usage: source-lens.exe QUERY.json REPORT.html [--json-nodes N]\n       source-lens.exe --help";
+}
+fn io_error(error: fs::Error) -> String {
+    return match error {
+        fs::Error::InvalidPath(_) => "Invalid file path",
+        fs::Error::Encoding(_) => "Invalid UTF-8",
+        fs::Error::Limit(n) => "Input exceeds " + to_string(n) + " bytes",
+        fs::Error::Io(file, why) => file + ": " + why,
+        fs::Error::Cleanup(folder, committed) => folder + ": cleanup failed; committed="
+            + to_string(committed)
+    };
+}
+fn identity(file: String) -> Result<String, String> effects { io } {
+    return match file_identity(file) {
+        StringResult::Ok(id) => Result<String, String>::Ok(id),
+        StringResult::Err(why) => Result<String, String>::Err(why)
+    };
+}
+fn work() -> Result<Int, String> effects { args, state, io } {
+    let specs = list_new<cli::Spec>();
+    list_push(specs, cli::Spec(name: "help", takes_value: false));
+    list_push(specs, cli::Spec(name: "json-nodes", takes_value: true));
+    let args = result::explain(cli::current(specs), usage())?;
+    if dict_has(args.options, "help") {
+        print(usage());
+        return Result<Int, String>::Ok(0);
+    }
+    if list_len(args.positional) != 2 {
+        return Result<Int, String>::Err(usage());
+    }
+    var node_limit = json::default_limits().nodes;
+    if dict_has(args.options, "json-nodes") {
+        match parse_int(dict_get(args.options, "json-nodes")) {
+            IntResult::Ok(value) => {
+                node_limit = value;
+            }
+            IntResult::Err(_) => {
+                node_limit = 0;
+            }
+        }
+        if node_limit < 1 || node_limit > 131072 {
+            return Result<Int, String>::Err("--json-nodes must be between 1 and 131072");
+        }
+    }
+    let input = result::explain(path::checked(list_get(args.positional, 0)), "Invalid input path")?;
+    let output = result::explain(path::checked(list_get(args.positional, 1)),
+        "Invalid output path")?;
+    let input_id = identity(input.value)?;
+    if input_id != "" && input_id == identity(output.value)? {
+        return Result<Int, String>::Err("Output aliases input");
+    }
+    var source = "";
+    match fs::read_text(input, 2097152) {
+        Result::Ok(value) => {
+            source = value.data;
+        }
+        Result::Err(error) => {
+            return Result<Int, String>::Err(io_error(error));
+        }
+    }
+    let model = graph::parse_with_node_limit(source, node_limit)?;
+    let html = report::render(model)?;
+    match fs::write_text_atomic(output, html) {
+        Result::Ok(_) => {}
+        Result::Err(error) => {
+            return Result<Int, String>::Err(io_error(error));
+        }
+    }
+    print(
+        f"modules={list_len(model.documents):d} functions={list_len(model.functions):d} calls={list_len(model.calls):d} imports={list_len(model.imports):d}");
+    return Result<Int, String>::Ok(0);
+}
+fn main() -> Int effects { args, state, io } {
+    match work() {
+        Result::Ok(code) => {
+            return code;
+        }
+        Result::Err(error) => {
+            eprint(error);
+            return 2;
+        }
+    }
+}

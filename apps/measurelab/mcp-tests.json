@@ -6,17 +6,24 @@
     "vela_check",
     "vela_format",
     "vela_symbols",
+    "vela_query",
+    "vela_plan",
+    "vela_read_output",
     "vela_build",
     "vela_test",
     "vela_run"
   ],
   "transport": "official SDK / local stdio",
   "native_tools_in_current_chat": false,
-  "compiler_id": "b4a8f64ada2925b3410c8aed84447cea0a45d8df5fa3f4693633eb862e62b199",
-  "execution_toolchain_id": "e810d30e42eef207fdc89ca29816929290e337894631fa35e29d0fce687d718f",
+  "compiler_id": "3f02f5f82bfc7b41b5444711eb7cf23e0e38d724bba51001e5b38c6517cfc644",
+  "execution_toolchain_id": "25fa9cce1bf32706eb9257ee4c33712aa3feeb3791fc4ff64fc7b82da2e0c46f",
   "named_tests": 12,
   "exit_code": 3,
   "stdout": "Saved: isolated-report.html\r\nscenarios=3 samples=60 over_budget=1\r\nРазбор JSON · 128 КБ: mean=4.04 p95=4.30 sigma=0.19 мс\r\nПостроение поискового индекса: mean=13.68 p95=22.10 sigma=3.35 мс\r\nЭкспорт отчёта в HTML: mean=6.63 p95=7.10 sigma=0.31 мс\r\n",
-  "native_adapter_allowed_by_sha256": true,
-  "generated_html_not_exported": true
+  "native_dependencies": 0,
+  "generated_html": {
+    "size": 17500,
+    "sha256": "39f30df4d5dcb8548291a5e241e906e44a3e99d3e2be882070a9010f304510ea",
+    "saved_explicitly": true
+  }
 }

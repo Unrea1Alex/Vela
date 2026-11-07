@@ -1,0 +1,9 @@
+enum State {
+    Ready,
+    Done
+}
+fn main() -> Int effects { state } {
+    let a = list_new<State>();
+    let invalid = a == a;
+    return 0;
+}

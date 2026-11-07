@@ -1,0 +1,38 @@
+import "../../std/json.vela" as json;
+
+fn fails<T>(outcome: Result<T, json::At<json::DecodeCause>>, expected: String) -> Unit {
+    match outcome {
+        Result::Ok(_) => { assert_true(false, "expected decode error"); }
+        Result::Err(error) => { assert_true(json::describe(error) == expected, json::describe(error)); }
+    }
+}
+fn examples() -> Result<Bool, json::At<json::DecodeCause>> effects { state } {
+    let c = json::decode("{\"a.b\":null,\"scenarios\":[{}, {\"samples\":[0,0,0,0,0,0,0,0,0,0,0,0,\"bad\"]}],\"large\":9007199254740993}")?;
+    let null_value = json::field(c, "a.b")?;
+    fails(json::as_string(null_value), "$[\"a.b\"]: expected string");
+    fails(json::field(c, "absent"), "$.absent: missing field");
+    let scenarios = json::field(c, "scenarios")?;
+    fails(json::item(scenarios, -1), "$.scenarios[-1]: array index out of range");
+    let second = json::item(scenarios, 1)?;
+    let samples = json::field(second, "samples")?;
+    let invalid = json::item(samples, 12)?;
+    fails(json::as_number(invalid, json::IntegerMode::Exact), "$.scenarios[1].samples[12]: expected number");
+    let large = json::field(c, "large")?;
+    assert_true(json::as_int(large)? == 9007199254740993, "original integer retained");
+    fails(json::as_number(large, json::IntegerMode::Exact), "$.large: integer is not exactly representable as Float64");
+    assert_true(json::as_number(large, json::IntegerMode::Round)? == 9007199254740992.0, "explicit rounding");
+    fails(json::field(c, str_from_byte(255)), "$: invalid UTF-8 at byte 0");
+    match json::with_path(Result<Bool, Int>::Err(42), "$.sample") {
+        Result::Ok(_) => { assert_true(false, "expected contextual error"); }
+        Result::Err(error) => {
+            assert_true(error.cause == 42 && error.path == "$.sample", "original typed cause");
+        }
+    }
+    return Result<Bool, json::At<json::DecodeCause>>::Ok(true);
+}
+fn main() -> Unit effects { state, io } {
+    match examples() {
+        Result::Ok(_) => { print("JSON decode passed"); }
+        Result::Err(error) => { assert_true(false, json::describe(error)); }
+    }
+}

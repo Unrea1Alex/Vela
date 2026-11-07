@@ -1,0 +1,7 @@
+enum Marker<T> {
+    Value
+}
+fn main() -> Int {
+    let invalid = Marker<Int>::Value == Marker<String>::Value;
+    return 0;
+}

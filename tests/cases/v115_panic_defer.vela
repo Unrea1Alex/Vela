@@ -1,0 +1,5 @@
+fn main() -> Unit effects { process } {
+    defer {
+        panic("direct panic in defer");
+    }
+}

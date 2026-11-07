@@ -1,0 +1,8 @@
+enum State {
+    Empty,
+    Value(Int)
+}
+fn main() -> Int {
+    let invalid = State::Empty == State::Empty;
+    return 0;
+}

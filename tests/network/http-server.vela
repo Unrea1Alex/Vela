@@ -1,0 +1,67 @@
+import "../../std/http_server.vela" as http;
+import "../../std/text.vela" as text;
+fn must<T, E>(outcome: Result<T, E>, message: String) -> T {
+    match outcome {
+        Result::Ok(value) => {
+            return value;
+        }
+        Result::Err(_) => {
+            assert_true(false, message);
+        }
+    }
+    return must(outcome, message);
+}
+fn clock() -> Int effects { io } {
+    match monotonic_millis() {
+        IntResult::Ok(value) => {
+            return value;
+        }
+        IntResult::Err(message) => {
+            assert_true(false, message);
+        }
+    }
+    return 0;
+}
+fn reply(request: http::Request) -> http::Response effects { state } {
+    if request.target == "/typed" {
+        return http::Response(content_type: "application/json", status: http::Status::Ok,
+            body: text::Bytes(data: "{}"));
+    }
+    if request.target == "/bad-type" {
+        return http::Response(content_type: "text/plain\r\nInjected: true",
+            status: http::Status::Ok, body: text::Bytes(data: "unsafe"));
+    }
+    if request.target == "/large" {
+        var body = "z";
+        for i in 0 .. 20 {
+            body = body + body;
+        }
+        return http::Response(content_type: "application/octet-stream", status: http::Status::Ok,
+            body: text::Bytes(data: body));
+    }
+    if request.target == "/binary" {
+        return http::Response(content_type: "application/octet-stream", status: http::Status::Ok,
+            body: text::Bytes(data: "Vela" + str_from_byte(0) + str_from_byte(255)));
+    }
+    return http::Response(content_type: "application/octet-stream", status: http::Status::NotFound,
+        body: text::Bytes(data: request.target));
+}
+fn main() -> Int effects { io, process, state } {
+    let start = clock();
+    let server = must(http::listen(0, start, 2000, reply), "bind test listener");
+    write_stdout("port=" + to_string(http::port(server)) + "\n");
+    var responses = 0;
+    var dropped = 0;
+    var parallel = false;
+    while clock() - start < 12000 && (responses < 14 || dropped < 1) {
+        let progress = must(http::poll(server, clock()), "poll test listener");
+        responses = responses + progress.responded;
+        dropped = dropped + progress.dropped;
+        parallel = parallel || progress.active >= 2;
+    }
+    assert_true(parallel && responses == 14 && dropped >= 1, "concurrent requests and timeout");
+    assert_true(must(http::close(server), "close listener"), "closed listener");
+    assert_true(must(http::close(server), "close again"), "idempotent listener close");
+    print("done");
+    return 0;
+}

@@ -1,0 +1,75 @@
+{
+  "stage": "1.0.4",
+  "version": "1.0.0",
+  "compiler_sha256": "942b23753f2c86a9135d378c41cadc14fe4f9b3c4f19a397194fde952b848d31",
+  "recovery_c_sha256": "0081ee53311c7ed384b912e3ffef6fa91d0c4668df7b8af2417e6aa7647517fa",
+  "windows": {
+    "os": "Microsoft Windows NT 10.0.26300.0",
+    "toolchain": "MSVC 19.44 x64",
+    "native": 1214,
+    "failed": 0,
+    "skipped": 0,
+    "generations": 3,
+    "c_fixed_point": true,
+    "bundler_fixed_point": true,
+    "clean_c_bootstrap_native": 1214,
+    "clean_bootstrap_without_old_vela": true,
+    "recovery_identical_c": true
+  },
+  "regressions": {
+    "http_client": 19,
+    "http_server": 16,
+    "pulsedeck_named": 11,
+    "pulsedeck_network": 21,
+    "fielddesk_named": 17,
+    "fielddesk_cli": 19,
+    "fielddesk_network": 8,
+    "notes_named": 2,
+    "fielddesk_soak": 1000,
+    "gc_compilations": [
+      200,
+      1600
+    ],
+    "gc_peak_managed_bytes": 1139506,
+    "lsp": "base/methods/interfaces: 200 requests each; callables rename/hover"
+  },
+  "actual_ui": [
+    "Notes Unicode Ctrl+A save/load",
+    "FieldDesk Analyze: accepted 9 excluded 1 alerts 2 mean 20.67",
+    "PulseDeck: 6/6 and 3 healthy; close active/queued preserves ready; no orphans"
+  ],
+  "mcp": {
+    "sdk_groups": 5,
+    "sequential": 1000,
+    "cancellations": 25,
+    "execution": 26,
+    "isolation": 26,
+    "faults": 11,
+    "new_client": "passed: help/check/build/test/run, deliberate E201, 3 named tests",
+    "skill_disk_read": false,
+    "skill_instructions": "client self-report of automatic instructions; disk read denied by policy",
+    "cache_hosts": "serial exclusive lease"
+  },
+  "linux": {
+    "environment": "isolated Alpine 3.22.8 WSL2 VelaRelease100",
+    "compiler": "GCC 14.2.0/musl",
+    "c_recovery": true,
+    "c_fixed_point": true,
+    "resources_lock_test": true,
+    "enum_behavior": true,
+    "unicode_relocation": true,
+    "unpacked_checksums": true,
+    "standalone_source_included": true
+  },
+  "acceptance_fix": "AppContainer canonical_path normalized NT GLOBALROOT fallback; same-object reopen and allowed DLL publish pass; source snapshot refreshed with compatibility assessment",
+  "delivery_receipt": "dist/RELEASE-1.0.0.json",
+  "unperformed": [
+    "fresh Windows OS install",
+    "physical multi-monitor DPI transition",
+    "Linux GUI/Windows DLL/network/fiber adapters unsupported",
+    "GitHub publishing not requested"
+  ],
+  "pulsedeck_tooling_checks": 4,
+  "packaged_setup": "passed with final ZIP in relocated Unicode path",
+  "documentation_links": 660
+}

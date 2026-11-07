@@ -1,0 +1,4 @@
+interface Empty {}
+struct Foo {}
+impl Empty for Foo { fn read(self: Foo) -> Int { return 0; } }
+fn main() -> Int { return 0; }

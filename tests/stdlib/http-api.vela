@@ -1,0 +1,106 @@
+import "../../std/http.vela" as http;
+import "../../std/http_server.vela" as server;
+import "../../std/text.vela" as text;
+fn must<T, E>(value: Result<T, E>) -> T effects { process } {
+    match value {
+        Result::Ok(found) => {
+            return found;
+        }
+        Result::Err(_) => {
+            panic("HTTP API test failed");
+        }
+    }
+}
+fn rejected<T, E>(value: Result<T, E>) -> Bool {
+    return match value {
+        Result::Ok(_) => false,
+        Result::Err(_) => true
+    };
+}
+fn main() -> Int effects { io, process, state } {
+    assert_true(http::url(must(http::from_url("http://example.com", 100, 100)))
+        == "http://example.com:80/", "default path and port");
+    assert_true(http::url(must(http::from_url("https://localhost?x=%23", 100, 100)))
+        == "https://localhost:443/?x=%23", "HTTPS query");
+    assert_true(http::url(must(http::from_url("http://localhost:8080/a/%2F?q=1", 100, 100)))
+        == "http://localhost:8080/a/%2F?q=1", "encoded target preserved");
+    let invalid = list_new<String>();
+    list_push(invalid, "http://user@host/");
+    list_push(invalid, "http://localhost/#fragment");
+    list_push(invalid, "http://[::1]/");
+    list_push(invalid, "ftp://localhost/");
+    list_push(invalid, "http://localhost:/");
+    list_push(invalid, "http://localhost:65536/");
+    list_push(invalid, "http://localhost:+80/");
+    list_push(invalid, "http://localhost/a b");
+    list_push(invalid, "http://localhost/%x1");
+    list_push(invalid, "http://localhost/a\\b");
+    list_push(invalid, "https://");
+    list_push(invalid, "http://пример.рф/");
+    for value in invalid {
+        assert_true(rejected(http::from_url(value, 100, 100)), "invalid URL");
+    }
+    let request = must(http::from_url("http://localhost/", 100, 100));
+    assert_true(rejected(http::with_method(request, http::Method::Get, text::Bytes(data: "body"))),
+        "GET body rejected");
+    assert_true(rejected(http::with_method(request, http::Method::Head, text::Bytes(data: "body"))),
+        "HEAD body rejected");
+    let post = must(http::with_method(request, http::Method::Post, text::Bytes(data: str_from_byte(
+        0) + str_from_byte(255))));
+    let headers = list_new<http::Header>();
+    list_push(headers, http::Header(name: "Content-Type", value: "application/json"));
+    let configured = must(http::with_headers(post, headers));
+    list_push(headers, http::Header(name: "content-type", value: "text/plain"));
+    assert_true(rejected(http::with_headers(request, headers)), "duplicate name insensitive");
+    list_truncate(headers, 0);
+    let names = list_new<String>();
+    list_push(names, "Host");
+    list_push(names, "Content-Length");
+    list_push(names, "Transfer-Encoding");
+    list_push(names, "Connection");
+    list_push(names, "Authorization");
+    list_push(names, "Proxy-Authorization");
+    list_push(names, "Cookie");
+    list_push(names, "Expect");
+    list_push(names, "Upgrade");
+    list_push(names, "bad:name");
+    list_push(names, "bad name");
+    for name in names {
+        list_push(headers, http::Header(name: name, value: "value"));
+        assert_true(rejected(http::with_headers(request, headers)), "reserved/invalid name");
+        list_truncate(headers, 0);
+    }
+    list_push(headers, http::Header(name: "X-Value", value: "injected\r\nHost: other"));
+    assert_true(rejected(http::with_headers(request, headers)), "header injection");
+    list_truncate(headers, 0);
+    for i in 0 .. 33 {
+        list_push(headers, http::Header(name: "X-" + to_string(i), value: "value"));
+    }
+    assert_true(rejected(http::with_headers(request, headers)), "header count cap");
+    var large = "x";
+    for i in 0 .. 20 {
+        large = large + large;
+    }
+    let boundary = must(http::with_method(request, http::Method::Put, text::Bytes(data: large)));
+    assert_true(rejected(http::with_method(request, http::Method::Put, text::Bytes(data: large
+        + "x"))), "upload byte cap");
+    list_truncate(headers, 0);
+    list_push(headers, http::Header(name: "X-Large", value: str_slice(large, 0, 1025)));
+    assert_true(rejected(http::with_headers(request, headers)), "header value cap");
+    list_truncate(headers, 0);
+    list_push(headers, http::Header(name: str_slice(large, 0, 65), value: ""));
+    assert_true(rejected(http::with_headers(request, headers)), "header name cap");
+    list_truncate(headers, 0);
+    for i in 0 .. 8 {
+        list_push(headers, http::Header(name: "X-" + to_string(i), value: str_slice(large, 0,
+            1024)));
+    }
+    assert_true(rejected(http::with_headers(request, headers)), "total header byte cap");
+    assert_true(server::valid_content_type("application/json") && server::valid_content_type(
+        "text/plain; charset=utf-8"), "media types");
+    assert_true(!server::valid_content_type("text/plain\r\nX: y") && !server::valid_content_type(
+        "invalid") && !server::valid_content_type("text/plain; charset=other"),
+        "media type rejection");
+    print("HTTP API passed");
+    return 0;
+}

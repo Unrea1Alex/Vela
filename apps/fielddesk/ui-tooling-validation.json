@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-06",
+  "platform": "Windows x64, current workstation",
+  "gui": {
+    "automation": "computer-use skill, @oai/sky",
+    "demo_analyze": "Accepted 9 | excluded 1 | alerts 2 | mean 20.67",
+    "edit_and_export": {
+      "station": "Проверка 🌳",
+      "values": [40, 20],
+      "accepted": 2,
+      "alerts": 1,
+      "mean": "30.00",
+      "output": "build/fielddesk-validation/gui-report.html",
+      "sha256": "c9f40069e152a37fcfe946a8bf83fffe5a1a3869c6c4a7eee9e426791e5c8ab7"
+    },
+    "invalid_edit": {
+      "value": "bad",
+      "status": "Error: line 1: $.value: expected number",
+      "previous_report_sha256_unchanged": true
+    },
+    "close": {"remaining_target_windows": 0, "exit_code": 0},
+    "fixes_verified": ["LF converted to CRLF for Win32 EDIT", "larger Segoe UI font"]
+  },
+  "browser": {
+    "target": "generated standalone demo-report.html via temporary loopback preview",
+    "all_rows": 9,
+    "alerts_only_rows": 2,
+    "search": "Лесная",
+    "search_with_alert_filter_rows": 0,
+    "empty_message_visible": true,
+    "search_without_alert_filter_rows": 3,
+    "preview": "preview.jpg"
+  },
+  "tooling": {
+    "check_and_project_build": "passed",
+    "format_all_application_sources_idempotent": true,
+    "native_query": "passed, opaque Sample and constrained generic transform visible",
+    "rename_preview": "transform to map_values, declaration and application call in analyze.vela",
+    "preview_applied": false,
+    "test_root_query": "additional transform call in tests.vela visible only from test root",
+    "mcp_tools_discovered_in_current_client": false,
+    "fallback": "matching native CLI and local vela-app guidance"
+  },
+  "unperformed": ["fresh MCP onboarding", "LSP client", "full compiler verify", "clean-machine installation", "DPI matrix", "other operating systems", "TLS and public network", "async cancellation"]
+}

@@ -1,0 +1,227 @@
+import "core.vela";
+import "driver.vela";
+import "errors.vela";
+import "projects.vela";
+pub struct Resource {
+    name: String,
+    relative: String,
+    path: String,
+    data: String
+}
+struct Companion {
+    name: String,
+    data: String
+}
+pub fn artifact_join(directory: String, relative: String) -> String {
+    if str_len(directory) > 0 {
+        let byte = str_byte(directory, str_len(directory) - 1);
+        if byte == 47 || (platform() == "windows" && byte == 92) {
+            return directory + relative;
+        }
+    }
+    return directory + "/" + relative;
+}
+pub fn artifact_key(value: String) -> String effects { state } {
+    let bytes = strings_new();
+    for i in 0 .. str_len(value) {
+        var b = str_byte(value, i);
+        if b >= 65 && b <= 90 {
+            b = b + 32;
+        }
+        strings_push(bytes, str_from_byte(b));
+    }
+    return strings_join(bytes, "");
+}
+fn starts_with(value: String, prefix: String) -> Bool {
+    return str_len(value) >= str_len(prefix) && str_slice(value, 0, str_len(prefix)) == prefix;
+}
+pub fn asset_name(value: String) -> Bool effects { state } {
+    if str_len(value) > 240 || !starts_with(value, "assets/") {
+        return false;
+    }
+    for part in project_split(value, 47) {
+        if part == "" || str_len(part) > 80 || str_byte(part, str_len(part) - 1) == 46 {
+            return false;
+        }
+        for i in 0 .. str_len(part) {
+            let b = str_byte(part, i);
+            if !((b >= 48 && b <= 57) || (b >= 65 && b <= 90) || (b >= 97 && b <= 122) || b == 45
+                || b == 46 || b == 95) {
+                return false;
+            }
+        }
+        let stem = artifact_key(list_get(project_split(part, 46), 0));
+        if stem == "con" || stem == "prn" || stem == "aux" || stem == "nul" {
+            return false;
+        }
+        if str_len(stem) == 4 && (starts_with(stem, "com") || starts_with(stem, "lpt")) && str_byte(
+            stem, 3) >= 48 && str_byte(stem, 3) <= 57 {
+            return false;
+        }
+    }
+    return true;
+}
+pub fn assets_collide(left: String, right: String) -> Bool effects { state } {
+    let a = artifact_key(left);
+    let b = artifact_key(right);
+    return a == b || starts_with(a, b + "/") || starts_with(b, a + "/");
+}
+pub fn artifact_source(manifest: String, relative: String) -> Result<String, String> effects { io,
+    state } {
+    if !project_relative(relative, true) {
+        return Result<String, String>::Err("Artifact source must be relative to the project");
+    }
+    let directory = parent_path(manifest);
+    let root = from_string(canonical_path(directory, false))?;
+    let full = artifact_join(directory, relative);
+    let file = from_string(canonical_path(full, true))?;
+    if !starts_with(path_key(file), path_key(artifact_join(root, ""))) {
+        return Result<String, String>::Err("Artifact source escapes the project directory");
+    }
+    return from_string(absolute_path(full));
+}
+pub fn artifact_bytes(file: String) -> Result<String, String> effects { io } {
+    return match read_file_bounded(file, 16777216) {
+        ReadResult::Ok(data) => Result<String, String>::Ok(data),
+        ReadResult::Limit => Result<String, String>::Err("Artifact exceeds 16 MiB"),
+        ReadResult::Err(message) => Result<String, String>::Err(message)
+    };
+}
+pub fn windows_x64_dll(data: String) -> Bool {
+    let size = str_len(data);
+    if size < 88 || str_slice(data, 0, 2) != "MZ" {
+        return false;
+    }
+    let pe = str_byte(data, 60) + 256 * str_byte(data, 61) + 65536 * str_byte(data, 62) + 16777216
+        * str_byte(data, 63);
+    if pe < 64 || pe > size - 24 {
+        return false;
+    }
+    return str_slice(data, pe, pe + 2) == "PE" && str_byte(data, pe + 2) == 0 && str_byte(data, pe
+        + 3) == 0 && str_byte(data, pe + 4) == 100 && str_byte(data, pe + 5) == 134 && str_byte(
+        data, pe + 23) / 32 % 2 == 1;
+}
+fn artifact_alias(path: String, expected: String, file: Bool) -> Result<Bool,
+    String> effects { state, io } {
+    let actual = from_string(canonical_path(path, file))?;
+    if path_key(actual) != path_key(expected) {
+        return Result<Bool, String>::Err("Artifact destination is an alias: " + path);
+    }
+    return Result<Bool, String>::Ok(true);
+}
+fn artifact_parents(directory: String, root: String, name: String, create: Bool) -> Result<Bool,
+    String> effects { state, io } {
+    let parts = project_split(name, 47);
+    var relative = "";
+    for i in 0 .. list_len(parts) - 1 {
+        let part = list_get(parts, i);
+        if relative == "" {
+            relative = part;
+        } else {
+            relative = relative + "/" + part;
+        }
+        let path = artifact_join(directory, relative);
+        if from_string(file_identity(path))? == "" {
+            if !create {
+                return Result<Bool, String>::Ok(true);
+            }
+            match make_dir(path) {
+                WriteResult::Ok => {}
+                WriteResult::Err(message) => {
+                    if from_string(file_identity(path))? == "" {
+                        return Result<Bool, String>::Err(message);
+                    }
+                }
+            }
+        }
+        let verified = artifact_alias(path, artifact_join(root, relative), false)?;
+    }
+    return Result<Bool, String>::Ok(true);
+}
+fn artifact_matches(path: String, expected: String, data: String) -> Result<Bool,
+    String> effects { state, io } {
+    if from_string(file_identity(path))? == "" {
+        return Result<Bool, String>::Ok(false);
+    }
+    let verified = artifact_alias(path, expected, true)?;
+    match read_file_bounded(path, str_len(data)) {
+        ReadResult::Ok(existing) => {
+            if existing == data {
+                return Result<Bool, String>::Ok(true);
+            }
+        }
+        ReadResult::Limit => {}
+        ReadResult::Err(_) => {}
+    }
+    return Result<Bool, String>::Err("Conflicting artifact output: " + path);
+}
+fn artifact_install(destination: String, expected: String, data: String) -> Result<Bool,
+    String> effects { state, io } {
+    let dir = from_string(temp_dir(parent_path(destination)))?;
+    let source = dir + "/content";
+    let written = write_file(source, data);
+    var outcome = written;
+    match written {
+        WriteResult::Ok => {
+            outcome = install_file(source, destination);
+        }
+        WriteResult::Err(_) => {}
+    }
+    let removed = remove_file(source);
+    let closed = remove_dir(dir);
+    match outcome {
+        WriteResult::Ok => {
+            return Result<Bool, String>::Ok(true);
+        }
+        WriteResult::Err(message) => {
+            if artifact_matches(destination, expected, data)? {
+                return Result<Bool, String>::Ok(true);
+            }
+            return Result<Bool, String>::Err(message);
+        }
+    }
+}
+pub fn stage_artifacts(natives: List<NativeDependency>, assets: List<Resource>,
+    directory: String) -> Result<Bool, String> effects { state, io } {
+    if list_len(natives) == 0 && list_len(assets) == 0 {
+        return Result<Bool, String>::Ok(true);
+    }
+    let root = from_string(canonical_path(directory, false))?;
+    let files = list_new<Companion>();
+    for native in natives {
+        var bytes = native.data;
+        if native.target == "" {
+            bytes = from_string(read_file(native.path))?;
+        }
+        list_push(files, Companion(name: native.name, data: bytes));
+    }
+    for asset in assets {
+        list_push(files, Companion(name: asset.name, data: asset.data));
+    }
+    for file in files {
+        let parents = artifact_parents(directory, root, file.name, false)?;
+        let matched = artifact_matches(artifact_join(directory, file.name), artifact_join(root,
+            file.name), file.data)?;
+    }
+    for file in files {
+        let parents = artifact_parents(directory, root, file.name, true)?;
+        let path = artifact_join(directory, file.name);
+        let expected = artifact_join(root, file.name);
+        if !artifact_matches(path, expected, file.data)? {
+            let installed = artifact_install(path, expected, file.data)?;
+        }
+    }
+    return Result<Bool, String>::Ok(true);
+}
+pub fn unstage_assets(assets: List<Resource>, directory: String) -> Unit effects { state, io } {
+    let root = artifact_join(directory, "");
+    for asset in assets {
+        let path = artifact_join(directory, asset.name);
+        let removed = remove_file(path);
+        var parent = parent_path(path);
+        while str_len(parent) > str_len(root) {
+            let closed = remove_dir(parent);
+            parent = parent_path(str_slice(parent, 0, str_len(parent) - 1));
+        }
+    }
+}

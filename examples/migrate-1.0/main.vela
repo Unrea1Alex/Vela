@@ -1,0 +1,27 @@
+import "../../std/http.vela" as http;
+import "../../std/http_server.vela" as server;
+import "../../std/text.vela" as text;
+enum State {
+    Ready,
+    Done
+}
+fn configured() -> Result<http::Request, http::Error> effects { state } {
+    let request = http::from_url("https://localhost/health", 1000, 4096)?;
+    let post = http::with_method(request, http::Method::Post, text::Bytes(data: "{}"))?;
+    let headers = list_new<http::Header>();
+    list_push(headers, http::Header(name: "Content-Type", value: "application/json"));
+    return http::with_headers(post, headers);
+}
+fn main() -> Int effects { io, state } {
+    match configured() {
+        Result::Ok(_) => {}, Result::Err(_) => {
+            return 2;
+        }
+    }
+    let response = server::Response(status: server::Status::Ok, body: text::Bytes(data: "{}"),
+        content_type: "application/json");
+    assert_true(server::valid_content_type(response.content_type), "media type");
+    assert_true(State::Ready != State::Done && State::Ready == State::Ready, "enum equality");
+    print("migration checks passed");
+    return 0;
+}

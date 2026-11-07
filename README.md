@@ -9,8 +9,28 @@ build driver and test runner are written in Vela. The language makes types,
 side effects and error paths visible so that people and agents can reason about
 a small piece of code from its local context.
 
-**Current version: 0.7.0.** Verified on Windows x64 with MSVC. Vela is experimental;
-the language and APIs may change before 1.0.
+**Vela 1.0.0** freezes the language, core standard library, project format,
+public FFI and tooling contracts. It includes typed async tasks, awaitable
+HTTP/process operations, a shared Windows GUI library, observable compiler
+caching and packaged resources. The compiler and a clean C-recovered build each
+passed **1214 native checks**. See the [acceptance report](docs/VALIDATION-1.0.md),
+[API contract](docs/contracts/STABLE-1.0.md), [compatibility policy](docs/COMPATIBILITY.md)
+and [migration from 0.11](docs/MIGRATING-1.0.md).
+
+## Download 1.0.0
+
+| Package | Target |
+|---|---|
+| [Windows native](https://github.com/Unrea1Alex/Vela/releases/download/v1.0.0/vela-1.0.0-windows-x64.zip) | Compiler, tools, sources, recovery seed and GUI examples; Windows x64/MSVC |
+| [Linux console](https://github.com/Unrea1Alex/Vela/releases/download/v1.0.0/vela-1.0.0-linux-x64-musl.tar.gz) | Static x86-64 compiler, standard modules, standalone source and C recovery seed |
+| [MCP adapter](https://github.com/Unrea1Alex/Vela/releases/download/v1.0.0/vela-mcp-1.0.0.zip) | Optional Node.js 24+ integration; use the matching Windows native package |
+
+[Release notes](https://github.com/Unrea1Alex/Vela/releases/tag/v1.0.0) ·
+[SHA-256 checksums](https://github.com/Unrea1Alex/Vela/releases/download/v1.0.0/SHA256SUMS-1.0.0.txt)
+
+Windows x64/MSVC is the full validation target. Linux x86-64/GCC/musl covers
+the compiler and console programs; Windows GUI, DLL, worker/fiber and HTTP
+adapters are outside that target. [Platform scope](docs/contracts/PLATFORM-SUPPORT.md).
 
 ## A small example
 
@@ -45,7 +65,7 @@ cd Vela
 .\bin\my-factorial.exe 10
 ```
 
-The repository includes four verified bootstrap executables in `bin/`. The command
+The repository includes five verified bootstrap/tool executables in `bin/`. The command
 wrappers locate MSVC automatically. Checking source, formatting and inspecting
 symbols do not require a C compiler. Building and running source do. Finished
 Vela programs do not require Vela, Python or Node.js to run.
@@ -54,17 +74,26 @@ To build the compiler without a Vela executable, use the standalone
 [C recovery seed](bootstrap/README.md). Its source and recovery procedure are
 included in the repository.
 
+For syntax highlighting in VS Code, install the [Vela Language extension](integrations/vscode/README.md).
+
 ## What works today
 
 - Static types, structs, enums, exhaustive matching and nominal `distinct` IDs.
 - Generic functions and types, `List<T>`, `Dict<K,V>`, `Option`, `Result` and `?`.
 - Explicit effects, runtime contracts and checked signed integer arithmetic.
-- Float64 with explicit integer conversions and documented floating-point rules.
+- Float64 with explicit integer conversions, square root and fixed precision.
+- Precise nonmoving GC, lexical cleanup with `scope` and `defer`.
+- Typed JSON navigation and bounded byte/text builders.
 - Imports, public declarations, local project dependencies and lock files.
 - Standard modules for text, paths, collections, JSON, CLI, configuration, files,
   processes and testing.
 - Named tests, structured diagnostics, formatting and symbol inspection.
+- Native semantic queries, revision-checked edit previews and a stdio LSP service.
+- Triple-quoted multiline raw strings for static text.
 - Synchronous Windows x64 FFI ABI 1, with explicit native dependencies and handles.
+- Opaque structures, methods, nominal interfaces, closures and callable effects.
+- Typed async tasks, task groups and awaitable HTTP/process adapters on Windows.
+- A shared Windows GUI module and bounded HTTP/HTTPS client and loopback server.
 
 See the [language specification](docs/LANGUAGE.md), [standard library](docs/STDLIB.md)
 and [project guide](docs/PROJECTS.md) for exact behavior and limits.
@@ -72,7 +101,7 @@ and [project guide](docs/PROJECTS.md) for exact behavior and limits.
 ## Use Vela with an agent
 
 The optional [MCP adapter](integrations/mcp/README.md) supplies language help,
-project context, checking, formatting and symbols. The accompanying
+project context, checking, formatting, semantic queries and edit previews. The accompanying
 [application skill](integrations/agent/vela-app/SKILL.md) teaches an agent how to
 use the current language without guessing syntax or APIs.
 
@@ -87,14 +116,14 @@ npm run build
 Follow the [MCP setup instructions](integrations/mcp/README.md) to connect an
 existing application folder to the matching toolchain. Optional build, test and
 run tools become available only after the Windows LPAC/Job isolation probes pass.
+An opted-in successful run can return generated file IDs for explicit retrieval.
 The native compiler and ordinary programs have no Node.js or MCP dependency.
 
 ## An application: MeasureLab
 
 [MeasureLab](apps/measurelab/README.md) reads JSON measurements, computes mean,
 median, p95 and standard deviation, and writes an offline HTML/SVG report.
-Its data model, validation, statistics and rendering are Vela; a small C adapter
-provides `sqrt` through the FFI.
+Its data model, validation, statistics and rendering use Vela's numeric, JSON and text APIs.
 
 ![MeasureLab report with scenario statistics and charts](apps/measurelab/preview-card.jpg)
 
@@ -109,6 +138,19 @@ application from the repository root:
 The repository also contains [TimeLog](apps/timelog/README.md), a TSV-to-HTML
 report application, and smaller [language examples](examples/).
 
+[SourceLens](apps/source-lens/README.md) turns semantic query JSON into a
+searchable offline HTML report of modules, functions, calls and effects.
+Its acceptance covers raw templates, CLI/LSP refactoring and MCP output export.
+
+[FieldDesk](apps/fielddesk/README.md) exercises Vela with calibrated measurements,
+an offline report, native editor, replaceable services, record/replay and callbacks.
+Its asynchronous HTTPS loading uses the standard HTTP client with cancellation.
+
+[PulseDeck](apps/pulse-deck/README.md) uses task groups and awaitable HTTP/HTTPS
+checks, typed async delays, a native window, cancellation, JSON reports and a
+local Vela demonstration server. Run `.\vela.cmd run apps/pulse-deck/build.vela`,
+then `.\apps\pulse-deck\bin\pulse-deck.exe` for an offline demo.
+
 ## Build and verify the language
 
 ```powershell
@@ -117,10 +159,8 @@ report application, and smaller [language examples](examples/).
 
 This builds three compiler generations, compares emitted C byte for byte,
 checks the bundler fixed point and runs the native fixture/driver suite.
-The recorded 0.7 release gate passed **974/974 checks**, with no failures or skips,
-in both the working tree and a clean staging tree. These are local Windows
-validation results, not a claim of cross-platform support or a hosted CI result.
-See [validation](docs/VALIDATION-0.7.md) and the [architecture](docs/ARCHITECTURE.md).
+See the [1.0 release validation](docs/VALIDATION-1.0.md), [tooling guide](docs/TOOLING.md)
+and the [architecture](docs/ARCHITECTURE.md).
 
 Edit the authored files listed in `selfhost/sources.list`; regenerate
 `selfhost/compiler.vela` using `.\vela-dev.cmd bundle`. Contributor rules are in
@@ -129,19 +169,15 @@ reproducer, the command used, expected behavior and actual diagnostics.
 
 ## Current limits and next steps
 
-Dynamic objects live in a process region; there is no GC or ownership system yet.
-Contracts are runtime checks. Functions as values, closures, async tasks, LSP and
-incremental analysis are planned. Windows GUI and HTTP prototypes exist, but a
-complete GUI/network framework and other platforms have not passed release gates.
+Contracts run at runtime. GC keeps reachable data and explicit close releases
+external resources. Closures and typed async tasks are implemented. The trusted
+cache reuses unchanged graphs; changed graphs still receive full semantic checking.
+HTTP uses supervised curl processes on Windows and can be awaited through
+`async_io` inside a task-group scope. It does not pool connections. The shared
+GUI forms API is Windows-only; portable widgets remain future work.
 
-The next development step is **0.8.1**, covering memory and resource contracts.
-The [roadmap](docs/ROADMAP.md) also records improvements found while building
-MeasureLab: basic math, precise number formatting, JSON extraction, text building,
-large text resources, formatter layout and retrieval of files produced through MCP.
-These are planned features, not APIs available in 0.7.0.
-
-Documentation was refined after the local 0.7.0 archives were built. Use the
-compiler, documentation and MCP compatibility manifest from the same checkout.
+The [roadmap](docs/ROADMAP.md) records the next development steps and release gates.
+Use the compiler, documentation and MCP manifest from the same checkout.
 The `vela/` Python frontend is a historical 0.2 reference; active development and
 verification use the native Vela tools.
 

@@ -1,0 +1,210 @@
+import "../../std/task_group.vela" as group;
+import "../../std/async_io.vela" as aio;
+import "../../std/event_loop.vela" as loop;
+import "../../std/http.vela" as http;
+import "../../std/path.vela" as path;
+import "../../std/text.vela" as text;
+fn must<T, E>(value: Result<T, E>) -> T effects { process } {
+    match value {
+        Result::Ok(found) => {
+            return found;
+        }
+        Result::Err(_) => {
+            panic("group test failed");
+        }
+    }
+}
+fn main() -> Int effects { io, process, state } {
+    let owner = must(group::create(0, 1));
+    let scope = group::root(owner);
+    let calls = list_new<Int>();
+    let step = fn [ calls ]() -> group::Step<Int, String> effects { state } {
+        list_push(calls, 1);
+        return group::Step<Int, String>::Wait(10);
+    };
+    let stop = fn [ calls ]() -> Bool effects { state } {
+        list_push(calls, 2);
+        return true;
+    };
+    let cleanup = fn [ calls ]() -> Result<Bool, String> effects { state } {
+        list_push(calls, 3);
+        return Result<Bool, String>::Ok(true);
+    };
+    let a = must(group::post(scope, 100, step, stop, cleanup));
+    let b = must(group::post(scope, 5, step, stop, cleanup));
+    let c = must(group::post(scope, 100, step, stop, cleanup));
+    let first = must(group::tick(owner, 0));
+    assert_true(list_len(calls) == 1, "bounded admission");
+    let cancelled = group::cancel(c);
+    let next = must(group::tick(owner, 5));
+    assert_true(list_len(calls) == 3, "queue deadline and cancellation skip launch and stop");
+    match group::outcome(b) {
+        Option::None => {
+            panic("no deadline");
+        }
+        Option::Some(done) => {
+            match done.outcome {
+                group::Outcome::TimedOut => {}
+                group::Outcome::Done(_) => {
+                    panic("wrong outcome");
+                }
+                group::Outcome::Failed(_) => {
+                    panic("wrong outcome");
+                }
+                group::Outcome::Cancelled => {
+                    panic("wrong outcome");
+                }
+                group::Outcome::InvalidDelay => {
+                    panic("wrong outcome");
+                }
+            }
+        }
+    }
+    let shut = must(group::shutdown(owner));
+    assert_true(must(group::tick(owner, 6)), "drained");
+    assert_true(list_len(calls) == 5 && list_get(calls, 3) == 2 && list_get(calls, 4) == 3,
+        "stop before cleanup");
+    let again = must(group::tick(owner, 7));
+    assert_true(list_len(calls) == 5, "cleanup once");
+    let faults = must(group::create(0, 1));
+    let good = fn [ ]() -> group::Step<Int, String> {
+        return group::Step<Int, String>::Done(42);
+    };
+    let stopped = fn [ ]() -> Bool {
+        return true;
+    };
+    let bad_close = fn [ ]() -> Result<Bool, String> {
+        return Result<Bool, String>::Err("cleanup fixture");
+    };
+    let ticket = must(group::post(group::root(faults), 10, good, stopped, bad_close));
+    let ticked = must(group::tick(faults, 0));
+    assert_true(list_len(group::cleanup_errors(faults)) == 1, "typed cleanup diagnostics");
+    match group::outcome(ticket) {
+        Option::None => {
+            panic("no completion");
+        }
+        Option::Some(done) => {
+            match done.cleanup {
+                Result::Err(message) => {
+                    assert_true(message == "cleanup fixture", "cleanup error");
+                }
+                Result::Ok(_) => {
+                    panic("lost cleanup failure");
+                }
+            }
+            match done.outcome {
+                group::Outcome::Done(value) => {
+                    assert_true(value == 42, "primary outcome preserved");
+                }
+                group::Outcome::Failed(_) => {
+                    panic("wrong outcome");
+                }
+                group::Outcome::Cancelled => {
+                    panic("wrong outcome");
+                }
+                group::Outcome::TimedOut => {
+                    panic("wrong outcome");
+                }
+                group::Outcome::InvalidDelay => {
+                    panic("wrong outcome");
+                }
+            }
+        }
+    }
+    if platform() != "windows" {
+        print("task groups host passed");
+        return 0;
+    }
+    let async_owner = must(group::create(0, 2));
+    let transport = dyn http::Transport(http::scripted(Result<http::Response, http::Error>::Ok(
+        http::Response(status: 200, headers: text::Bytes(data: ""), body: text::Bytes(
+        data: "ready")))));
+    let request = must(http::get(http::Scheme::Http, "localhost", 80, "/", 100, 100));
+    let action = async fn [ transport, request ](scope: group::Scope) -> Int effects { state } {
+        let answer = await aio::fetch(scope, transport, request, path::Path(value: "C:/"), 100);
+        return match answer {
+            Result::Ok(response) => response.status,
+            Result::Err(_) => -1
+        };
+    };
+    let task = must(group::spawn(async_owner, 100, action));
+    for time in 0 .. 10 {
+        let ticked = must(group::tick(async_owner, time));
+    }
+    match group::task_outcome(task) {
+        Option::None => {
+            panic("task pending");
+        }
+        Option::Some(value) => {
+            match value {
+                loop::Outcome::Done(status) => {
+                    assert_true(status == 200, "awaited typed HTTP");
+                }
+                loop::Outcome::Failed(error) => {
+                    panic(error);
+                }
+                loop::Outcome::Cancelled => {
+                    panic("unexpected cancellation");
+                }
+                loop::Outcome::TimedOut => {
+                    panic("unexpected timeout");
+                }
+            }
+        }
+    }
+    let cancelled_owner = must(group::create(0, 1));
+    let child_events = list_new<Int>();
+    let child_scope = async fn [ child_events ](scope: group::Scope) -> String effects { state } {
+        let step = fn [ child_events ]() -> group::Step<Int, String> effects { state } {
+            list_push(child_events, 1);
+            return group::Step<Int, String>::Wait(20);
+        };
+        let stop = fn [ child_events ]() -> Bool effects { state } {
+            list_push(child_events, 2);
+            return list_len(child_events) >= 4;
+        };
+        let cleanup = fn [ child_events ]() -> Result<Bool, String> effects { state } {
+            list_push(child_events, 3);
+            return Result<Bool, String>::Ok(true);
+        };
+        let posted = group::post(scope, 100, step, stop, cleanup);
+        await sleep_ms(80);
+        return "retained";
+    };
+    let child_task = must(group::spawn(cancelled_owner, 100, child_scope));
+    let started = must(group::tick(cancelled_owner, 0));
+    let task_cancelled = group::cancel_task(child_task);
+    let pending = must(group::tick(cancelled_owner, 1));
+    match group::task_outcome(child_task) {
+        Option::None => {}
+        Option::Some(_) => {
+            panic("published before child drain");
+        }
+    }
+    for time in 2 .. 8 {
+        let ticked = must(group::tick(cancelled_owner, time));
+    }
+    assert_true(list_len(child_events) == 5 && list_get(child_events, 4) == 3,
+        "child stopped and cleaned once");
+    match group::task_outcome(child_task) {
+        Option::None => {
+            panic("still pending after drain");
+        }
+        Option::Some(value) => {
+            match value {
+                loop::Outcome::Cancelled => {}
+                loop::Outcome::Done(_) => {
+                    panic("wrong cancellation");
+                }
+                loop::Outcome::TimedOut => {
+                    panic("wrong cancellation");
+                }
+                loop::Outcome::Failed(error) => {
+                    panic(error);
+                }
+            }
+        }
+    }
+    print("task groups passed");
+    return 0;
+}

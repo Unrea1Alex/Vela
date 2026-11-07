@@ -1,0 +1,20 @@
+fn must(value: StringResult) -> String effects { process } {
+    match value {
+        StringResult::Ok(found) => {
+            return found;
+        }
+        StringResult::Err(message) => {
+            panic(message);
+        }
+    }
+}
+fn main() -> Int effects { io, process } {
+    let image = must(executable_path());
+    let resolved = must(canonical_path(image, true));
+    assert_true(must(file_identity(image)) == must(file_identity(resolved)), "same canonical file");
+    let directory = must(canonical_path(".", false));
+    assert_true(must(file_identity(".")) == must(file_identity(directory)),
+        "same canonical directory");
+    print("canonical roundtrip passed");
+    return 0;
+}

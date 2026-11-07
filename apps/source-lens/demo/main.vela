@@ -1,0 +1,11 @@
+import "pipeline.vela" as pipeline;
+import "rules.vela" as rules;
+
+fn usage() -> String { return "Release pulse: no arguments required"; }
+fn main() -> Int effects { args, state, io } {
+    if arg_count() > 0 { print(usage()); return 2; }
+    let tasks = pipeline::sample();
+    pipeline::announce(tasks);
+    if rules::approved(rules::grade(98)) { return 0; }
+    return 1;
+}

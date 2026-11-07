@@ -1,5 +1,8 @@
 # String interpolation (0.5.5)
 
+Memory descriptions of the original version are historical. In 0.8,
+[the tracing heap](../MEMORY.md) governs managed values.
+
 Status: verified in 0.5.5: 626 native checks and both fixed points.
 
 `f"value={expression:d}"` creates a String. Each hole requires an explicit format:

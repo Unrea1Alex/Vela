@@ -1,0 +1,4 @@
+interface Read { fn read(self: Self) -> Int; }
+struct Foo {}
+impl Read for Foo { fn read(self: Foo) -> Int effects { io } { print(1); return 0; } }
+fn main() -> Int { return 0; }

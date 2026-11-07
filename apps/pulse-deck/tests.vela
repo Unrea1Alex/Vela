@@ -1,0 +1,102 @@
+import "model.vela" as model;
+import "../../std/http.vela" as http;
+import "../../std/text.vela" as text;
+import "../../std/json.vela" as json;
+fn must<T>(value: Result<T, String>) -> T effects { process } {
+    match value {
+        Result::Ok(found) => {
+            return found;
+        }
+        Result::Err(error) => {
+            panic(error);
+        }
+    }
+}
+fn entry() -> String {
+    return """{"name":"test","scheme":"http","host":"127.0.0.1","port":1234,"target":"/health","expect":200,"delay_ms":0,"timeout_ms":1000,"body_limit":64}""";
+}
+fn settings(entries: String, concurrency: Int) -> String {
+    return """{"demo":false,"curl":"system","ca_file":"","concurrency":""" + to_string(concurrency)
+        + ",\"endpoints\":[" + entries + "]}";
+}
+fn rejected(value: Result<model::Settings, String>) -> Bool {
+    return match value {
+        Result::Err(_) => true,
+        Result::Ok(_) => false
+    };
+}
+test "valid settings preserve endpoint and limits" effects { state, process } {
+    let config = must(model::parse(settings(entry(), 2)));
+    assert_true(config.concurrency == 2 && list_len(config.endpoints) == 1, "parsed config");
+    assert_true(list_get(config.endpoints, 0).limit == 64, "body limit");
+}
+test "duplicate endpoint names rejected" effects { state } {
+    assert_true(rejected(model::parse(settings(entry() + "," + entry(), 2))), "duplicate names");
+}
+test "empty endpoint list rejected" effects { state } {
+    assert_true(rejected(model::parse(settings("", 2))), "no checks");
+}
+test "concurrency bounded" effects { state } {
+    assert_true(rejected(model::parse(settings(entry(), 0))), "zero concurrency");
+    assert_true(rejected(model::parse(settings(entry(), 5))), "unbounded concurrency");
+}
+test "malformed and duplicate JSON rejected" effects { state } {
+    assert_true(rejected(model::parse("{")), "syntax");
+    assert_true(rejected(model::parse("{\"demo\":true,\"demo\":false}")), "duplicate field");
+}
+test "wrong JSON field reports path" effects { state, process } {
+    match model::parse(settings("{\"name\":42}", 1)) {
+        Result::Ok(_) => {
+            panic("accepted wrong name type");
+        }
+        Result::Err(error) => {
+            assert_true(str_len(error) > 10, "context retained");
+        }
+    }
+}
+test "binary response is hashed without text decoding" {
+    let endpoint = model::Endpoint(name: "binary", scheme: http::Scheme::Http, host: "localhost",
+        port: 80, target: "/", expect: 204, delay: 0, timeout: 1000, limit: 64);
+    let bytes = "a" + str_from_byte(0) + str_from_byte(255);
+    let row = model::response(endpoint, http::Response(status: 204, headers: text::Bytes(data: ""),
+        body: text::Bytes(data: bytes)), 1);
+    assert_true(row.state == model::State::Healthy && row.bytes == 3 && row.digest == sha256(bytes),
+        "binary handling");
+}
+test "report encodes Unicode and special characters as data" effects { state, process } {
+    let rows = list_new<model::Row>();
+    list_push(rows, model::row("Москва \"test\"", model::State::Cancelled, "a\\b", 0));
+    let encoded = must(model::report(rows, 3, 1));
+    match json::decode(encoded) {
+        Result::Err(_) => {
+            panic("report is not JSON");
+        }
+        Result::Ok(_) => {}
+    }
+    assert_true(model::counts(rows) == "1/1 completed | 0 healthy", "summary");
+}
+test "pending states are not terminal" {
+    assert_true(!model::terminal(model::row("x", model::State::Queued, "", 0)), "queue");
+    assert_true(!model::terminal(model::row("x", model::State::Running, "", 0)), "running");
+    assert_true(model::terminal(model::row("x", model::State::Error, "", 0)), "error");
+}
+test "status mismatch remains HTTP, not transport" {
+    let endpoint = model::Endpoint(name: "probe", scheme: http::Scheme::Http, host: "localhost",
+        port: 80, target: "/", expect: 200, delay: 0, timeout: 1000, limit: 64);
+    let response = http::Response(status: 404, headers: text::Bytes(data: ""), body: text::Bytes(
+        data: "missing"));
+    let row = model::response(endpoint, response, 42);
+    assert_true(row.state == model::State::HttpError && row.status == 404 && row.elapsed == 42,
+        "HTTP classification");
+    assert_true(row.bytes == 7 && row.digest == sha256("missing"), "exact binary digest");
+}
+test "counters use typed states" effects { state } {
+    let rows = list_new<model::Row>();
+    list_push(rows, model::row("queued", model::State::Queued, "", 0));
+    list_push(rows, model::row("running", model::State::Running, "", 0));
+    list_push(rows, model::row("healthy", model::State::Healthy, "", 0));
+    list_push(rows, model::row("http", model::State::HttpError, "", 0));
+    list_push(rows, model::row("error", model::State::Error, "", 0));
+    list_push(rows, model::row("cancel", model::State::Cancelled, "", 0));
+    assert_true(model::counts(rows) == "4/6 completed | 1 healthy", "typed state counters");
+}

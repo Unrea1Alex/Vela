@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "stage": "0.10.6",
+  "compiler": "0.10.0-dev.6",
+  "compiler_sha256": "732596d91c1da12a23e2153d8222733b16bb8fa6f83aaa525714bde9a6652d3a",
+  "bootstrap_driver_version": "0.10.0-dev.5",
+  "recovery_c_sha256": "6555c0329ee9659c838f13219aa8e1611a57128c7994e9e9bdf00d3433b8015a",
+  "native": { "passed": 1131, "failed": 0, "skipped": 0 },
+  "fixed_point": true,
+  "bundler_fixed_point": true,
+  "focused_cases": 9,
+  "forced_gc": true,
+  "rename_edits": 9,
+  "mcp_sdk_suites_passed": 3,
+  "dynamic_resource_checks": ["closed_alias", "close_failure_preserves_access", "retain_and_release", "repeat_close"],
+  "cycle_gc_stress": {
+    "repetitions": [10, 1000],
+    "collections": [200, 17031],
+    "peak_bytes": [640, 640],
+    "retained_bytes": [408, 408]
+  },
+  "benchmark": {
+    "calls": 1000000,
+    "checksum": 500000500000,
+    "warmups": 1,
+    "runs": 7,
+    "builds": 3,
+    "within_budgets": true,
+    "static": { "median_ms": 19.9131, "median_build_ms": 1712.4346, "c_bytes": 71709, "exe_bytes": 144384, "managed_peak_bytes": 0 },
+    "dynamic": { "median_ms": 17.8613, "median_build_ms": 1764.6702, "c_bytes": 72441, "exe_bytes": 145408, "managed_peak_bytes": 56 }
+  },
+  "next_item": "0.10.7"
+}

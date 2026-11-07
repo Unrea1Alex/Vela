@@ -1,4 +1,85 @@
-# Vela: explicit process-region memory model
+# Vela memory model
+
+## Cooperative work in 0.11
+
+Explicit loop continuations are ordinary typed callables held in managed task
+records. The loop retains pending tasks and their captures across ticks.
+On termination it replaces the pending record with the typed outcome and
+removes its queue entry. A separately retained task still owns its outcome.
+
+Windows process jobs use owner-tagged ForeignHandle metadata with explicit
+close. The runtime roots a live handle until it closes. Cancellation waits
+for the Job to become empty before closing it. The native Job and process
+handles are also released at runtime teardown. A child uses its own address
+space and inherits only the explicit standard handles. See
+[the operation contract](contracts/ASYNC-CANCELLATION.md).
+
+Typed tasks in dev.2 use a Windows stack per suspended task on the same
+Vela thread. The collector walks saved precise roots on inactive stacks
+and the suspended host stack. A native launch worker holds its own UTF-16
+buffers. It cannot access the managed heap. Cancellation and Job drain
+complete before the corresponding owner releases its resources.
+
+## Tracing heap in 0.8
+
+Programs generated with the ABI 2 root protocol use a single-threaded,
+nonmoving, precise mark/sweep collector. Value copies, shared identity of
+collections, immutable strings and `state` effects for collection reads and
+writes keep their existing semantics. Removed entries and obsolete storage
+become eligible for reclamation once unreachable. Cycles do not keep themselves
+alive. A slice keeps its backing allocation alive.
+
+Generated C registers typed roots for parameters, lexical variables, operands,
+and snapshots. A collection can run before evaluation of a checked temporary.
+The runtime does not collect inside a native operation. Visitor functions read
+only active enum payloads and live collection entries. Allocation pressure starts
+collection at one MiB of managed storage and then at twice the last retained
+size, with a one MiB minimum. This threshold is a trigger rather than a cap.
+`VELA_GC_STRESS=1` collects at every generated safepoint. `VELA_GC_REPORT=1`
+prints collection count, peak managed bytes and bytes before teardown to stderr.
+These counts include heap headers and exclude native stack and OS allocations.
+
+The [internal ABI](contracts/GC-RUNTIME-ABI.md) keeps uninstrumented bootstrap
+output on region semantics. Collection does not close native handles. Synchronous
+FFI arguments are valid through the call, with DLL ABI 1 and process-lifetime
+library loading. Native code cannot retain borrowed byte pointers.
+Use [lexical cleanup](contracts/RESOURCES.md) for explicit close on structured
+exits. Destructors are never called by the collector.
+
+## Closure environments in 0.10.5
+
+A nonempty capture list allocates one immutable traced environment. Capture
+slots contain shallow copies of the source values. Each invocation roots its
+own parameters and local values. Copies of a callable share its environment.
+Function names and empty capture lists use a null environment. The descriptor
+marks captured collections and nested environments, including cycles. Captured
+handle metadata can outlive an explicit close through any alias.
+See [the callable contract](contracts/CALLABLES-EFFECTS.md).
+
+## Dynamic interfaces in 0.10.6
+
+Explicit packing allocates one traced box holding a shallow copy of the
+concrete value. The wrapper keeps the box reachable. Copying a wrapper shares
+the box and invoking an operation copies the receiver out of the box. The box
+descriptor traces private fields through the same visitors used for concrete
+values. The operation table is immutable and lives for the process.
+See [the interface contract](contracts/INTERFACES.md).
+
+## File streams in 0.10.7
+
+An open stream retains its handle metadata. The owner tag keeps it separate
+from foreign DLL resources. Aliases share position and close state. Explicit
+close removes the native root and invalidates all aliases. The collector
+does not close a stream. See [the stream contract](contracts/SERVICES.md).
+
+## Callback registrations in 0.10.9
+
+An active registration is a native root for the owner metadata and callable
+environment. Canceling it drops both roots and keeps the descriptor token
+closed. Registry descriptors have stable addresses until process exit.
+See [the callback contract](contracts/CALLBACKS.md).
+
+## Historical process region through 0.7
 
 This decision is made before introducing dynamic storage.
 
@@ -78,3 +159,16 @@ one compilation, not owning references or cross-context identities. The formatte
 second parsing context also lives until process exit. No garbage collector, new
 lifetime rule or per-object reclamation was introduced. OS file-identity queries
 close handles before returning; exact stdout writes restore the Windows CRT mode.
+
+Task-group ownership (1.0.0-dev.1): typed tickets retain results without retaining
+host work callbacks after completion. Captured scopes/queue entries can form
+managed cycles and remain under the existing precise collector. Native resources
+remain explicitly owned by operation adapters; cancellation acknowledgement and
+cleanup precede result publication. No GC finalizer or shared-memory threading
+is added. See [task-group contract](contracts/TASK-GROUPS.md).
+
+GUI ownership (1.0.0-dev.3): opaque Window copies share a ForeignHandle,
+callback, bounded event list and closed flag. Explicit close cancels the callback
+before native release; native storage owns controls/font/snapshot, managed storage
+owns queued Int events. Dropping a Window is not an automatic resource close.
+Applications drain their tasks first. [GUI lifetime](contracts/GUI-LIBRARY.md).

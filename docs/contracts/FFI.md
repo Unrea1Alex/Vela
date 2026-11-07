@@ -20,7 +20,8 @@ extern is contextual at module scope. Symbols use the Vela function name and
 must be ordinary ASCII C identifiers. Library names contain ASCII letters, digits,
 underscore or hyphen followed by .dll, total 5..128 bytes.
 No inline C, variadics, C++ objects/exceptions, custom calling convention, generics,
-contracts, callbacks or arbitrary pointer casts. Up to 16 parameters.
+contracts or arbitrary pointer casts. Up to 16 parameters. From dev.9,
+registered callback handles can cross the boundary as input parameters.
 Every foreign declaration requires process and state; io is additionally declared
 when the external operation performs I/O. Callers inherit these effects normally.
 Effects describe behavior; they grant no OS permission.
@@ -47,6 +48,7 @@ values are not promised across separate Vela calls or loader/runtime operations.
 | Bool | int32_t restricted to 0/1 | 4/4 |
 | String parameter only | VelaBytes { const char *data; uint64_t length; } | 16/8, fields at 0 and 8 |
 | ForeignHandle | void * externally; checked metadata handle inside Vela | pointer 8/8 |
+| CallbackHandle parameter only | const VelaCallback * | pointer 8/8 |
 | Unit result only | void | no value |
 
 The generated C prototype, not hand-written assembly, performs the platform's
@@ -83,18 +85,16 @@ that signature. Foreign functions must not secretly free an input handle; owned
 resources are released only through ffi_close. This rule is part of the trusted
 C contract, not something the compiler can prove.
 
-All wrapper metadata lives in the current process region. Libraries stay loaded
+Wrapper metadata uses the managed heap in 0.8. Libraries stay loaded
 until process exit; no unload is allowed while handles/functions could reference
 them. Unclosed native resources are not silently finalized by GC or by an inferred
 destructor. Explicit close is required; process teardown provides only OS cleanup.
 
-0.8 transition: tracing GC must root borrowed managed arguments for the full
-foreign call, trace handle metadata/owner references and preserve stable addresses
-for the non-moving design. Resource scopes/defer close resources deterministically;
-GC never substitutes for close. Registration of retained managed roots, callbacks,
-cross-thread invocation and callback cancellation require the separate 0.8.5/0.10
-contracts before implementation. An old compiler generation must never enable
-GC for frames without root metadata. ABI 1 extern values contain no GC header.
+Generated roots hold borrowed managed arguments across synchronous calls.
+Collection runs at Vela safepoints and keeps addresses stable. Resource scopes
+support deterministic close. The [callback contract](CALLBACKS.md) defines
+registration, thread checks and cancellation from dev.9. ABI 1 extern
+values contain no GC header.
 
 ## Loading, projects and delivery
 
@@ -126,3 +126,9 @@ locations. Reject generics/aggregates/returned strings/unknown effects before C.
 Test native manifest lock changes, staging, dependency resolution from a different
 cwd, refusing conflicting outputs and source preservation. Native verify plus
 three compiler generations; no GUI/TLS/Node/Python build dependency.
+### Explicit collector roots in 0.8
+
+`ffi_retain` and `ffi_release` register and remove a root for live handle
+metadata. Successful close invalidates aliases and drops the root. These
+operations leave the DLL ABI and borrowed byte lifetime unchanged. See the
+[foreign root contract](FFI-ROOTS.md) and [lexical cleanup](RESOURCES.md).

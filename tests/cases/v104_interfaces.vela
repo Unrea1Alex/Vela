@@ -1,0 +1,16 @@
+import "interface-owner.vela" as api;
+struct Fixed { value: String }
+impl api::Reader for Fixed { fn read(self: Fixed, label: String) -> String { return self.value; } }
+struct Bucket<T> { value: String }
+impl<T> api::Reader for Bucket<T> {
+    fn read(self: Bucket<T>, key: String) -> String { return self.value; }
+}
+fn relay<T>(x: T) -> T { return x; }
+fn load<T: api::Reader>(x: T) -> String effects { io, state } { return api::Reader::read(relay(x), "key"); }
+fn unused<T: api::Reader>(x: T) -> T { return relay(x); }
+fn main() -> Int effects { io, state } {
+    print(load(api::memory("settings")));
+    print(load(Fixed(value: "settings")));
+    print(api::Reader::read(Bucket<Int>(value: "settings"), "key"));
+    return 0;
+}

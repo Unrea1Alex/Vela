@@ -1,0 +1,30 @@
+type Key = distinct String;
+struct Node { name: String, children: List<Node> }
+
+fn make_node(n: Int) -> Node effects { state } {
+    let text = "[" + to_string(n) + "]";
+    return Node(name: str_slice(text, 1, str_len(text) - 1), children: list_new<Node>());
+}
+
+fn main() -> Unit effects { state, io, process } {
+    let root = make_node(123);
+    list_push(root.children, root);
+    let table = dict_new<Key, Option<Node>>();
+    dict_set(table, Key("id-" + to_string(1)), Option<Node>::Some(root));
+    let nodes = list_new<Node>();
+    list_push(nodes, make_node(10));
+    list_push(nodes, make_node(20));
+    list_push(nodes, make_node(30));
+    for node in nodes {
+        list_truncate(nodes, 0);
+        if node.name == "10" { continue; }
+        print(node.name);
+        if node.name == "20" { break; }
+    }
+    let item = dict_get(table, Key("id-1"));
+    if !dict_remove(table, Key("id-1")) { exit(1); }
+    match item {
+        Option::Some(node) => { print(list_get(node.children, 0).name); }
+        Option::None => { exit(1); }
+    }
+}

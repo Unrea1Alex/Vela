@@ -1,0 +1,5 @@
+fn pure() -> Int { return 0; }
+fn main() -> Int {
+    let effectful: fn() -> Int effects { io } = pure;
+    return effectful();
+}

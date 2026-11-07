@@ -1,0 +1,26 @@
+{
+  "stage": "1.0.1a",
+  "compiler_version": "1.0.0-dev.1",
+  "compiler_sha256": "9de156199a34ff700aafaccefa1e06a740f4da5d7a9aefa9508de0d6edab880c",
+  "native_passed": 1180,
+  "native_failed": 0,
+  "native_skipped": 0,
+  "compiler_generations": 3,
+  "c_fixed_point": true,
+  "bundler_fixed_point": true,
+  "network_checks": 21,
+  "gc_stress": "task group binary passed",
+  "gui": [
+    "cancel preserved completed results",
+    "rerun observed",
+    "close during requests drained",
+    "no curl or application processes after close",
+    "report only in owned directory"
+  ],
+  "platform": "Windows x64 MSVC",
+  "unperformed": [
+    "Linux async and GUI: unsupported"
+  ],
+  "bootstrap_launcher_version": "0.11.0",
+  "note": "Bootstrap log version belongs to the pre-existing orchestrator; all three compiler binaries report 1.0.0-dev.1."
+}

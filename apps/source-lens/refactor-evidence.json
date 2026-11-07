@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "from": "target_link",
+  "to": "call_target_link",
+  "revision": "8fcb1019ef422ceb83187cc79b5d7a854f5c5edf302fed05bb4f6022ab5b2bfb",
+  "lsp": {
+    "hover": true,
+    "references": 3,
+    "versioned_edits": 3,
+    "native_plan_parity": true,
+    "rename_applied": true
+  },
+  "changed_files": [
+    "report.vela"
+  ],
+  "stale_rejected": true
+}

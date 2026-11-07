@@ -3,6 +3,8 @@ import "../tests/cases/project-cases.vela";
 import "../tests/cases/stdlib-cases.vela";
 import "../tests/cases/testing-cases.vela";
 import "../tests/cases/ffi-cases.vela";
+import "../tests/cases/cache-cases.vela";
+import "../tests/cases/gui-cases.vela";
 // Native black-box language/driver tests. No Python modules or subprocesses.
 pub struct Outcome {
     code: Int,
@@ -172,7 +174,7 @@ pub fn fixture(s: Suite, cols: List<String>, formatted: Bool) -> Suite effects {
     if formatted {
         let fmt_args = compiler_command(s, "fmt", input);
         let first = invoke(s, fmt_args, 15000);
-        if diagnostic == "E001" || diagnostic == "E100" || diagnostic == "E206" || diagnostic == "E227" {
+        if diagnostic == "E001" || diagnostic == "E100" || diagnostic == "E206" || diagnostic == "E227" || name == "v09_raw_import" || name == "v103_method_generic" {
             return record(s, "fmt_reject_" + name, first.code == 1 && first.out == "", first.out + first.err);
         }
         if first.code == 1 && diagnostic == "E101" {
@@ -224,10 +226,26 @@ pub fn build(s: Suite, source_path: String, output: String) -> Outcome effects {
     strings_push(a, output);
     return invoke(s, a, 120000);
 }
+fn nested_call_source(depth: Int) -> String effects { state } {
+    let parts = strings_new();
+    strings_push(parts, "fn id(value:Int)->Int{return value;} fn main()->Unit effects{io}{print(");
+    for i in 0 .. depth { strings_push(parts, "id("); }
+    strings_push(parts, "42");
+    for i in 0 .. depth { strings_push(parts, ")"); }
+    strings_push(parts, ");}");
+    return strings_join(parts, "");
+}
 pub fn protocol(suite: Suite) -> Suite effects { state, io, process } {
     var s = suite;
     let input = s.dir + "/protocol.vela";
     let exe = s.dir + "/protocol.exe";
+    done(write_file(input, nested_call_source(150)));
+    let deep_build = build(s, input, exe);
+    let deep_run = invoke(s, command(exe), 10000);
+    s = record(s, "nested_calls_build_and_run", deep_build.code == 0 && deep_run.code == 0 && deep_run.out == "42\n", deep_build.err + deep_run.err);
+    done(write_file(input, nested_call_source(220)));
+    let depth = invoke(s, compiler_command(s, "check", input), 15000);
+    s = record(s, "nested_calls_depth_limit", depth.code == 1 && contains(depth.err, "E101"), depth.out + depth.err);
     let code = "fn main() -> Int ensures result == 0; { return 0; }";
     done(write_file(input, code));
     done(write_file(input, "type Id = distinct Int; struct Row { id: Id, values: List<String> } " + code));
@@ -694,6 +712,11 @@ pub fn main() -> Int effects { args, state, io, process } {
     done(make_dir(root + "/build/native"));
     let dir = replace(value(temp_dir(root + "/build/native")), "\\", "/");
     var suite = Suite(root: root, compiler: compiler, dir: dir, passed: 0, failed: 0);
+    done(write_file(dir + "/opaque-owner.vela", value(read_file(root + "/tests/cases/opaque-owner.vela"))));
+    done(write_file(dir + "/method-owner.vela", value(read_file(root + "/tests/cases/method-owner.vela"))));
+    done(write_file(dir + "/interface-owner.vela", value(read_file(root + "/tests/cases/interface-owner.vela"))));
+    done(write_file(dir + "/enum-equality-owner.vela", value(read_file(root + "/tests/cases/enum-equality-owner.vela"))));
+    done(write_file(dir + "/enum-equality-other.vela", value(read_file(root + "/tests/cases/enum-equality-other.vela"))));
     let names = dict_new<String, Bool>();
     let rows = split(replace(value(read_file(root + "/tests/cases/cases.tsv")), "\r\n", "\n"), 10);
     var i = 0;
@@ -729,9 +752,11 @@ pub fn main() -> Int effects { args, state, io, process } {
     suite = timelog_checks(suite);
     suite = module_checks(suite);
     suite = project_checks(suite);
+    suite = cache_checks(suite);
     suite = stdlib_checks(suite);
     suite = testing_checks(suite);
     suite = ffi_checks(suite);
+    suite = gui_checks(suite);
     let report = f"{{\"schema_version\":1,\"runner\":\"Vela\",\"passed\":{suite.passed:d},\"failed\":{suite.failed:d},\"skipped\":0}}\n";
     done(write_file(root + "/build/native/tests.json", report));
     print(report);

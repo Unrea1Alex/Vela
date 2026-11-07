@@ -1,0 +1,8 @@
+enum State {
+    Ready,
+    Done
+}
+fn main() -> Int effects { state } {
+    let invalid = dict_new<State, Int>();
+    return 0;
+}

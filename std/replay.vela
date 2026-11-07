@@ -1,0 +1,176 @@
+import "collections.vela" as collections;
+import "fs.vela" as fs;
+import "path.vela" as path;
+import "process.vela" as process;
+import "services.vela" as services;
+import "text.vela" as text;
+pub enum Request {
+    Read(path::Path, Int),
+    Publish(path::Path, text::Bytes),
+    Run(services::Command),
+    Now,
+    Entropy
+}
+pub enum Answer {
+    Read(Result<text::Bytes, fs::Error>),
+    Publish(Result<Bool, fs::Error>),
+    Run(Result<process::Completed, process::Error>),
+    Now(Result<Int, services::ObservationError>),
+    Entropy(Result<Int, services::ObservationError>)
+}
+pub enum Failure {
+    Full,
+    Busy,
+    Mismatch(Int, String, String),
+    Extra(Int),
+    Missing(Int)
+}
+struct Exchange {
+    request: List<String>,
+    answer: Answer
+}
+pub opaque struct Transcript {
+    exchanges: List<Exchange>
+}
+pub opaque struct Recorder {
+    files: dyn services::FileStore,
+    processes: dyn services::Processes,
+    clock: dyn services::Clock,
+    entropy: dyn services::Entropy,
+    exchanges: List<Exchange>,
+    busy: List<Bool>
+}
+struct Progress {
+    position: Int,
+    failure: Option<Failure>
+}
+pub opaque struct Replay {
+    transcript: Transcript,
+    progress: List<Progress>
+}
+pub fn recorder(files: dyn services::FileStore, processes: dyn services::Processes,
+    clock: dyn services::Clock, entropy: dyn services::Entropy) -> Recorder effects { state } {
+    let busy = list_new<Bool>();
+    list_push(busy, false);
+    return Recorder(files: files, processes: processes, clock: clock, entropy: entropy,
+        exchanges: list_new<Exchange>(), busy: busy);
+}
+fn tokens(request: Request) -> List<String> effects { state } {
+    let parts = list_new<String>();
+    match request {
+        Request::Read(file, limit) => {
+            list_push(parts, "read");
+            list_push(parts, file.value);
+            list_push(parts, to_string(limit));
+        }
+        Request::Publish(file, bytes) => {
+            list_push(parts, "publish");
+            list_push(parts, file.value);
+            list_push(parts, bytes.data);
+        }
+        Request::Run(command) => {
+            list_push(parts, "run");
+            list_push(parts, command.cwd.value);
+            list_push(parts, command.stdout.value);
+            list_push(parts, command.stderr.value);
+            list_push(parts, to_string(command.timeout_ms));
+            for argument in command.argv {
+                list_push(parts, argument);
+            }
+        }
+        Request::Now => {
+            list_push(parts, "now");
+        }
+        Request::Entropy => {
+            list_push(parts, "entropy");
+        }
+    }
+    return parts;
+}
+fn perform(target: Recorder, request: Request) -> Answer effects { io, process, state } {
+    return match request {
+        Request::Read(file, limit) => Answer::Read(target.files.read(file, limit)),
+        Request::Publish(file, bytes) => Answer::Publish(target.files.publish(file, bytes)),
+        Request::Run(command) => Answer::Run(target.processes.run(command)),
+        Request::Now => Answer::Now(target.clock.now_ms()),
+        Request::Entropy => Answer::Entropy(target.entropy.next_u32())
+    };
+}
+pub fn record(target: Recorder, request: Request) -> Result<Answer, Failure> effects { io, process,
+    state } {
+    if list_get(target.busy, 0) {
+        return Result<Answer, Failure>::Err(Failure::Busy);
+    }
+    if list_len(target.exchanges) >= 1024 {
+        return Result<Answer, Failure>::Err(Failure::Full);
+    }
+    list_set(target.busy, 0, true);
+    defer {
+        list_set(target.busy, 0, false);
+    }
+    let input = tokens(request);
+    let answer = perform(target, request);
+    list_push(target.exchanges, Exchange(request: input, answer: answer));
+    return Result<Answer, Failure>::Ok(answer);
+}
+pub fn transcript(target: Recorder) -> Transcript effects { state } {
+    return Transcript(exchanges: collections::copy(target.exchanges));
+}
+pub fn start(trace: Transcript) -> Replay effects { state } {
+    let progress = list_new<Progress>();
+    list_push(progress, Progress(position: 0, failure: Option<Failure>::None));
+    return Replay(transcript: trace, progress: progress);
+}
+fn equal(left: List<String>, right: List<String>) -> Bool effects { state } {
+    if list_len(left) != list_len(right) {
+        return false;
+    }
+    for i in 0 .. list_len(left) {
+        if list_get(left, i) != list_get(right, i) {
+            return false;
+        }
+    }
+    return true;
+}
+fn fault(session: Replay, current: Progress, failure: Failure) -> Failure effects { state } {
+    list_set(session.progress, 0, Progress(position: current.position,
+        failure: Option<Failure>::Some(failure)));
+    return failure;
+}
+pub fn next(session: Replay, request: Request) -> Result<Answer, Failure> effects { state } {
+    let current = list_get(session.progress, 0);
+    match current.failure {
+        Option::Some(error) => {
+            return Result<Answer, Failure>::Err(error);
+        }
+        Option::None => {}
+    }
+    if current.position >= list_len(session.transcript.exchanges) {
+        return Result<Answer, Failure>::Err(fault(session, current, Failure::Extra(
+            current.position)));
+    }
+    let expected = list_get(session.transcript.exchanges, current.position);
+    let actual = tokens(request);
+    if !equal(expected.request, actual) {
+        let failure = Failure::Mismatch(current.position, list_get(expected.request, 0), list_get(
+            actual, 0));
+        return Result<Answer, Failure>::Err(fault(session, current, failure));
+    }
+    list_set(session.progress, 0, Progress(position: current.position + 1,
+        failure: Option<Failure>::None));
+    return Result<Answer, Failure>::Ok(expected.answer);
+}
+pub fn finish(session: Replay) -> Result<Bool, Failure> effects { state } {
+    let current = list_get(session.progress, 0);
+    match current.failure {
+        Option::Some(error) => {
+            return Result<Bool, Failure>::Err(error);
+        }
+        Option::None => {}
+    }
+    if current.position != list_len(session.transcript.exchanges) {
+        return Result<Bool, Failure>::Err(fault(session, current, Failure::Missing(
+            current.position)));
+    }
+    return Result<Bool, Failure>::Ok(true);
+}

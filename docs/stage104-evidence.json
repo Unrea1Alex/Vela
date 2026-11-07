@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "stage": "0.10.4",
+  "compiler": "0.10.0-dev.4",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1086,
+    "failed": 0,
+    "skipped": 0
+  },
+  "fixed_point": true,
+  "bundler_fixed_point": true,
+  "focused_cases": 16,
+  "forced_gc": true,
+  "rename_edits": 6,
+  "mcp_sdk_suites_passed": 3,
+  "lsp": {
+    "requests": 200,
+    "elapsed_ms": 3091,
+    "baseline": {
+      "WorkingSet64": 7581696,
+      "HandleCount": 101
+    },
+    "final": {
+      "WorkingSet64": 8077312,
+      "HandleCount": 101
+    },
+    "utf16": true,
+    "stale_versions": true,
+    "parity": true,
+    "unchanged": true,
+    "methods": false,
+    "interfaces": true
+  },
+  "compiler_sha256": "2c0ec215ccc8a9254720740a19836e3cd8fa1760dc8e9f3ec8e314c3510b70fa",
+  "next_item": "0.10.5"
+}

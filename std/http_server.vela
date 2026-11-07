@@ -1,0 +1,426 @@
+import "http.vela" as http;
+import "text.vela" as text;
+extern "vela-http-server.dll" fn server_listen(port: Int) -> ForeignHandle effects { io, process,
+    state };
+extern "vela-http-server.dll" fn server_port(listener: ForeignHandle) -> Int effects { process,
+    state };
+extern "vela-http-server.dll" fn server_socket_error(
+    listener: ForeignHandle) -> Int effects { process, state };
+extern "vela-http-server.dll" fn server_accept(
+    listener: ForeignHandle) -> ForeignHandle effects { io, process, state };
+extern "vela-http-server.dll" fn server_receive(client: ForeignHandle) -> Int effects { io, process,
+    state };
+extern "vela-http-server.dll" fn server_byte(client: ForeignHandle,
+    index: Int) -> Int effects { process, state };
+extern "vela-http-server.dll" fn server_send(client: ForeignHandle,
+    bytes: String) -> Int effects { io, process, state };
+pub enum Error {
+    Invalid,
+    Bind,
+    Clock,
+    Closed,
+    Transport(Int),
+    Close(String)
+}
+pub enum Status {
+    Ok,
+    NotFound,
+    BadRequest,
+    HeaderLimit,
+    Internal
+}
+pub struct Request {
+    target: String,
+    method: http::Method
+}
+pub struct Response {
+    status: Status,
+    body: text::Bytes,
+    content_type: String
+}
+pub struct Progress {
+    active: Int,
+    responded: Int,
+    dropped: Int
+}
+enum Mode {
+    Read(String),
+    Write(String, Int)
+}
+struct Client {
+    socket: ForeignHandle,
+    deadline: Int,
+    mode: Mode
+}
+enum Advance {
+    Keep(Mode),
+    End(Bool)
+}
+struct Control {
+    now: Int,
+    closed: Bool
+}
+pub opaque struct Server {
+    listener: ForeignHandle,
+    port: Int,
+    timeout: Int,
+    handler: fn(Request) -> Response effects { state },
+    clients: List<Client>,
+    control: List<Control>
+}
+pub fn listen(port: Int, now: Int, timeout: Int, handler: fn(
+    Request) -> Response effects { state }) -> Result<Server, Error> effects { io, process,
+    state } {
+    if port < 0 || port > 65535 || now < 0 || now > 9223372036854655807 || timeout < 1 || timeout
+        > 120000 {
+        return Result<Server, Error>::Err(Error::Invalid);
+    }
+    let listener = server_listen(port);
+    if ffi_is_null(listener) {
+        return Result<Server, Error>::Err(Error::Bind);
+    }
+    let control = list_new<Control>();
+    list_push(control, Control(now: now, closed: false));
+    return Result<Server, Error>::Ok(Server(listener: listener, port: server_port(listener),
+        timeout: timeout, handler: handler, clients: list_new<Client>(), control: control));
+}
+pub fn port(server: Server) -> Int {
+    return server.port;
+}
+fn line_end(value: String, from: Int) -> Int {
+    var i = from;
+    while i + 1 < str_len(value) {
+        if str_byte(value, i) == 13 && str_byte(value, i + 1) == 10 {
+            return i;
+        }
+        i = i + 1;
+    }
+    return -1;
+}
+fn header_end(value: String) -> Int {
+    if str_len(value) < 4 {
+        return -1;
+    }
+    for i in 0 .. str_len(value) - 3 {
+        if str_byte(value, i) == 13 && str_byte(value, i + 1) == 10 && str_byte(value, i + 2) == 13
+            && str_byte(value, i + 3) == 10 {
+            return i + 4;
+        }
+    }
+    return -1;
+}
+fn field_equals(value: String, name: String) -> Bool {
+    if str_len(value) != str_len(name) {
+        return false;
+    }
+    for i in 0 .. str_len(value) {
+        var byte = str_byte(value, i);
+        if byte >= 65 && byte <= 90 {
+            byte = byte + 32;
+        }
+        if byte != str_byte(name, i) {
+            return false;
+        }
+    }
+    return true;
+}
+fn valid_name(name: String) -> Bool {
+    if name == "" {
+        return false;
+    }
+    for i in 0 .. str_len(name) {
+        let byte = str_byte(name, i);
+        if byte != 45 && !(byte >= 48 && byte <= 57) && !(byte >= 65 && byte <= 90) && !(byte >= 97
+            && byte <= 122) {
+            return false;
+        }
+    }
+    return true;
+}
+fn horizontal_space(byte: Int) -> Bool {
+    return byte == 32 || byte == 9;
+}
+fn decode(value: String) -> Option<Request> {
+    let end = line_end(value, 0);
+    if end < 14 || str_slice(value, end - 9, end) != " HTTP/1.1" {
+        return Option<Request>::None;
+    }
+    var start = 4;
+    var method = http::Method::Get;
+    if str_slice(value, 0, 4) != "GET " {
+        if end < 15 || str_slice(value, 0, 5) != "HEAD " {
+            return Option<Request>::None;
+        }
+        start = 5;
+        method = http::Method::Head;
+    }
+    let target = str_slice(value, start, end - 9);
+    if !http::valid_target(target) {
+        return Option<Request>::None;
+    }
+    var cursor = end + 2;
+    var host = false;
+    var length = false;
+    while cursor + 2 < str_len(value) {
+        let line = line_end(value, cursor);
+        if line <= cursor {
+            return Option<Request>::None;
+        }
+        var colon = cursor;
+        while colon < line && str_byte(value, colon) != 58 {
+            colon = colon + 1;
+        }
+        if colon == line {
+            return Option<Request>::None;
+        }
+        let name = str_slice(value, cursor, colon);
+        if !valid_name(name) {
+            return Option<Request>::None;
+        }
+        var begin = colon + 1;
+        var finish = line;
+        while begin < finish && horizontal_space(str_byte(value, begin)) {
+            begin = begin + 1;
+        }
+        while finish > begin && horizontal_space(str_byte(value, finish - 1)) {
+            finish = finish - 1;
+        }
+        for i in begin .. finish {
+            let byte = str_byte(value, i);
+            if byte != 9 && (byte < 32 || byte > 126) {
+                return Option<Request>::None;
+            }
+        }
+        if field_equals(name, "host") {
+            if host || begin == finish {
+                return Option<Request>::None;
+            }
+            for i in begin .. finish {
+                if horizontal_space(str_byte(value, i)) {
+                    return Option<Request>::None;
+                }
+            }
+            host = true;
+        } else if field_equals(name, "transfer-encoding") {
+            return Option<Request>::None;
+        } else if field_equals(name, "content-length") {
+            if length || str_slice(value, begin, finish) != "0" {
+                return Option<Request>::None;
+            }
+            length = true;
+        }
+        cursor = line + 2;
+    }
+    if !host || cursor + 2 != str_len(value) {
+        return Option<Request>::None;
+    }
+    return Option<Request>::Some(Request(target: target, method: method));
+}
+fn status_line(status: Status) -> String {
+    return match status {
+        Status::Ok => "200 OK",
+        Status::NotFound => "404 Not Found",
+        Status::BadRequest => "400 Bad Request",
+        Status::HeaderLimit => "431 Request Header Fields Too Large",
+        Status::Internal => "500 Internal Server Error"
+    };
+}
+pub fn valid_content_type(value: String) -> Bool {
+    if str_len(value) < 3 || str_len(value) > 128 {
+        return false;
+    }
+    var end = str_len(value);
+    for i in 0 .. str_len(value) {
+        if str_byte(value, i) == 59 {
+            if str_slice(value, i, str_len(value)) != "; charset=utf-8" {
+                return false;
+            }
+            end = i;
+            break;
+        }
+    }
+    var slash = -1;
+    for i in 0 .. end {
+        let byte = str_byte(value, i);
+        if byte == 47 {
+            if slash >= 0 {
+                return false;
+            }
+            slash = i;
+        } else if !((byte >= 48 && byte <= 57) || (byte >= 65 && byte <= 90) || (byte >= 97 && byte
+            <= 122) || byte == 45 || byte == 46 || byte == 43) {
+            return false;
+        }
+    }
+    return slash > 0 && slash < end - 1;
+}
+fn encode(answer: Response, head: Bool) -> String {
+    let body = answer.body.data;
+    let header = "HTTP/1.1 " + status_line(answer.status) + "\r\nContent-Type: "
+        + answer.content_type + "\r\nConnection: close\r\nContent-Length: " + to_string(str_len(
+        body)) + "\r\n\r\n";
+    if head {
+        return header;
+    }
+    return header + body;
+}
+fn is_head(value: String) -> Bool {
+    return str_len(value) >= 5 && str_slice(value, 0, 5) == "HEAD ";
+}
+fn reject_head(status: Status, head: Bool) -> Advance {
+    let body = text::Bytes(data: status_line(status));
+    return Advance::Keep(Mode::Write(encode(Response(status: status, body: body,
+        content_type: "text/plain; charset=utf-8"), head), 0));
+}
+fn receive(server: Server, socket: ForeignHandle, prefix: String) -> Advance effects { io, process,
+    state } {
+    let size = server_receive(socket);
+    if size == -1 {
+        return Advance::Keep(Mode::Read(prefix));
+    }
+    if size <= 0 || size > 8192 {
+        return Advance::End(false);
+    }
+    var method = prefix;
+    var offset = 0;
+    while str_len(method) < 5 && offset < size {
+        let byte = server_byte(socket, offset);
+        if byte < 0 || byte > 255 {
+            return Advance::End(false);
+        }
+        method = method + str_from_byte(byte);
+        offset = offset + 1;
+    }
+    let head = is_head(method);
+    if size > 8192 - str_len(prefix) {
+        return reject_head(Status::HeaderLimit, head);
+    }
+    let bytes = strings_new();
+    strings_push(bytes, prefix);
+    for i in 0 .. size {
+        let byte = server_byte(socket, i);
+        if byte < 0 || byte > 255 {
+            return Advance::End(false);
+        }
+        strings_push(bytes, str_from_byte(byte));
+    }
+    let data = strings_join(bytes, "");
+    let end = header_end(data);
+    if end < 0 {
+        if str_len(data) == 8192 {
+            return reject_head(Status::HeaderLimit, head);
+        }
+        return Advance::Keep(Mode::Read(data));
+    }
+    if end != str_len(data) {
+        return reject_head(Status::BadRequest, head);
+    }
+    match decode(data) {
+        Option::None => {
+            return reject_head(Status::BadRequest, head);
+        }
+        Option::Some(request) => {
+            let handler = server.handler;
+            let answer = handler(request);
+            if str_len(answer.body.data) > 1048576 || !valid_content_type(answer.content_type) {
+                return reject_head(Status::Internal, head);
+            }
+            return Advance::Keep(Mode::Write(encode(answer, head), 0));
+        }
+    }
+}
+fn transmit(socket: ForeignHandle, bytes: String, offset: Int) -> Advance effects { io, process,
+    state } {
+    var end = offset + 8192;
+    if end > str_len(bytes) {
+        end = str_len(bytes);
+    }
+    let sent = server_send(socket, str_slice(bytes, offset, end));
+    if sent == -1 {
+        return Advance::Keep(Mode::Write(bytes, offset));
+    }
+    if sent <= 0 || sent > end - offset {
+        return Advance::End(false);
+    }
+    if offset + sent == str_len(bytes) {
+        return Advance::End(true);
+    }
+    return Advance::Keep(Mode::Write(bytes, offset + sent));
+}
+fn step(server: Server, client: Client, now: Int) -> Advance effects { io, process, state } {
+    if now >= client.deadline {
+        return Advance::End(false);
+    }
+    return match client.mode {
+        Mode::Read(bytes) => receive(server, client.socket, bytes),
+        Mode::Write(bytes, offset) => transmit(client.socket, bytes, offset)
+    };
+}
+fn close_socket(handle: ForeignHandle) -> Result<Bool, Error> effects { io, process, state } {
+    return match ffi_close(handle, "server_socket_close") {
+        WriteResult::Ok => Result<Bool, Error>::Ok(true),
+        WriteResult::Err(error) => Result<Bool, Error>::Err(Error::Close(error))
+    };
+}
+pub fn poll(server: Server, now: Int) -> Result<Progress, Error> effects { io, process, state } {
+    let control = list_get(server.control, 0);
+    if control.closed {
+        return Result<Progress, Error>::Err(Error::Closed);
+    }
+    if now < control.now || now > 9223372036854655807 {
+        return Result<Progress, Error>::Err(Error::Clock);
+    }
+    list_set(server.control, 0, Control(now: now, closed: false));
+    var responded = 0;
+    var dropped = 0;
+    var i = 0;
+    while i < list_len(server.clients) {
+        var client = list_get(server.clients, i);
+        match step(server, client, now) {
+            Advance::Keep(mode) => {
+                client.mode = mode;
+                list_set(server.clients, i, client);
+                i = i + 1;
+            }
+            Advance::End(sent) => {
+                let closed = close_socket(client.socket)?;
+                if sent {
+                    responded = responded + 1;
+                } else {
+                    dropped = dropped + 1;
+                }
+                let last = list_len(server.clients) - 1;
+                list_set(server.clients, i, list_get(server.clients, last));
+                list_truncate(server.clients, last);
+            }
+        }
+    }
+    if list_len(server.clients) < 16 {
+        let client = server_accept(server.listener);
+        if ffi_is_null(client) {
+            let error = server_socket_error(server.listener);
+            if error != 0 {
+                return Result<Progress, Error>::Err(Error::Transport(error));
+            }
+        } else {
+            list_push(server.clients, Client(socket: client, deadline: now + server.timeout,
+                mode: Mode::Read("")));
+        }
+    }
+    return Result<Progress, Error>::Ok(Progress(active: list_len(server.clients),
+        responded: responded, dropped: dropped));
+}
+pub fn close(server: Server) -> Result<Bool, Error> effects { io, process, state } {
+    let control = list_get(server.control, 0);
+    if control.closed {
+        return Result<Bool, Error>::Ok(true);
+    }
+    while list_len(server.clients) > 0 {
+        let last = list_len(server.clients) - 1;
+        let closed = close_socket(list_get(server.clients, last).socket)?;
+        list_truncate(server.clients, last);
+    }
+    let closed = close_socket(server.listener)?;
+    list_set(server.control, 0, Control(now: control.now, closed: true));
+    return Result<Bool, Error>::Ok(true);
+}

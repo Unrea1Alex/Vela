@@ -1,0 +1,426 @@
+import "event_loop.vela" as loop;
+import "tasks.vela" as tasks;
+pub enum Error {
+    Invalid,
+    Closed,
+    Busy,
+    Capacity,
+    Clock
+}
+pub enum Step<T, E> {
+    Done(T),
+    Failed(E),
+    Wait(Int)
+}
+pub enum Outcome<T, E> {
+    Done(T),
+    Failed(E),
+    Cancelled,
+    TimedOut,
+    InvalidDelay
+}
+pub struct Completion<T, E> {
+    outcome: Outcome<T, E>,
+    cleanup: Result<Bool, String>
+}
+pub struct CleanupError {
+    operation: Int,
+    message: String
+}
+struct Control {
+    now: Int,
+    closed: Bool,
+    busy: Bool,
+    next: Int,
+    peak: Int
+}
+struct Owner {
+    closed: Bool,
+    children: Int
+}
+struct Work {
+    id: Int,
+    advance: fn(Int, Bool) -> Bool effects { io, process, state },
+    stop: fn() -> Unit effects { state }
+}
+pub opaque struct Scope {
+    queue: List<Work>,
+    control: List<Control>,
+    owner: List<Owner>,
+    errors: List<CleanupError>
+}
+struct Managed {
+    task: loop::Task<Unit>,
+    scope: Scope
+}
+pub opaque struct Group {
+    scheduler: loop::Loop<Unit>,
+    queue: List<Work>,
+    active: List<Work>,
+    managed: List<Managed>,
+    control: List<Control>,
+    root: List<Owner>,
+    errors: List<CleanupError>,
+    limit: Int
+}
+pub opaque struct Ticket<T, E> {
+    value: List<Option<Completion<T, E>>>,
+    cancellation: List<Bool>
+}
+pub opaque struct Task<T> {
+    carrier: loop::Task<Unit>,
+    value: List<Option<T>>,
+    owner: List<Owner>
+}
+struct Operation<T, E> {
+    scope: Scope,
+    id: Int,
+    deadline: Int,
+    wake: List<Int>,
+    started: List<Bool>,
+    ticket: Ticket<T, E>,
+    terminal: List<Option<Outcome<T, E>>>,
+    step: fn() -> Step<T, E> effects { io, process, state },
+    stop: fn() -> Bool effects { io, process, state },
+    cleanup: fn() -> Result<Bool, String> effects { io, process, state }
+}
+pub fn create(now: Int, limit: Int) -> Result<Group, Error> effects { state } {
+    if limit < 1 || limit > 128 || now < 0 || now > 9223372034707292160 {
+        return Result<Group, Error>::Err(Error::Invalid);
+    }
+    let control = list_new<Control>();
+    list_push(control, Control(now: now, closed: false, busy: false, next: 0, peak: 0));
+    let root = list_new<Owner>();
+    list_push(root, Owner(closed: false, children: 0));
+    return match loop::create<Unit>(now) {
+        Result::Err(_) => Result<Group, Error>::Err(Error::Clock),
+        Result::Ok(scheduler) => Result<Group, Error>::Ok(Group(scheduler: scheduler,
+            queue: list_new<Work>(), active: list_new<Work>(), managed: list_new<Managed>(),
+            control: control, root: root, errors: list_new<CleanupError>(), limit: limit))
+    };
+}
+pub fn root(group: Group) -> Scope {
+    return Scope(queue: group.queue, control: group.control, owner: group.root,
+        errors: group.errors);
+}
+pub fn time(scope: Scope) -> Int effects { state } {
+    return list_get(scope.control, 0).now;
+}
+pub fn peak(group: Group) -> Int effects { state } {
+    return list_get(group.control, 0).peak;
+}
+pub fn cleanup_errors(group: Group) -> List<CleanupError> effects { state } {
+    let copy = list_new<CleanupError>();
+    for error in group.errors {
+        list_push(copy, error);
+    }
+    return copy;
+}
+fn close_owner(owner: List<Owner>) -> Unit effects { state } {
+    var value = list_get(owner, 0);
+    value.closed = true;
+    list_set(owner, 0, value);
+}
+pub fn cancel<T, E>(ticket: Ticket<T, E>) -> Bool effects { state } {
+    match list_get(ticket.value, 0) {
+        Option::Some(_) => {
+            return false;
+        }
+        Option::None => {}
+    }
+    if list_get(ticket.cancellation, 0) {
+        return false;
+    }
+    list_set(ticket.cancellation, 0, true);
+    return true;
+}
+pub fn outcome<T, E>(ticket: Ticket<T, E>) -> Option<Completion<T, E>> effects { state } {
+    return list_get(ticket.value, 0);
+}
+pub async fn wait<T, E>(ticket: Ticket<T, E>) -> Completion<T, E> effects { state } {
+    while true {
+        match outcome(ticket) {
+            Option::Some(value) => {
+                return value;
+            }
+            Option::None => {
+                await sleep_ms(1);
+            }
+        }
+    }
+    return Completion<T, E>(outcome: Outcome<T, E>::InvalidDelay, cleanup: Result<Bool, String>::Ok(
+        true));
+}
+fn finish<T, E>(operation: Operation<T, E>, value: Outcome<T, E>) -> Bool effects { io, process,
+    state } {
+    let cleanup = operation.cleanup;
+    var cleanup_result = cleanup();
+    match cleanup_result {
+        Result::Ok(ok) => {
+            if !ok {
+                cleanup_result = Result<Bool, String>::Err("Cleanup returned false");
+            }
+        }
+        Result::Err(_) => {}
+    }
+    match cleanup_result {
+        Result::Err(message) => {
+            list_push(operation.scope.errors, CleanupError(operation: operation.id,
+                message: message));
+        }
+        Result::Ok(_) => {}
+    }
+    list_set(operation.ticket.value, 0, Option<Completion<T, E>>::Some(Completion<T, E>(
+        outcome: value, cleanup: cleanup_result)));
+    var owner = list_get(operation.scope.owner, 0);
+    owner.children = owner.children - 1;
+    list_set(operation.scope.owner, 0, owner);
+    return true;
+}
+fn advance<T, E>(operation: Operation<T, E>, now: Int, admitted: Bool) -> Bool effects { io,
+    process, state } {
+    var terminal = list_get(operation.terminal, 0);
+    match terminal {
+        Option::Some(_) => {}
+        Option::None => {
+            if list_get(operation.ticket.cancellation, 0) || list_get(operation.scope.owner,
+                0).closed {
+                terminal = Option<Outcome<T, E>>::Some(Outcome<T, E>::Cancelled);
+            } else if now >= operation.deadline {
+                terminal = Option<Outcome<T, E>>::Some(Outcome<T, E>::TimedOut);
+            }
+        }
+    }
+    match terminal {
+        Option::Some(value) => {
+            list_set(operation.terminal, 0, terminal);
+            let stop = operation.stop;
+            if list_get(operation.started, 0) && !stop() {
+                return false;
+            }
+            return finish(operation, value);
+        }
+        Option::None => {}
+    }
+    if !admitted || now < list_get(operation.wake, 0) {
+        return false;
+    }
+    list_set(operation.started, 0, true);
+    let step = operation.step;
+    match step() {
+        Step::Done(value) => {
+            return finish(operation, Outcome<T, E>::Done(value));
+        }
+        Step::Failed(error) => {
+            list_set(operation.terminal, 0, Option<Outcome<T, E>>::Some(Outcome<T, E>::Failed(
+                error)));
+        }
+        Step::Wait(delay) => {
+            if delay < 0 || delay > 2147483647 {
+                list_set(operation.terminal, 0, Option<Outcome<T, E>>::Some(Outcome<T,
+                    E>::InvalidDelay));
+            } else {
+                list_set(operation.wake, 0, now + delay);
+            }
+        }
+    }
+    return false;
+}
+pub fn post<T, E>(scope: Scope, timeout: Int, step: fn() -> Step<T, E> effects { io, process,
+    state }, stop: fn() -> Bool effects { io, process, state }, cleanup: fn() -> Result<Bool,
+    String> effects { io, process, state }) -> Result<Ticket<T, E>, Error> effects { state } {
+    var control = list_get(scope.control, 0);
+    if control.closed || list_get(scope.owner, 0).closed {
+        return Result<Ticket<T, E>, Error>::Err(Error::Closed);
+    }
+    if timeout < 1 || timeout > 2147483647 {
+        return Result<Ticket<T, E>, Error>::Err(Error::Invalid);
+    }
+    // Both queued and active operations remain in this list until completion.
+    if list_len(scope.queue) >= 256 || control.next == 9223372036854775807 {
+        return Result<Ticket<T, E>, Error>::Err(Error::Capacity);
+    }
+    let ticket = Ticket<T, E>(value: list_new<Option<Completion<T, E>>>(),
+        cancellation: list_new<Bool>());
+    list_push(ticket.value, Option<Completion<T, E>>::None);
+    list_push(ticket.cancellation, false);
+    let wake = list_new<Int>();
+    list_push(wake, control.now);
+    let started = list_new<Bool>();
+    list_push(started, false);
+    let terminal = list_new<Option<Outcome<T, E>>>();
+    list_push(terminal, Option<Outcome<T, E>>::None);
+    let operation = Operation<T, E>(scope: scope, id: control.next, deadline: control.now + timeout,
+        wake: wake, started: started, terminal: terminal, ticket: ticket, step: step, stop: stop,
+        cleanup: cleanup);
+    let advance = fn [ operation ](now: Int, admitted: Bool) -> Bool effects { io, process,
+        state } {
+        return advance(operation, now, admitted);
+    };
+    let cancel = fn [ ticket ]() -> Unit effects { state } {
+        let requested = cancel(ticket);
+    };
+    list_push(scope.queue, Work(id: control.next, advance: advance, stop: cancel));
+    control.next = control.next + 1;
+    list_set(scope.control, 0, control);
+    var owner = list_get(scope.owner, 0);
+    owner.children = owner.children + 1;
+    list_set(scope.owner, 0, owner);
+    return Result<Ticket<T, E>, Error>::Ok(ticket);
+}
+pub fn spawn<T>(group: Group, timeout: Int, action: async fn(Scope) -> T effects { io, process,
+    state }) -> Result<Task<T>, Error> effects { io, process, state } {
+    let control = list_get(group.control, 0);
+    if control.busy {
+        return Result<Task<T>, Error>::Err(Error::Busy);
+    }
+    if control.closed {
+        return Result<Task<T>, Error>::Err(Error::Closed);
+    }
+    if list_len(group.managed) >= 128 {
+        return Result<Task<T>, Error>::Err(Error::Capacity);
+    }
+    let owner = list_new<Owner>();
+    list_push(owner, Owner(closed: false, children: 0));
+    let scope = Scope(queue: group.queue, control: group.control, owner: owner,
+        errors: group.errors);
+    let values = list_new<Option<T>>();
+    list_push(values, Option<T>::None);
+    let body = async fn [ action, scope, values ]() -> Unit effects { io, process, state } {
+        defer {
+            close_owner(scope.owner);
+        }
+        let value = await action(scope);
+        list_set(values, 0, Option<T>::Some(value));
+    };
+    match tasks::submit(group.scheduler, timeout, body) {
+        Result::Err(_) => {
+            return Result<Task<T>, Error>::Err(Error::Invalid);
+        }
+        Result::Ok(carrier) => {
+            list_push(group.managed, Managed(task: carrier, scope: scope));
+            return Result<Task<T>, Error>::Ok(Task<T>(carrier: carrier, value: values,
+                owner: owner));
+        }
+    }
+}
+pub fn cancel_task<T>(task: Task<T>) -> Bool effects { state } {
+    let requested = loop::cancel(task.carrier);
+    if requested {
+        close_owner(task.owner);
+    }
+    return requested;
+}
+pub fn task_outcome<T>(task: Task<T>) -> Option<loop::Outcome<T>> effects { state } {
+    if list_get(task.owner, 0).children != 0 {
+        return Option<loop::Outcome<T>>::None;
+    }
+    return match loop::outcome(task.carrier) {
+        Option::None => Option<loop::Outcome<T>>::None,
+        Option::Some(value) => Option<loop::Outcome<T>>::Some(match value {
+            loop::Outcome::Done(_) => match list_get(task.value, 0) {
+                Option::Some(found) => loop::Outcome<T>::Done(found),
+                Option::None => loop::Outcome<T>::Failed("Task returned no value")
+            },
+            loop::Outcome::Failed(error) => loop::Outcome<T>::Failed(error),
+            loop::Outcome::Cancelled => loop::Outcome<T>::Cancelled,
+            loop::Outcome::TimedOut => loop::Outcome<T>::TimedOut
+        })
+    };
+}
+pub fn shutdown(group: Group) -> Result<Bool, Error> effects { state } {
+    var control = list_get(group.control, 0);
+    if control.busy {
+        return Result<Bool, Error>::Err(Error::Busy);
+    }
+    control.closed = true;
+    list_set(group.control, 0, control);
+    close_owner(group.root);
+    for managed in group.managed {
+        close_owner(managed.scope.owner);
+    }
+    for work in group.queue {
+        let cancel = work.stop;
+        cancel();
+    }
+    return match loop::shutdown(group.scheduler) {
+        Result::Ok(value) => Result<Bool, Error>::Ok(value),
+        Result::Err(_) => Result<Bool, Error>::Err(Error::Busy)
+    };
+}
+pub fn tick(group: Group, now: Int) -> Result<Bool, Error> effects { io, process, state } {
+    var control = list_get(group.control, 0);
+    if control.busy {
+        return Result<Bool, Error>::Err(Error::Busy);
+    }
+    if now < control.now || now > 9223372034707292160 {
+        return Result<Bool, Error>::Err(Error::Clock);
+    }
+    control.now = now;
+    control.busy = true;
+    list_set(group.control, 0, control);
+    defer {
+        var latest = list_get(group.control, 0);
+        latest.busy = false;
+        list_set(group.control, 0, latest);
+    }
+    let turn = loop::tick(group.scheduler, now);
+    var m = 0;
+    while m < list_len(group.managed) {
+        let item = list_get(group.managed, m);
+        var terminal = false;
+        match loop::outcome(item.task) {
+            Option::None => {}
+            Option::Some(_) => {
+                terminal = true;
+                close_owner(item.scope.owner);
+            }
+        }
+        if terminal && list_get(item.scope.owner, 0).children == 0 {
+            list_set(group.managed, m, list_get(group.managed, list_len(group.managed) - 1));
+            list_truncate(group.managed, list_len(group.managed) - 1);
+        } else {
+            m = m + 1;
+        }
+    }
+    let ceiling = list_get(group.control, 0).next;
+    var index = 0;
+    while index < list_len(group.queue) {
+        let work = list_get(group.queue, index);
+        if work.id >= ceiling {
+            break;
+        }
+        var admitted = false;
+        for active in group.active {
+            if active.id == work.id {
+                admitted = true;
+            }
+        }
+        if !admitted && list_len(group.active) < group.limit {
+            list_push(group.active, work);
+            admitted = true;
+            var latest = list_get(group.control, 0);
+            if list_len(group.active) > latest.peak {
+                latest.peak = list_len(group.active);
+                list_set(group.control, 0, latest);
+            }
+        }
+        let advance = work.advance;
+        if advance(now, admitted) {
+            for i in 0 .. list_len(group.active) {
+                if list_get(group.active, i).id == work.id {
+                    list_set(group.active, i, list_get(group.active, list_len(group.active) - 1));
+                    list_truncate(group.active, list_len(group.active) - 1);
+                    break;
+                }
+            }
+            for i in index .. list_len(group.queue) - 1 {
+                list_set(group.queue, i, list_get(group.queue, i + 1));
+            }
+            list_truncate(group.queue, list_len(group.queue) - 1);
+        } else {
+            index = index + 1;
+        }
+    }
+    return Result<Bool, Error>::Ok(list_len(group.queue) == 0 && list_len(group.managed) == 0);
+}

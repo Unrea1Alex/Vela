@@ -22,14 +22,27 @@ test('setup idempotence, preserved config and real MCP handshake',async()=>{
   execFileSync(process.execPath,args,{encoding:'utf8'});
   assert.equal((await fs.stat(configPath)).mtimeMs,stat.mtimeMs);
   const doctor=JSON.parse(execFileSync(process.execPath,[path.join(workspace,'vela-codex.mjs'),'--doctor'],{encoding:'utf8'}));
-  assert.equal(doctor.tools.length,5);assert.equal(doctor.client_discovery,'not_tested');
+  assert.equal(doctor.tools.length,7);assert.equal(doctor.client_discovery,'not_tested');
   assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib/json.vela'),'utf8'),await fs.readFile(path.join(root,'std/json.vela'),'utf8'));
+  assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib/event_loop.vela'),'utf8'),await fs.readFile(path.join(root,'std/event_loop.vela'),'utf8'));
+  assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib/tasks.vela'),'utf8'),await fs.readFile(path.join(root,'std/tasks.vela'),'utf8'));
+  for(const name of ['task_group','async_io','gui','http','http_server']) assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib',name+'.vela'),'utf8'),await fs.readFile(path.join(root,'std',name+'.vela'),'utf8'));
   const client=new Client({name:'vela-installed-library-gate',version:'1'});
   const transport=new StdioClientTransport({command:process.execPath,args:[path.join(pkg,'dist/index.js'),'--config',configPath]});
   try {
    await client.connect(transport);
    const checked=await client.callTool({name:'vela_check',arguments:{path:'suite.vela',text:'import "vela-stdlib/testing.vela" as t; test "installed library" {t::equal(2,2,"numbers");}'}});
    assert.equal(checked.structuredContent.status,'ok');
+   const loop=await client.callTool({name:'vela_check',arguments:{path:'loop.vela',text:'import "vela-stdlib/event_loop.vela" as loop; import "vela-stdlib/process.vela" as process; test "installed process loop" effects { state } {let scheduler=loop::create<process::Completed>(0);}' }});
+   assert.equal(loop.structuredContent.status,'ok');
+   const tasks=await client.callTool({name:'vela_check',arguments:{path:'tasks.vela',text:'import "vela-stdlib/tasks.vela" as tasks; async fn wait() -> Int effects {state} {await sleep_ms(1);return 42;} fn main() -> Int {return 0;}' }});
+   assert.equal(tasks.structuredContent.status,'ok');
+   const grouped=await client.callTool({name:'vela_check',arguments:{path:'grouped.vela',text:'import "vela-stdlib/task_group.vela" as g; import "vela-stdlib/async_io.vela" as aio; import "vela-stdlib/http.vela" as http; import "vela-stdlib/path.vela" as path; async fn fetch(scope:g::Scope, transport:dyn http::Transport, request:http::Request) -> Result<http::Response,aio::Error<http::Error>> effects{state} { return await aio::fetch(scope,transport,request,path::Path(value:"C:/"),100); } fn main()->Int{return 0;}' }});
+   assert.equal(grouped.structuredContent.status,'ok');
+   const http=await client.callTool({name:'vela_check',arguments:{path:'http-api.vela',text:'import "vela-stdlib/http.vela" as h; import "vela-stdlib/http_server.vela" as s; import "vela-stdlib/text.vela" as t; fn configured()->Result<h::Request,h::Error> effects{state} {let req=h::from_url("https://localhost/health",100,1024)?;let post=h::with_method(req,h::Method::Post,t::Bytes(data:"{}"))?;let headers=list_new<h::Header>();list_push(headers,h::Header(name:"Content-Type",value:"application/json"));return h::with_headers(post,headers);} fn response()->s::Response{return s::Response(status:s::Status::Ok,body:t::Bytes(data:"{}"),content_type:"application/json");} fn main()->Int{return 0;}' }});
+   assert.equal(http.structuredContent.status,'ok');
+   const enums=await client.callTool({name:'vela_check',arguments:{path:'enums.vela',text:'enum State {Ready,Done} fn main()->Int {let same=State::Ready==State::Ready;let different=State::Ready!=State::Done;return 0;}' }});
+   assert.equal(enums.structuredContent.status,'ok');
    const help=await client.callTool({name:'vela_get_help',arguments:{topic:'testing'}});
    assert.equal(help.structuredContent.status,'ok');assert.match(help.structuredContent.data.text,/schema_version=2/);
   } finally {await client.close();await transport.close();}

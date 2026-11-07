@@ -1,0 +1,278 @@
+import "../../std/gui.vela" as ui;
+import "ui.vela" as form;
+import "model.vela" as model;
+import "engine.vela" as engine;
+import "../../std/http.vela" as http;
+import "../../std/http_server.vela" as server;
+import "../../std/path.vela" as path;
+import "../../std/fs.vela" as fs;
+import "../../std/text.vela" as text;
+import "../../std/result.vela" as result;
+struct Options {
+    config: String,
+    output: String,
+    headless: Bool,
+    cancel_after: Int
+}
+fn string_result(value: StringResult) -> Result<String, String> {
+    return match value {
+        StringResult::Ok(found) => Result<String, String>::Ok(found),
+        StringResult::Err(error) => Result<String, String>::Err(error)
+    };
+}
+fn options() -> Result<Options, String> effects { args, io, process } {
+    let base = result::explain(path::resource_base(), "Cannot locate executable resources")?;
+    var value = Options(config: base.value + "/assets/demo.json", output: env("TEMP"),
+        headless: false, cancel_after: 0);
+    var i = 0;
+    while i < arg_count() {
+        let flag = string_result(arg(i))?;
+        if flag == "--headless" {
+            value.headless = true;
+        } else if flag == "--config" || flag == "--output" || flag == "--cancel-after" {
+            i = i + 1;
+            if i >= arg_count() {
+                return Result<Options, String>::Err("Missing value for " + flag);
+            }
+            let item = string_result(arg(i))?;
+            if flag == "--config" {
+                value.config = item;
+            } else if flag == "--output" {
+                value.output = item;
+            } else {
+                match parse_int(item) {
+                    IntResult::Err(_) => {
+                        return Result<Options, String>::Err("Invalid cancellation delay");
+                    }
+                    IntResult::Ok(delay) => {
+                        value.cancel_after = delay;
+                    }
+                }
+                if value.cancel_after < 1 || value.cancel_after > 120000 {
+                    return Result<Options, String>::Err("Cancellation delay must be 1..120000 ms");
+                }
+            }
+        } else {
+            return Result<Options, String>::Err("Unknown argument: " + flag);
+        }
+        i = i + 1;
+    }
+    return Result<Options, String>::Ok(value);
+}
+fn demo(request: server::Request) -> server::Response {
+    if request.target == "/health" {
+        return server::Response(content_type: "application/octet-stream",
+            status: server::Status::Ok, body: text::Bytes(data: "ready"));
+    }
+    if request.target == "/unicode" {
+        return server::Response(content_type: "application/octet-stream",
+            status: server::Status::Ok, body: text::Bytes(
+            data: "Москва: сервис доступен"));
+    }
+    if request.target == "/failed" {
+        return server::Response(content_type: "application/octet-stream",
+            status: server::Status::Internal, body: text::Bytes(data: "maintenance"));
+    }
+    if request.target == "/large" {
+        return server::Response(content_type: "application/octet-stream",
+            status: server::Status::Ok, body: text::Bytes(
+            data: "0123456789012345678901234567890123456789012345678901234567890123456789"));
+    }
+    return server::Response(content_type: "application/octet-stream",
+        status: server::Status::NotFound, body: text::Bytes(data: "missing"));
+}
+fn poll_server(listeners: List<server::Server>, clock: Int) -> Result<Bool, String> effects { io,
+    process, state } {
+    for listener in listeners {
+        let progress = result::explain(server::poll(listener, clock), "Demo server poll failed")?;
+    }
+    return Result<Bool, String>::Ok(true);
+}
+fn save(run: engine::Run, directory: String) -> Result<Bool, String> effects { io, state } {
+    let content = model::report(run.rows, list_get(run.peak, 0), list_len(run.cleanups))?;
+    return result::explain(fs::write_atomic(path::Path(value: directory + "/report.json"),
+        text::Bytes(data: content)), "Cannot publish report.json");
+}
+fn execute(config: model::Settings, transport: dyn http::Transport, directory: String,
+    demo_port: Int, listeners: List<server::Server>, options: Options) -> Result<Int,
+    String> effects { io, process, state } {
+    var run = engine::create(config, transport, path::Path(value: directory), demo_port)?;
+    let owned = list_new<engine::Run>();
+    list_push(owned, run);
+    let events = list_new<Int>();
+    let windows = list_new<ui::Window>();
+    defer {
+        for item in owned {
+            engine::close(item);
+        }
+        for window in windows {
+            let closed = ui::close(window);
+        }
+    }
+    if !options.headless {
+        list_push(windows, form::open()?);
+    }
+    var started = engine::now()?;
+    var painted = 0;
+    var finished = false;
+    var closing = false;
+    var notice = "";
+    var last_view = "";
+    var last_message = "";
+    while true {
+        for window in windows {
+            for code in ui::pump(window, 5)? {
+                list_push(events, code);
+            }
+        }
+        for event in events {
+            if event == 103 {
+                closing = true;
+                if !finished {
+                    engine::cancel(run);
+                }
+            } else if !closing && event == 105 && !finished {
+                engine::cancel(run);
+            } else if !closing && event == 101 && finished {
+                engine::close(run);
+                run = engine::create(config, transport, path::Path(value: directory), demo_port)?;
+                list_set(owned, 0, run);
+                finished = false;
+                started = engine::now()?;
+                notice = "";
+            } else if !closing && event == 102 && finished {
+                match save(run, directory) {
+                    Result::Ok(_) => {
+                        notice = "Saved: " + directory + "/report.json";
+                    }
+                    Result::Err(error) => {
+                        notice = error;
+                    }
+                }
+            } else if !closing && event == 104 {
+                notice = "GET checks with bounded concurrency. Demo failures are intentional.";
+            }
+        }
+        list_truncate(events, 0);
+        let current = engine::now()?;
+        let served = poll_server(listeners, current)?;
+        if !finished {
+            if options.cancel_after > 0 && current - started >= options.cancel_after {
+                engine::cancel(run);
+            }
+            finished = engine::tick(run, current)?;
+            if finished {
+                engine::close(run);
+                let saved = save(run, directory)?;
+                notice = "Saved: " + directory + "/report.json";
+                print(model::counts(run.rows));
+                print("REPORT=" + directory + "/report.json");
+            }
+        }
+        if current - painted >= 100 || finished {
+            for window in windows {
+                let content = model::display(run.rows);
+                let summary = model::counts(run.rows) + "\r\n" + notice;
+                var view = true;
+                var message = true;
+                if content != last_view {
+                    view = ui::set_text(window, content);
+                    last_view = content;
+                }
+                if summary != last_message {
+                    message = ui::status(window, summary);
+                    last_message = summary;
+                }
+                var busy = 1;
+                if finished {
+                    busy = 0;
+                }
+                var cancelling = 0;
+                if list_get(run.cancelled, 0) {
+                    cancelling = 1;
+                }
+                let buttons = form::buttons(window, busy == 1, cancelling == 1);
+                if !view || !message || !buttons {
+                    return Result<Int, String>::Err("Cannot update window");
+                }
+            }
+            painted = current;
+        }
+        if finished && options.headless {
+            return Result<Int, String>::Ok(engine::code(run));
+        }
+        if finished && closing {
+            return Result<Int, String>::Ok(0);
+        }
+        if options.headless {
+            let slept = host_sleep(2);
+        }
+    }
+    return Result<Int, String>::Err("Unexpected event loop exit");
+}
+fn application(options: Options) -> Result<Int, String> effects { io, process, state } {
+    let data = result::explain(fs::read_text(path::Path(value: options.config), 65536),
+        "Cannot read settings (UTF-8, max 64 KiB)")?;
+    let config = model::parse(data.data)?;
+    var curl = config.curl;
+    if curl == "system" {
+        curl = env("SystemRoot") + "/System32/curl.exe";
+    }
+    var ca = Option<path::Path>::None;
+    if config.ca != "" {
+        ca = Option<path::Path>::Some(path::Path(value: config.ca));
+    }
+    let transport = result::map_error(http::curl(path::Path(value: curl), ca), model::http_error)?;
+    let base = string_result(absolute_path(options.output))?;
+    let directory = string_result(temp_dir(base))?;
+    let listeners = list_new<server::Server>();
+    defer {
+        for listener in listeners {
+            match server::close(listener) {
+                Result::Ok(_) => {}
+                Result::Err(_) => {
+                    eprint("Demo listener cleanup failed");
+                }
+            }
+        }
+    }
+    var port = 0;
+    if config.demo {
+        let listener = result::explain(server::listen(0, engine::now()?, 5000, demo),
+            "Cannot start demo listener")?;
+        list_push(listeners, listener);
+        port = server::port(listener);
+    }
+    return execute(config, dyn http::Transport(transport), directory, port, listeners, options);
+}
+fn main() -> Int effects { args, io, process, state } {
+    if arg_count() == 1 {
+        match arg(0) {
+            StringResult::Ok(flag) => {
+                if flag == "--help" {
+                    print("PulseDeck 1.0 / Vela " + model::language_version()
+                        + "\nNo arguments: interactive local demo.\n--headless --config FILE --output EXISTING_DIRECTORY --cancel-after MS\nEach launch creates a unique report directory. Windows x64; curl >= 8.4.\nExit: 0 healthy, 1 failed probes, 2 application error, 3 cancelled.");
+                    return 0;
+                }
+            }
+            StringResult::Err(_) => {}
+        }
+    }
+    match options() {
+        Result::Err(error) => {
+            eprint(error);
+            return 2;
+        }
+        Result::Ok(settings) => {
+            match application(settings) {
+                Result::Ok(code) => {
+                    return code;
+                }
+                Result::Err(error) => {
+                    eprint(error);
+                    return 2;
+                }
+            }
+        }
+    }
+}

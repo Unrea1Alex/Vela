@@ -1,0 +1,195 @@
+import "text.vela" as text;
+extern "vela-gui.dll" fn gui_open(title: String, caption: String, width: Int, height: Int,
+    readonly: Int, limit: Int, close_id: Int, changed_id: Int) -> ForeignHandle effects { io,
+    process, state };
+extern "vela-gui.dll" fn gui_button(owner: ForeignHandle, id: Int,
+    label: String) -> Bool effects { io, process, state };
+extern "vela-gui.dll" fn gui_attach(owner: ForeignHandle,
+    callback: CallbackHandle) -> Bool effects { io, process, state };
+extern "vela-gui.dll" fn gui_text(owner: ForeignHandle, value: String) -> Bool effects { io,
+    process, state };
+extern "vela-gui.dll" fn gui_status(owner: ForeignHandle, value: String) -> Bool effects { io,
+    process, state };
+extern "vela-gui.dll" fn gui_enabled(owner: ForeignHandle, id: Int,
+    enabled: Int) -> Bool effects { io, process, state };
+extern "vela-gui.dll" fn gui_snapshot(owner: ForeignHandle) -> Int effects { io, process, state };
+extern "vela-gui.dll" fn gui_byte(owner: ForeignHandle, index: Int) -> Int effects { io, process,
+    state };
+extern "vela-gui.dll" fn gui_pump(owner: ForeignHandle, wait_ms: Int) -> Int effects { io, process,
+    state };
+pub struct Button {
+    id: Int,
+    label: String
+}
+pub struct Config {
+    title: String,
+    caption: String,
+    width: Int,
+    height: Int,
+    read_only: Bool,
+    text_limit: Int,
+    buttons: List<Button>,
+    close_id: Int,
+    changed_id: Int
+}
+pub opaque struct Window {
+    owner: ForeignHandle,
+    callback: CallbackHandle,
+    events: List<Int>,
+    closed: List<Bool>,
+    limit: Int
+}
+fn valid(value: String, limit: Int) -> Bool {
+    if str_len(value) > limit || text::invalid_offset(value) >= 0 {
+        return false;
+    }
+    for i in 0 .. str_len(value) {
+        if str_byte(value, i) == 0 {
+            return false;
+        }
+    }
+    return true;
+}
+pub fn open(config: Config) -> Result<Window, String> effects { io, process, state } {
+    if platform() != "windows" {
+        return Result<Window, String>::Err("GUI requires Windows 10+ x64");
+    }
+    if !valid(config.title, 4096) || !valid(config.caption, 4096) || config.width < 320
+        || config.width > 1600 || config.height < 240 || config.height > 1200 || config.text_limit
+        < 1 || config.text_limit > 65536 || config.close_id < 1 || config.close_id > 65535
+        || config.changed_id < 0 || config.changed_id > 65535 || config.close_id
+        == config.changed_id || list_len(config.buttons) < 1 || list_len(config.buttons) > 5 {
+        return Result<Window, String>::Err("Invalid GUI configuration");
+    }
+    var found = false;
+    for i in 0 .. list_len(config.buttons) {
+        let button = list_get(config.buttons, i);
+        if !valid(button.label, 4096) || button.id < 1 || button.id > 65535 || button.id
+            == config.changed_id {
+            return Result<Window, String>::Err("Invalid GUI button");
+        }
+        for j in 0 .. i {
+            if list_get(config.buttons, j).id == button.id {
+                return Result<Window, String>::Err("Duplicate GUI button ID");
+            }
+        }
+        if button.id == config.close_id {
+            found = true;
+        }
+    }
+    if !found {
+        return Result<Window, String>::Err("Missing close button");
+    }
+    var readonly = 0;
+    if config.read_only {
+        readonly = 1;
+    }
+    let owner = gui_open(config.title, config.caption, config.width, config.height, readonly,
+        config.text_limit, config.close_id, config.changed_id);
+    if ffi_is_null(owner) {
+        return Result<Window, String>::Err("Cannot create GUI window");
+    }
+    var keep = false;
+    defer {
+        if !keep {
+            let released = ffi_close(owner, "gui_close");
+        }
+    }
+    for button in config.buttons {
+        if !gui_button(owner, button.id, button.label) {
+            return Result<Window, String>::Err("Cannot create GUI button");
+        }
+    }
+    let events = list_new<Int>();
+    let enqueue = fn [ events ](code: Int) -> Int effects { state } {
+        if list_len(events) >= 64 {
+            return 1;
+        }
+        list_push(events, code);
+        return 0;
+    };
+    match ffi_callback_register(owner, enqueue) {
+        CallbackResult::Err(message) => {
+            return Result<Window, String>::Err(message);
+        }
+        CallbackResult::Ok(callback) => {
+            if !gui_attach(owner, callback) {
+                let cancelled = ffi_callback_cancel(callback);
+                return Result<Window, String>::Err("Cannot attach GUI event queue");
+            }
+            let closed = list_new<Bool>();
+            list_push(closed, false);
+            keep = true;
+            return Result<Window, String>::Ok(Window(owner: owner, callback: callback,
+                events: events, closed: closed, limit: config.text_limit));
+        }
+    }
+}
+pub fn close(window: Window) -> Result<Bool, String> effects { io, process, state } {
+    if list_get(window.closed, 0) {
+        return Result<Bool, String>::Ok(true);
+    }
+    match ffi_callback_cancel(window.callback) {
+        WriteResult::Err(message) => {
+            return Result<Bool, String>::Err(message);
+        }
+        WriteResult::Ok => {}
+    }
+    match ffi_close(window.owner, "gui_close") {
+        WriteResult::Err(message) => {
+            return Result<Bool, String>::Err(message);
+        }
+        WriteResult::Ok => {}
+    }
+    list_set(window.closed, 0, true);
+    list_truncate(window.events, 0);
+    return Result<Bool, String>::Ok(true);
+}
+pub fn pump(window: Window, wait_ms: Int) -> Result<List<Int>, String> effects { io, process,
+    state } {
+    if list_get(window.closed, 0) || wait_ms < 0 || wait_ms > 100 {
+        return Result<List<Int>, String>::Err("Closed GUI or invalid wait");
+    }
+    if gui_pump(window.owner, wait_ms) != 0 {
+        return Result<List<Int>, String>::Err("GUI dispatch failed or event queue overflow");
+    }
+    let events = list_new<Int>();
+    for code in window.events {
+        list_push(events, code);
+    }
+    list_truncate(window.events, 0);
+    return Result<List<Int>, String>::Ok(events);
+}
+pub fn set_text(window: Window, value: String) -> Bool effects { io, process, state } {
+    return !list_get(window.closed, 0) && valid(value, window.limit) && gui_text(window.owner,
+        value);
+}
+pub fn status(window: Window, value: String) -> Bool effects { io, process, state } {
+    return !list_get(window.closed, 0) && valid(value, 4096) && gui_status(window.owner, value);
+}
+pub fn enabled(window: Window, id: Int, enabled: Bool) -> Bool effects { io, process, state } {
+    var value = 0;
+    if enabled {
+        value = 1;
+    }
+    return !list_get(window.closed, 0) && gui_enabled(window.owner, id, value);
+}
+pub fn snapshot(window: Window) -> Result<String, String> effects { io, process, state } {
+    if list_get(window.closed, 0) {
+        return Result<String, String>::Err("GUI is closed");
+    }
+    let count = gui_snapshot(window.owner);
+    if count < 0 || count > window.limit {
+        return Result<String, String>::Err(
+            "Editor exceeds UTF-8 byte limit or has invalid encoding");
+    }
+    let bytes = strings_new();
+    for i in 0 .. count {
+        let byte = gui_byte(window.owner, i);
+        if byte < 0 || byte > 255 {
+            return Result<String, String>::Err("Invalid GUI snapshot");
+        }
+        strings_push(bytes, str_from_byte(byte));
+    }
+    return Result<String, String>::Ok(strings_join(bytes, ""));
+}

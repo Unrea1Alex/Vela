@@ -1,0 +1,4 @@
+struct Example {}
+impl Example {}
+impl Example {}
+fn main() -> Int { return 0; }

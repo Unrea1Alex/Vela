@@ -1,0 +1,11 @@
+import "opaque-owner.vela" as api;
+fn identity<T>(value: T) -> T { return value; }
+fn main() -> Int effects { io, state } {
+    let original = identity(api::create(7));
+    let boxed = api::wrap(original);
+    let copy = api::changed(api::unwrap(boxed));
+    var open = api::Open(value: 3);
+    open.value = 4;
+    print(f"{api::number(copy):d},{api::scalar(original):d},{api::scalar(copy):d},{api::shared(original):s},{api::first(original):s},{open.value:d}");
+    return 0;
+}

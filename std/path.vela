@@ -7,6 +7,25 @@ pub enum Error {
     Nul,
     Encoding(Int)
 }
+pub enum LocateError {
+    Host(String),
+    Invalid(Error)
+}
+pub fn executable() -> Result<Path, LocateError> effects { io } {
+    return match executable_path() {
+        StringResult::Err(message) => Result<Path, LocateError>::Err(LocateError::Host(message)),
+        StringResult::Ok(value) => located(checked(value))
+    };
+}
+fn located(value: Result<Path, Error>) -> Result<Path, LocateError> {
+    return match value {
+        Result::Ok(path) => Result<Path, LocateError>::Ok(path),
+        Result::Err(error) => Result<Path, LocateError>::Err(LocateError::Invalid(error))
+    };
+}
+pub fn resource_base() -> Result<Path, LocateError> effects { io } {
+    return located(parent(executable()?));
+}
 pub fn checked(value: String) -> Result<Path, Error> {
     if value == "" {
         return Result<Path, Error>::Err(Error::Empty);
@@ -30,7 +49,8 @@ pub fn absolute(value: Path) -> Result<Bool, Error> {
     if separator(str_byte(valid.value, 0)) {
         return Result<Bool, Error>::Ok(true);
     }
-    return Result<Bool, Error>::Ok(platform() == "windows" && str_len(valid.value) >= 3 && str_byte(valid.value, 1) == 58 && separator(str_byte(valid.value, 2)));
+    return Result<Bool, Error>::Ok(platform() == "windows" && str_len(valid.value) >= 3 && str_byte(
+        valid.value, 1) == 58 && separator(str_byte(valid.value, 2)));
 }
 pub fn parent(value: Path) -> Result<Path, Error> {
     let valid = checked(value.value)?;
@@ -40,10 +60,12 @@ pub fn parent(value: Path) -> Result<Path, Error> {
     if separator(str_byte(raw, 0)) {
         root = 1;
     }
-    if platform() == "windows" && end >= 3 && str_byte(raw, 1) == 58 && separator(str_byte(raw, 2)) {
+    if platform() == "windows" && end >= 3 && str_byte(raw, 1) == 58 && separator(str_byte(raw,
+        2)) {
         root = 3;
     }
-    if platform() == "windows" && end >= 2 && separator(str_byte(raw, 0)) && separator(str_byte(raw, 1)) {
+    if platform() == "windows" && end >= 2 && separator(str_byte(raw, 0)) && separator(str_byte(raw,
+        1)) {
         var at = 2;
         while at < end && !separator(str_byte(raw, at)) {
             at = at + 1;

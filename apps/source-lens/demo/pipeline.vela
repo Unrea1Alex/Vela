@@ -1,0 +1,27 @@
+import "rules.vela" as rules;
+
+pub struct Task { title: String, score: Int }
+
+pub fn sample() -> List<Task> effects { state } {
+    let tasks = list_new<Task>();
+    list_push(tasks, Task(title: "Компилятор", score: rules::keep(98)));
+    list_push(tasks, Task(title: rules::keep("Документация 🌿"), score: 78));
+    list_push(tasks, Task(title: "Поставка", score: 45));
+    return tasks;
+}
+pub fn name(task: Task) -> String { return task.title; }
+pub fn status_label(status: rules::Status) -> String {
+    return match status { rules::Status::Ready => "готово", rules::Status::Review => "проверка", rules::Status::Blocked => "блокировка" };
+}
+pub fn total(tasks: List<Task>) -> Int effects { state } {
+    var ready = 0;
+    for task in tasks { if rules::approved(rules::grade(task.score)) { ready = ready + 1; } }
+    return ready;
+}
+pub fn summary(task: Task) -> String {
+    return name(task) + ": " + status_label(rules::grade(task.score));
+}
+pub fn announce(tasks: List<Task>) -> Unit effects { state, io } {
+    for task in tasks { print(summary(task)); }
+    print(f"Готово: {total(tasks):d}/{list_len(tasks):d}");
+}

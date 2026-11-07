@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "version": "0.8.0",
+  "status": "verified",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 990,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "0.8.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 52,
+    "tests_run": true
+  },
+  "gc_repeat": [
+    {
+      "compilations": 200,
+      "collections": 99,
+      "peak_managed_bytes": 1075989,
+      "managed_bytes_before_teardown": 723985,
+      "elapsed_ms": 172
+    },
+    {
+      "compilations": 1600,
+      "collections": 799,
+      "peak_managed_bytes": 1075989,
+      "managed_bytes_before_teardown": 723986,
+      "elapsed_ms": 818
+    }
+  ],
+  "report_builder": [
+    {
+      "stage": "before",
+      "reports": 16,
+      "bytes": 401319,
+      "sha256": "6c7c6641c7aa57ef88b6b9d2d76c289d590176348be02fe061c763d93315551c",
+      "collections": 9265,
+      "peak": 1615874,
+      "elapsed_ms": 815
+    },
+    {
+      "stage": "after",
+      "reports": 16,
+      "bytes": 401319,
+      "sha256": "6c7c6641c7aa57ef88b6b9d2d76c289d590176348be02fe061c763d93315551c",
+      "collections": 337,
+      "peak": 1735514,
+      "elapsed_ms": 309
+    },
+    {
+      "stage": "after",
+      "reports": 64,
+      "bytes": 401319,
+      "sha256": "6c7c6641c7aa57ef88b6b9d2d76c289d590176348be02fe061c763d93315551c",
+      "collections": 1345,
+      "peak": 1735514,
+      "elapsed_ms": 900
+    }
+  ],
+  "bootstrap_tools_sha256": {
+    "bin/velac.exe": "c60304918eba1d692aaf9d581711f2d0e1f14eebc064f91e569943eea9fb325f",
+    "bin/vela-dev.exe": "d74e3381f77f7b7728d68a410a06741e62d52cb8d0262bd49a2a7eb044c86d96",
+    "bin/vela-bundle.exe": "4febd66c49f6608627d09f9ba95b88286c20b8388b6b7d827fbe02b1d5b8f9a2",
+    "bin/vela-test.exe": "f82e32bf2909bf8793b6622e32015c7c63467e0f707e0b287c31d44d6aa510d5"
+  },
+  "clean_native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 990,
+    "failed": 0,
+    "skipped": 0
+  },
+  "recovery": {
+    "c_sha256": "3dcd57ed3d34f47ee9a581eb354c8027eef095d60f9bd2cb0211dcfaddc1b080",
+    "same_emitted_bytes": true
+  },
+  "memory_stress": {
+    "graph_collections": 130,
+    "msvc_address_sanitizer": true,
+    "ffi_roots": true,
+    "builder_finish_reset_iterations": 250
+  },
+  "application": {
+    "named_tests": 12,
+    "cli_checks": 29,
+    "standalone": true,
+    "report_sha256": "9dd65556373a318068b1027a751f293c1f0304d20e48a2db25a62d735fb9568a"
+  },
+  "mcp": {
+    "analysis_suites": 3,
+    "request_stress": 1000,
+    "sdk_execution": [
+      "eight native MCP tools",
+      "execution enabled after OS startup probe",
+      "isolated MSVC build issues artifact",
+      "Unicode output and no inherited secret",
+      "source unchanged",
+      "forged artifact rejected",
+      "invalid argv 6",
+      "invalid argv 7",
+      "invalid argv 8",
+      "invalid code rejected with native diagnostic",
+      "path escape rejected",
+      "native tests continue after failure",
+      "unsaved source build",
+      "application nonzero exit is run result",
+      "overlay is private",
+      "stale snapshot rejected",
+      "native bytes require host allowlist",
+      "hardlinked snapshot rejected",
+      "loop build",
+      "execution concurrency limit",
+      "wall time limit",
+      "server recovers after cancellation",
+      "transport stdout contains only MCP",
+      "MCP disconnect releases execution cache"
+    ],
+    "isolation": [
+      "startup access, socket, build/run/test probes",
+      "--memory",
+      "--memory bounded capture",
+      "--process-limit",
+      "--process-limit bounded capture",
+      "--breakaway",
+      "--breakaway bounded capture",
+      "--flood",
+      "--flood bounded capture",
+      "--disk",
+      "--disk bounded capture",
+      "--files",
+      "--files bounded capture",
+      "--tree",
+      "--tree bounded capture",
+      "child preserves LPAC/job",
+      "timeout kills descendant",
+      "explicit cancellation",
+      "cancel kills descendant",
+      "disconnect cancels job",
+      "disconnect kills descendant",
+      "supervisor death fails closed and recovers profile",
+      "supervisor death kills descendant",
+      "toolchain bytes unchanged",
+      "forced Node death kills descendants",
+      "forced Node death removes snapshot and lease"
+    ],
+    "faults": [
+      "changed artifact bytes rejected",
+      "expired artifact rejected",
+      "artifact count bound",
+      "invalid UTF8 stdout uses hex",
+      "snapshot race rejected",
+      "cancelled build publishes nothing",
+      "authorized native DLL is pinned and staged",
+      "toolchain mutation disables execution",
+      "failed backend keeps analysis only"
+    ],
+    "measurelab": {
+      "passed": true,
+      "tools": [
+        "vela_get_context",
+        "vela_get_help",
+        "vela_check",
+        "vela_format",
+        "vela_symbols",
+        "vela_build",
+        "vela_test",
+        "vela_run"
+      ],
+      "transport": "official SDK / local stdio",
+      "native_tools_in_current_chat": false,
+      "compiler_id": "c60304918eba1d692aaf9d581711f2d0e1f14eebc064f91e569943eea9fb325f",
+      "execution_toolchain_id": "97b1c2ec5cca8df245a353d560d1d684feb48dc23b064e671dc9c9f8dd523bb9",
+      "named_tests": 12,
+      "exit_code": 3,
+      "stdout": "Saved: isolated-report.html\r\nscenarios=3 samples=60 over_budget=1\r\nРазбор JSON · 128 КБ: mean=4.04 p95=4.30 sigma=0.19 мс\r\nПостроение поискового индекса: mean=13.68 p95=22.10 sigma=3.35 мс\r\nЭкспорт отчёта в HTML: mean=6.63 p95=7.10 sigma=0.31 мс\r\n",
+      "native_dependencies": 0,
+      "generated_html_not_exported": true
+    },
+    "new_codex_client_discovery": "not_tested"
+  },
+  "frozen_archives_verified": 3,
+  "docs": {
+    "markdown": 64,
+    "links": 286,
+    "missing": [],
+    "pins": 23,
+    "mismatches": [],
+    "done08": 10
+  }
+}
