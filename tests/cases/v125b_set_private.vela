@@ -1,0 +1,3 @@
+import "../../../std/set.vela" as sets;
+fn invalid(value: sets::Set<Int>) -> List<Int> { return value.order; }
+fn main() -> Unit {}

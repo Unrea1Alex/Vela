@@ -1,0 +1,46 @@
+import "../../../std/algorithms.vela" as algorithms;
+import "../../../std/collections.vela" as collections;
+struct Row { key: Int, id: Int }
+fn compare(a: Int, b: Int) -> Int {
+    if a < b { return -1; } if a > b { return 1; } return 0;
+}
+fn main() -> Unit effects { state, io } {
+    let calls = list_new<Int>(); list_push(calls, 0);
+    let spy = fn [calls](a: Int, b: Int) -> Int effects { state } { list_set(calls, 0, list_get(calls, 0) + 1); return compare(a, b); };
+    let empty = list_new<Int>();
+    let copied_empty = algorithms::sort(empty, spy); list_push(copied_empty, 1);
+    assert_true(list_len(empty) == 0 && list_get(calls, 0) == 0, "empty independent copy no comparisons");
+    list_push(empty, 3); let single = algorithms::sort(empty, spy); list_set(single, 0, 9);
+    assert_true(list_get(empty, 0) == 3 && list_get(calls, 0) == 0, "single independent copy no comparisons");
+    let values = list_new<Int>(); list_push(values, 3); list_push(values, 1); list_push(values, 2); list_push(values, 0);
+    let trace = strings_new();
+    let sorted = algorithms::sort(values, fn [trace](a: Int, b: Int) -> Int effects { state } {
+        strings_push(trace, to_string(a) + ":" + to_string(b)); return compare(a, b);
+    });
+    assert_true(strings_join(trace, ",") == "3:1,2:0,1:0,1:2,3:2", "deterministic merge comparisons");
+    for i in 0 .. 4 { assert_true(list_get(sorted, i) == i, "ordered values"); }
+    assert_true(list_get(values, 0) == 3, "source preserved");
+    let rows = list_new<Row>();
+    list_push(rows, Row(key: 2, id: 0)); list_push(rows, Row(key: 1, id: 1)); list_push(rows, Row(key: 2, id: 2)); list_push(rows, Row(key: 1, id: 3)); list_push(rows, Row(key: 2, id: 4));
+    let ordered = algorithms::sort(rows, fn [](a: Row, b: Row) -> Int { return compare(a.key, b.key); });
+    assert_true(list_get(ordered, 0).id == 1 && list_get(ordered, 1).id == 3 && list_get(ordered, 2).id == 0 && list_get(ordered, 3).id == 2 && list_get(ordered, 4).id == 4, "stable records");
+    let alias = algorithms::sort(values, fn [values](a: Int, b: Int) -> Int effects { state } { list_truncate(values, 0); return compare(a, b); });
+    assert_true(list_len(values) == 0 && list_len(alias) == 4, "source alias mutation detached");
+    for i in 0 .. 4 { assert_true(list_get(alias, i) == i, "snapshot order"); }
+    let reversed = list_new<Int>(); for i in 0 .. 257 { list_push(reversed, 256 - i); }
+    list_set(calls, 0, 0); let large = algorithms::sort(reversed, spy);
+    for i in 0 .. 257 { assert_true(list_get(large, i) == i, "reverse adversary"); }
+    assert_true(list_get(calls, 0) <= 2313, "257*ceil(log2(257)) comparison bound");
+    let inconsistent = algorithms::sort(reversed, fn [](a: Int, b: Int) -> Int { return 1; });
+    assert_true(list_len(inconsistent) == 257, "inconsistent comparator terminates");
+    let keys = list_new<String>(); list_push(keys, "я"); list_push(keys, str_from_byte(255)); list_push(keys, "a"); list_push(keys, str_from_byte(128)); list_push(keys, "");
+    let strings = collections::sort_strings(keys);
+    assert_true(list_get(strings, 0) == "" && list_get(strings, 1) == "a" && list_get(strings, 2) == str_from_byte(128) && list_get(strings, 3) == "я" && list_get(strings, 4) == str_from_byte(255), "unsigned bytes Unicode");
+    let floats = list_new<Float64>(); list_push(floats, 0.0 / 0.0); list_push(floats, 0.0); list_push(floats, -0.0); list_push(floats, -2.0); list_push(floats, 0.0 / 0.0);
+    let numbers = collections::sort_floats(floats);
+    assert_true(list_get(numbers, 0) == -2.0 && 1.0 / list_get(numbers, 1) > 0.0 && 1.0 / list_get(numbers, 2) < 0.0 && float_is_nan(list_get(numbers, 3)) && float_is_nan(list_get(numbers, 4)), "NaNs last signed zero stable");
+    let nested = list_new<List<Int>>(); let inner = list_new<Int>(); list_push(inner, 1); list_push(nested, inner);
+    let shallow = algorithms::sort(nested, fn [](a: List<Int>, b: List<Int>) -> Int { return 0; });
+    list_set(list_get(shallow, 0), 0, 7); assert_true(list_get(inner, 0) == 7, "nested aliases shared");
+    print("stable generic sort passed");
+}

@@ -1,0 +1,65 @@
+import "../../../std/result_ops.vela" as result;
+import "../../../std/result.vela" as legacy;
+import "../../../std/option.vela" as option;
+fn value<T, E>(input: Result<T, E>) -> T {
+    match input { Result::Ok(item) => { return item; } Result::Err(_) => { assert_true(false, "expected Ok"); } }
+    return value(input);
+}
+fn error<T, E>(input: Result<T, E>) -> E {
+    match input { Result::Err(cause) => { return cause; } Result::Ok(_) => { assert_true(false, "expected Err"); } }
+    return error(input);
+}
+fn some<T>(input: Option<T>) -> T {
+    match input { Option::Some(item) => { return item; } Option::None => { assert_true(false, "expected Some"); } }
+    return some(input);
+}
+fn touch(trace: StringList, label: String, number: Int) -> Int effects { state } {
+    strings_push(trace, label); return number;
+}
+fn main() -> Unit effects { state, io } {
+    let trace = strings_new();
+    let transform = fn [trace](n: Int) -> Int effects { state } { return touch(trace, "map", n + 1); };
+    assert_true(value(result::map(Result<Int, Int>::Ok(2), transform)) == 3, "result map Ok");
+    assert_true(error(result::map(Result<Int, Int>::Err(7), transform)) == 7, "result map Err");
+    assert_true(strings_join(trace, ",") == "map", "map zero/one");
+    let chain = fn [trace](n: Int) -> Result<Int, Int> effects { state } { strings_push(trace, "then"); return Result<Int, Int>::Err(n + 10); };
+    assert_true(error(result::and_then(Result<Int, Int>::Ok(2), chain)) == 12, "chain failure");
+    assert_true(error(result::and_then(Result<Int, Int>::Err(9), chain)) == 9, "chain skips");
+    let skipped = result::and_then(result::and_then(Result<Int, Int>::Ok(4), chain), chain);
+    assert_true(error(skipped) == 14 && strings_join(trace, ",") == "map,then,then", "nested short circuit");
+    assert_true(result::unwrap_or(Result<Int, Int>::Ok(3), touch(trace, "eager", 8)) == 3, "eager even Ok");
+    assert_true(result::unwrap_or(Result<Int, Int>::Err(2), touch(trace, "eager-error", 8)) == 8, "eager Err");
+    let recover = fn [trace](cause: Int) -> Int effects { state } { return touch(trace, "recover", cause + 100); };
+    assert_true(result::unwrap_or_else(Result<Int, Int>::Ok(5), recover) == 5, "lazy skip");
+    assert_true(result::unwrap_or_else(Result<Int, Int>::Err(7), recover) == 107, "lazy cause");
+    let context = error(result::with_context(Result<Int, Int>::Err(7), "load"));
+    assert_true(context.cause == 7 && context.message == "load", "typed context");
+    assert_true(value(result::with_context(Result<Int, Int>::Ok(6), "ignored")) == 6, "context Ok");
+    let mapped_error = legacy::map_error(Result<Int, Int>::Err(4), fn [trace](n: Int) -> String effects { state } { strings_push(trace, "legacy"); return "code=" + to_string(n); });
+    assert_true(error(mapped_error) == "code=4", "old map_error");
+    assert_true(value(legacy::map_error(Result<Int, Int>::Ok(3), fn [trace](n: Int) -> String effects { state } { strings_push(trace, "wrong"); return "error"; })) == 3, "old map_error skips Ok");
+    assert_true(error(legacy::explain(Result<Int, Int>::Err(4), "human")) == "human", "old explain");
+    assert_true(some(option::map(Option<Int>::Some(8), transform)) == 9, "option map");
+    match option::map(Option<Int>::None, transform) { Option::Some(_) => { assert_true(false, "None map"); } Option::None => {} }
+    let choose = fn [trace](n: Int) -> Option<String> effects { state } { strings_push(trace, "choose"); return Option<String>::None; };
+    match option::and_then(Option<Int>::Some(2), choose) { Option::Some(_) => { assert_true(false, "None chain"); } Option::None => {} }
+    match option::and_then(Option<Int>::None, choose) { Option::Some(_) => { assert_true(false, "None skips"); } Option::None => {} }
+    assert_true(option::unwrap_or(Option<Int>::Some(3), touch(trace, "option-eager", 90)) == 3, "option eager");
+    assert_true(option::unwrap_or(Option<Int>::None, touch(trace, "option-none", 91)) == 91, "option fallback");
+    let produce = fn [trace]() -> Int effects { state } { return touch(trace, "produce", 92); };
+    assert_true(option::unwrap_or_else(Option<Int>::Some(3), produce) == 3, "option lazy skip");
+    assert_true(option::unwrap_or_else(Option<Int>::None, produce) == 92, "option lazy call");
+    assert_true(strings_join(trace, ",") == "map,then,then,eager,eager-error,recover,legacy,map,choose,option-eager,option-none,produce", "exact ordered callback trace");
+    assert_true(value(result::map(Result<Int, String>::Ok(4), fn [](n: Int) -> String { return to_string(n); })) == "4", "pure Result callback");
+    assert_true(some(option::and_then(Option<Int>::Some(4), fn [](n: Int) -> Option<Int> { return Option<Int>::Some(n + 1); })) == 5, "pure Some chain");
+    let nested = list_new<Int>(); list_push(nested, 1);
+    let shared = value(result::map(Result<List<Int>, Int>::Ok(nested), fn [](n: List<Int>) -> List<Int> { return n; }));
+    list_set(shared, 0, 7); assert_true(list_get(nested, 0) == 7, "payload alias preserved");
+    let retained = error(result::with_context(Result<Int, List<Int>>::Err(nested), "typed list cause"));
+    list_set(retained.cause, 0, 8); assert_true(list_get(nested, 0) == 8, "context retains typed cause alias");
+    let effectful = fn [](n: Int) -> Int effects { io } { print("result io callback"); return n; };
+    assert_true(value(result::map(Result<Int, String>::Ok(3), effectful)) == 3, "io effect propagated");
+    assert_true(error(result::map(Result<Int, String>::Err("first"), effectful)) == "first", "io callback skipped");
+    assert_true(option::unwrap_or_else(Option<Int>::None, fn []() -> Int effects { io } { print("option io callback"); return 9; }) == 9, "option io effect propagated");
+    print("result option combinators passed");
+}

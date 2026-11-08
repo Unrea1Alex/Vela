@@ -10,36 +10,38 @@ import "formatter.vela";
 import "lexer.vela";
 import "driver.vela";
 import "incremental.vela";
-
-pub fn record_query_use(c: Context, span: Span, symbol: SymbolId, type_id: TypeId, role: String) -> Unit effects { state } {
+import "repairs.vela";
+pub fn record_query_use(c: Context, span: Span, symbol: SymbolId, type_id: TypeId,
+    role: String) -> Unit effects { state } {
     if c.query_mode {
         list_push(c.query_uses, QueryUse(span: span, symbol: symbol, type_id: type_id, role: role));
     }
 }
-
 pub fn query_point(c: Context, unit: SourceUnit, offset: Int) -> String effects { state } {
     let line = global_line_at(c, offset);
     var character = 0;
     for i in list_get(c.lines, line - 1) .. offset {
         let b = str_byte(c.source_text, i);
-        if b < 128 || b >= 192 { character = character + 1; }
-        if b >= 240 { character = character + 1; }
+        if b < 128 || b >= 192 {
+            character = character + 1;
+        }
+        if b >= 240 {
+            character = character + 1;
+        }
     }
     return f"{{\"line\":{line - unit.line_base - 1:d},\"character\":{character:d},\"byte\":{offset - unit.start:d}}}";
 }
-
 pub fn query_range(c: Context, span: Span) -> String effects { state } {
     let module = source_unit_at(c, span.start);
     let unit = list_get(c.source_units, module);
     return f"{{\"document\":{module:d},\"start\":{query_point(c, unit, span.start):s},\"end\":{query_point(c, unit, span.end):s}}}";
 }
-
 pub fn query_key(c: Context, span: Span, kind: String) -> String effects { state } {
     let module = source_unit_at(c, span.start);
     return f"{module:d}:{span.start - list_get(c.source_units, module).start:d}:{kind:s}";
 }
-
-pub fn query_decl_span(c: Context, span: Span, name: String) -> Span effects { state, io, process } {
+pub fn query_decl_span(c: Context, span: Span, name: String) -> Span effects { state, io,
+    process } {
     for d in c.declarations {
         if d.span.start >= span.start && d.span.end <= span.end && d.canonical == name {
             return d.span;
@@ -47,7 +49,6 @@ pub fn query_decl_span(c: Context, span: Span, name: String) -> Span effects { s
     }
     return empty_span();
 }
-
 pub fn query_type_template(c: Context, id: TypeId) -> TypeInfo effects { state, io, process } {
     let t = type_info(c, id);
     if t.template_index >= 0 {
@@ -56,20 +57,26 @@ pub fn query_type_template(c: Context, id: TypeId) -> TypeInfo effects { state, 
     }
     return t;
 }
-
 pub fn query_symbol_kind(symbol: Symbol) -> String {
-    if symbol.kind == 73 { return "function"; }
-    if symbol.kind == 61 { return "binding"; }
+    if symbol.kind == 73 {
+        return "function";
+    }
+    if symbol.kind == 61 {
+        return "binding";
+    }
     return "member";
 }
-
 pub fn query_symbol_span(c: Context, symbol: Symbol) -> Span effects { state, io, process } {
     if has_symbol(symbol.capture_origin) {
         return query_symbol_span(c, symbol_info(c, symbol.capture_origin));
     }
-    if symbol.builtin || symbol.span.end == 0 || symbol.name == "result" { return empty_span(); }
+    if symbol.builtin || symbol.span.end == 0 || symbol.name == "result" {
+        return empty_span();
+    }
     if symbol.kind == 73 {
-        if symbol.method_span.end > 0 { return symbol.method_span; }
+        if symbol.method_span.end > 0 {
+            return symbol.method_span;
+        }
         if symbol.template_index >= 0 {
             let template = list_get(c.bound_functions, symbol.template_index);
             return query_decl_span(c, template.span, template.name);
@@ -82,32 +89,49 @@ pub fn query_symbol_span(c: Context, symbol: Symbol) -> Span effects { state, io
     }
     return empty_span();
 }
-
 pub fn query_type_name(c: Context, id: TypeId) -> String effects { state, io, process } {
-    if !has_type(id) { return ""; }
+    if !has_type(id) {
+        return "";
+    }
     return display_type(c, id);
 }
-
 pub fn query_target(c: Context, site: QueryUse) -> Span effects { state, io, process } {
     if has_symbol(site.symbol) {
         return query_symbol_span(c, symbol_info(c, site.symbol));
     }
     return empty_span();
 }
-
-pub fn query_open(p: Project, overlays: List<QueryOverlay>) -> Context effects { state, io, process } {
+pub fn query_open(p: Project, overlays: List<QueryOverlay>) -> Context effects { state, io,
+    process } {
+    return query_open_mode(p, overlays, "", -1);
+}
+pub fn query_open_mode(p: Project, overlays: List<QueryOverlay>, revision: String,
+    document: Int) -> Context effects { state, io, process } {
     var code = "";
     match query_source_text(p.entry, overlays) {
-        Result::Ok(text) => { code = text; }
-        Result::Err(message) => { source_error(message, true); }
+        Result::Ok(text) => {
+            code = text;
+        }
+        Result::Err(message) => {
+            source_error(message, true);
+        }
     }
     var c = project_overlay_context(p.entry, p.entry, code, true, p.dependencies, overlays);
     c.query_mode = true;
+    if revision != "" {
+        repair_validate(c, revision, document);
+        c.repair_mode = true;
+        c.repair_document = document;
+        c.repair_overlays = overlays;
+        c.repair_root = p.entry;
+        if p.manifest != "" {
+            c.repair_root = p.manifest;
+        }
+    }
     parse_program(c);
     analyze_mode(c, false);
     return c;
 }
-
 pub fn query_overlay_args(start: Int) -> List<QueryOverlay> effects { args, state, io, process } {
     let overlays = list_new<QueryOverlay>();
     var i = start;
@@ -120,36 +144,46 @@ pub fn query_overlay_args(start: Int) -> List<QueryOverlay> effects { args, stat
         let data = io_value(arg(i + 2));
         var code = "";
         match read_file_bounded(data, 2097152) {
-            ReadResult::Ok(text) => { code = text; }
-            ReadResult::Limit => { source_error("Overlay exceeds 2 MiB.", true); }
-            ReadResult::Err(message) => { source_error(message, true); }
+            ReadResult::Ok(text) => {
+                code = text;
+            }
+            ReadResult::Limit => {
+                source_error("Overlay exceeds 2 MiB.", true);
+            }
+            ReadResult::Err(message) => {
+                source_error(message, true);
+            }
         }
         total = total + str_len(code);
-        if total > 8388608 { source_error("Overlay byte budget exceeded.", true); }
-        if !source_inside_boundary(path) { source_error("Overlay escapes source root.", true); }
+        if total > 8388608 {
+            source_error("Overlay byte budget exceeded.", true);
+        }
+        if !source_inside_boundary(path) {
+            source_error("Overlay escapes source root.", true);
+        }
         list_push(overlays, QueryOverlay(path: path, code: normalized(code)));
         i = i + 3;
     }
     return overlays;
 }
-
 pub struct PlanEdit {
     span: Span,
     text: String
 }
-
 pub fn plan_reject(c: Context, message: String) -> Unit effects { state, io, process } {
     bad(c, "E231", message, empty_span());
 }
-
 pub fn plan_integer(raw: String) -> Int effects { io, process, state } {
     match parse_int(raw) {
-        IntResult::Ok(value) => { return value; }
-        IntResult::Err(_) => { source_error("Expected an integer plan coordinate.", true); }
+        IntResult::Ok(value) => {
+            return value;
+        }
+        IntResult::Err(_) => {
+            source_error("Expected an integer plan coordinate.", true);
+        }
     }
     return -1;
 }
-
 pub fn plan_symbol(c: Context, offset: Int) -> SymbolId effects { state, io, process } {
     for site in c.query_uses {
         if site.span.start <= offset && offset < site.span.end && has_symbol(site.symbol) {
@@ -159,11 +193,12 @@ pub fn plan_symbol(c: Context, offset: Int) -> SymbolId effects { state, io, pro
     for i in 0 .. list_len(c.symbols) {
         let symbol = list_get(c.symbols, i);
         let span = query_symbol_span(c, symbol);
-        if span.start <= offset && offset < span.end { return symbol_at(i); }
+        if span.start <= offset && offset < span.end {
+            return symbol_at(i);
+        }
     }
     return no_symbol();
 }
-
 pub fn plan_offset(c: Context, span: Span, edits: List<PlanEdit>) -> Int effects { state } {
     let owner = source_unit_at(c, span.start);
     let unit = list_get(c.source_units, owner);
@@ -175,47 +210,66 @@ pub fn plan_offset(c: Context, span: Span, edits: List<PlanEdit>) -> Int effects
     }
     return pos;
 }
-
-pub fn plan_binding_graph(c: Context, edits: List<PlanEdit>) -> Dict<String, Bool> effects { state, io, process } {
+pub fn plan_binding_graph(c: Context, edits: List<PlanEdit>) -> Dict<String, Bool> effects { state,
+    io, process } {
     let graph = dict_new<String, Bool>();
     for site in c.query_uses {
-        if !has_symbol(site.symbol) { continue; }
+        if !has_symbol(site.symbol) {
+            continue;
+        }
         let sym = symbol_info(c, site.symbol);
         let target = query_symbol_span(c, sym);
         var key = "";
         if target.end > 0 {
-            key = f"{source_unit_at(c, target.start):d}:{plan_offset(c, target, edits):d}:{query_symbol_kind(sym):s}";
+            key =
+                f"{source_unit_at(c, target.start):d}:{plan_offset(c, target, edits):d}:{query_symbol_kind(sym):s}";
         } else if sym.builtin {
             key = "builtin:" + sym.name;
         }
-        dict_set(graph, f"{source_unit_at(c, site.span.start):d}:{plan_offset(c, site.span, edits):d}:{site.role:s}:{key:s}", true);
+        dict_set(graph,
+            f"{source_unit_at(c, site.span.start):d}:{plan_offset(c, site.span, edits):d}:{site.role:s}:{key:s}",
+            true);
     }
     return graph;
 }
-
 pub fn interface_rename_group(c: Context, symbol: Symbol) -> String effects { state } {
-    if symbol.interface_operation { return symbol.name; }
-    if symbol.kind != 73 || symbol.method_span.end == 0 { return ""; }
+    if symbol.interface_operation {
+        return symbol.name;
+    }
+    if symbol.kind != 73 || symbol.method_span.end == 0 {
+        return "";
+    }
     var name = symbol.name;
-    if symbol.template_index >= 0 { name = list_get(c.bound_functions, symbol.template_index).name; }
+    if symbol.template_index >= 0 {
+        name = list_get(c.bound_functions, symbol.template_index).name;
+    }
     let parts = split_text(name, 35);
-    if list_len(parts) == 3 { return list_get(parts, 1) + "::" + list_get(parts, 2); }
+    if list_len(parts) == 3 {
+        return list_get(parts, 1) + "::" + list_get(parts, 2);
+    }
     return "";
 }
-pub fn plan_rename(c: Context, offset: Int, name: String) -> List<PlanEdit> effects { state, io, process } {
+pub fn plan_rename(c: Context, offset: Int, name: String) -> List<PlanEdit> effects { state, io,
+    process } {
     let edits = list_new<PlanEdit>();
-    if !project_identifier(name) || keyword(name) || name == "_" || name == "result" || name == "main" {
+    if !project_identifier(name) || keyword(name) || name == "_" || name == "result" || name
+        == "main" {
         plan_reject(c, "Replacement must be a non-reserved identifier.");
     }
     let id = plan_symbol(c, offset);
-    if !has_symbol(id) { plan_reject(c, "Position has no renameable symbol."); }
+    if !has_symbol(id) {
+        plan_reject(c, "Position has no renameable symbol.");
+    }
     let symbol = symbol_info(c, id);
     let span = query_symbol_span(c, symbol);
-    if span.end == 0 || symbol.kind != 73 && symbol.kind != 61 || symbol.foreign_library != "" || symbol.name == "main" {
+    if span.end == 0 || symbol.kind != 73 && symbol.kind != 61 || symbol.foreign_library != ""
+        || symbol.name == "main" {
         plan_reject(c, "This symbol kind cannot be renamed.");
     }
     let original = str_slice(c.source_text, span.start, span.end);
-    if original == name { return edits; }
+    if original == name {
+        return edits;
+    }
     let declarations = dict_new<Int, Bool>();
     list_push(edits, PlanEdit(span: span, text: name));
     dict_set(declarations, span.start, true);
@@ -236,17 +290,28 @@ pub fn plan_rename(c: Context, offset: Int, name: String) -> List<PlanEdit> effe
         // potential use there rather than return an incomplete rename.
         for i in 0 .. list_len(c.bound_functions) {
             let f = list_get(c.bound_functions, i);
-            if list_len(f.type_parameters) == 0 { continue; }
+            if list_len(f.type_parameters) == 0 {
+                continue;
+            }
             var instantiated = false;
             for instance in c.instances {
-                if instance.syntax_index == i { instantiated = true; break; }
+                if instance.syntax_index == i {
+                    instantiated = true;
+                    break;
+                }
             }
-            if instantiated { continue; }
+            if instantiated {
+                continue;
+            }
             for j in f.span.start .. f.span.end - str_len(original) + 1 {
-                if str_slice(c.source_text, j, j + str_len(original)) == original &&
-                    (j == f.span.start || !is_alpha(str_byte(c.source_text, j - 1)) && !is_digit(str_byte(c.source_text, j - 1))) &&
-                    (j + str_len(original) == f.span.end || !is_alpha(str_byte(c.source_text, j + str_len(original))) && !is_digit(str_byte(c.source_text, j + str_len(original)))) {
-                    if !dict_has(declarations, j) { plan_reject(c, "Potential reference in an uninstantiated generic body."); }
+                if str_slice(c.source_text, j, j + str_len(original)) == original && (j
+                    == f.span.start || !is_alpha(str_byte(c.source_text, j - 1)) && !is_digit(
+                    str_byte(c.source_text, j - 1))) && (j + str_len(original) == f.span.end
+                    || !is_alpha(str_byte(c.source_text, j + str_len(original))) && !is_digit(
+                    str_byte(c.source_text, j + str_len(original)))) {
+                    if !dict_has(declarations, j) {
+                        plan_reject(c, "Potential reference in an uninstantiated generic body.");
+                    }
                 }
             }
         }
@@ -254,7 +319,8 @@ pub fn plan_rename(c: Context, offset: Int, name: String) -> List<PlanEdit> effe
     let seen = dict_new<Int, Bool>();
     for site in c.query_uses {
         let target = query_target(c, site);
-        if target.end > 0 && dict_has(declarations, target.start) && !dict_has(seen, site.span.start) && !dict_has(declarations, site.span.start) {
+        if target.end > 0 && dict_has(declarations, target.start) && !dict_has(seen,
+            site.span.start) && !dict_has(declarations, site.span.start) {
             if str_slice(c.source_text, site.span.start, site.span.end) != original {
                 plan_reject(c, "Inconsistent reference spelling.");
             }
@@ -264,8 +330,8 @@ pub fn plan_rename(c: Context, offset: Int, name: String) -> List<PlanEdit> effe
     }
     return edits;
 }
-
-pub fn plan_preview(p: Project, c: Context, overlays: List<QueryOverlay>, edits: List<PlanEdit>, rename: Bool) -> String effects { state, io, process } {
+pub fn plan_preview(p: Project, c: Context, overlays: List<QueryOverlay>, edits: List<PlanEdit>,
+    rename: Bool) -> String effects { state, io, process } {
     let proposed = list_new<QueryOverlay>();
     let changes = strings_new();
     let edit_by_offset = dict_new<Int, Int>();
@@ -282,7 +348,8 @@ pub fn plan_preview(p: Project, c: Context, overlays: List<QueryOverlay>, edits:
                 let edit = list_get(edits, dict_get(edit_by_offset, pos));
                 strings_push(parts, str_slice(c.source_text, previous, pos));
                 strings_push(parts, edit.text);
-                strings_push(unit_edits, f"{{\"range\":{query_range(c, edit.span):s},\"new_text\":{json_string(edit.text):s}}}");
+                strings_push(unit_edits,
+                    f"{{\"range\":{query_range(c, edit.span):s},\"new_text\":{json_string(edit.text):s}}}");
                 pos = edit.span.end;
                 previous = pos;
             } else {
@@ -292,11 +359,14 @@ pub fn plan_preview(p: Project, c: Context, overlays: List<QueryOverlay>, edits:
         if strings_len(unit_edits) > 0 {
             strings_push(parts, str_slice(c.source_text, previous, unit.end));
             let revision = sha256(unit.code);
-            strings_push(changes, f"{{\"path\":{json_string(unit.path):s},\"revision\":\"{revision:s}\",\"edits\":[{strings_join(unit_edits, ","):s}]}}");
+            strings_push(changes,
+                f"{{\"path\":{json_string(unit.path):s},\"revision\":\"{revision:s}\",\"edits\":[{strings_join(unit_edits, ","):s}]}}");
             list_push(proposed, QueryOverlay(path: unit.path, code: strings_join(parts, "")));
         }
     }
-    for overlay in overlays { list_push(proposed, overlay); }
+    for overlay in overlays {
+        list_push(proposed, overlay);
+    }
     if list_len(edits) > 0 {
         let checked = query_open(p, proposed);
         if rename {
@@ -306,83 +376,152 @@ pub fn plan_preview(p: Project, c: Context, overlays: List<QueryOverlay>, edits:
                 plan_reject(c, "Rename changes reference resolution.");
             }
             for site in checked.query_uses {
-                if !has_symbol(site.symbol) { continue; }
+                if !has_symbol(site.symbol) {
+                    continue;
+                }
                 let sym = symbol_info(checked, site.symbol);
                 let target = query_symbol_span(checked, sym);
                 var key = "";
-                if target.end > 0 { key = query_key(checked, target, query_symbol_kind(sym)); }
-                else if sym.builtin { key = "builtin:" + sym.name; }
+                if target.end > 0 {
+                    key = query_key(checked, target, query_symbol_kind(sym));
+                } else if sym.builtin {
+                    key = "builtin:" + sym.name;
+                }
                 let unit = list_get(checked.source_units, source_unit_at(checked, site.span.start));
-                let item = f"{source_unit_at(checked, site.span.start):d}:{site.span.start - unit.start:d}:{site.role:s}:{key:s}";
-                if !dict_has(expected, item) { plan_reject(c, "Rename changes reference resolution."); }
+                let item =
+                    f"{source_unit_at(checked, site.span.start):d}:{site.span.start - unit.start:d}:{site.role:s}:{key:s}";
+                if !dict_has(expected, item) {
+                    plan_reject(c, "Rename changes reference resolution.");
+                }
             }
         }
     }
     return f"{{\"schema_version\":1,\"ok\":true,\"revision\":\"{query_revision(c):s}\",\"scope\":{query_scope(p):s},\"diagnostics\":[],\"changes\":[{strings_join(changes, ","):s}]}}";
 }
-
 pub fn query_scope(p: Project) -> String effects { state } {
     return f"{{\"root\":\"entry\",\"excluded_test_roots\":{list_len(p.tests):d}}}";
 }
 pub fn query_page(p: Project, start: Int) -> Int effects { args, state, io, process } {
     if start + 1 >= arg_count() {
-        source_error("Usage: vela query ROOT --page LIMIT [--offset OFFSET --revision PAGE_REVISION]", true);
+        source_error(
+            "Usage: vela query ROOT --page LIMIT [--offset OFFSET --revision PAGE_REVISION]", true);
     }
     let limit = plan_integer(io_value(arg(start + 1)));
     var offset = 0;
     var expected = "";
     if arg_count() != start + 2 {
-        if arg_count() != start + 6 || io_value(arg(start + 2)) != "--offset" || io_value(arg(start + 4)) != "--revision" {
+        if arg_count() != start + 6 || io_value(arg(start + 2)) != "--offset" || io_value(arg(start
+            + 4)) != "--revision" {
             source_error("Invalid query continuation arguments.", true);
         }
         offset = plan_integer(io_value(arg(start + 3)));
         expected = io_value(arg(start + 5));
-        if str_len(expected) != 64 { source_error("Invalid query continuation revision.", true); }
+        if str_len(expected) != 64 {
+            source_error("Invalid query continuation revision.", true);
+        }
     }
     if limit < 1 || limit > 10000 || offset < 0 || offset > 2147483647 {
         source_error("Query limit must be 1..10000 and offset must be nonnegative.", true);
     }
     let c = query_open(p, list_new<QueryOverlay>());
     let revision = analysis_cache_key(c, p, "query-page-v1");
-    if expected != "" && expected != revision { plan_reject(c, "Stale query continuation."); }
+    if expected != "" && expected != revision {
+        plan_reject(c, "Stale query continuation.");
+    }
     print(query_json_at(c, -1, query_scope(p), offset, limit, revision));
     return 0;
 }
 pub fn query_command(command: String, input: String) -> Int effects { args, state, io, process } {
-    let p = project_load(io_value(absolute_path(input)), true);
-    project_verify_lock(p, true);
+    let root = io_value(absolute_path(input));
     if command == "query" {
         var start = 2;
-        if arg_count() > 2 && io_value(arg(2)) == "--json" { start = 3; }
-        if start < arg_count() && io_value(arg(start)) == "--page" { return query_page(p, start); }
+        if arg_count() > 2 && io_value(arg(2)) == "--json" {
+            start = 3;
+        }
+        if start < arg_count() && io_value(arg(start)) == "--page" {
+            let p = project_load(root, true);
+            project_verify_lock(p, true);
+            return query_page(p, start);
+        }
+        var at = false;
+        var validate = false;
+        var overlay_start = start;
         if start + 3 < arg_count() && io_value(arg(start)) == "--at" {
-            let c = query_open(p, query_overlay_args(start + 4));
+            at = true;
+            overlay_start = start + 4;
+        }
+        if start < arg_count() && io_value(arg(start)) == "--validate" {
+            validate = true;
+            overlay_start = start + 1;
+        }
+        let overlays = query_overlay_args(overlay_start);
+        let p = project_load_with(root, true, overlays, fn [ root, overlays ](code: String,
+            message: String, text: String) -> Unit effects { state, io, process } {
+            repair_project_reject(root, "", -1, overlays, code, message, text);
+        });
+        project_verify_lock(p, true);
+        let c = query_open(p, overlays);
+        if validate {
+            print(
+                f"{{\"schema_version\":1,\"ok\":true,\"revision\":\"{query_revision(c):s}\",\"diagnostics\":[]}}");
+            return 0;
+        }
+        if at {
             let target = path_key(io_value(absolute_path(io_value(arg(start + 1)))));
             let line = plan_integer(io_value(arg(start + 2)));
             let character = plan_integer(io_value(arg(start + 3)));
             for unit in c.source_units {
                 if path_key(unit.path) == target {
-                    print(query_json_at(c, query_coordinate(c, unit, line, character), query_scope(p), 0, 0, ""));
+                    print(query_json_at(c, query_coordinate(c, unit, line, character), query_scope(
+                        p), 0, 0, ""));
                     return 0;
                 }
             }
             plan_reject(c, "Document is outside the analysis graph.");
         }
-        print(query_json_at(query_open(p, query_overlay_args(start)), -1, query_scope(p), 0, 0, ""));
+        print(query_json_at(c, -1, query_scope(p), 0, 0, ""));
         return 0;
     }
-    if arg_count() < 5 { source_error("Usage: vela plan ROOT REVISION DOCUMENT fmt | BYTE NEW_NAME", true); }
+    if arg_count() < 5 {
+        source_error("Usage: vela plan ROOT REVISION DOCUMENT fmt | diagnose | BYTE NEW_NAME",
+            true);
+    }
     let format = io_value(arg(4)) == "fmt";
+    let diagnose = io_value(arg(4)) == "diagnose";
     var option_start = 5;
-    if !format {
-        if arg_count() < 6 { source_error("Rename requires NEW_NAME.", true); }
+    if !format && !diagnose {
+        if arg_count() < 6 {
+            source_error("Rename requires NEW_NAME.", true);
+        }
         option_start = 6;
     }
     let overlays = query_overlay_args(option_start);
-    let c = query_open(p, overlays);
-    if query_revision(c) != io_value(arg(2)) { plan_reject(c, "Stale analysis revision."); }
+    let expected = io_value(arg(2));
     let doc = plan_integer(io_value(arg(3)));
-    if doc < 0 || doc >= list_len(c.source_units) { plan_reject(c, "Unknown document."); }
+    var diagnostic_revision = "";
+    if diagnose {
+        if str_len(expected) != 64 {
+            plan_reject(make_context("", root, true), "Invalid analysis revision.");
+        }
+        diagnostic_revision = expected;
+    }
+    let p = project_load_with(root, true, overlays, fn [ root, diagnostic_revision, doc, overlays ](
+        code: String, message: String, text: String) -> Unit effects { state, io, process } {
+        repair_project_reject(root, diagnostic_revision, doc, overlays, code, message, text);
+    });
+    project_verify_lock(p, true);
+    let c = query_open_mode(p, overlays, diagnostic_revision, doc);
+    if query_revision(c) != expected {
+        plan_reject(c, "Stale analysis revision.");
+    }
+    if doc < 0 || doc >= list_len(c.source_units) {
+        plan_reject(c, "Unknown document.");
+    }
+    if diagnose {
+        print(
+            f"{{\"schema_version\":1,\"ok\":true,\"revision\":\"{query_revision(c):s}\",\"documents\":{repair_documents(c):s},\"validated\":true,\"reason\":\"no_diagnostics\",\"diagnostics\":[],\"explanations\":[],\"changes\":[]}}");
+        return 0;
+    }
     let unit = list_get(c.source_units, doc);
     if format {
         let single = make_context(unit.code, unit.path, true);
@@ -391,44 +530,54 @@ pub fn query_command(command: String, input: String) -> Int effects { args, stat
         let formatted = format_source(single);
         let edits = list_new<PlanEdit>();
         if formatted != unit.code && unit.start < unit.end {
-            list_push(edits, PlanEdit(span: Span(start: unit.start, end: unit.end), text: formatted));
+            list_push(edits, PlanEdit(span: Span(start: unit.start, end: unit.end),
+                text: formatted));
         }
         print(plan_preview(p, c, overlays, edits, false));
         return 0;
     }
     let byte = plan_integer(io_value(arg(4)));
-    if byte < 0 || byte >= str_len(unit.code) || str_byte(unit.code, byte) >= 128 && str_byte(unit.code, byte) < 192 {
+    if byte < 0 || byte >= str_len(unit.code) || str_byte(unit.code, byte) >= 128 && str_byte(
+        unit.code, byte) < 192 {
         plan_reject(c, "Invalid byte position.");
     }
     print(plan_preview(p, c, overlays, plan_rename(c, unit.start + byte, io_value(arg(5))), true));
     return 0;
 }
-
-pub fn query_coordinate(c: Context, unit: SourceUnit, line: Int, character: Int) -> Int effects { state, io, process } {
+pub fn query_coordinate(c: Context, unit: SourceUnit, line: Int,
+    character: Int) -> Int effects { state, io, process } {
     if line >= 0 && line < list_len(c.lines) - unit.line_base && character >= 0 {
         var offset = list_get(c.lines, unit.line_base + line);
         var column = 0;
         while offset <= unit.end {
-            if column == character { return offset; }
-            if offset == unit.end || str_byte(c.source_text, offset) == 10 { break; }
+            if column == character {
+                return offset;
+            }
+            if offset == unit.end || str_byte(c.source_text, offset) == 10 {
+                break;
+            }
             let width = utf8_width(str_byte(c.source_text, offset));
             column = column + 1;
-            if width == 4 { column = column + 1; }
-            if column > character { break; }
+            if width == 4 {
+                column = column + 1;
+            }
+            if column > character {
+                break;
+            }
             offset = offset + width;
         }
     }
     plan_reject(c, "Invalid UTF-16 position.");
     return -2;
 }
-
 pub fn query_revision(c: Context) -> String effects { state } {
     let revisions = strings_new();
-    for unit in c.source_units { strings_push(revisions, sha256(unit.code)); }
+    for unit in c.source_units {
+        strings_push(revisions, sha256(unit.code));
+    }
     // Fixed-width hashes in deterministic traversal order, independent of snapshot mount.
     return sha256(strings_join(revisions, ""));
 }
-
 pub fn query_enclosing_function(c: Context, offset: Int) -> Int effects { state } {
     var low = 0;
     var high = list_len(c.bound_functions);
@@ -440,22 +589,27 @@ pub fn query_enclosing_function(c: Context, offset: Int) -> Int effects { state 
             high = middle;
         }
     }
-    if low > 0 && offset < list_get(c.bound_functions, low - 1).span.end { return low - 1; }
+    if low > 0 && offset < list_get(c.bound_functions, low - 1).span.end {
+        return low - 1;
+    }
     return -1;
 }
-
 pub fn query_type_site(c: Context, site: SyntaxName) -> TypeId effects { state, io, process } {
     let owner = source_unit_at(c, site.span.start);
     let enclosing = query_enclosing_function(c, site.span.start);
     if enclosing >= 0 {
         for parameter in list_get(c.bound_functions, enclosing).type_parameters {
-            if parameter.name == site.name { return no_type(); }
+            if parameter.name == site.name {
+                return no_type();
+            }
         }
     } else {
         for declaration in c.bound_types {
             if declaration.span.start <= site.span.start && site.span.start < declaration.span.end {
                 for parameter in declaration.type_parameters {
-                    if parameter.name == site.name { return no_type(); }
+                    if parameter.name == site.name {
+                        return no_type();
+                    }
                 }
                 break;
             }
@@ -464,42 +618,57 @@ pub fn query_type_site(c: Context, site: SyntaxName) -> TypeId effects { state, 
     for i in 0 .. str_len(site.name) - 1 {
         if str_byte(site.name, i) == 58 && str_byte(site.name, i + 1) == 58 {
             let target = module_alias(c, str_slice(site.name, 0, i), site.span);
-            if target < 0 { return no_type(); }
-            let found = module_declaration(c, target, str_slice(site.name, i + 2, str_len(site.name)));
-            if found < 0 || !list_get(c.declarations, found).exported { return no_type(); }
+            if target < 0 {
+                return no_type();
+            }
+            let found = module_declaration(c, target, str_slice(site.name, i + 2, str_len(
+                site.name)));
+            if found < 0 || !list_get(c.declarations, found).exported {
+                return no_type();
+            }
             return find_type(c, list_get(c.declarations, found).canonical);
         }
     }
     let own = module_declaration(c, owner, site.name);
-    if own >= 0 { return find_type(c, list_get(c.declarations, own).canonical); }
+    if own >= 0 {
+        return find_type(c, list_get(c.declarations, own).canonical);
+    }
     var imported = -1;
     for edge in c.imports {
         if edge.owner == owner && edge.alias == "" {
             let found = module_declaration(c, edge.target, site.name);
             if found >= 0 && list_get(c.declarations, found).exported {
-                if imported >= 0 && imported != found { return no_type(); }
+                if imported >= 0 && imported != found {
+                    return no_type();
+                }
                 imported = found;
             }
         }
     }
-    if imported >= 0 { return find_type(c, list_get(c.declarations, imported).canonical); }
+    if imported >= 0 {
+        return find_type(c, list_get(c.declarations, imported).canonical);
+    }
     return find_type(c, site.name);
 }
-
 pub fn query_site_key(c: Context, site: QueryUse) -> String effects { state, io, process } {
     if has_symbol(site.symbol) {
         let symbol = symbol_info(c, site.symbol);
-        if symbol.builtin { return "builtin:" + symbol.name; }
+        if symbol.builtin {
+            return "builtin:" + symbol.name;
+        }
         let span = query_symbol_span(c, symbol);
-        if span.end != 0 { return query_key(c, span, query_symbol_kind(symbol)); }
+        if span.end != 0 {
+            return query_key(c, span, query_symbol_kind(symbol));
+        }
     } else if has_type(site.type_id) {
         let t = query_type_template(c, site.type_id);
         let span = query_decl_span(c, t.span, t.name);
-        if span.end != 0 { return query_key(c, span, "type"); }
+        if span.end != 0 {
+            return query_key(c, span, "type");
+        }
     }
     return "";
 }
-
 pub fn query_page_row(index: Int, first: Int, limit: Int) -> Bool {
     return limit == 0 || (index >= first && index - first < limit);
 }
@@ -525,42 +694,61 @@ pub fn query_json_at(c: Context, offset: Int, scope: String, first: Int, limit: 
         if has_symbol(symbol) {
             let sym = symbol_info(c, symbol);
             let span = query_symbol_span(c, sym);
-            if span.end != 0 { dict_set(targets, query_key(c, span, query_symbol_kind(sym)), true); }
+            if span.end != 0 {
+                dict_set(targets, query_key(c, span, query_symbol_kind(sym)), true);
+            }
         }
         for d in c.declarations {
-            if d.span.start <= offset && offset < d.span.end && has_type(find_type(c, d.canonical)) {
+            if d.span.start <= offset && offset < d.span.end && has_type(find_type(c,
+                d.canonical)) {
                 dict_set(targets, query_key(c, d.span, "type"), true);
             }
         }
     }
     for i in 0 .. list_len(c.source_units) {
         let unit = list_get(c.source_units, i);
-        strings_push(documents, f"{{\"id\":{i:d},\"path\":{json_string(unit.path):s},\"revision\":\"{sha256(unit.code):s}\"}}");
+        strings_push(documents,
+            f"{{\"id\":{i:d},\"path\":{json_string(unit.path):s},\"revision\":\"{sha256(unit.code):s}\"}}");
     }
     for d in c.declarations {
         let id = find_type(c, d.canonical);
         if has_type(id) {
             let key = query_key(c, d.span, "type");
-            if offset >= 0 && !dict_has(targets, key) { continue; }
+            if offset >= 0 && !dict_has(targets, key) {
+                continue;
+            }
             let include = query_page_row(row, first, limit);
             row = row + 1;
-            if !include { continue; }
+            if !include {
+                continue;
+            }
             var opacity = "";
-            if type_info(c, id).opaque { opacity = "\"opaque\":true,"; }
-            strings_push(definitions, f"{{{opacity:s}\"id\":\"{key:s}\",\"name\":{json_string(d.name):s},\"kind\":\"type\",\"type\":{json_string(d.name):s},\"effects\":[],\"range\":{query_range(c, d.span):s}}}");
+            if type_info(c, id).opaque {
+                opacity = "\"opaque\":true,";
+            }
+            strings_push(definitions,
+                f"{{{opacity:s}\"id\":\"{key:s}\",\"name\":{json_string(d.name):s},\"kind\":\"type\",\"type\":{json_string(d.name):s},\"effects\":[],\"range\":{query_range(c, d.span):s}}}");
         }
     }
     for symbol in c.symbols {
         let span = query_symbol_span(c, symbol);
-        if span.end == 0 { continue; }
+        if span.end == 0 {
+            continue;
+        }
         let kind = query_symbol_kind(symbol);
         let key = query_key(c, span, kind);
-        if offset >= 0 && !dict_has(targets, key) { continue; }
-        if dict_has(seen, key) { continue; }
+        if offset >= 0 && !dict_has(targets, key) {
+            continue;
+        }
+        if dict_has(seen, key) {
+            continue;
+        }
         dict_set(seen, key, true);
         let include = query_page_row(row, first, limit);
         row = row + 1;
-        if !include { continue; }
+        if !include {
+            continue;
+        }
         let name = str_slice(c.source_text, span.start, span.end);
         var visibility = "";
         if symbol.kind == 72 && has_type(symbol.owner) && type_info(c, symbol.owner).opaque {
@@ -568,29 +756,40 @@ pub fn query_json_at(c: Context, offset: Int, scope: String, first: Int, limit: 
         }
         if symbol.method_span.end > 0 {
             visibility = "\"method\":true,";
-            if !symbol.method_exported { visibility = visibility + "\"visibility\":\"module\","; }
+            if !symbol.method_exported {
+                visibility = visibility + "\"visibility\":\"module\",";
+            }
         }
         if symbol.kind == 73 && symbol.foreign_library == "" && !symbol.interface_operation {
             var status = "checked_body";
             if symbol.template_index >= 0 {
                 status = "deferred";
-                if symbol.constraints_checked { status = "checked_constraints"; }
+                if symbol.constraints_checked {
+                    status = "checked_constraints";
+                }
             }
             visibility = visibility + "\"analysis_status\":" + json_string(status) + ",";
         }
-        strings_push(definitions, f"{{{visibility:s}\"id\":\"{key:s}\",\"name\":{json_string(name):s},\"kind\":\"{kind:s}\",\"type\":{json_string(query_type_name(c, symbol.type_id)):s},\"effects\":{effect_json(symbol.effect_mask):s},\"range\":{query_range(c, span):s}}}");
+        strings_push(definitions,
+            f"{{{visibility:s}\"id\":\"{key:s}\",\"name\":{json_string(name):s},\"kind\":\"{kind:s}\",\"type\":{json_string(query_type_name(c, symbol.type_id)):s},\"effects\":{effect_json(symbol.effect_mask):s},\"range\":{query_range(c, span):s}}}");
     }
     for site in c.query_uses {
         let key = query_site_key(c, site);
-        if offset >= 0 && (key == "" && !(site.span.start <= offset && offset < site.span.end) || key != "" && !dict_has(targets, key)) { continue; }
+        if offset >= 0 && (key == "" && !(site.span.start <= offset && offset < site.span.end)
+            || key != "" && !dict_has(targets, key)) {
+            continue;
+        }
         var effect_mask = 0;
         var analysis = "";
         if has_symbol(site.symbol) {
             let symbol = symbol_info(c, site.symbol);
             effect_mask = symbol.effect_mask;
-            if site.role == "call" && symbol.kind == 73 && !symbol.builtin && !symbol.interface_operation && symbol.foreign_library == "" {
+            if site.role == "call" && symbol.kind == 73 && !symbol.builtin
+                && !symbol.interface_operation && symbol.foreign_library == "" {
                 analysis = "\"analysis_status\":\"checked_body\",";
-                if symbol.template_index >= 0 { analysis = "\"analysis_status\":\"checked_instance\","; }
+                if symbol.template_index >= 0 {
+                    analysis = "\"analysis_status\":\"checked_instance\",";
+                }
             }
         }
         var caller = "";
@@ -599,29 +798,42 @@ pub fn query_json_at(c: Context, offset: Int, scope: String, first: Int, limit: 
             if enclosing >= 0 {
                 let f = list_get(c.bound_functions, enclosing);
                 var span = query_decl_span(c, f.span, f.name);
-                if f.impl_index >= 0 { span = f.name_span; }
-                if span.end != 0 { caller = query_key(c, span, "function"); }
+                if f.impl_index >= 0 {
+                    span = f.name_span;
+                }
+                if span.end != 0 {
+                    caller = query_key(c, span, "function");
+                }
             }
         }
-        let value = f"{{{analysis:s}\"id\":{json_string(key):s},\"caller\":{json_string(caller):s},\"role\":\"{site.role:s}\",\"type\":{json_string(query_type_name(c, site.type_id)):s},\"effects\":{effect_json(effect_mask):s},\"range\":{query_range(c, site.span):s}}}";
+        let value =
+            f"{{{analysis:s}\"id\":{json_string(key):s},\"caller\":{json_string(caller):s},\"role\":\"{site.role:s}\",\"type\":{json_string(query_type_name(c, site.type_id)):s},\"effects\":{effect_json(effect_mask):s},\"range\":{query_range(c, site.span):s}}}";
         if !dict_has(seen, value) {
             dict_set(seen, value, true);
-            if query_page_row(row, first, limit) { strings_push(references, value); }
+            if query_page_row(row, first, limit) {
+                strings_push(references, value);
+            }
             row = row + 1;
         }
     }
     for edge in c.imports {
         if query_page_row(row, first, limit) {
-            strings_push(imports, f"{{\"from\":{edge.owner:d},\"to\":{edge.target:d},\"alias\":{json_string(edge.alias):s},\"range\":{query_range(c, edge.span):s}}}");
+            strings_push(imports,
+                f"{{\"from\":{edge.owner:d},\"to\":{edge.target:d},\"alias\":{json_string(edge.alias):s},\"range\":{query_range(c, edge.span):s}}}");
         }
         row = row + 1;
     }
     var page = "";
     if limit > 0 {
-        if first > row { plan_reject(c, "Query continuation offset is out of range."); }
+        if first > row {
+            plan_reject(c, "Query continuation offset is out of range.");
+        }
         var next = "null";
-        if first + limit < row { next = to_string(first + limit); }
-        page = f",\"page\":{{\"revision\":\"{continuation_revision:s}\",\"offset\":{first:d},\"total\":{row:d},\"next_offset\":{next:s}}}";
+        if first + limit < row {
+            next = to_string(first + limit);
+        }
+        page =
+            f",\"page\":{{\"revision\":\"{continuation_revision:s}\",\"offset\":{first:d},\"total\":{row:d},\"next_offset\":{next:s}}}";
     }
     return f"{{\"schema_version\":1,\"ok\":true,\"revision\":\"{query_revision(c):s}\",\"scope\":{scope:s},\"diagnostics\":[],\"documents\":[{strings_join(documents, ","):s}],\"definitions\":[{strings_join(definitions, ","):s}],\"references\":[{strings_join(references, ","):s}],\"imports\":[{strings_join(imports, ","):s}]{page:s}}}";
 }

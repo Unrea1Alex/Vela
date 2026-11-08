@@ -1,0 +1,404 @@
+import "cli.vela" as cli;
+enum Kind {
+    Flag(Bool),
+    Text(Option<String>),
+    Integer(Int, Int, Option<Int>)
+}
+pub opaque struct Parameter {
+    name: String,
+    description: String,
+    kind: Kind,
+    positional: Bool
+}
+pub struct LessEqual {
+    minimum: String,
+    maximum: String
+}
+pub opaque struct Schema {
+    program: String,
+    description: String,
+    parameters: List<Parameter>,
+    relations: List<LessEqual>
+}
+enum Value {
+    Flag(Bool),
+    Text(String),
+    Integer(Int)
+}
+pub opaque struct Arguments {
+    values: Dict<String, Value>,
+    help: String,
+    requested_help: Bool
+}
+pub enum Error {
+    InvalidSchema(String),
+    Parse(cli::Error),
+    Required(String),
+    Positionals(Int, Int),
+    Integer(String, String),
+    Range(String, Int, Int, Int),
+    Relation(String, String, Int, Int),
+    Lookup(String, String),
+    System(String)
+}
+pub fn flag(name: String, description: String, default: Bool) -> Parameter {
+    return Parameter(name: name, description: description, kind: Kind::Flag(default),
+        positional: false);
+}
+pub fn text(name: String, description: String, default: Option<String>) -> Parameter {
+    return Parameter(name: name, description: description, kind: Kind::Text(default),
+        positional: false);
+}
+pub fn integer(name: String, description: String, minimum: Int, maximum: Int,
+    default: Option<Int>) -> Parameter {
+    return Parameter(name: name, description: description, kind: Kind::Integer(minimum, maximum,
+        default), positional: false);
+}
+pub fn positional(name: String, description: String, default: Option<String>) -> Parameter {
+    return Parameter(name: name, description: description, kind: Kind::Text(default),
+        positional: true);
+}
+fn valid_name(name: String) -> Bool {
+    if str_len(name) == 0 || str_len(name) > 64 || str_byte(name, 0) == 45 {
+        return false;
+    }
+    for i in 0 .. str_len(name) {
+        let b = str_byte(name, i);
+        if !(b >= 65 && b <= 90 || b >= 97 && b <= 122 || b >= 48 && b <= 57 || b == 45) {
+            return false;
+        }
+    }
+    return name != "help";
+}
+pub fn create(program: String, description: String, parameters: List<Parameter>,
+    relations: List<LessEqual>) -> Result<Schema, Error> effects { state } {
+    if program == "" || list_len(parameters) > 64 || list_len(relations) > 64 {
+        return Result<Schema, Error>::Err(Error::InvalidSchema("program or descriptor limit"));
+    }
+    let names = dict_new<String, Bool>();
+    let integers = dict_new<String, Bool>();
+    let copied = list_new<Parameter>();
+    let pairs = list_new<LessEqual>();
+    var optional_position = false;
+    for p in parameters {
+        if !valid_name(p.name) || dict_has(names, p.name) {
+            return Result<Schema, Error>::Err(Error::InvalidSchema(p.name));
+        }
+        dict_set(names, p.name, true);
+        match p.kind {
+            Kind::Flag(_) => {}
+            Kind::Text(default) => {
+                if p.positional {
+                    match default {
+                        Option::Some(_) => {
+                            optional_position = true;
+                        }
+                        Option::None => {
+                            if optional_position {
+                                return Result<Schema, Error>::Err(Error::InvalidSchema(
+                                    "required positional after optional: " + p.name));
+                            }
+                        }
+                    }
+                }
+            }
+            Kind::Integer(minimum, maximum, default) => {
+                if minimum > maximum {
+                    return Result<Schema, Error>::Err(Error::InvalidSchema("invalid range: "
+                        + p.name));
+                }
+                match default {
+                    Option::Some(value) => {
+                        if value < minimum || value > maximum {
+                            return Result<Schema, Error>::Err(Error::InvalidSchema(
+                                "default outside range: " + p.name));
+                        }
+                    }
+                    Option::None => {}
+                }
+                dict_set(integers, p.name, true);
+            }
+        }
+        list_push(copied, p);
+    }
+    for relation in relations {
+        if !dict_has(integers, relation.minimum) || !dict_has(integers, relation.maximum) {
+            return Result<Schema, Error>::Err(Error::InvalidSchema(
+                "relation requires integer options"));
+        }
+        list_push(pairs, relation);
+    }
+    return Result<Schema, Error>::Ok(Schema(program: program, description: description,
+        parameters: copied, relations: pairs));
+}
+fn usage(schema: Schema) -> String effects { state } {
+    let parts = strings_new();
+    strings_push(parts, "Usage: " + schema.program);
+    for p in schema.parameters {
+        if p.positional {
+            match p.kind {
+                Kind::Text(default) => {
+                    match default {
+                        Option::None => {
+                            strings_push(parts, " <" + p.name + ">");
+                        }
+                        Option::Some(_) => {
+                            strings_push(parts, " [" + p.name + "]");
+                        }
+                    }
+                }
+                Kind::Flag(_) => {}
+                Kind::Integer(_, _, _) => {}
+            }
+        }
+    }
+    strings_push(parts, " [options]\n" + schema.description + "\n  --help  Show this help");
+    for p in schema.parameters {
+        var label = "  --" + p.name;
+        if p.positional {
+            label = "  " + p.name;
+        }
+        match p.kind {
+            Kind::Flag(default) => {
+                label = label + " (default " + to_string(default) + ")";
+            }
+            Kind::Text(default) => {
+                if !p.positional {
+                    label = label + " TEXT";
+                }
+                match default {
+                    Option::None => {
+                        label = label + " (required)";
+                    }
+                    Option::Some(value) => {
+                        label = label + " (default '" + value + "')";
+                    }
+                }
+            }
+            Kind::Integer(minimum, maximum, default) => {
+                label = label + " INT " + to_string(minimum) + ".." + to_string(maximum);
+                match default {
+                    Option::None => {
+                        label = label + " (required)";
+                    }
+                    Option::Some(value) => {
+                        label = label + " (default " + to_string(value) + ")";
+                    }
+                }
+            }
+        }
+        strings_push(parts, "\n" + label + "  " + p.description);
+    }
+    return strings_join(parts, "");
+}
+pub fn parse(values: List<String>, schema: Schema) -> Result<Arguments, Error> effects { state } {
+    if list_len(values) > 4096 {
+        return Result<Arguments, Error>::Err(Error::InvalidSchema("argument limit"));
+    }
+    let specs = list_new<cli::Spec>();
+    list_push(specs, cli::Spec(name: "help", takes_value: false));
+    for p in schema.parameters {
+        if !p.positional {
+            let takes = match p.kind {
+                Kind::Flag(_) => false,
+                Kind::Text(_) => true,
+                Kind::Integer(_, _, _) => true
+            };
+            list_push(specs, cli::Spec(name: p.name, takes_value: takes));
+        }
+    }
+    let old = match cli::parse(values, specs) {
+        Result::Ok(parsed) => Result<cli::Arguments, Error>::Ok(parsed),
+        Result::Err(cause) => Result<cli::Arguments, Error>::Err(Error::Parse(cause))
+    }
+    ?;
+    let args = Arguments(values: dict_new<String, Value>(), help: usage(schema),
+        requested_help: dict_has(old.options, "help"));
+    if args.requested_help {
+        return Result<Arguments, Error>::Ok(args);
+    }
+    var at = 0;
+    for p in schema.parameters {
+        var supplied = dict_has(old.options, p.name);
+        var raw = "";
+        if p.positional {
+            supplied = at < list_len(old.positional);
+            if supplied {
+                raw = list_get(old.positional, at);
+                at = at + 1;
+            }
+        } else if supplied {
+            raw = dict_get(old.options, p.name);
+        }
+        match p.kind {
+            Kind::Flag(default) => {
+                dict_set(args.values, p.name, Value::Flag(supplied || default));
+            }
+            Kind::Text(default) => {
+                if supplied {
+                    dict_set(args.values, p.name, Value::Text(raw));
+                } else {
+                    match default {
+                        Option::Some(value) => {
+                            dict_set(args.values, p.name, Value::Text(value));
+                        }
+                        Option::None => {
+                            return Result<Arguments, Error>::Err(Error::Required(p.name));
+                        }
+                    }
+                }
+            }
+            Kind::Integer(minimum, maximum, default) => {
+                var number = 0;
+                if supplied {
+                    match parse_int(raw) {
+                        IntResult::Ok(value) => {
+                            number = value;
+                        }
+                        IntResult::Err(_) => {
+                            return Result<Arguments, Error>::Err(Error::Integer(p.name, raw));
+                        }
+                    }
+                } else {
+                    match default {
+                        Option::Some(value) => {
+                            number = value;
+                        }
+                        Option::None => {
+                            return Result<Arguments, Error>::Err(Error::Required(p.name));
+                        }
+                    }
+                }
+                if number < minimum || number > maximum {
+                    return Result<Arguments, Error>::Err(Error::Range(p.name, number, minimum,
+                        maximum));
+                }
+                dict_set(args.values, p.name, Value::Integer(number));
+            }
+        }
+    }
+    if at != list_len(old.positional) {
+        return Result<Arguments, Error>::Err(Error::Positionals(at, list_len(old.positional)));
+    }
+    for relation in schema.relations {
+        let minimum = int_value(args, relation.minimum)?;
+        let maximum = int_value(args, relation.maximum)?;
+        if minimum > maximum {
+            return Result<Arguments, Error>::Err(Error::Relation(relation.minimum, relation.maximum,
+                minimum, maximum));
+        }
+    }
+    return Result<Arguments, Error>::Ok(args);
+}
+pub fn current(schema: Schema) -> Result<Arguments, Error> effects { args, state } {
+    if arg_count() > 4096 {
+        return Result<Arguments, Error>::Err(Error::InvalidSchema("argument limit"));
+    }
+    let values = list_new<String>();
+    for i in 0 .. arg_count() {
+        match arg(i) {
+            StringResult::Ok(value) => {
+                list_push(values, value);
+            }
+            StringResult::Err(cause) => {
+                return Result<Arguments, Error>::Err(Error::System(cause));
+            }
+        }
+    }
+    return parse(values, schema);
+}
+pub fn is_help(args: Arguments) -> Bool {
+    return args.requested_help;
+}
+pub fn help(args: Arguments) -> String {
+    return args.help;
+}
+pub fn text_value(args: Arguments, name: String) -> Result<String, Error> effects { state } {
+    if dict_has(args.values, name) {
+        match dict_get(args.values, name) {
+            Value::Text(value) => {
+                return Result<String, Error>::Ok(value);
+            }
+            Value::Flag(_) => {}
+            Value::Integer(_) => {}
+        }
+    }
+    return Result<String, Error>::Err(Error::Lookup(name, "Text"));
+}
+pub fn int_value(args: Arguments, name: String) -> Result<Int, Error> effects { state } {
+    if dict_has(args.values, name) {
+        match dict_get(args.values, name) {
+            Value::Integer(value) => {
+                return Result<Int, Error>::Ok(value);
+            }
+            Value::Flag(_) => {}
+            Value::Text(_) => {}
+        }
+    }
+    return Result<Int, Error>::Err(Error::Lookup(name, "Int"));
+}
+pub fn flag_value(args: Arguments, name: String) -> Result<Bool, Error> effects { state } {
+    if dict_has(args.values, name) {
+        match dict_get(args.values, name) {
+            Value::Flag(value) => {
+                return Result<Bool, Error>::Ok(value);
+            }
+            Value::Integer(_) => {}
+            Value::Text(_) => {}
+        }
+    }
+    return Result<Bool, Error>::Err(Error::Lookup(name, "Flag"));
+}
+pub fn describe(error: Error) -> String {
+    match error {
+        Error::InvalidSchema(reason) => {
+            return "Invalid CLI schema: " + reason;
+        }
+        Error::Required(name) => {
+            return "Missing required parameter: " + name;
+        }
+        Error::Positionals(expected, actual) => {
+            return "Positional count: expected " + to_string(expected) + ", got " + to_string(
+                actual);
+        }
+        Error::Integer(name, raw) => {
+            return "Invalid Int for " + name + ": " + raw;
+        }
+        Error::Range(name, actual, minimum, maximum) => {
+            return "Int range for " + name + ": " + to_string(minimum) + ".." + to_string(maximum)
+                + ", got " + to_string(actual);
+        }
+        Error::Relation(minimum, maximum, low, high) => {
+            return minimum + " must be <= " + maximum + ": " + to_string(low) + " > " + to_string(
+                high);
+        }
+        Error::Lookup(name, expected) => {
+            return "Parameter " + name + " is missing or is not " + expected;
+        }
+        Error::System(cause) => {
+            return cause;
+        }
+        Error::Parse(cause) => {
+            match cause {
+                cli::Error::Unknown(name) => {
+                    return "Unknown option: " + name;
+                }
+                cli::Error::Duplicate(name) => {
+                    return "Repeated option: " + name;
+                }
+                cli::Error::MissingValue(name) => {
+                    return "Missing option value: " + name;
+                }
+                cli::Error::UnexpectedValue(name) => {
+                    return "Flag takes no value: " + name;
+                }
+                cli::Error::InvalidSpec(name) => {
+                    return "Invalid option: " + name;
+                }
+                cli::Error::System(message) => {
+                    return message;
+                }
+            }
+        }
+    }
+}

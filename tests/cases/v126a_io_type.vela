@@ -1,0 +1,3 @@
+import "../../../std/io.vela" as io;
+fn finish() -> Result<Unit,io::Error> { return Result<Unit,io::Error>::Err(io::error(io::ErrorKind::Close,0,"x")); }
+fn main() -> Unit effects {state} { let value=io::reader(fn [](n:Int)->Result<Bool,io::Error>{return Result<Bool,io::Error>::Ok(true);},finish,1); }

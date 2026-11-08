@@ -1,0 +1,3 @@
+import "../../../std/algorithms.vela" as a;
+fn invalid(values: List<Int>) -> List<Int> effects { state } { return a::filter(values, fn [](n: Int) -> Int { return n; }); }
+fn main() -> Unit {}

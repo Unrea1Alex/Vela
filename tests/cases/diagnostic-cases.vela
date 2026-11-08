@@ -1,0 +1,89 @@
+import "../../tools/test.vela";
+fn diagnostic_plan_args(s: Suite, input: String, revision: String,
+    document: Int) -> StringList effects { state } {
+    let args = compiler_command(s, "plan", input);
+    strings_push(args, revision);
+    strings_push(args, to_string(document));
+    strings_push(args, "diagnose");
+    return args;
+}
+pub fn diagnostic_plan_checks(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let input = s.dir + "/diagnostic-main.vela";
+    let code = "fn main()->Unit { print(7); }\n";
+    done(write_file(input, code));
+    let revision = sha256(sha256(code));
+    let query = invoke(s, compiler_command(s, "query", input), 15000);
+    s = record(s, "diagnostic_revision", query.code == 1 && contains(query.out, "E209") && contains(
+        query.out, revision) && contains(query.out, "explanation"), query.out + query.err);
+    let preview = invoke(s, diagnostic_plan_args(s, input, revision, 0), 20000);
+    s = record(s, "diagnostic_checked_preview", preview.code == 0 && contains(preview.out,
+        "\"validated\":true") && contains(preview.out, "effects {io} {") && value(read_file(input))
+        == code, preview.out + preview.err);
+    let stale = invoke(s, diagnostic_plan_args(s, input, sha256("stale"), 0), 15000);
+    s = record(s, "diagnostic_stale", stale.code == 1 && contains(stale.out, "E231") && value(
+        read_file(input)) == code, stale.out + stale.err);
+    let bad_doc = invoke(s, diagnostic_plan_args(s, input, revision, 9), 15000);
+    s = record(s, "diagnostic_document", bad_doc.code == 1 && contains(bad_doc.out, "E231"),
+        bad_doc.out + bad_doc.err);
+    let typed = "fn main()->Int{return true;}\n";
+    done(write_file(input, typed));
+    let explanation = invoke(s, diagnostic_plan_args(s, input, sha256(sha256(typed)), 0), 15000);
+    s = record(s, "diagnostic_type_explanation", explanation.code == 0 && contains(explanation.out,
+        "\"expected\":\"Int\"") && contains(explanation.out, "\"actual\":\"Bool\"") && contains(
+        explanation.out, "\"changes\":[]"), explanation.out + explanation.err);
+    let public_code = "pub fn action()->Unit{print(7);} fn main()->Unit{}\n";
+    done(write_file(input, public_code));
+    let refused = invoke(s, diagnostic_plan_args(s, input, sha256(sha256(public_code)), 0), 15000);
+    s = record(s, "diagnostic_public_effect_refused", refused.code == 0 && contains(refused.out,
+        "\"validated\":false") && contains(refused.out, "\"changes\":[]"), refused.out
+        + refused.err);
+    done(write_file(input, "fn main()->Int{return 0;}\n"));
+    let manifest = s.dir + "/diagnostic.vproj";
+    let config = "vela-project|1\nname|bad-name\nentry|diagnostic-main.vela\n";
+    done(write_file(manifest, config));
+    let name = invoke(s, diagnostic_plan_args(s, manifest, sha256(sha256(config)), 0), 20000);
+    s = record(s, "diagnostic_project_name", name.code == 0 && contains(name.out,
+        "\"validated\":true") && contains(name.out, "bad_name") && value(read_file(manifest))
+        == config, name.out + name.err);
+    let before = value(file_identity(s.root + "/--help"));
+    let help = compiler_command(s, "init", "--help");
+    strings_push(help, "--json");
+    let helped = invoke(s, help, 15000);
+    let identity = value(file_identity(s.root + "/--help"));
+    s = record(s, "diagnostic_init_help", helped.code == 0 && contains(helped.out, "\"help\":")
+        && identity == before, helped.out + helped.err);
+    for alias in split("Int|T", 124) {
+        done(write_file(s.dir + "/" + alias + ".vela", "pub fn answer()->Int{return 42;}\n"));
+        var known = "fn main()->Int{return Int::answer();}\n";
+        if alias == "T" {
+            known = "fn wrong<T>(value:T)->Int{return T::answer();} fn main()->Int{return wrong(4);}\n";
+        }
+        done(write_file(input, known));
+        let declined = invoke(s, diagnostic_plan_args(s, input, sha256(sha256(known)), 0), 20000);
+        s = record(s, "diagnostic_known_type_" + alias, declined.code == 0 && contains(declined.out,
+            "Unknown enum.") && contains(declined.out, "\"validated\":false") && contains(
+            declined.out, "\"changes\":[]") && value(read_file(input)) == known,
+            declined.out + declined.err);
+    }
+    if platform() == "windows" {
+        let exe = s.dir + "/temp-directory-host.exe";
+        let args = command(env("VELA_CC"));
+        for flag in split("/nologo|/TC|/std:c11|/MT|/O2", 124) {
+            strings_push(args, flag);
+        }
+        strings_push(args, "/Fo" + s.dir + "/temp-directory-host.obj");
+        strings_push(args, "/Fe" + exe);
+        strings_push(args, s.root + "/tests/library12/temp-directory-host.c");
+        let compiled = invoke(s, args, 30000);
+        s = record(s, "diagnostic_temp_collision_build", compiled.code == 0, compiled.out
+            + compiled.err);
+        if compiled.code == 0 {
+            let probe = invoke(s, command(exe), 15000);
+            s = record(s, "diagnostic_temp_collision_ownership", probe.code == 0 && probe.out
+                == "exclusive temporary directory retry, rival preservation and bound passed\n",
+                probe.out + probe.err);
+        }
+    }
+    return s;
+}

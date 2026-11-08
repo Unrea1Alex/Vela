@@ -141,10 +141,12 @@ fn main() -> Int effects { args, state, io, process } {
         }
     }
     build(previous, root + "/tools/lsp.vela", out + "/vela-lsp.exe", out + "/lsp-build");
+    build(previous, root + "/tools/api.vela", out + "/vela-api.exe", out + "/api-build");
     copy(previous, bin + "/velac.exe");
     copy(out + "/vela-test.exe", bin + "/vela-test.exe");
     copy(out + "/vela-bundle-final.exe", bin + "/vela-bundle.exe");
     copy(out + "/vela-lsp.exe", bin + "/vela-lsp.exe");
+    copy(out + "/vela-api.exe", bin + "/vela-api.exe");
     copy(out + "/vela-dev.exe", bin + "/vela-dev.next.exe");
     let version_args = command(previous);
     strings_push(version_args, "--version");

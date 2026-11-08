@@ -1,0 +1,3 @@
+import "../../../std/json_decode.vela" as d;
+fn invalid(fields: d::Fields) -> Int { return fields.start; }
+fn main() -> Unit {}

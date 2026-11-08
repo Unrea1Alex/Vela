@@ -1,0 +1,27 @@
+pub fn map<T, U, effect Eff>(value: Option<T>, transform: fn(
+    T) -> U effects Eff) -> Option<U> effects Eff {
+    return match value {
+        Option::Some(item) => Option<U>::Some(transform(item)),
+        Option::None => Option<U>::None
+    };
+}
+pub fn and_then<T, U, effect Eff>(value: Option<T>, transform: fn(
+    T) -> Option<U> effects Eff) -> Option<U> effects Eff {
+    return match value {
+        Option::Some(item) => transform(item),
+        Option::None => Option<U>::None
+    };
+}
+pub fn unwrap_or<T>(value: Option<T>, default: T) -> T {
+    return match value {
+        Option::Some(item) => item,
+        Option::None => default
+    };
+}
+pub fn unwrap_or_else<T, effect Eff>(value: Option<T>,
+    produce: fn() -> T effects Eff) -> T effects Eff {
+    return match value {
+        Option::Some(item) => item,
+        Option::None => produce()
+    };
+}

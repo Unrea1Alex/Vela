@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.8",
+  "status": "verified",
+  "date": "2026-11-08",
+  "contract": "../contracts/DIAGNOSTIC-PLANS-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1393,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 511535,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/128-verify.log",
+  "focused": {
+    "schema_version": 1,
+    "status": "passed",
+    "checks": [
+      "типы-😀: explanation",
+      "independent Unicode UTF16/byte coordinates",
+      "main-effects: checked preview",
+      "existing-effects: checked preview",
+      "public-effects: explanation",
+      "process-effects: explanation",
+      "closure-effects: explanation",
+      "project-name: checked preview",
+      "empty-project-name: checked preview",
+      "project-field: checked preview",
+      "duplicate-field: explanation",
+      "import: checked preview",
+      "unicode-leading-import: checked preview",
+      "installed-import: checked preview",
+      "ambiguous-import: explanation",
+      "alias-conflict: explanation",
+      "несколько-😀: checked preview",
+      "imported-document correction",
+      "stale revision rejected",
+      "invalid document rejected",
+      "different diagnostic document rejected",
+      "oversized manifest: no diagnostic line-table growth or plan",
+      "init help JSON/plain no filesystem writes; complete empty usage"
+    ],
+    "passed": 23,
+    "allocation": [
+      {
+        "name": "text",
+        "managed_peak": 2117057
+      },
+      {
+        "name": "lines",
+        "managed_peak": 2117065
+      }
+    ],
+    "work": "G:\\Vela\\build\\stage12\\diagnostics-DKJf4p"
+  },
+  "gc": {
+    "schema_version": 1,
+    "status": "passed",
+    "query": {
+      "collections": 299904,
+      "managed_peak": 203070,
+      "managed_live": 181034
+    },
+    "plan": {
+      "collections": 312253,
+      "managed_peak": 203094,
+      "managed_live": 181058
+    },
+    "scope": "bounded source/context/overlay child recheck; full compiler source and full diagnostic corpus not forced-GC tested"
+  },
+  "recipes": {
+    "schema_version": 1,
+    "checks": [
+      "recipe basics",
+      "recipe directory",
+      "recipe json",
+      "recipe bytes",
+      "recipe result",
+      "recipe callable",
+      "recipe http",
+      "recipe cli",
+      "recipe sort",
+      "recipe traversals",
+      "recipe set",
+      "recipe cell",
+      "recipe json-schema",
+      "recipe streams",
+      "recipe parallel",
+      "generic/effect/opaque/method/async interface",
+      "reject invalid interface before emission",
+      "all embedded builtin rows",
+      "all shipped modules and recipe IDs resolve to verified catalog"
+    ],
+    "passed": 19
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 119,
+    "links": 827,
+    "missing": []
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "api": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "mcp": {
+    "passed": 8,
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "startup_tokens": 1891,
+    "logs": [
+      "build/stage12/128-mcp.log",
+      "build/stage12/128-mcp-diagnostic.log"
+    ],
+    "rerun": "Only new test failed: cleanup used undefined work; corrected to workspace, focused group then passed",
+    "groups": 8
+  },
+  "lsp": {
+    "legacy": [
+      "build/stage12/128-lsp-legacy.json",
+      "build/stage12/128-lsp-refactor.json",
+      "build/stage12/128-lsp-callables.json",
+      "build/stage12/128-lsp-test-root-scope.json"
+    ],
+    "diagnostic": "build/stage12/128-lsp.json",
+    "parallel_400": [
+      "build/stage12/128-lsp-methods-fixed.json",
+      "build/stage12/128-lsp-interfaces-fixed.json"
+    ]
+  },
+  "linux": {
+    "scope": "native GCC CLI diagnostic plans and source preservation; no Linux fiber claim",
+    "log": "build/stage12/128-linux.log",
+    "status": "passed"
+  },
+  "resolved_failures": [
+    "authored repair imports and typed-table fixture import graph",
+    "Windows temporary-directory reservation race: 32 bounded retries, independent C hook checks rival preservation and exhaustion",
+    "LSP refactor verification now uses an owned temporary project instead of a historical one-off source migration"
+  ],
+  "next": "1.2.8a"
+}

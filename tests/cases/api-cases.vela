@@ -1,0 +1,45 @@
+import "../../tools/test.vela";
+fn api_request(s: Suite, exe: String, query: String, mode: String) -> StringList effects { state } {
+    let args = command(exe);
+    strings_push(args, s.root + "/docs/api-index.json");
+    strings_push(args, s.root + "/docs/api-purpose.json");
+    strings_push(args, query);
+    strings_push(args, mode);
+    strings_push(args, "0");
+    strings_push(args, "1");
+    strings_push(args, "4096");
+    strings_push(args, "");
+    strings_push(args, "");
+    return args;
+}
+pub fn api_checks(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    let exe = s.dir + "/api-native.exe";
+    let compiled = build(s, s.root + "/tools/api.vela", exe);
+    s = record(s, "api_search_native_build", compiled.code == 0, compiled.out + compiled.err);
+    if compiled.code != 0 {
+        return s;
+    }
+    let exact = invoke(s, api_request(s, exe, "std/directory:walk", "name"), 15000);
+    s = record(s, "api_search_exact", exact.code == 0 && contains(exact.out,
+        "\"id\":\"std/directory:walk\"") && contains(exact.out, "\"state\":\"matches\""), exact.out
+        + exact.err);
+    let empty = invoke(s, api_request(s, exe, "  ", "query"), 15000);
+    s = record(s, "api_search_empty", empty.code == 0 && contains(empty.out, "\"state\":\"empty\"")
+        && contains(empty.out, "\"items\":[]"), empty.out + empty.err);
+    let missing = invoke(s, api_request(s, exe, "not_an_api", "name"), 15000);
+    s = record(s, "api_search_unknown", missing.code == 0 && contains(missing.out,
+        "\"state\":\"not_found\""), missing.out + missing.err);
+    let ambiguous = invoke(s, api_request(s, exe, "open", "name"), 15000);
+    s = record(s, "api_search_ambiguous", ambiguous.code == 0 && contains(ambiguous.out,
+        "\"state\":\"ambiguous\""), ambiguous.out + ambiguous.err);
+    let page = invoke(s, api_request(s, exe, "directory", "query"), 15000);
+    s = record(s, "api_search_page", page.code == 0 && contains(page.out, "\"next_offset\":1"),
+        page.out + page.err);
+    let stale_args = api_request(s, exe, "directory", "query");
+    strings_set(stale_args, 8, "0.0.0");
+    let stale = invoke(s, stale_args, 15000);
+    s = record(s, "api_search_stale", stale.code == 0 && contains(stale.out,
+        "\"reason\":\"stale_version\""), stale.out + stale.err);
+    return s;
+}

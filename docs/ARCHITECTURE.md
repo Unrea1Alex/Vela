@@ -1,6 +1,22 @@
-# Архитектура Vela: типизированный компилятор 0.9
+# Архитектура Vela: типизированный компилятор 1.x
+
+Карта authored-модулей, инвариантов, bootstrap-зависимостей и решений аудита:
+[COMPILER-AUDIT-1.2](COMPILER-AUDIT-1.2.md).
 
 ## Компилятор
+
+`selfhost/help.vela` сериализует public-интерфейсы после frontend/type checking
+для команды api; он не передаёт syntax backend-у. Каталог builtin остаётся в
+`vela/builtins.def`; документационный генератор `tools/help.vela` получает
+сигнатуры/effects от native compiler, а не из TypeScript-парсера.
+
+`selfhost/repairs.vela` формирует объяснения ошибок и ограниченные source edits
+из native diagnostics/bound source metadata. Ошибка по-прежнему завершает
+frontend: частичный checked IR не поступает в backend. Диагностический plan
+проверяет revision и запускает тот же native frontend с временным overlay;
+`query --validate` не генерирует C. Manifest overlays проходят тот же project
+parser, а не отдельный формат в MCP. LSP/MCP только передают native результат.
+[Контракт](contracts/DIAGNOSTIC-PLANS-1.2.md).
 
 `selfhost/` содержит активную реализацию на Vela:
 

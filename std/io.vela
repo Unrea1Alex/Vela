@@ -1,0 +1,526 @@
+import "text.vela" as text;
+fn empty() -> Unit {}
+pub enum ErrorKind {
+    InvalidLimit,
+    Closed,
+    NoProgress,
+    Protocol,
+    Read,
+    Write,
+    Close,
+    TotalLimit,
+    Busy
+}
+pub struct Error {
+    kind: ErrorKind,
+    offset: Int,
+    cause: String
+}
+pub enum Chunk {
+    Data(String),
+    End
+}
+pub struct Counters {
+    bytes: Int,
+    calls: Int,
+    largest: Int,
+    closed: Bool
+}
+struct State {
+    closed: Bool,
+    busy: Bool,
+    failed: Option<Error>,
+    close_error: Option<Error>,
+    offset: Int,
+    calls: Int,
+    largest: Int,
+    eof: Bool
+}
+pub opaque struct Reader {
+    pull: fn(Int) -> Result<Chunk, Error> effects { state, io },
+    finish: fn() -> Result<Unit, Error> effects { state, io },
+    shared: List<State>,
+    total: Int
+}
+pub opaque struct Writer {
+    push: fn(String) -> Result<Int, Error> effects { state, io },
+    finish: fn() -> Result<Unit, Error> effects { state, io },
+    shared: List<State>
+}
+pub opaque struct Sink {
+    chunks: StringList,
+    shared: List<Int>,
+    limit: Int,
+    writer: Writer
+}
+pub struct Statistics {
+    bytes: Int,
+    reads: Int,
+    writes: Int,
+    peak_chunk: Int
+}
+pub struct Failure {
+    operation: Option<Error>,
+    reader_close: Option<Error>,
+    writer_close: Option<Error>
+}
+pub fn error(kind: ErrorKind, offset: Int, cause: String) -> Error {
+    return Error(kind: kind, offset: offset, cause: cause);
+}
+pub fn describe(value: Error) -> String {
+    return "stream byte " + to_string(value.offset) + ": " + value.cause;
+}
+fn state() -> List<State> effects { state } {
+    let shared = list_new<State>();
+    list_push(shared, State(closed: false, busy: false, failed: Option<Error>::None,
+        close_error: Option<Error>::None, offset: 0, calls: 0, largest: 0, eof: false));
+    return shared;
+}
+pub fn reader(pull: fn(Int) -> Result<Chunk, Error> effects { state, io },
+    finish: fn() -> Result<Unit, Error> effects { state, io }, total: Int) -> Result<Reader,
+    Error> effects { state } {
+    if total < 1 {
+        return Result<Reader, Error>::Err(error(ErrorKind::InvalidLimit, 0,
+            "total must be positive"));
+    }
+    return Result<Reader, Error>::Ok(Reader(pull: pull, finish: finish, shared: state(),
+        total: total));
+}
+pub fn writer(push: fn(String) -> Result<Int, Error> effects { state, io },
+    finish: fn() -> Result<Unit, Error> effects { state, io }) -> Writer effects { state } {
+    return Writer(push: push, finish: finish, shared: state());
+}
+fn fail_read(value: Reader, failure: Error) -> Result<Chunk, Error> effects { state } {
+    var s = list_get(value.shared, 0);
+    s.busy = false;
+    s.failed = Option<Error>::Some(failure);
+    list_set(value.shared, 0, s);
+    return Result<Chunk, Error>::Err(failure);
+}
+fn fail_write(value: Writer, failure: Error) -> Result<Int, Error> effects { state } {
+    var s = list_get(value.shared, 0);
+    s.busy = false;
+    s.failed = Option<Error>::Some(failure);
+    list_set(value.shared, 0, s);
+    return Result<Int, Error>::Err(failure);
+}
+pub fn read(value: Reader, requested: Int) -> Result<Chunk, Error> effects { state, io } {
+    var s = list_get(value.shared, 0);
+    if s.closed {
+        return Result<Chunk, Error>::Err(error(ErrorKind::Closed, s.offset, "reader closed"));
+    }
+    if s.busy {
+        return Result<Chunk, Error>::Err(error(ErrorKind::Busy, s.offset, "reader active"));
+    }
+    match s.failed {
+        Option::Some(e) => {
+            return Result<Chunk, Error>::Err(e);
+        }
+        Option::None => {}
+    }
+    if requested < 1 || requested > 65536 {
+        return Result<Chunk, Error>::Err(error(ErrorKind::InvalidLimit, s.offset,
+            "buffer must be 1..65536"));
+    }
+    if s.eof {
+        return Result<Chunk, Error>::Ok(Chunk::End);
+    }
+    if s.calls == 9223372036854775807 {
+        return fail_read(value, error(ErrorKind::TotalLimit, s.offset, "read counter limit"));
+    }
+    s.busy = true;
+    s.calls = s.calls + 1;
+    list_set(value.shared, 0, s);
+    let pull = value.pull;
+    match pull(requested) {
+        Result::Err(e) => {
+            var failure = e;
+            failure.offset = s.offset;
+            return fail_read(value, failure);
+        }
+        Result::Ok(chunk) => {
+            s.busy = false;
+            match chunk {
+                Chunk::End => {
+                    s.eof = true;
+                }
+                Chunk::Data(data) => {
+                    let count = str_len(data);
+                    if count == 0 {
+                        return fail_read(value, error(ErrorKind::NoProgress, s.offset,
+                            "empty Data"));
+                    }
+                    if count > requested {
+                        return fail_read(value, error(ErrorKind::Protocol, s.offset,
+                            "oversized read"));
+                    }
+                    if count > value.total - s.offset {
+                        return fail_read(value, error(ErrorKind::TotalLimit, s.offset,
+                            "total input limit"));
+                    }
+                    s.offset = s.offset + count;
+                    if count > s.largest {
+                        s.largest = count;
+                    }
+                }
+            }
+            list_set(value.shared, 0, s);
+            return Result<Chunk, Error>::Ok(chunk);
+        }
+    }
+}
+pub fn write(value: Writer, data: String) -> Result<Int, Error> effects { state, io } {
+    var s = list_get(value.shared, 0);
+    if s.closed {
+        return Result<Int, Error>::Err(error(ErrorKind::Closed, s.offset, "writer closed"));
+    }
+    if s.busy {
+        return Result<Int, Error>::Err(error(ErrorKind::Busy, s.offset, "writer active"));
+    }
+    match s.failed {
+        Option::Some(e) => {
+            return Result<Int, Error>::Err(e);
+        }
+        Option::None => {}
+    }
+    let size = str_len(data);
+    if size > 65536 {
+        return Result<Int, Error>::Err(error(ErrorKind::InvalidLimit, s.offset,
+            "write buffer exceeds 65536"));
+    }
+    if size == 0 {
+        return Result<Int, Error>::Ok(0);
+    }
+    if size > 9223372036854775807 - s.offset || s.calls == 9223372036854775807 {
+        return fail_write(value, error(ErrorKind::TotalLimit, s.offset, "write counter limit"));
+    }
+    s.busy = true;
+    s.calls = s.calls + 1;
+    list_set(value.shared, 0, s);
+    let push = value.push;
+    match push(data) {
+        Result::Err(e) => {
+            var failure = e;
+            failure.offset = s.offset;
+            return fail_write(value, failure);
+        }
+        Result::Ok(count) => {
+            if count == 0 {
+                return fail_write(value, error(ErrorKind::NoProgress, s.offset, "zero write"));
+            }
+            if count < 0 || count > size {
+                return fail_write(value, error(ErrorKind::Protocol, s.offset,
+                    "invalid write count"));
+            }
+            s.busy = false;
+            s.offset = s.offset + count;
+            if size > s.largest {
+                s.largest = size;
+            }
+            list_set(value.shared, 0, s);
+            return Result<Int, Error>::Ok(count);
+        }
+    }
+}
+fn close_shared(shared: List<State>, finish: fn() -> Result<Unit, Error> effects { state,
+    io }) -> Result<Unit, Error> effects { state, io } {
+    var s = list_get(shared, 0);
+    if s.busy {
+        return Result<Unit, Error>::Err(error(ErrorKind::Busy, s.offset, "stream active"));
+    }
+    if s.closed {
+        match s.close_error {
+            Option::Some(e) => {
+                return Result<Unit, Error>::Err(e);
+            }
+            Option::None => {
+                return Result<Unit, Error>::Ok(empty());
+            }
+        }
+    }
+    s.closed = true;
+    s.busy = true;
+    list_set(shared, 0, s);
+    var answer = finish();
+    s.busy = false;
+    match answer {
+        Result::Err(e) => {
+            var failure = e;
+            failure.offset = s.offset;
+            answer = Result<Unit, Error>::Err(failure);
+        }
+        Result::Ok(_) => {}
+    }
+    match answer {
+        Result::Err(e) => {
+            s.close_error = Option<Error>::Some(e);
+        }
+        Result::Ok(_) => {}
+    }
+    list_set(shared, 0, s);
+    return answer;
+}
+pub fn close_reader(value: Reader) -> Result<Unit, Error> effects { state, io } {
+    return close_shared(value.shared, value.finish);
+}
+pub fn close_writer(value: Writer) -> Result<Unit, Error> effects { state, io } {
+    return close_shared(value.shared, value.finish);
+}
+fn counts(shared: List<State>) -> Counters effects { state } {
+    let s = list_get(shared, 0);
+    return Counters(bytes: s.offset, calls: s.calls, largest: s.largest, closed: s.closed);
+}
+pub fn reader_counters(value: Reader) -> Counters effects { state } {
+    return counts(value.shared);
+}
+pub fn writer_counters(value: Writer) -> Counters effects { state } {
+    return counts(value.shared);
+}
+fn noop() -> Result<Unit, Error> {
+    return Result<Unit, Error>::Ok(empty());
+}
+pub fn memory_reader(data: String, chunk_limit: Int, total: Int) -> Result<Reader,
+    Error> effects { state } {
+    if chunk_limit < 1 || chunk_limit > 65536 || total < 1 {
+        return Result<Reader, Error>::Err(error(ErrorKind::InvalidLimit, 0,
+            "invalid memory limits"));
+    }
+    if str_len(data) > total {
+        return Result<Reader, Error>::Err(error(ErrorKind::TotalLimit, 0,
+            "memory input exceeds total"));
+    }
+    let cursor = list_new<Int>();
+    list_push(cursor, 0);
+    return reader(fn [ data, cursor, chunk_limit ](requested: Int) -> Result<Chunk,
+        Error> effects { state } {
+        let start = list_get(cursor, 0);
+        var count = str_len(data) - start;
+        if count == 0 {
+            return Result<Chunk, Error>::Ok(Chunk::End);
+        }
+        if count > requested {
+            count = requested;
+        }
+        if count > chunk_limit {
+            count = chunk_limit;
+        }
+        list_set(cursor, 0, start + count);
+        return Result<Chunk, Error>::Ok(Chunk::Data(str_slice(data, start, start + count)));
+    }, noop, total);
+}
+pub fn memory_writer(limit: Int) -> Result<Sink, Error> effects { state } {
+    if limit < 1 {
+        return Result<Sink, Error>::Err(error(ErrorKind::InvalidLimit, 0,
+            "sink limit must be positive"));
+    }
+    let chunks = strings_new();
+    let shared = list_new<Int>();
+    list_push(shared, 0);
+    let target = writer(fn [ chunks, shared, limit ](data: String) -> Result<Int,
+        Error> effects { state } {
+        let size = list_get(shared, 0);
+        if str_len(data) > limit - size {
+            return Result<Int, Error>::Err(error(ErrorKind::TotalLimit, size, "sink output limit"));
+        }
+        // Copy backing: a tiny accepted suffix must not retain unrelated input.
+        strings_push(chunks, strings_join_one(data));
+        list_set(shared, 0, size + str_len(data));
+        return Result<Int, Error>::Ok(str_len(data));
+    }, noop);
+    return Result<Sink, Error>::Ok(Sink(chunks: chunks, shared: shared, limit: limit,
+        writer: target));
+}
+fn strings_join_one(data: String) -> String effects { state } {
+    let parts = strings_new();
+    strings_push(parts, data);
+    return strings_join(parts, "");
+}
+pub fn sink_writer(value: Sink) -> Writer {
+    return value.writer;
+}
+pub fn output(value: Sink) -> String effects { state } {
+    return strings_join(value.chunks, "");
+}
+pub fn output_bytes(value: Sink) -> Int effects { state } {
+    return list_get(value.shared, 0);
+}
+fn valid_path(path: String) -> Bool {
+    if str_len(path) == 0 || text::invalid_offset(path) >= 0 {
+        return false;
+    }
+    var i = 0;
+    while i < str_len(path) {
+        if str_byte(path, i) == 0 {
+            return false;
+        }
+        i = i + 1;
+    }
+    return true;
+}
+pub fn open(path: String, total: Int) -> Result<Reader, Error> effects { state, io } {
+    if total < 1 {
+        return Result<Reader, Error>::Err(error(ErrorKind::InvalidLimit, 0,
+            "total must be positive"));
+    }
+    if !valid_path(path) {
+        return Result<Reader, Error>::Err(error(ErrorKind::Read, 0, "invalid file path"));
+    }
+    match stream_open_large(path, total) {
+        StreamResult::Limit => {
+            return Result<Reader, Error>::Err(error(ErrorKind::TotalLimit, 0,
+                "file exceeds total"));
+        }
+        StreamResult::Err(e) => {
+            return Result<Reader, Error>::Err(error(ErrorKind::Read, 0, e));
+        }
+        StreamResult::Ok(handle) => {
+            return reader(fn [ handle ](requested: Int) -> Result<Chunk, Error> effects { state,
+                io } {
+                var count = requested;
+                if count > 8192 {
+                    count = 8192;
+                }
+                match stream_next(handle, count) {
+                    ReadResult::Ok(data) => {
+                        if str_len(data) == 0 {
+                            return Result<Chunk, Error>::Ok(Chunk::End);
+                        }
+                        return Result<Chunk, Error>::Ok(Chunk::Data(data));
+                    }
+                    ReadResult::Limit => {
+                        return Result<Chunk, Error>::Err(error(ErrorKind::InvalidLimit, 0,
+                            "native read limit"));
+                    }
+                    ReadResult::Err(e) => {
+                        return Result<Chunk, Error>::Err(error(ErrorKind::Read, 0, e));
+                    }
+                }
+            }, fn [ handle ]() -> Result<Unit, Error> effects { state, io } {
+                match stream_close(handle) {
+                    WriteResult::Ok => {
+                        return Result<Unit, Error>::Ok(empty());
+                    }
+                    WriteResult::Err(e) => {
+                        return Result<Unit, Error>::Err(error(ErrorKind::Close, 0, e));
+                    }
+                }
+            }, total);
+        }
+    }
+}
+pub fn create(path: String) -> Result<Writer, Error> effects { state, io } {
+    if !valid_path(path) {
+        return Result<Writer, Error>::Err(error(ErrorKind::Write, 0, "invalid file path"));
+    }
+    match stream_create(path) {
+        StreamResult::Limit => {
+            return Result<Writer, Error>::Err(error(ErrorKind::InvalidLimit, 0,
+                "native create limit"));
+        }
+        StreamResult::Err(e) => {
+            return Result<Writer, Error>::Err(error(ErrorKind::Write, 0, e));
+        }
+        StreamResult::Ok(handle) => {
+            return Result<Writer, Error>::Ok(writer(fn [ handle ](data: String) -> Result<Int,
+                Error> effects { state, io } {
+                match stream_write(handle, data) {
+                    IntResult::Ok(count) => {
+                        return Result<Int, Error>::Ok(count);
+                    }
+                    IntResult::Err(e) => {
+                        return Result<Int, Error>::Err(error(ErrorKind::Write, 0, e));
+                    }
+                }
+            }, fn [ handle ]() -> Result<Unit, Error> effects { state, io } {
+                match stream_write_close(handle) {
+                    WriteResult::Ok => {
+                        return Result<Unit, Error>::Ok(empty());
+                    }
+                    WriteResult::Err(e) => {
+                        return Result<Unit, Error>::Err(error(ErrorKind::Close, 0, e));
+                    }
+                }
+            }));
+        }
+    }
+}
+pub fn copy(source: Reader, target: Writer, buffer: Int) -> Result<Statistics,
+    Error> effects { state, io } {
+    if buffer < 1 || buffer > 65536 {
+        return Result<Statistics, Error>::Err(error(ErrorKind::InvalidLimit, 0,
+            "buffer must be 1..65536"));
+    }
+    var stats = Statistics(bytes: 0, reads: 0, writes: 0, peak_chunk: 0);
+    while true {
+        if stats.reads == 9223372036854775807 {
+            return Result<Statistics, Error>::Err(error(ErrorKind::TotalLimit, stats.bytes,
+                "copy counter limit"));
+        }
+        let before = reader_counters(source).calls;
+        let chunk = read(source, buffer)?;
+        stats.reads = stats.reads + (reader_counters(source).calls - before);
+        match chunk {
+            Chunk::End => {
+                return Result<Statistics, Error>::Ok(stats);
+            }
+            Chunk::Data(data) => {
+                let size = str_len(data);
+                if size > stats.peak_chunk {
+                    stats.peak_chunk = size;
+                }
+                var start = 0;
+                while start < size {
+                    let count = write(target, str_slice(data, start, size))?;
+                    start = start + count;
+                    stats.writes = stats.writes + 1;
+                }
+                if size > 9223372036854775807 - stats.bytes {
+                    return Result<Statistics, Error>::Err(error(ErrorKind::TotalLimit, stats.bytes,
+                        "copy total limit"));
+                }
+                stats.bytes = stats.bytes + size;
+            }
+        }
+    }
+    return Result<Statistics, Error>::Ok(stats);
+}
+pub fn copy_owned(source: Reader, target: Writer, buffer: Int) -> Result<Statistics,
+    Failure> effects { state, io } {
+    let answer = copy(source, target, buffer);
+    let read_close = close_reader(source);
+    let write_close = close_writer(target);
+    var failure = Failure(operation: Option<Error>::None, reader_close: Option<Error>::None,
+        writer_close: Option<Error>::None);
+    var bad = false;
+    match answer {
+        Result::Err(e) => {
+            bad = true;
+            failure.operation = Option<Error>::Some(e);
+        }
+        Result::Ok(_) => {}
+    }
+    match read_close {
+        Result::Err(e) => {
+            bad = true;
+            failure.reader_close = Option<Error>::Some(e);
+        }
+        Result::Ok(_) => {}
+    }
+    match write_close {
+        Result::Err(e) => {
+            bad = true;
+            failure.writer_close = Option<Error>::Some(e);
+        }
+        Result::Ok(_) => {}
+    }
+    if bad {
+        return Result<Statistics, Failure>::Err(failure);
+    }
+    match answer {
+        Result::Ok(stats) => {
+            return Result<Statistics, Failure>::Ok(stats);
+        }
+        Result::Err(_) => {}
+    }
+    return Result<Statistics, Failure>::Err(failure);
+}

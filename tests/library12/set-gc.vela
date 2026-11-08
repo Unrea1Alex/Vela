@@ -1,0 +1,23 @@
+import "../../std/set.vela" as sets;
+fn managed_keys() -> sets::Set<String> effects { state } {
+    let value = sets::create<String>();
+    for i in 0 .. 64 { let inserted = sets::insert(value, "key-" + to_string(i)); }
+    return value;
+}
+fn main() -> Unit effects { state, io } {
+    let retained = managed_keys();
+    let alias = retained;
+    for i in 0 .. 128 {
+        let garbage = managed_keys();
+        let changed = sets::remove(garbage, "key-17");
+    }
+    let order = sets::values(retained);
+    for i in 0 .. 64 {
+        assert_true(sets::contains(alias, "key-" + to_string(i)), "managed Dict keys survive creator scope and GC");
+        assert_true(list_get(order, i) == "key-" + to_string(i), "managed order keys survive GC");
+    }
+    let removed = sets::remove(alias, "key-17");
+    let updated = sets::values(retained);
+    assert_true(sets::size(retained) == 63 && !sets::contains(retained, "key-17") && list_get(updated, 17) == "key-18", "shared order after GC removal");
+    print("set GC roots passed");
+}

@@ -1,0 +1,48 @@
+import "../../../std/cell.vela" as cell;
+import "../../../std/set.vela" as sets;
+struct Accessor { read: fn() -> String effects { state }, write: fn(String) -> Unit effects { state } }
+struct Payload { keys: sets::Set<String>, count: Int }
+struct Callable { value: cell::Cell<fn() -> Int effects { state }> }
+fn accessor() -> Accessor effects { state } {
+    let value = cell::create("initial:" + to_string(7));
+    return Accessor(read: fn [value]() -> String effects { state } { return cell::get(value); }, write: fn [value](item: String) -> Unit effects { state } { cell::set(value, item); });
+}
+fn payload() -> cell::Cell<Payload> effects { state } {
+    let keys = sets::create<String>(); let inserted = sets::insert(keys, "managed:" + to_string(42));
+    return cell::create(Payload(keys: keys, count: 42));
+}
+fn callable_payload() -> Callable effects { state } {
+    let number = cell::create(91);
+    let value = cell::create(fn [number]() -> Int effects { state } { return cell::get(number); });
+    return Callable(value: value);
+}
+fn main() -> Unit effects { state, io } {
+    let original = cell::create(1);
+    let alias = original;
+    cell::set(alias, 42); assert_true(cell::get(original) == 42, "copy shares identity");
+    let other = cell::create(7);
+    cell::set(original, 43); assert_true(cell::get(other) == 7, "independent creates");
+    let increment = fn [alias]() -> Int effects { state } { let next = cell::get(alias) + 1; cell::set(alias, next); return next; };
+    assert_true(increment() == 44 && cell::get(original) == 44, "closure shares identity");
+    let values = list_new<Int>(); list_push(values, 1);
+    let nested = cell::create(values); let shared = cell::get(nested);
+    list_set(shared, 0, 8); assert_true(list_get(values, 0) == 8, "get preserves payload alias");
+    list_truncate(shared, 0); assert_true(list_len(cell::get(nested)) == 0, "payload clearing does not clear slot");
+    let replacement = list_new<Int>(); list_push(replacement, 9); cell::set(nested, replacement);
+    assert_true(list_get(cell::get(nested), 0) == 9 && list_len(values) == 0, "replacement updates slot independently");
+    let read_write = accessor(); let independent = accessor();
+    let read = read_write.read; let write = read_write.write; let other_read = independent.read;
+    let retained = payload();
+    let retained_callable = callable_payload();
+    for i in 0 .. 256 { let garbage = accessor(); let discarded = payload(); }
+    assert_true(read() == "initial:7", "captured cell roots dynamic String after creator scope");
+    write("updated:" + to_string(9));
+    assert_true(read() == "updated:9" && other_read() == "initial:7", "two closures share one cell; factories independent");
+    let stored = cell::get(retained);
+    assert_true(stored.count == 42 && sets::contains(stored.keys, "managed:42"), "generic record with nested opaque Set survives GC");
+    let inserted = sets::insert(stored.keys, "alias"); assert_true(sets::contains(cell::get(retained).keys, "alias"), "nested record aliases ordinary values");
+    let callable = cell::create(fn [original]() -> Int effects { state } { return cell::get(original); });
+    let function = cell::get(callable); assert_true(function() == 44, "generic callable payload");
+    let retained_function = cell::get(retained_callable.value); assert_true(retained_function() == 91, "callable capture retained through generic cell slot");
+    print("shared cell passed");
+}

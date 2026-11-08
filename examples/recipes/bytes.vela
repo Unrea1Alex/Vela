@@ -1,0 +1,11 @@
+// Pass a three-byte binary file, e.g. A, NUL, 0xff.
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+fn main() -> Int effects { io, args } {
+    let input = match arg(0) { StringResult::Ok(value) => value, StringResult::Err(_) => "" };
+    match fs::read_bytes(path::Path(value: input), 16) {
+        Result::Err(_) => { return 1; }
+        Result::Ok(bytes) => { print("bytes=" + to_string(str_len(bytes.data))); }
+    }
+    return 0;
+}

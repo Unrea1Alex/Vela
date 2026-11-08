@@ -1,0 +1,26 @@
+import "../../std/io.vela" as io;
+import "../../std/stream_lines.vela" as lines;
+fn must<T>(r:Result<T,io::Error>)->T { match r { Result::Ok(v)=>{return v;} Result::Err(e)=>{assert_true(false,io::describe(e));} }return must(r); }
+fn lm<T>(r:Result<T,lines::Error>)->T { match r { Result::Ok(v)=>{return v;} Result::Err(e)=>{assert_true(false,lines::describe(e));} }return lm(r); }
+fn argument(n:Int)->String effects {args} { match arg(n) { StringResult::Ok(v)=>{return v;} StringResult::Err(e)=>{assert_true(false,e);} }return argument(n); }
+fn integer(data:String)->Int { match parse_int(data){IntResult::Ok(v)=>{return v;}IntResult::Err(e)=>{assert_true(false,e);}}return integer(data); }
+fn main()->Unit effects {state,io,args} {
+    let mode=argument(0);let buffer=integer(argument(3));let total=integer(argument(4));
+    var source=must(io::memory_reader("",1,1));var owned_input=0;
+    if mode=="memory" || mode=="memory-lines" {
+        let block="abcdefghijklmnopqrstuvwxyz0123456789\n";let parts=strings_new();var i=0;let count=integer(argument(1));while i<count { strings_push(parts,block);i=i+1; }let data=strings_join(parts,"");owned_input=str_len(data);source=must(io::memory_reader(data,buffer,total));
+    } else {
+        match stream_open(argument(1),268435456) { StreamResult::Limit=>{} StreamResult::Ok(h)=>{let closed=stream_close(h);assert_true(total<=268435456,"legacy cap must reject large file");} StreamResult::Err(e)=>{assert_true(false,e);} }
+        source=must(io::open(argument(1),total));
+    }
+    if mode=="file-lines" || mode=="memory-lines" {
+        let reader=lm(lines::reader(source,buffer,1024));var count=0;var payload=0;var finished=false;
+        while !finished { match lm(lines::next(reader)) { Option::None=>{finished=true;} Option::Some(value)=>{count=count+1;payload=payload+str_len(value.data);if mode=="file-lines" {assert_true(str_len(value.data)==1023 && str_byte(value.data,0)==97 && str_byte(value.data,1022)==97,"large fixture record");}else{assert_true(value.data=="abcdefghijklmnopqrstuvwxyz0123456789","memory record");}} } }
+        lm(lines::close(reader));let stats=lines::statistics(reader);let reads=io::reader_counters(source);
+        print(f"{{\"mode\":\"{mode:s}\",\"input_owned\":{owned_input:d},\"bytes\":{stats.consumed:d},\"lines\":{count:d},\"payload\":{payload:d},\"reads\":{reads.calls:d},\"peak_chunk\":{stats.peak_chunk:d},\"peak_record\":{stats.peak_record:d},\"peak_working_payload\":{stats.peak_working_payload:d},\"peak_parts\":{stats.peak_parts:d}}}");
+    } else {
+        var target=must(io::create(argument(2)));let sink=must(io::memory_writer(total));
+        if mode=="memory" { must(io::close_writer(target));target=io::sink_writer(sink); }
+        match io::copy_owned(source,target,buffer) { Result::Err(_)=>{assert_true(false,"copy or cleanup failed");} Result::Ok(stats)=>{var output_owned=0;if mode=="memory"{output_owned=io::output_bytes(sink);assert_true(output_owned==owned_input,"memory output bytes");let output=io::output(sink);assert_true(str_len(output)==owned_input,"memory output storage");}print(f"{{\"mode\":\"{mode:s}\",\"input_owned\":{owned_input:d},\"output_owned\":{output_owned:d},\"bytes\":{stats.bytes:d},\"reads\":{stats.reads:d},\"writes\":{stats.writes:d},\"peak_chunk\":{stats.peak_chunk:d}}}");} }
+    }
+}

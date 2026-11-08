@@ -1,0 +1,2 @@
+import "../../tools/test.vela" as testing;
+fn main()->Int effects {args,state,io,process}{let root=testing::replace(testing::value(absolute_path(testing::value(arg(0)))),"\\","/");let compiler=testing::value(absolute_path(testing::value(arg(1))));let directory=testing::value(temp_dir(root+"/build/stage12"));let suite=testing::typed_tables(testing::Suite(root:root,compiler:compiler,dir:directory,passed:0,failed:0));print(f"{{\"schema_version\":1,\"passed\":{suite.passed:d},\"failed\":{suite.failed:d}}}");if suite.failed!=0{return 1;}return 0;}

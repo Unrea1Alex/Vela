@@ -1,5 +1,38 @@
 # Vela standard modules
 
+The generated `api-index.json` is the signature/effects index, obtained from
+checked public interfaces by `tools/help.vela`. Use [recipes](RECIPES.md) and
+[capabilities](CAPABILITIES.md) for purpose, ownership and platform limits;
+this guide explains behavior rather than defining a second signature catalog.
+The [1.2 evolution contract](contracts/STDLIB-EVOLUTION-1.2.md) specifies future
+opt-in modules and the separate later checked-value work; proposed APIs are not
+available until their implementation stage is verified. Frozen 1.1 fixtures
+preserve old aliases, callbacks, sorts, String line errors and public records.
+
+`io` supplies opaque shared Reader/Writer handles, memory/file adapters and
+bounded copy. `Chunk::End` alone means EOF; empty Data/zero writes are typed
+NoProgress. Operational errors are sticky. `copy` borrows; `copy_owned` closes
+both endpoints and preserves operation plus both cleanup errors. All I/O uses
+the common state/io ceiling, including memory callbacks. File creation truncates
+at open; partial failures do not roll back output. Explicit close is required.
+The new stream_open_large/native writers share the old 128-handle budget.
+`stream_lines` adds typed UTF-8/category/absolute-byte/line errors, strips initial
+BOM and CR before LF, and retains bounded current-record/chunk storage. Buffer,
+record and total limits are separate. Legacy `lines` retains its String errors,
+CR behavior and 256 MiB total cap. See the exact [I/O contract](contracts/IO-1.2.md)
+and [stream recipe](../examples/recipes/streams.vela).
+
+`parallel` maps a bounded list through async callbacks with ordered typed
+results. It reuses task_group and async_io: each item owns a Scope, and its slot
+is reused only after child operations finish cleanup. Collect continues after
+item errors; FailFast, cancellation and the overall deadline stop admission and
+drain siblings. The host calls tick without a hidden sleep, keeps pumping GUI,
+and waits for outcome before closing external resources. Completion reports
+NotStarted items, independent cleanup causes and actual counters. Concurrency
+is 1..128, input <=65536; fibers/host bridges require Windows. Linux supports
+construction/empty mapping and reports driver failure for nonempty work.
+[Contract](contracts/PARALLEL-1.2.md), [recipe](../examples/recipes/parallel.vela).
+
 Implementation: [std](../std/). The native compiler remains dependency-free;
 these are ordinary Vela modules with explicit imports. The MCP setup copies the
 matching modules into the application's `vela-stdlib/` folder. For example:
@@ -35,12 +68,18 @@ MCP snapshots require dependencies to be inside the configured workspace.
 | event_loop | create/submit/tick/cancel/outcome/shutdown for explicit continuations from 0.11.0-dev.1 |
 | tasks | submit typed async callables on Windows and wait_for a loop task from 0.11.0-dev.2 |
 | collections | copy/reverse/sort_ints/sort_floats/sort_strings/compare |
+| algorithms | stable sort; map/filter/fold/find/any/all and try_ variants; state plus callback effects |
+| set | opaque Set<K>, create/from_list/size/contains/insert/remove/values/union/intersection/difference |
+| cell | opaque Cell<T>; create/get/set, explicit shared identity and state |
 | json | Value/Member/Error; parse/stringify; typed cursor access; parse_with_limits and as_bool from dev.7 |
 | json_stream (1.1) | Reader/Limits/Event/Token/Number/Error; create/next/skip_value/finish/read_string/read_integer; spelling/is_integer/integer/floating |
+| json_decode (1.2) | opaque Decoder<T>/Fields; primitives/array/nullable/object; typed required/optional/defaulted and exact error coordinates |
 | cli | Spec/Arguments/Error; parse/current |
+| cli_schema | Opaque typed descriptors/schema/arguments; defaults, ranges, relations and help |
 | config | Config/Error; parse/from_value/find/required/string/integer/number/boolean/allow_only |
 | testing | Case<I,O>; equal/close/is_ok/is_err; для test-деклараций и обычного Vela-кода |
 | result | map_error/explain from 0.10.0-dev.5 |
+| result_ops / option | map/and_then/unwrap_or/unwrap_or_else; result_ops adds typed Context<E>/with_context |
 | lines | reader/next/from_string for bounded chunked line processing from dev.7 |
 | services | FileStore, Processes, Clock, Entropy and OS or scripted implementations from dev.7 |
 | replay | record/transcript/start/next/finish for typed service transcripts from dev.8 |
@@ -151,9 +190,48 @@ with the `io` effect and typed host or path validation errors. Join the base
 with a declared `assets/` path to open packaged data independently of cwd.
 See [packaging](contracts/PACKAGING.md).
 
-Sorts return copies and are stable insertion sorts, O(n²), intended for bounded
-collections. String order is lexicographic unsigned bytes. Float NaNs sort last;
-equal values retain order, including signed zeros. No callback comparators yet.
+Sorts return fresh outer lists. algorithms::sort uses stable bottom-up merging,
+at most n*ceil(log2(n)) comparisons and O(n) extra slots; it snapshots elements
+before the first comparator call and retains no callback. Compare sign orders
+elements; zero takes the left item. Comparator effects add to state. Nested
+payload aliases remain shared; inconsistent comparison still terminates but
+sortedness requires a strict weak ordering. Empty/singleton inputs compare zero
+times. collections::sort_ints/floats/strings use this common algorithm with their
+old signatures/order: unsigned lexicographic string bytes, NaNs last, stable
+equal values and signed zeros. [Contract](contracts/STDLIB-EVOLUTION-1.2.md),
+[record example](../examples/recipes/sort.vela).
+
+map/filter/fold/find/any/all and try_map/try_filter/try_fold/try_find/try_any/try_all
+operate eagerly on a detached shallow snapshot taken before callbacks. Traversal
+is in source order; find/any/all short-circuit. Fallible operations return the
+first unchanged typed error and stop; no partial list is published. All callbacks
+run at most once per visited element; map/filter/fold visit every element unless
+a fallible callback fails. Empty any=false, all=true, find=None and fold returns
+its initial value. Even a first-element short circuit creates the O(n) snapshot;
+these are not lazy pipelines. Output outer lists are fresh, nested aliases stay
+shared. Native resources created inside callbacks still require explicit caller
+cleanup: discarding a partial managed list adds no destructor/rollback.
+
+set::Set<K> uses Dict membership plus a private insertion-order list. Keys are
+Int/Bool/String and distinct types over those; the Scalar bound alone is not
+sufficient for Float64, and the existing Dict key check rejects it. Int32, enums
+and records are not supported keys. Every operation requires state. Copies share
+identity; values() returns fresh list storage. insert/remove report whether a key
+was added/removed. Reinserting a removed key appends it. Binary operations return
+independent sets: union lists left keys then absent right keys; intersection and
+difference retain left order. Membership/insert use expected hash costs, not a
+worst-case O(1) promise; removal scans O(n) and binary operations have expected
+O(n+m) work/storage. No resource/lifetime or thread-safety model is added.
+[Contract](contracts/STDLIB-EVOLUTION-1.2.md), [example](../examples/recipes/set.vela).
+
+cell::Cell<T> gives explicit shared storage through create/get/set, all requiring
+state. Copies and closure captures see the same slot; separate create calls stay
+independent. get returns an ordinary value copy, so nested mutable payloads keep
+their aliases. Setting a payload replaces the slot; clearing a returned List
+payload does not clear internal storage. The one-element List is private and
+cannot be constructed/accessed externally. Container work is O(1); Cell adds no
+atomics, references, unique ownership, implicit close or worker-transfer promise.
+[Contract](contracts/STDLIB-EVOLUTION-1.2.md), [example](../examples/recipes/cell.vela).
 
 JSON Value variants: Null, Boolean(Bool), Integer(Int), Number(Float64),
 StringValue(String), Array(List<Value>), Object(List<Member>). Member has name
@@ -168,9 +246,42 @@ Forged cyclic value graphs fail the depth bound during serialization.
 CLI specs are long option names with takes_value. Supports --name=value,
 --name value, flags and -- terminator; unknown/duplicate/missing options fail.
 A value beginning -- must use =. Other arguments, including -2, are positional.
+The opt-in [cli_schema](contracts/CLI-SCHEMA-1.2.md) validates descriptors before
+argument access, resolves required/default values and inclusive Int bounds, and
+checks named min<=max relations. Typed getters return Results. Inspect is_help
+before reading values; help does not perform I/O. The three library acceptance
+apps use this schema, print --help to stdout/exit 0 and errors to stderr/exit 2.
 Configuration lookups have no coercion; integer 1 is not Float64 1.0. find returns
 Option for optional fields; callers choose defaults and use allow_only to reject
 unknown fields.
+
+json_decode describes typed records with object(names, Unknown policy, builder),
+whose builder calls required/optional/defaulted with typed Decoder<T> values.
+decode first validates all syntax/UTF-8/duplicates with json_stream, including
+unknown data, before callbacks. Ignore skips unknown conversion; Reject reports
+the first unknown key before the builder. Missing, null and a default differ:
+defaulted only substitutes absence, optional only makes absence optional, and
+nullable explicitly accepts null. integer checks lexical signed Int64 and bounds;
+number converts a finite Float64 with ordinary rounding and bounds. Arrays keep
+source order and typed failures stop further element callbacks.
+
+Outer errors carry root-relative JSON path and UTF-8 byte offset; an optional
+json_stream cause is unchanged and uses its local span coordinates. Missing fields
+point to the containing object. Syntax/input maxima remain 16 MiB/depth 4096/nodes
+1000000; selected decoder nesting is separately 128, array count <=65536, fields
+<=256, declared key <=1024 bytes and outer path <=65536 bytes. This is eager
+in-memory decoding; span views retain backing input. Builders have state only;
+failure does not undo their explicit captured state. Old json/json_stream remain
+unchanged. [Contract](contracts/JSON-DECODE-1.2.md),
+[record recipe](../examples/recipes/json-schema.vela).
+
+Opt-in result_ops and option combinators call callbacks only for the matching
+variant (zero or one call) and propagate their declared effects. unwrap_or takes
+an eagerly evaluated default; unwrap_or_else delays its callback until Err/None.
+and_then short-circuits, preserving the first typed error/None. with_context uses
+the existing result::map_error to attach a message while retaining cause:E in
+Context<E>; it does not implicitly stringify errors. Payload aliases are ordinary
+values and callbacks are not retained. [Contract](contracts/STDLIB-EVOLUTION-1.2.md).
 
 Working application: [config-report](../apps/config-report/README.md).
 The [PulseDeck](../apps/pulse-deck/README.md) example combines typed async

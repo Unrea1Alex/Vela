@@ -1,5 +1,9 @@
 # Standard library — 0.7.2 contract
 
+Historical 0.7 snapshot: its platform results, no-comparator and insertion-sort
+statements describe that release. Current behavior is in [standard modules](../STDLIB.md);
+1.2.5 uses [generic stable merging](STDLIB-EVOLUTION-1.2.md) and callable effects.
+
 Memory descriptions of the original version are historical. In 0.8,
 [the tracing heap](../MEMORY.md) governs managed values.
 
@@ -58,7 +62,7 @@ Compiler rebuild and full native verify close the item; unperformed platforms
 remain explicitly unverified.
 
 Actual API/signatures and limitations: [standard modules](../STDLIB.md).
-The prototype uses stable insertion sorts (quadratic time). Read limits are
+The 0.7 prototype uses stable insertion sorts (quadratic time). Read limits are
 0..256 MiB. Cleanup failure after successful atomic publication reports the
 committed flag. Output redirection files are explicit caller-authorized outputs;
 launch failure may leave them truncated. This library is not the MCP sandbox.

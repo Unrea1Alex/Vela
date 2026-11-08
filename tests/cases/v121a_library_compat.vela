@@ -1,0 +1,207 @@
+// Frozen 1.1 API behavior; expected values are independent literals.
+import "../../../std/cli.vela" as cli;
+import "../../../std/collections.vela" as collections;
+import "../../../std/result.vela" as result;
+import "../../../std/text.vela" as text;
+import "../../../std/path.vela" as path;
+import "../../../std/json.vela" as json;
+import "../../../std/lines.vela" as lines;
+fn old_json_error(error: json::Error) -> Int {
+    return match error {
+        json::Error::Syntax(_, _) => 1,
+        json::Error::Encoding(_) => 2,
+        json::Error::Limit => 3,
+        json::Error::NonFinite => 4,
+        json::Error::Duplicate(_) => 5
+    };
+}
+fn old_cli_error(error: cli::Error) -> Int {
+    return match error {
+        cli::Error::Unknown(_) => 1,
+        cli::Error::Duplicate(_) => 2,
+        cli::Error::MissingValue(_) => 3,
+        cli::Error::UnexpectedValue(_) => 4,
+        cli::Error::InvalidSpec(_) => 5,
+        cli::Error::System(_) => 6
+    };
+}
+fn main() -> Unit effects { io, state } {
+    let calls = list_new<Int>();
+    list_push(calls, 0);
+    let converted = result::map_error(Result<Int, Int>::Err(7), fn [ calls ](
+        value: Int) -> String effects { state } {
+        list_set(calls, 0, list_get(calls, 0) + 1);
+        return to_string(value);
+    });
+    match converted {
+        Result::Ok(_) => {
+            assert_true(false, "old map_error");
+        }
+        Result::Err(error) => {
+            assert_true(error == "7", "typed conversion");
+        }
+    }
+    let success = result::map_error(Result<Int, Int>::Ok(42), fn [ calls ](
+        value: Int) -> String effects { state } {
+        list_set(calls, 0, list_get(calls, 0) + 1);
+        return "unexpected";
+    });
+    assert_true(list_get(calls, 0) == 1, "callback count");
+    let explained = result::explain(Result<Int, Int>::Err(8), "load failed");
+    match explained {
+        Result::Ok(_) => {
+            assert_true(false, "explain");
+        }
+        Result::Err(error) => {
+            assert_true(error == "load failed", "old explain");
+        }
+    }
+    let original = list_new<Int>();
+    list_push(original, 2);
+    list_push(original, 1);
+    let copied = collections::copy(original);
+    list_set(copied, 0, 9);
+    assert_true(list_get(original, 0) == 2, "independent list storage");
+    let nested = list_new<List<Int>>();
+    list_push(nested, original);
+    let shallow = collections::copy(nested);
+    list_set(list_get(shallow, 0), 0, 3);
+    assert_true(list_get(original, 0) == 3, "nested aliases remain shared");
+    let ordered = collections::sort_ints(original);
+    assert_true(list_get(ordered, 0) == 1 && list_get(ordered, 1) == 3 && list_get(original, 0)
+        == 3, "old sort copies");
+    let floats = list_new<Float64>();
+    list_push(floats, 0.0 / 0.0);
+    list_push(floats, -0.0);
+    list_push(floats, 0.0);
+    list_push(floats, 1.0);
+    let sorted = collections::sort_floats(floats);
+    assert_true(1.0 / list_get(sorted, 0) < 0.0 && 1.0 / list_get(sorted, 1) > 0.0 && list_get(
+        sorted, 2) == 1.0 && float_is_nan(list_get(sorted, 3)), "NaN and stable signed zeros");
+    let strings = list_new<String>();
+    list_push(strings, str_from_byte(255));
+    list_push(strings, "😀");
+    list_push(strings, "z");
+    list_push(strings, "A");
+    let bytes = collections::sort_strings(strings);
+    assert_true(list_get(bytes, 0) == "A" && list_get(bytes, 1) == "z" && list_get(bytes, 2)
+        == "😀" && str_byte(list_get(bytes, 3), 0) == 255, "unsigned byte order");
+    let specs = list_new<cli::Spec>();
+    list_push(specs, cli::Spec(name: "value", takes_value: true));
+    let args = list_new<String>();
+    list_push(args, "--value");
+    list_push(args, "-2");
+    list_push(args, "--");
+    list_push(args, "--literal");
+    list_push(args, "");
+    match cli::parse(args, specs) {
+        Result::Err(_) => {
+            assert_true(false, "old parse");
+        }
+        Result::Ok(parsed) => {
+            assert_true(dict_get(parsed.options, "value") == "-2" && list_get(parsed.positional, 0)
+                == "--literal" && list_get(parsed.positional, 1) == "", "old argument behavior");
+        }
+    }
+    list_push(args, "--value");
+    match cli::parse(args, specs) {
+        Result::Ok(parsed) => {
+            assert_true(list_len(parsed.positional) == 3, "separator is sticky");
+        }
+        Result::Err(_) => {
+            assert_true(false, "separator");
+        }
+    }
+    let forged = text::Text(data: str_from_byte(255));
+    match text::encode(forged) {
+        Result::Ok(_) => {
+            assert_true(false, "open Text is revalidated");
+        }
+        Result::Err(_) => {}
+    }
+    let unchecked = path::Path(value: "");
+    match path::checked(unchecked.value) {
+        Result::Ok(_) => {
+            assert_true(false, "Path validation");
+        }
+        Result::Err(error) => {
+            match error {
+                path::Error::Empty => {}
+                path::Error::Nul => {
+                    assert_true(false, "old Path error");
+                }
+                path::Error::Encoding(_) => {
+                    assert_true(false, "old Path error");
+                }
+            }
+        }
+    }
+    match json::parse("1e9999") {
+        Result::Ok(_) => {
+            assert_true(false, "old numeric limits");
+        }
+        Result::Err(error) => {
+            assert_true(old_json_error(error) > 0, "old error enum");
+        }
+    }
+    match lines::reader(268435457, 8, 1) {
+        Result::Ok(_) => {
+            assert_true(false, "old total cap");
+        }
+        Result::Err(error) => {
+            assert_true(error == "Invalid line reader limits", "old String error");
+        }
+    }
+    match lines::reader(16, 8, 1) {
+        Result::Err(_) => {
+            assert_true(false, "old reader");
+        }
+        Result::Ok(reader) => {
+            let pull = lines::from_string("a\r\nb");
+            match lines::next(reader, pull) {
+                Result::Err(_) => {
+                    assert_true(false, "line");
+                }
+                Result::Ok(value) => {
+                    match value {
+                        Option::None => {
+                            assert_true(false, "first line");
+                        }
+                        Option::Some(line) => {
+                            assert_true(line.data == "a\r" && line.number == 1, "old CR retained");
+                        }
+                    }
+                }
+            }
+            match lines::next(reader, pull) {
+                Result::Err(_) => {
+                    assert_true(false, "line");
+                }
+                Result::Ok(value) => {
+                    match value {
+                        Option::None => {
+                            assert_true(false, "last line");
+                        }
+                        Option::Some(line) => {
+                            assert_true(line.data == "b" && line.number == 2, "old final line");
+                        }
+                    }
+                }
+            }
+            match lines::next(reader, pull) {
+                Result::Err(_) => {
+                    assert_true(false, "EOF");
+                }
+                Result::Ok(value) => {
+                    match value {
+                        Option::None => {}
+                        Option::Some(_) => {
+                            assert_true(false, "old EOF");
+                        }
+                    }
+                }
+            }
+        }
+    }
+    print("legacy library APIs passed");
+}

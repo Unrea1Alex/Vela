@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.9",
+  "status": "verified",
+  "date": "2026-11-08",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1401,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 511651,
+    "tests_run": true
+  },
+  "clean_recovery": {
+    "log": "build/stage12/129-clean-recovery.log",
+    "bootstrap": {
+      "schema_version": 1,
+      "version": "1.2.0",
+      "orchestrator": "Vela",
+      "fixed_point": true,
+      "bundler_fixed_point": true,
+      "source_bytes": 511651,
+      "tests_run": true
+    },
+    "native": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 1401,
+      "failed": 0,
+      "skipped": 0
+    },
+    "status": "verified"
+  },
+  "seed": {
+    "schema_version": 1,
+    "status": "passed",
+    "bootstrap": {
+      "schema_version": 1,
+      "version": "1.2.0",
+      "orchestrator": "Vela",
+      "fixed_point": true,
+      "bundler_fixed_point": true,
+      "source_bytes": 511651,
+      "tests_run": true
+    },
+    "files": {
+      "seed.exe": {
+        "bytes": 4178944,
+        "sha256": "eb9ee9baccc097d3da9f7e9e410b19b5d80e824973070faf202e477a2ae2505c"
+      },
+      "stage1.exe": {
+        "bytes": 4179456,
+        "sha256": "a9f0c9ba9548f8192edfddae895eb9d2ae636e25410b7bc7e52e8bcc652abddb"
+      },
+      "stage2.exe": {
+        "bytes": 4179456,
+        "sha256": "0aafa6cfcb32efdc7559cc6f9cea83c39487125c1d206a12e408c22e39f2c1e1"
+      },
+      "stage3.exe": {
+        "bytes": 4179456,
+        "sha256": "56b3bce46c96b86d8bcc89a0db8af4740d0b0962313a4db7028e285d8863c4ab"
+      },
+      "stage1.c": {
+        "bytes": 6026153,
+        "sha256": "f248f307df6e1f0550c40d71b7ca12549de2605ccf5f0dd55a4c7a4ef274a1f2"
+      },
+      "stage2.c": {
+        "bytes": 6026153,
+        "sha256": "f248f307df6e1f0550c40d71b7ca12549de2605ccf5f0dd55a4c7a4ef274a1f2"
+      },
+      "stage3.c": {
+        "bytes": 6026153,
+        "sha256": "f248f307df6e1f0550c40d71b7ca12549de2605ccf5f0dd55a4c7a4ef274a1f2"
+      },
+      "compiler.vela": {
+        "bytes": 511651,
+        "sha256": "51dc1ddb193e44ec28f6d726a71927b4163783bcc54f34ef904f1f4d08aea08e"
+      },
+      "rebundled.vela": {
+        "bytes": 511651,
+        "sha256": "51dc1ddb193e44ec28f6d726a71927b4163783bcc54f34ef904f1f4d08aea08e"
+      }
+    },
+    "scope": "mandatory verify transition from installed compiler through bundle seed and authored stages; independent hash comparisons"
+  },
+  "ab": "1.2.9-ab.json",
+  "sdk": {
+    "isolation": 26,
+    "new_client": {
+      "schema_version": 1,
+      "status": "passed",
+      "version": "1.2.0",
+      "checks": [
+        "new Unicode/space installation with execution manifest",
+        "setup is idempotent",
+        "matching version/capabilities and isolated execution available",
+        "installed native API discovery",
+        "check installed sort/fold overlay",
+        "build issues isolated artifact",
+        "named test through allowed execution path",
+        "run issued artifact produces independent literal output",
+        "overlay did not write source"
+      ],
+      "scope": "fresh packaged setup and real stdio SDK client, isolated native check/build/test/run; desktop IDE discovery not exercised"
+    },
+    "startup_tokens": 1893,
+    "source_groups": 8,
+    "wire_startup_tokens": 3538,
+    "outputs": 22,
+    "fault": 11,
+    "packaged_groups": 8,
+    "execution": 29
+  },
+  "recipes": {
+    "schema_version": 1,
+    "checks": [
+      "recipe basics",
+      "recipe directory",
+      "recipe json",
+      "recipe bytes",
+      "recipe result",
+      "recipe callable",
+      "recipe http",
+      "recipe cli",
+      "recipe sort",
+      "recipe traversals",
+      "recipe set",
+      "recipe cell",
+      "recipe json-schema",
+      "recipe streams",
+      "recipe parallel",
+      "generic/effect/opaque/method/async interface",
+      "reject invalid interface before emission",
+      "all embedded builtin rows",
+      "all shipped modules and recipe IDs resolve to verified catalog"
+    ],
+    "passed": 19
+  },
+  "api": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 108,
+    "negative_checks": 2
+  },
+  "linux_candidate": {
+    "compiler": "GCC 14.2/musl, static x86-64",
+    "checks": "C recovery/fixed point; API/init/check/build/test/run; resources/locks; checksum inventory and Unicode/empty-environment console relocation",
+    "log": "build/stage12/129-linux-candidate.log",
+    "status": "verified"
+  },
+  "unperformed": [
+    "Fresh physical Windows OS installation",
+    "desktop IDE discovery and physical monitor transitions",
+    "Linux fibers/GUI/HTTP adapters unsupported",
+    "full compiler forced-GC stress",
+    "full independent VelaBench deferred to 1.4.6"
+  ],
+  "windows": {
+    "status": "verified",
+    "gui_network": "Relocated FieldDesk report and PulseDeck headless 6/6 completed",
+    "inventory": "Every ZIP entry size and SHA-256 checked",
+    "log": "build/stage12/129-windows-package.log",
+    "relocation": "Unicode/spaces and stripped PATH",
+    "oracles": {
+      "logs": {
+        "passed": 46,
+        "total": 46,
+        "failed": 0
+      },
+      "http": {
+        "passed": 44,
+        "total": 44,
+        "failed": 0
+      },
+      "index": {
+        "passed": 26,
+        "total": 26,
+        "failed": 0
+      }
+    }
+  },
+  "ab_result": {
+    "checks": 63,
+    "median_compact_uncached": 32055,
+    "reduction_percent": 32.6943,
+    "full": "3/3",
+    "compact": "3/3",
+    "median_full_uncached": 47626
+  },
+  "delivery": {
+    "checksums": "dist/SHA256SUMS-1.2.0.txt",
+    "manifest": "dist/RELEASE-1.2.0.json",
+    "status": "code and functional gates passed; final status-document inventories are checked separately"
+  },
+  "next": "1.3.1"
+}

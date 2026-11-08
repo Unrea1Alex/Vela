@@ -82,6 +82,10 @@ StringResult, `write_file` — WriteResult, `parse_int` — IntResult. Для и
 `install_file(from, to)` публикует обычный файл в той же файловой системе
 с отказом при существующем назначении.
 Драйвер сам убирает исходный временный файл, если он остался после публикации.
+С 1.2 directory-source также публикуется без замены: Windows move или Linux
+renameat2(RENAME_NOREPLACE); успех переносит исходный каталог. Неподдерживаемая
+ОС/файловая система отклоняет directory-source без небезопасного fallback.
+Обычный файл сохраняет прежнее поведение. [Контракт](contracts/PROJECT-INIT-1.2.md).
 
 `fiber_open`, `fiber_step`, `fiber_cancel` и `fiber_close` обслуживают
 `std/tasks.vela`. `fiber_step` возвращает относительную задержку или

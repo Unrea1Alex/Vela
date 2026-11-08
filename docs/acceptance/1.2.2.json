@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.2",
+  "status": "verified",
+  "date": "2026-11-07",
+  "contract": "../contracts/API-SEARCH-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1255,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 477645,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/122-verify.log",
+  "native": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "helper": {
+    "source": "tools/api.vela",
+    "binary_sha256": "0534b2c9b943be0e85d300b443e13cd3c13bc79aa85cb73232bb863033513799",
+    "algorithms": "Vela; Node validates transport, orchestrates pinned captured helper and bounds complete response",
+    "linux": "GCC/musl console CLI passed",
+    "examples": "All metadata code fragments checked in typed contexts; OS calls not executed",
+    "native_suite_checks": 7
+  },
+  "mcp": {
+    "sdk_groups": 7,
+    "failed": 0,
+    "skipped": 0,
+    "sequential": 1000,
+    "cancellations": 25,
+    "log": "build/stage12/122-mcp-sdk.log",
+    "response_tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "both_forms": true,
+    "measurements": [
+      {
+        "request": {
+          "name": "std/directory:walk"
+        },
+        "bytes": 1900,
+        "tokens": 532
+      },
+      {
+        "request": {
+          "query": "JSON ignored numbers"
+        },
+        "bytes": 3172,
+        "tokens": 808
+      },
+      {
+        "request": {
+          "name": "std/http:curl_transfer"
+        },
+        "bytes": 1884,
+        "tokens": 545
+      },
+      {
+        "request": {
+          "name": "missing_api"
+        },
+        "bytes": 854,
+        "tokens": 296
+      },
+      {
+        "request": {
+          "query": ""
+        },
+        "bytes": 846,
+        "tokens": 294
+      }
+    ]
+  },
+  "startup": {
+    "total": 1789,
+    "limit": 2000,
+    "full_wire_total": 3434,
+    "parts": {
+      "skill": 134,
+      "tools": 939,
+      "context": 716
+    }
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 113,
+    "links": 766,
+    "missing": []
+  },
+  "next": "1.2.3"
+}

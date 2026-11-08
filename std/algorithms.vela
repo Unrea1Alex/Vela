@@ -1,0 +1,181 @@
+fn snapshot<T>(values: List<T>) -> List<T> effects { state } {
+    let copied = list_new<T>();
+    for i in 0 .. list_len(values) {
+        list_push(copied, list_get(values, i));
+    }
+    return copied;
+}
+pub fn map<T, U, effect E>(values: List<T>, transform: fn(
+    T) -> U effects E) -> List<U> effects { state, E } {
+    let copied = snapshot(values);
+    let output = list_new<U>();
+    for i in 0 .. list_len(copied) {
+        list_push(output, transform(list_get(copied, i)));
+    }
+    return output;
+}
+pub fn filter<T, effect E>(values: List<T>, predicate: fn(
+    T) -> Bool effects E) -> List<T> effects { state, E } {
+    let copied = snapshot(values);
+    let output = list_new<T>();
+    for i in 0 .. list_len(copied) {
+        let item = list_get(copied, i);
+        if predicate(item) {
+            list_push(output, item);
+        }
+    }
+    return output;
+}
+pub fn fold<T, A, effect E>(values: List<T>, initial: A, combine: fn(A,
+    T) -> A effects E) -> A effects { state, E } {
+    let copied = snapshot(values);
+    var accumulated = initial;
+    for i in 0 .. list_len(copied) {
+        accumulated = combine(accumulated, list_get(copied, i));
+    }
+    return accumulated;
+}
+pub fn find<T, effect E>(values: List<T>, predicate: fn(
+    T) -> Bool effects E) -> Option<T> effects { state, E } {
+    let copied = snapshot(values);
+    for i in 0 .. list_len(copied) {
+        let item = list_get(copied, i);
+        if predicate(item) {
+            return Option<T>::Some(item);
+        }
+    }
+    return Option<T>::None;
+}
+pub fn any<T, effect E>(values: List<T>, predicate: fn(
+    T) -> Bool effects E) -> Bool effects { state, E } {
+    let copied = snapshot(values);
+    for i in 0 .. list_len(copied) {
+        if predicate(list_get(copied, i)) {
+            return true;
+        }
+    }
+    return false;
+}
+pub fn all<T, effect E>(values: List<T>, predicate: fn(
+    T) -> Bool effects E) -> Bool effects { state, E } {
+    let copied = snapshot(values);
+    for i in 0 .. list_len(copied) {
+        if !predicate(list_get(copied, i)) {
+            return false;
+        }
+    }
+    return true;
+}
+pub fn try_map<T, U, F, effect E>(values: List<T>, transform: fn(T) -> Result<U,
+    F> effects E) -> Result<List<U>, F> effects { state, E } {
+    let copied = snapshot(values);
+    let output = list_new<U>();
+    for i in 0 .. list_len(copied) {
+        list_push(output, transform(list_get(copied, i))?);
+    }
+    return Result<List<U>, F>::Ok(output);
+}
+pub fn try_filter<T, F, effect E>(values: List<T>, predicate: fn(T) -> Result<Bool,
+    F> effects E) -> Result<List<T>, F> effects { state, E } {
+    let copied = snapshot(values);
+    let output = list_new<T>();
+    for i in 0 .. list_len(copied) {
+        let item = list_get(copied, i);
+        if predicate(item)? {
+            list_push(output, item);
+        }
+    }
+    return Result<List<T>, F>::Ok(output);
+}
+pub fn try_fold<T, A, F, effect E>(values: List<T>, initial: A, combine: fn(A, T) -> Result<A,
+    F> effects E) -> Result<A, F> effects { state, E } {
+    let copied = snapshot(values);
+    var accumulated = initial;
+    for i in 0 .. list_len(copied) {
+        accumulated = combine(accumulated, list_get(copied, i))?;
+    }
+    return Result<A, F>::Ok(accumulated);
+}
+pub fn try_find<T, F, effect E>(values: List<T>, predicate: fn(T) -> Result<Bool,
+    F> effects E) -> Result<Option<T>, F> effects { state, E } {
+    let copied = snapshot(values);
+    for i in 0 .. list_len(copied) {
+        let item = list_get(copied, i);
+        if predicate(item)? {
+            return Result<Option<T>, F>::Ok(Option<T>::Some(item));
+        }
+    }
+    return Result<Option<T>, F>::Ok(Option<T>::None);
+}
+pub fn try_any<T, F, effect E>(values: List<T>, predicate: fn(T) -> Result<Bool,
+    F> effects E) -> Result<Bool, F> effects { state, E } {
+    let copied = snapshot(values);
+    for i in 0 .. list_len(copied) {
+        if predicate(list_get(copied, i))? {
+            return Result<Bool, F>::Ok(true);
+        }
+    }
+    return Result<Bool, F>::Ok(false);
+}
+pub fn try_all<T, F, effect E>(values: List<T>, predicate: fn(T) -> Result<Bool,
+    F> effects E) -> Result<Bool, F> effects { state, E } {
+    let copied = snapshot(values);
+    for i in 0 .. list_len(copied) {
+        if !predicate(list_get(copied, i))? {
+            return Result<Bool, F>::Ok(false);
+        }
+    }
+    return Result<Bool, F>::Ok(true);
+}
+pub fn sort<T, effect E>(values: List<T>, compare: fn(T,
+    T) -> Int effects E) -> List<T> effects { state, E } {
+    var source = snapshot(values);
+    let size = list_len(source);
+    if size < 2 {
+        return source;
+    }
+    var target = snapshot(source);
+    var width = 1;
+    while width < size {
+        var start = 0;
+        while start < size {
+            var left_size = width;
+            if left_size > size - start {
+                left_size = size - start;
+            }
+            let middle = start + left_size;
+            var right_size = width;
+            if right_size > size - middle {
+                right_size = size - middle;
+            }
+            let end = middle + right_size;
+            var left = start;
+            var right = middle;
+            var output = start;
+            while left < middle || right < end {
+                var take_left = right == end;
+                if left < middle && right < end {
+                    take_left = compare(list_get(source, left), list_get(source, right)) <= 0;
+                }
+                if take_left {
+                    list_set(target, output, list_get(source, left));
+                    left = left + 1;
+                } else {
+                    list_set(target, output, list_get(source, right));
+                    right = right + 1;
+                }
+                output = output + 1;
+            }
+            start = end;
+        }
+        let previous = source;
+        source = target;
+        target = previous;
+        if width >= size - width {
+            width = size;
+        } else {
+            width = width + width;
+        }
+    }
+    return source;
+}

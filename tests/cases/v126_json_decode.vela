@@ -1,0 +1,148 @@
+import "../../../std/json_decode.vela" as d;
+import "../../../std/json_stream.vela" as stream;
+import "../../../std/cell.vela" as cell;
+import "../../../std/json.vela" as json;
+struct Row { quantity: Int }
+struct Defaults { maybe: Option<Option<String>>, value: Int }
+struct Node { children: List<Node> }
+fn must<T>(value: Result<T, d::Error>) -> T {
+    match value { Result::Ok(item) => { return item; } Result::Err(error) => { assert_true(false, d::describe(error)); } }
+    return must(value);
+}
+fn failed<T>(value: Result<T, d::Error>) -> d::Error {
+    match value { Result::Err(error) => { return error; } Result::Ok(_) => { assert_true(false, "expected decoder rejection"); } }
+    return failed(value);
+}
+fn names(name: String) -> List<String> effects { state } { let fields = list_new<String>(); list_push(fields, name); return fields; }
+fn rows(policy: d::Unknown, calls: cell::Cell<Int>) -> d::Decoder<List<Row>> effects { state } {
+    let integer = must(d::integer(-10, 10));
+    let row = must(d::object(names("量"), d::Unknown::Reject, fn [integer, calls](fields: d::Fields) -> Result<Row, d::Error> effects { state } {
+        cell::set(calls, cell::get(calls) + 1);
+        return Result<Row, d::Error>::Ok(Row(quantity: d::required(fields, "量", integer)?));
+    }));
+    let array = must(d::array(row, 0, 10));
+    let declared = names("items");
+    let schema = must(d::object(declared, policy, fn [array](fields: d::Fields) -> Result<List<Row>, d::Error> effects { state } { return d::required(fields, "items", array); }));
+    list_truncate(declared, 0);
+    return schema;
+}
+fn fallback(calls: cell::Cell<Int>) -> Int effects { state } { cell::set(calls, cell::get(calls) + 1); return 5; }
+fn defaults(calls: cell::Cell<Int>) -> d::Decoder<Defaults> effects { state } {
+    let declared = names("maybe"); list_push(declared, "value"); let integer = must(d::integer(0, 9));
+    return must(d::object(declared, d::Unknown::Ignore, fn [integer, calls](fields: d::Fields) -> Result<Defaults, d::Error> effects { state } {
+        return Result<Defaults, d::Error>::Ok(Defaults(maybe: d::optional(fields, "maybe", d::nullable(d::string()))?, value: d::defaulted(fields, "value", integer, fallback(calls))?));
+    }));
+}
+fn node_schema(key: String) -> Result<d::Decoder<Node>, d::Error> effects { state } {
+    return d::object(names(key), d::Unknown::Ignore, fn [key](fields: d::Fields) -> Result<Node, d::Error> effects { state } {
+        let children = d::array(node_schema(key)?, 0, 1)?;
+        return Result<Node, d::Error>::Ok(Node(children: d::defaulted(fields, key, children, list_new<Node>())?));
+    });
+}
+fn nested(wrappings: Int, key: String) -> String effects { state } {
+    let quoted = match json::stringify(json::Value::StringValue(key)) { Result::Ok(text) => text, Result::Err(_) => "\"key\"" };
+    let parts = strings_new(); for i in 0 .. wrappings { strings_push(parts, "{" + quoted + ":["); }
+    strings_push(parts, "{}"); for i in 0 .. wrappings { strings_push(parts, "]}"); }
+    return strings_join(parts, "");
+}
+fn main() -> Unit effects { state, io } {
+    let limits = stream::default_limits();
+    let all_ints = must(d::integer(-9223372036854775808, 9223372036854775807));
+    assert_true(must(d::decode(all_ints, "9223372036854775807", limits)) == 9223372036854775807, "exact Int max");
+    assert_true(must(d::decode(all_ints, "-9223372036854775808", limits)) == -9223372036854775808, "exact Int min");
+    assert_true(failed(d::decode(all_ints, "9223372036854775808", limits)).kind == d::ErrorKind::Range, "Int overflow");
+    assert_true(failed(d::decode(all_ints, "1.0", limits)).kind == d::ErrorKind::Type && failed(d::decode(all_ints, "1e0", limits)).kind == d::ErrorKind::Type, "lexical integer only");
+    assert_true(failed(d::decode(all_ints, "true", limits)).kind == d::ErrorKind::Type && failed(d::decode(all_ints, "null", limits)).kind == d::ErrorKind::Type, "no coercion");
+    assert_true(failed(d::decode(all_ints, "\"1\"", limits)).kind == d::ErrorKind::Type && failed(d::decode(d::boolean(), "1", limits)).kind == d::ErrorKind::Type, "no String or number coercion");
+    assert_true(must(d::decode(d::boolean(), "true", limits)) && !must(d::decode(d::boolean(), "false", limits)), "boolean decoder");
+    assert_true(must(d::decode(d::string(), "\"\\uD83D\\uDE00\"", limits)) == "😀", "decoded surrogate pair");
+    let number = must(d::number(-10.0, 10.0));
+    assert_true(must(d::decode(number, "1.25", limits)) == 1.25 && must(d::decode(number, "1", limits)) == 1.0, "finite number conversion");
+    assert_true(failed(d::decode(number, "1e9999", limits)).kind == d::ErrorKind::Range && failed(d::decode(number, "11", limits)).kind == d::ErrorKind::Range, "number bounds");
+    assert_true(failed(d::integer(2, 1)).kind == d::ErrorKind::Schema && failed(d::number(2.0, 1.0)).kind == d::ErrorKind::Schema, "constructor numeric bounds");
+    assert_true(failed(d::number(0.0 / 0.0, 1.0)).kind == d::ErrorKind::Schema, "nonfinite bounds");
+    assert_true(failed(d::array(all_ints, -1, 1)).kind == d::ErrorKind::Schema && failed(d::array(all_ints, 0, 65537)).kind == d::ErrorKind::Schema, "array declaration bounds");
+    let bounded = must(d::array(all_ints, 1, 2));
+    assert_true(failed(d::decode(bounded, "[]", limits)).kind == d::ErrorKind::Range, "array minimum");
+    let excess = failed(d::decode(bounded, "[1,2,3]", limits)); assert_true(excess.kind == d::ErrorKind::Range && excess.path == "$[2]" && excess.offset == 5, "array maximum path offset");
+    let matrix = must(d::array(must(d::array(all_ints, 0, 10)), 0, 10));
+    let decoded_matrix = must(d::decode(matrix, "[ [1,2], [], [3] ]", limits));
+    assert_true(list_get(list_get(decoded_matrix, 0), 1) == 2 && list_len(list_get(decoded_matrix, 1)) == 0, "nested collections");
+    let calls = cell::create(0); let schema = rows(d::Unknown::Ignore, calls);
+    let good = must(d::decode(schema, "{\"items\":[{\"量\":1},{\"量\":2}],\"ignored\":1e999999}", limits));
+    assert_true(list_len(good) == 2 && list_get(good, 1).quantity == 2 && cell::get(calls) == 2, "typed records unknown huge number callback once");
+    cell::set(calls, 0);
+    let wrong = failed(d::decode(schema, "{\"items\":[{\"量\":1},{\"量\":\"x\"},{\"量\":3}]}", limits));
+    assert_true(wrong.kind == d::ErrorKind::Type && wrong.path == "$[\"items\"][1][\"量\"]" && wrong.offset == 27 && cell::get(calls) == 2, "Unicode byte offset first typed failure");
+    let escaped = failed(d::decode(schema, "{\"items\":[{\"\\u91cf\":\"x\"}]}", limits));
+    assert_true(escaped.path == "$[\"items\"][0][\"量\"]" && escaped.offset == 20, "escaped key semantic path raw byte offset");
+    let nested_overflow = failed(d::decode(schema, "{\"items\":[{\"量\":9223372036854775808}]}", limits));
+    assert_true(nested_overflow.kind == d::ErrorKind::Range && nested_overflow.offset == 17 && nested_overflow.path == "$[\"items\"][0][\"量\"]", "outer numeric failure coordinates");
+    match nested_overflow.cause { Option::Some(cause) => { assert_true(cause.kind == stream::ErrorKind::Range && cause.offset == 0 && cause.path == "$", "unmodified local numeric cause"); } Option::None => { assert_true(false, "numeric cause missing"); } }
+    let spaced = failed(d::decode(schema, "\r\n{\"items\":[{\"量\":\"x\"}]}", limits));
+    assert_true(spaced.offset == 19, "CRLF counts bytes");
+    let missing = failed(d::decode(schema, "{\"items\":[{}]}", limits));
+    assert_true(missing.kind == d::ErrorKind::Missing && missing.path == "$[\"items\"][0][\"量\"]" && missing.offset == 10, "missing member containing object offset");
+    cell::set(calls, 0);
+    let duplicate = failed(d::decode(schema, "{\"items\":[],\"items\":[]}", limits));
+    assert_true(duplicate.kind == d::ErrorKind::Syntax && duplicate.path == "$[\"items\"]" && duplicate.offset == 12 && cell::get(calls) == 0, "duplicate before callbacks");
+    match duplicate.cause { Option::Some(cause) => { assert_true(cause.kind == stream::ErrorKind::Syntax && cause.offset == 12, "typed syntax cause unchanged"); } Option::None => { assert_true(false, "missing syntax cause"); } }
+    let invalid_unknown = failed(d::decode(schema, "{\"items\":[{\"量\":1}],\"ignored\":[1,]}", limits));
+    assert_true(invalid_unknown.kind == d::ErrorKind::Syntax && cell::get(calls) == 0, "ignored malformed value validates before callbacks");
+    let rejected = failed(d::decode(rows(d::Unknown::Reject, calls), "{\"items\":[],\"extra\":1}", limits));
+    assert_true(rejected.kind == d::ErrorKind::Unknown && rejected.path == "$[\"extra\"]" && rejected.offset == 12 && cell::get(calls) == 0, "unknown policy before callbacks");
+    let fallback_calls = cell::create(0); let with_defaults = defaults(fallback_calls);
+    let absent = must(d::decode(with_defaults, "{}", limits));
+    assert_true(absent.value == 5 && cell::get(fallback_calls) == 1, "absent default eager once");
+    match absent.maybe { Option::None => {} Option::Some(_) => { assert_true(false, "missing optional"); } }
+    let present = must(d::decode(with_defaults, "{\"value\":2,\"maybe\":null}", limits));
+    assert_true(present.value == 2 && cell::get(fallback_calls) == 2, "present still evaluates fallback argument");
+    match present.maybe { Option::Some(value) => { match value { Option::None => {} Option::Some(_) => { assert_true(false, "null distinction"); } } } Option::None => { assert_true(false, "present null distinct from missing"); } }
+    let text = must(d::decode(with_defaults, "{\"maybe\":\"x\"}", limits));
+    match text.maybe { Option::Some(value) => { match value { Option::Some(s) => { assert_true(s == "x", "optional nullable present"); } Option::None => { assert_true(false, "expected text"); } } } Option::None => { assert_true(false, "expected present"); } }
+    let null_default = failed(d::decode(with_defaults, "{\"value\":null}", limits)); assert_true(null_default.kind == d::ErrorKind::Type && null_default.path == "$[\"value\"]" && null_default.offset == 9, "default only absent never null");
+    let quoted_name = "a\"b";
+    let quoted_schema = must(d::object(names(quoted_name), d::Unknown::Ignore, fn [quoted_name](fields: d::Fields) -> Result<String, d::Error> effects { state } { return d::required(fields, quoted_name, d::string()); }));
+    let quote_error = failed(d::decode(quoted_schema, "{\"a\\\"b\":true}", limits));
+    assert_true(quote_error.path == "$[\"a\\\"b\"]" && quote_error.offset == 8, "quoted field path");
+    let text_array = must(d::array(d::string(), 0, 5));
+    let strings = must(d::decode(text_array, "[\"a,b]}\",\"a\\\"b\",\"文\"]", limits));
+    assert_true(list_get(strings, 0) == "a,b]}" && list_get(strings, 1) == "a\"b" && list_get(strings, 2) == "文", "validated string boundary spans");
+    let duplicate_names = names("x"); list_push(duplicate_names, "x");
+    assert_true(failed(d::object(duplicate_names, d::Unknown::Ignore, fn [](fields: d::Fields) -> Result<Int, d::Error> { return Result<Int, d::Error>::Ok(1); })).kind == d::ErrorKind::Schema, "duplicate declaration");
+    let wrong_access = must(d::object(names("x"), d::Unknown::Ignore, fn [](fields: d::Fields) -> Result<String, d::Error> effects { state } { return d::required(fields, "typo", d::string()); }));
+    assert_true(failed(d::decode(wrong_access, "{}", limits)).kind == d::ErrorKind::Schema, "undeclared field lookup");
+    assert_true(failed(d::decode(all_ints, "1234", stream::Limits(bytes: 3, depth: 10, nodes: 10))).kind == d::ErrorKind::Limit, "input byte budget");
+    assert_true(failed(d::decode(bounded, "[1,2]", stream::Limits(bytes: 100, depth: 10, nodes: 2))).kind == d::ErrorKind::Limit, "node budget before schema");
+    assert_true(failed(d::decode(all_ints, str_from_byte(255), limits)).kind == d::ErrorKind::Encoding, "encoding classification");
+    assert_true(failed(d::decode(all_ints, "1 2", limits)).kind == d::ErrorKind::Syntax, "trailing data");
+    let big = strings_new(); for i in 0 .. 6000 { strings_push(big, "9"); }
+    let large_ignored = "{\"items\":[],\"ignored\":" + strings_join(big, "") + "}";
+    assert_true(list_len(must(d::decode(schema, large_ignored, limits))) == 0, "ignored 6000 digit number not converted");
+    let deep = strings_new(); strings_push(deep, "{\"items\":[],\"ignored\":"); for i in 0 .. 4095 { strings_push(deep, "["); } strings_push(deep, "0"); for i in 0 .. 4095 { strings_push(deep, "]"); } strings_push(deep, "}");
+    assert_true(list_len(must(d::decode(schema, strings_join(deep, ""), limits))) == 0, "ignored depth 4096 iterative validation");
+    let recursive = must(node_schema("children"));
+    let accepted = must(d::decode(recursive, nested(63, "children"), limits));
+    assert_true(list_len(accepted.children) == 1, "127 nested decoder invocations");
+    let depth_error = failed(d::decode(recursive, nested(64, "children"), limits));
+    assert_true(depth_error.kind == d::ErrorKind::Limit && depth_error.offset == 832, "129th decoder invocation rejected");
+    let long_name = strings_new(); for i in 0 .. 1024 { strings_push(long_name, "a"); } let key = strings_join(long_name, "");
+    let path_error = failed(d::decode(must(node_schema(key)), nested(64, key), limits));
+    assert_true(path_error.kind == d::ErrorKind::Limit && str_len(path_error.path) <= 65536 && path_error.offset == 64828, "outer path budget and nearest parent");
+    assert_true(failed(d::object(names(key + "a"), d::Unknown::Ignore, fn [](fields: d::Fields) -> Result<Int, d::Error> { return Result<Int, d::Error>::Ok(1); })).kind == d::ErrorKind::Schema, "field name byte budget");
+    assert_true(failed(d::object(names(str_from_byte(255)), d::Unknown::Ignore, fn [](fields: d::Fields) -> Result<Int, d::Error> { return Result<Int, d::Error>::Ok(1); })).kind == d::ErrorKind::Schema, "field name encoding");
+    let many_names = list_new<String>(); for i in 0 .. 257 { list_push(many_names, "field-" + to_string(i)); }
+    assert_true(failed(d::object(many_names, d::Unknown::Ignore, fn [](fields: d::Fields) -> Result<Int, d::Error> { return Result<Int, d::Error>::Ok(1); })).kind == d::ErrorKind::Schema, "schema field count budget");
+    assert_true(failed(d::decode(all_ints, "1", stream::Limits(bytes: 10, depth: 10, nodes: 0))).kind == d::ErrorKind::Schema, "invalid parser budget category");
+    let null_required = must(d::object(names("n"), d::Unknown::Ignore, fn [all_ints](fields: d::Fields) -> Result<Option<Int>, d::Error> effects { state } { return d::required(fields, "n", d::nullable(all_ints)); }));
+    match must(d::decode(null_required, "{\"n\":null}", limits)) { Option::None => {} Option::Some(_) => { assert_true(false, "required nullable null"); } }
+    assert_true(failed(d::decode(null_required, "{}", limits)).kind == d::ErrorKind::Missing, "required nullable still required");
+    let plain_optional = must(d::object(names("n"), d::Unknown::Ignore, fn [](fields: d::Fields) -> Result<Option<String>, d::Error> effects { state } { return d::optional(fields, "n", d::string()); }));
+    assert_true(failed(d::decode(plain_optional, "{\"n\":null}", limits)).kind == d::ErrorKind::Type, "optional nonnullable rejects null");
+    cell::set(calls, 0);
+    assert_true(failed(d::decode(schema, "{\"items\":[{\"量\":1}],\"u\":0,\"u\":1}", limits)).kind == d::ErrorKind::Syntax && cell::get(calls) == 0, "duplicate ignored field before callbacks");
+    let root_element = must(d::object(names("x"), d::Unknown::Ignore, fn [calls, all_ints](fields: d::Fields) -> Result<Int, d::Error> effects { state } { cell::set(calls, cell::get(calls) + 1); return d::required(fields, "x", all_ints); }));
+    let root_array = must(d::array(root_element, 0, 5));
+    assert_true(failed(d::decode(root_array, "[{\"x\":1},{\"x\":2,}]", limits)).kind == d::ErrorKind::Syntax && cell::get(calls) == 0, "complete array syntax before callbacks");
+    print("typed JSON schemas passed");
+}

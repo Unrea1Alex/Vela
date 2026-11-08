@@ -1,0 +1,4 @@
+type Left = distinct Int;
+type Right = distinct Int;
+fn consume(value: Left) -> Int { return value.value; }
+fn main() -> Int { return consume(Right(4)); }

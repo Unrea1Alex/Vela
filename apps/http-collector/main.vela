@@ -1,11 +1,15 @@
+import "../../std/json_decode.vela" as decode;
+import "../../std/cli_schema.vela" as cli;
+import "../../std/result.vela" as result;
 import "../../std/http.vela" as http;
 import "../../std/json_stream.vela" as stream;
 import "../../std/json.vela" as json;
 import "../../std/fs.vela" as fs;
 import "../../std/path.vela" as path;
 import "../../std/text.vela" as text;
-import "../../std/event_loop.vela" as loop;
-import "../../std/process.vela" as process;
+import "../../std/parallel.vela" as parallel;
+import "../../std/task_group.vela" as group;
+import "../../std/async_io.vela" as aio;
 struct Options {
     input: String,
     output: String,
@@ -15,130 +19,57 @@ struct Options {
 struct Config {
     urls: List<String>,
     requests: List<http::Request>,
-    concurrency: Int
+    concurrency: Int,
+    timeout: Int
 }
-struct Running {
-    index: Int,
-    exchange: http::Exchange
+struct Row {
+    output: String,
+    failed: Bool
 }
 struct Collected {
     output: String,
     failed: Bool
 }
-fn argument(index: Int) -> String effects { args } {
-    return match arg(index) {
-        StringResult::Ok(value) => value,
-        StringResult::Err(_) => ""
-    };
+fn cli_result<T>(value: Result<T, cli::Error>) -> Result<T, String> {
+    return result::map_error(value, cli::describe);
 }
-fn options() -> Result<Options, String> effects { args } {
-    if arg_count() < 2 {
-        return Result<Options, String>::Err("usage: CONFIG OUTPUT [--fail-on-error] [--repeat N]");
+fn options() -> Result<Option<Options>, String> effects { args, state, io } {
+    let parameters = list_new<cli::Parameter>();
+    list_push(parameters, cli::positional("input", "JSON configuration", Option<String>::None));
+    list_push(parameters, cli::positional("output", "JSON destination", Option<String>::None));
+    list_push(parameters, cli::flag("fail-on-error", "Exit 1 if a request fails", false));
+    list_push(parameters, cli::integer("repeat", "Repetitions", 1, 1000, Option<Int>::Some(1)));
+    let schema = cli_result(cli::create("http-collector", "Collect bounded HTTP requests.",
+        parameters, list_new<cli::LessEqual>()))?;
+    let parsed = cli_result(cli::current(schema))?;
+    if cli::is_help(parsed) {
+        print(cli::help(parsed));
+        return Result<Option<Options>, String>::Ok(Option<Options>::None);
     }
-    var fail = false;
-    var repeat = 1;
-    var at = 2;
-    while at < arg_count() {
-        let option = argument(at);
-        if option == "--fail-on-error" {
-            fail = true;
-            at = at + 1;
-        } else if option == "--repeat" {
-            if at + 1 >= arg_count() {
-                return Result<Options, String>::Err("missing repetition count");
-            }
-            repeat = match parse_int(argument(at + 1)) {
-                IntResult::Ok(n) => n,
-                IntResult::Err(_) => 0
-            };
-            if repeat < 1 || repeat > 1000 {
-                return Result<Options, String>::Err("invalid repetition count");
-            }
-            at = at + 2;
-        } else {
-            return Result<Options, String>::Err("unknown option");
-        }
-    }
-    return Result<Options, String>::Ok(Options(input: argument(0), output: argument(1), fail: fail,
-        repeat: repeat));
+    return Result<Option<Options>, String>::Ok(Option<Options>::Some(Options(input: cli_result(
+        cli::text_value(parsed, "input"))?, output: cli_result(cli::text_value(parsed, "output"))?,
+        fail: cli_result(cli::flag_value(parsed, "fail-on-error"))?, repeat: cli_result(
+        cli::int_value(parsed, "repeat"))?)));
 }
-fn parsed<T>(value: Result<T, stream::Error>) -> Result<T, String> {
-    return match value {
-        Result::Ok(found) => Result<T, String>::Ok(found),
-        Result::Err(error) => Result<T, String>::Err(stream::describe(error))
-    };
+struct InputConfig {
+    urls: List<String>,
+    concurrency: Int,
+    timeout: Int
 }
-fn next(reader: stream::Reader) -> Result<stream::Token, String> effects { state } {
-    match parsed(stream::next(reader))? {
-        Option::Some(found) => {
-            return Result<stream::Token, String>::Ok(found);
-        }
-        Option::None => {
-            return Result<stream::Token, String>::Err("unexpected end of configuration");
-        }
-    }
-}
-fn tag(event: stream::Event) -> Int {
-    return match event {
-        stream::Event::ObjectStart => 0,
-        stream::Event::ObjectEnd => 1,
-        stream::Event::ArrayStart => 2,
-        stream::Event::ArrayEnd => 3,
-        stream::Event::Key(_) => 4,
-        stream::Event::StringValue(_) => 5,
-        stream::Event::NumberLiteral(_) => 6,
-        stream::Event::Boolean(_) => 7,
-        stream::Event::Null => 8
-    };
-}
-fn member(reader: stream::Reader) -> Result<Option<String>, String> effects { state } {
-    let found = next(reader)?;
-    match found.event {
-        stream::Event::Key(name) => {
-            return Result<Option<String>, String>::Ok(Option<String>::Some(name));
-        }
-        stream::Event::ObjectEnd => {
-            return Result<Option<String>, String>::Ok(Option<String>::None);
-        }
-        stream::Event::ObjectStart => {}
-        stream::Event::ArrayStart => {}
-        stream::Event::ArrayEnd => {}
-        stream::Event::StringValue(_) => {}
-        stream::Event::NumberLiteral(_) => {}
-        stream::Event::Boolean(_) => {}
-        stream::Event::Null => {}
-    }
-    return Result<Option<String>, String>::Err("expected configuration member");
-}
-fn urls(reader: stream::Reader) -> Result<List<String>, String> effects { state } {
-    if tag(next(reader)?.event) != 2 {
-        return Result<List<String>, String>::Err("expected urls array");
-    }
-    let values = list_new<String>();
-    while true {
-        let found = next(reader)?;
-        match found.event {
-            stream::Event::StringValue(value) => {
-                if list_len(values) >= 128 {
-                    return Result<List<String>, String>::Err("128 URL limit");
-                }
-                list_push(values, value);
-                continue;
-            }
-            stream::Event::ArrayEnd => {
-                return Result<List<String>, String>::Ok(values);
-            }
-            stream::Event::ObjectStart => {}
-            stream::Event::ObjectEnd => {}
-            stream::Event::ArrayStart => {}
-            stream::Event::Key(_) => {}
-            stream::Event::NumberLiteral(_) => {}
-            stream::Event::Boolean(_) => {}
-            stream::Event::Null => {}
-        }
-        return Result<List<String>, String>::Err("expected URL string");
-    }
-    return Result<List<String>, String>::Err("unfinished urls");
+fn config_schema() -> Result<decode::Decoder<InputConfig>, decode::Error> effects { state } {
+    let names = list_new<String>();
+    list_push(names, "urls");
+    list_push(names, "concurrency");
+    list_push(names, "timeout_ms");
+    let urls = decode::array(decode::string(), 0, 128)?;
+    let concurrency = decode::integer(1, 8)?;
+    let timeout = decode::integer(50, 5000)?;
+    return decode::object(names, decode::Unknown::Ignore, fn [ urls, concurrency, timeout ](
+        fields: decode::Fields) -> Result<InputConfig, decode::Error> effects { state } {
+        return Result<InputConfig, decode::Error>::Ok(InputConfig(urls: decode::required(fields,
+            "urls", urls)?, concurrency: decode::required(fields, "concurrency", concurrency)?,
+            timeout: decode::required(fields, "timeout_ms", timeout)?));
+    });
 }
 fn config(file: String) -> Result<Config, String> effects { state, io } {
     var data = "";
@@ -150,50 +81,15 @@ fn config(file: String) -> Result<Config, String> effects { state, io } {
             return Result<Config, String>::Err("cannot read UTF-8 configuration");
         }
     }
-    let reader = parsed(stream::create(data, stream::Limits(bytes: 1048576, depth: 4096,
-        nodes: 1000000)))?;
-    if tag(next(reader)?.event) != 0 {
-        return Result<Config, String>::Err("expected configuration object");
-    }
-    var values = list_new<String>();
-    var concurrency = 0;
-    var timeout = 0;
-    var have_urls = false;
-    var have_concurrency = false;
-    var have_timeout = false;
-    var ended = false;
-    while !ended {
-        match member(reader)? {
-            Option::None => {
-                ended = true;
-            }
-            Option::Some(name) => {
-                if name == "urls" {
-                    values = urls(reader)?;
-                    have_urls = true;
-                } else if name == "concurrency" {
-                    concurrency = parsed(stream::read_integer(reader))?;
-                    have_concurrency = true;
-                } else if name == "timeout_ms" {
-                    timeout = parsed(stream::read_integer(reader))?;
-                    have_timeout = true;
-                } else {
-                    let skipped = parsed(stream::skip_value(reader))?;
-                }
-            }
-        }
-    }
-    let complete = parsed(stream::finish(reader))?;
-    if !have_urls || !have_concurrency || !have_timeout || concurrency < 1 || concurrency > 8
-        || timeout < 50 || timeout > 5000 {
-        return Result<Config, String>::Err("invalid configuration fields");
-    }
+    let schema = result::map_error(config_schema(), decode::describe)?;
+    let input = result::map_error(decode::decode(schema, data, stream::Limits(bytes: 1048576,
+        depth: 4096, nodes: 1000000)), decode::describe)?;
     let requests = list_new<http::Request>();
-    for url in values {
+    for url in input.urls {
         if str_len(url) < 7 || str_slice(url, 0, 7) != "http://" {
             return Result<Config, String>::Err("plain HTTP URL required");
         }
-        match http::from_url(url, timeout, 1048576) {
+        match http::from_url(url, input.timeout, 1048576) {
             Result::Ok(request) => {
                 list_push(requests, request);
             }
@@ -202,8 +98,8 @@ fn config(file: String) -> Result<Config, String> effects { state, io } {
             }
         }
     }
-    return Result<Config, String>::Ok(Config(urls: values, requests: requests,
-        concurrency: concurrency));
+    return Result<Config, String>::Ok(Config(urls: input.urls, requests: requests,
+        concurrency: input.concurrency, timeout: input.timeout));
 }
 fn clock() -> Int effects { io } {
     match monotonic_millis() {
@@ -242,126 +138,118 @@ fn error_label(error: http::Error) -> String {
         http::Error::Closed => "network"
     };
 }
-fn stop_all(scheduler: loop::Loop<process::Completed>,
-    running: List<Running>) -> Bool effects { state, io, process } {
-    for item in running {
-        let cancelled = http::cancel(item.exchange);
-    }
-    let started = clock();
-    var pending = true;
-    while pending && clock() - started < 2000 {
-        let turn = loop::tick(scheduler, clock());
-        pending = false;
-        for item in running {
-            if http::pending(item.exchange) {
-                pending = true;
+fn response_row(url: String, answer: Result<http::Response, aio::Error<http::Error>>) -> Result<Row,
+    String> effects { state } {
+    var status = 0;
+    var bytes = 0;
+    var label = "";
+    var failed = false;
+    match answer {
+        Result::Ok(response) => {
+            status = response.status;
+            bytes = str_len(response.body.data);
+            failed = status >= 400;
+        }
+        Result::Err(error) => {
+            failed = true;
+            match error {
+                aio::Error::Operation(cause) => {
+                    label = error_label(cause);
+                    if label == "storage" {
+                        return Result<Row, String>::Err("HTTP helper storage/launch failure");
+                    }
+                }
+                aio::Error::TimedOut => {
+                    label = "timeout";
+                }
+                aio::Error::Cancelled => {
+                    label = "network";
+                }
+                aio::Error::Queue(_) => {
+                    return Result<Row, String>::Err("cannot schedule HTTP exchange");
+                }
+                aio::Error::Cleanup(_) => {
+                    return Result<Row, String>::Err("HTTP cleanup failure");
+                }
+                aio::Error::Driver(_) => {
+                    return Result<Row, String>::Err("HTTP driver failure");
+                }
             }
         }
-        if pending {
-            let slept = host_sleep(1);
-        }
     }
-    var cleaned = !pending;
-    for item in running {
-        match http::release(item.exchange) {
-            Result::Err(_) => {
-                cleaned = false;
-            }
-            Result::Ok(_) => {}
-        }
+    var error = "null";
+    if label != "" {
+        error = quote(label);
     }
-    return cleaned;
+    return Result<Row, String>::Ok(Row(output: "{\"url\":" + quote(url) + ",\"status\":"
+        + to_string(status) + ",\"bytes\":" + to_string(bytes) + ",\"error\":" + error + "}",
+        failed: failed));
 }
 fn perform(values: Config, directory: path::Path,
     transport: dyn http::Transport) -> Result<Collected, String> effects { state, io, process } {
-    let created = match loop::create<process::Completed>(clock()) {
-        Result::Ok(value) => Result<loop::Loop<process::Completed>, String>::Ok(value),
-        Result::Err(_) => Result<loop::Loop<process::Completed>, String>::Err(
-            "cannot create scheduler")
+    let urls = values.urls;
+    let timeout = values.timeout + 3000;
+    let action = async fn [ urls, timeout, directory, transport ](scope: group::Scope,
+        request: http::Request, index: Int) -> Result<Row, String> effects { state } {
+        return response_row(list_get(urls, index), await aio::fetch(scope, transport, request,
+            directory, timeout));
     };
-    let scheduler = created?;
-    let running = list_new<Running>();
-    let rows = list_new<String>();
-    for url in values.urls {
-        list_push(rows, "");
-    }
-    var next_index = 0;
-    var completed = 0;
-    var failed = false;
-    var fatal = "";
-    while completed < list_len(values.urls) && fatal == "" {
-        while next_index < list_len(values.urls) && list_len(running) < values.concurrency {
-            // Acquire a slot before creating an exchange/starting its transfer timer.
-            match transport.start(scheduler, list_get(values.requests, next_index), directory) {
-                Result::Err(_) => {
-                    fatal = "cannot start HTTP exchange";
-                    break;
-                }
-                Result::Ok(exchange) => {
-                    list_push(running, Running(index: next_index, exchange: exchange));
-                    next_index = next_index + 1;
-                }
+    let mapped = parallel::create(values.requests, values.concurrency, clock(), timeout * (list_len(
+        values.requests) + 1), parallel::Policy::FailFast, action);
+    let job = result::map_error(mapped, fn [ ](e: parallel::Error) -> String {
+        return "cannot create parallel job";
+    })?;
+    var ready = false;
+    while !ready {
+        match parallel::tick(job, clock()) {
+            Result::Ok(done) => {
+                ready = done;
+            }
+            Result::Err(_) => {
+                assert_true(false, "invalid parallel host clock");
             }
         }
-        let turn = loop::tick(scheduler, clock());
-        var at = 0;
-        while at < list_len(running) && fatal == "" {
-            let item = list_get(running, at);
-            var terminal = false;
-            var row = "";
-            match http::poll(item.exchange) {
-                Result::Ok(found) => {
-                    match found {
-                        Option::None => {}
-                        Option::Some(response) => {
-                            terminal = true;
-                            if response.status >= 400 {
-                                failed = true;
-                            }
-                            row = "{\"url\":" + quote(list_get(values.urls, item.index))
-                                + ",\"status\":" + to_string(response.status) + ",\"bytes\":"
-                                + to_string(str_len(response.body.data)) + ",\"error\":null}";
-                        }
-                    }
-                }
-                Result::Err(error) => {
-                    terminal = true;
-                    failed = true;
-                    let label = error_label(error);
-                    if label == "storage" {
-                        fatal = "HTTP helper storage/launch failure";
-                    }
-                    row = "{\"url\":" + quote(list_get(values.urls, item.index))
-                        + ",\"status\":0,\"bytes\":0,\"error\":" + quote(label) + "}";
-                }
-            }
-            if terminal {
-                match http::release(item.exchange) {
-                    Result::Ok(_) => {}
-                    Result::Err(_) => {
-                        fatal = "HTTP cleanup failure";
-                        break;
-                    }
-                }
-                list_set(rows, item.index, row);
-                completed = completed + 1;
-                list_set(running, at, list_get(running, list_len(running) - 1));
-                list_truncate(running, list_len(running) - 1);
-            } else {
-                at = at + 1;
-            }
-        }
-        if fatal == "" && completed < list_len(values.urls) {
+        if !ready {
             let slept = host_sleep(1);
         }
     }
-    if fatal != "" {
-        let cleaned = stop_all(scheduler, running);
-        return Result<Collected, String>::Err(fatal);
+    return match parallel::outcome(job) {
+        Option::Some(value) => render(value),
+        Option::None => Result<Collected, String>::Err("missing parallel completion")
+    };
+}
+fn render(collected: parallel::Completion<Row, String>) -> Result<Collected,
+    String> effects { state } {
+    if list_len(collected.cleanup) > 0 {
+        return Result<Collected, String>::Err("HTTP cleanup failure");
     }
     let parts = strings_new();
-    for row in rows {
-        strings_push(parts, row);
+    var failed = false;
+    for item in collected.items {
+        match item {
+            parallel::Item::Value(row) => {
+                strings_push(parts, row.output);
+                failed = failed || row.failed;
+            }
+            parallel::Item::Error(message) => {
+                return Result<Collected, String>::Err(message);
+            }
+            parallel::Item::Cancelled => {
+                return Result<Collected, String>::Err("HTTP job cancelled");
+            }
+            parallel::Item::TimedOut => {
+                return Result<Collected, String>::Err("HTTP job deadline");
+            }
+            parallel::Item::Driver(_) => {
+                return Result<Collected, String>::Err("HTTP driver failure");
+            }
+            parallel::Item::NotStarted => {
+                return Result<Collected, String>::Err("HTTP job stopped before admission");
+            }
+        }
+    }
+    if collected.reason != parallel::Finish::Complete {
+        return Result<Collected, String>::Err("HTTP job did not complete");
     }
     return Result<Collected, String>::Ok(Collected(output: "{\"results\":[" + strings_join(parts,
         ",") + "]}", failed: failed));
@@ -420,16 +308,23 @@ fn main() -> Int effects { args, state, io, process } {
             return 2;
         }
         Result::Ok(value) => {
-            match run(value) {
-                Result::Err(message) => {
-                    eprint(message);
-                    return 2;
-                }
-                Result::Ok(failed) => {
-                    if failed {
-                        return 1;
-                    }
+            match value {
+                Option::None => {
                     return 0;
+                }
+                Option::Some(config) => {
+                    match run(config) {
+                        Result::Err(message) => {
+                            eprint(message);
+                            return 2;
+                        }
+                        Result::Ok(failed) => {
+                            if failed {
+                                return 1;
+                            }
+                            return 0;
+                        }
+                    }
                 }
             }
         }

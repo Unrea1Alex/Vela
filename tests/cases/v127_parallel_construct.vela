@@ -1,0 +1,2 @@
+import "../../../std/parallel.vela" as p;
+fn main()->Unit{let job=p::Job<Int,Int,Int>();}

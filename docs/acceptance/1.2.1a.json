@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.1a",
+  "status": "verified",
+  "date": "2026-11-07",
+  "contract": "../contracts/STDLIB-EVOLUTION-1.2.md",
+  "map": "../STDLIB-MAP-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1248,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 477645,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/121a-verify.log",
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "source_provenance": {
+    "source_files": 22,
+    "matches_commit": "106890ecb19566a91b4b59ca5d942efd614a7a08",
+    "status": "passed"
+  },
+  "independent_behavior": {
+    "expected": "legacy library APIs passed LF",
+    "archived_1_1": "passed",
+    "current": "passed",
+    "linux_console": "passed (GCC/musl emitted-C fixture)",
+    "rejection_old": "E209",
+    "rejection_current": "E209",
+    "legacy_CR_retained": true,
+    "effects_aliases_NaNs_zeros_bytes": true
+  },
+  "baseline": "tests/library12/frozen/manifest.json",
+  "application_metrics": {
+    "tree-index": {
+      "source_sha256": "6569a7b3600904395cdc1e9f4296ba8c3b1fe317e16c2783be23922f93b4d98b",
+      "bytes": 5104,
+      "nonblank_lines": 95,
+      "function_headings": 9,
+      "control_flow_lines": 20
+    },
+    "log-summary": {
+      "source_sha256": "20027e21f261e9fee2faa42eafab6fd940ff2979df0a45ac5883715ed284a80d",
+      "bytes": 9589,
+      "nonblank_lines": 274,
+      "function_headings": 13,
+      "control_flow_lines": 30
+    },
+    "http-collector": {
+      "source_sha256": "9af860f550be42305a6c46cf16fea394c202b2db392381a03c646315c23a7926",
+      "bytes": 15948,
+      "nonblank_lines": 437,
+      "function_headings": 16,
+      "control_flow_lines": 48
+    }
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 112,
+    "links": 760,
+    "missing": []
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 89,
+    "negative_checks": 2
+  },
+  "implementation": "No proposed std API implemented in this contract stage. Opt-in modules avoid new wildcard-name collisions; old signatures/representations/errors preserved.",
+  "next": "1.2.2"
+}

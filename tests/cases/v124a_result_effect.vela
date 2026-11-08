@@ -1,0 +1,3 @@
+import "../../../std/result_ops.vela" as result;
+fn invalid(value: Result<Int, String>) -> Result<Int, String> { return result::map(value, fn [](n: Int) -> Int effects { io } { print(n); return n; }); }
+fn main() -> Unit {}

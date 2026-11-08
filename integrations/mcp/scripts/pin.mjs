@@ -7,12 +7,13 @@ const root=path.resolve(process.argv[2]??'../..');
 const version=/^Vela (\S+) \(self-hosted\)/.exec(execFileSync(path.join(root,'bin/velac.exe'),['--version'],{encoding:'utf8'}))?.[1];
 if(!version)throw new Error('Cannot determine the pinned native compiler version.');
 const files={};
-for(const file of ['bin/velac.exe','vela/builtins.def','vela/backends/runtime.h',
+for(const file of ['bin/velac.exe','bin/vela-api.exe','docs/api-purpose.json','docs/contracts/API-SEARCH-1.2.md','vela/builtins.def','vela/backends/runtime.h',
+ 'docs/AGENT-START.md','docs/CAPABILITIES.md','docs/RECIPES.md','docs/AGENT-MIGRATION.md','docs/STDLIB-MAP-1.2.md','docs/api-index.json',
  'docs/AGENT-QUICKSTART.md','docs/LANGUAGE.md','docs/PROJECTS.md','docs/COMPATIBILITY.md','docs/MIGRATING-1.0.md','docs/CHANGELOG.md','docs/stable-1.0.json','docs/contracts/STABLE-1.0.md',
  'docs/contracts/MODULES.md','docs/MEMORY.md','examples/agent-idioms/main.vela','docs/contracts/NUMBERS.md',
  'docs/STDLIB.md','docs/TOOLING.md','docs/contracts/TESTING.md','docs/contracts/FFI.md','vela/ffi.h',
- ...['LIBRARY-1.1','SEMANTIC-QUERIES','REFACTORING','LSP','FORMATTER','TEXT-LITERALS-RESOURCES','MCP-OUTPUT-ARTIFACTS','MCP-PROTOCOL','MCP-EXECUTION','ENCAPSULATION','METHODS','INTERFACES','CALLABLES-EFFECTS','SERVICES','REPLAY','CALLBACKS','GUI-APPLICATION','GUI-LIBRARY','EVENT-LOOP','ASYNC-CANCELLATION','TASK-GROUPS','NETWORK-TLS','HTTP-API','ENUM-EQUALITY','GUI-NETWORK','INCREMENTAL-BUILD','DEBUGGING','PACKAGING','PLATFORM-SUPPORT'].map(name=>'docs/contracts/'+name+'.md'),
- ...['json_stream','directory','text','path','collections','json','cli','config','fs','process','testing','result','lines','services','replay','event_loop','tasks','task_group','async_io','gui','http','http_server'].map(name=>'std/'+name+'.vela')]){
+ ...['AGENT-ENTRY-1.2','PROJECT-INIT-1.2','CLI-SCHEMA-1.2','DIAGNOSTIC-PLANS-1.2','PARALLEL-1.2','IO-1.2','JSON-DECODE-1.2','STDLIB-EVOLUTION-1.2','LIBRARY-1.1','SEMANTIC-QUERIES','REFACTORING','LSP','FORMATTER','TEXT-LITERALS-RESOURCES','MCP-OUTPUT-ARTIFACTS','MCP-PROTOCOL','MCP-EXECUTION','ENCAPSULATION','METHODS','INTERFACES','CALLABLES-EFFECTS','SERVICES','REPLAY','CALLBACKS','GUI-APPLICATION','GUI-LIBRARY','EVENT-LOOP','ASYNC-CANCELLATION','TASK-GROUPS','NETWORK-TLS','HTTP-API','ENUM-EQUALITY','GUI-NETWORK','INCREMENTAL-BUILD','DEBUGGING','PACKAGING','PLATFORM-SUPPORT'].map(name=>'docs/contracts/'+name+'.md'),
+ ...['json_stream','parallel','io','stream_lines','json_decode','directory','text','path','collections','algorithms','set','cell','json','cli','cli_schema','config','fs','process','testing','result','result_ops','option','lines','services','replay','event_loop','tasks','task_group','async_io','gui','http','http_server'].map(name=>'std/'+name+'.vela')]){
  files[file]=createHash('sha256').update(await readFile(path.join(root,file))).digest('hex');
 }
 await writeFile(new URL('../compatibility.json',import.meta.url),JSON.stringify({

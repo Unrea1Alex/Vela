@@ -1,0 +1,3 @@
+import "../../../std/algorithms.vela" as a;
+fn invalid(values: List<Int>) -> Bool { return a::any(values, fn [](n: Int) -> Bool { return true; }); }
+fn main() -> Unit {}

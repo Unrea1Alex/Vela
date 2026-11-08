@@ -1,0 +1,91 @@
+import "../../../std/algorithms.vela" as a;
+struct Row { key: Int, name: String }
+struct Failure { code: Int, cause: List<Int> }
+fn ok<T, E>(value: Result<T, E>) -> T {
+    match value { Result::Ok(item) => { return item; } Result::Err(_) => { assert_true(false, "expected Ok"); } }
+    return ok(value);
+}
+fn err<T, E>(value: Result<T, E>) -> E {
+    match value { Result::Err(cause) => { return cause; } Result::Ok(_) => { assert_true(false, "expected Err"); } }
+    return err(value);
+}
+fn some<T>(value: Option<T>) -> T {
+    match value { Option::Some(item) => { return item; } Option::None => { assert_true(false, "expected Some"); } }
+    return some(value);
+}
+fn input() -> List<Int> effects { state } {
+    let values = list_new<Int>(); list_push(values, 1); list_push(values, 2); list_push(values, 3); return values;
+}
+fn main() -> Unit effects { state, io } {
+    let values = input();
+    let trace = strings_new();
+    let mapped = a::map(values, fn [trace](n: Int) -> Row effects { state } { strings_push(trace, to_string(n)); return Row(key: n * 2, name: to_string(n)); });
+    assert_true(list_len(mapped) == 3 && list_get(mapped, 0).key == 2 && list_get(mapped, 2).name == "3" && strings_join(trace, ",") == "1,2,3", "map order records once");
+    strings_truncate(trace, 0);
+    let filtered = a::filter(values, fn [trace](n: Int) -> Bool effects { state } { strings_push(trace, to_string(n)); return n != 2; });
+    assert_true(list_len(filtered) == 2 && list_get(filtered, 0) == 1 && list_get(filtered, 1) == 3 && strings_join(trace, ",") == "1,2,3", "filter order once");
+    list_set(filtered, 0, 8); assert_true(list_get(values, 0) == 1, "fresh result outer list");
+    strings_truncate(trace, 0);
+    let sum = a::fold(values, 10, fn [trace](acc: Int, n: Int) -> Int effects { state } { strings_push(trace, to_string(acc) + ":" + to_string(n)); return acc + n; });
+    assert_true(sum == 16 && strings_join(trace, ",") == "10:1,11:2,13:3", "fold ordered accumulator");
+    let predicate = fn [trace](n: Int) -> Bool effects { state } { strings_push(trace, to_string(n)); return n == 2; };
+    strings_truncate(trace, 0); assert_true(some(a::find(values, predicate)) == 2 && strings_join(trace, ",") == "1,2", "find short circuit");
+    strings_truncate(trace, 0); assert_true(a::any(values, predicate) && strings_join(trace, ",") == "1,2", "any short circuit");
+    strings_truncate(trace, 0); assert_true(!a::all(values, predicate) && strings_join(trace, ",") == "1", "all short circuit");
+    strings_truncate(trace, 0); assert_true(a::all(values, fn [trace](n: Int) -> Bool effects { state } { strings_push(trace, to_string(n)); return true; }) && strings_join(trace, ",") == "1,2,3", "all full traversal");
+    assert_true(!a::any(values, fn [](n: Int) -> Bool { return false; }), "any no match");
+    match a::find(values, fn [](n: Int) -> Bool { return false; }) { Option::Some(_) => { assert_true(false, "find missing"); } Option::None => {} }
+    let empty = list_new<Int>(); strings_truncate(trace, 0);
+    assert_true(list_len(a::map(empty, fn [trace](n: Int) -> Int effects { state } { strings_push(trace, "wrong"); return n; })) == 0, "empty map");
+    assert_true(list_len(a::filter(empty, predicate)) == 0 && a::fold(empty, 9, fn [](x: Int, y: Int) -> Int { return x + y; }) == 9, "empty filter fold");
+    match a::find(empty, predicate) { Option::Some(_) => { assert_true(false, "empty find"); } Option::None => {} }
+    assert_true(!a::any(empty, predicate) && a::all(empty, predicate) && strings_len(trace) == 0, "empty callbacks skipped");
+    let single = list_new<Int>(); list_push(single, 7);
+    let count = list_new<Int>(); list_push(count, 0);
+    let see = fn [count](n: Int) -> Bool effects { state } { list_set(count, 0, list_get(count, 0) + 1); return true; };
+    let one = a::map(single, fn [count](n: Int) -> Int effects { state } { list_set(count, 0, list_get(count, 0) + 1); return n + 1; });
+    assert_true(list_get(one, 0) == 8 && list_len(a::filter(single, see)) == 1, "singleton map filter");
+    assert_true(a::fold(single, 9, fn [count](x: Int, y: Int) -> Int effects { state } { list_set(count, 0, list_get(count, 0) + 1); return x + y; }) == 16, "singleton fold");
+    assert_true(some(a::find(single, see)) == 7 && a::any(single, see) && a::all(single, see) && list_get(count, 0) == 6, "singleton once per API");
+    let changing = input(); strings_truncate(trace, 0);
+    let snapshot = a::map(changing, fn [changing, trace](n: Int) -> Int effects { state } { list_truncate(changing, 0); strings_push(trace, to_string(n)); return n + 10; });
+    assert_true(list_len(changing) == 0 && list_get(snapshot, 2) == 13 && strings_join(trace, ",") == "1,2,3", "source alias changes do not alter traversal");
+    let changing_any = input(); strings_truncate(trace, 0);
+    assert_true(a::any(changing_any, fn [changing_any, trace](n: Int) -> Bool effects { state } { list_truncate(changing_any, 0); strings_push(trace, to_string(n)); return n == 2; }) && strings_join(trace, ",") == "1,2", "short circuit still snapshots eagerly");
+    let changing_try = input(); strings_truncate(trace, 0);
+    assert_true(err(a::try_filter(changing_try, fn [changing_try, trace](n: Int) -> Result<Bool, Int> effects { state } { list_truncate(changing_try, 0); strings_push(trace, to_string(n)); if n == 2 { return Result<Bool, Int>::Err(42); } return Result<Bool, Int>::Ok(true); })) == 42 && strings_join(trace, ",") == "1,2", "fallible snapshot and first error");
+    let inner = input(); let nested = list_new<List<Int>>(); list_push(nested, inner);
+    let shared = a::map(nested, fn [](value: List<Int>) -> List<Int> { return value; });
+    list_set(list_get(shared, 0), 0, 90); assert_true(list_get(inner, 0) == 90, "nested aliases retained");
+    let cause = err(a::try_map(values, fn [inner](n: Int) -> Result<Int, Failure> { if n == 2 { return Result<Int, Failure>::Err(Failure(code: 5, cause: inner)); } return Result<Int, Failure>::Ok(n); }));
+    list_set(cause.cause, 0, 99); assert_true(cause.code == 5 && list_get(inner, 0) == 99, "typed cause aliases preserved");
+    let fallible = fn [trace](n: Int) -> Result<String, Int> effects { state } { strings_push(trace, to_string(n)); if n == 2 { return Result<String, Int>::Err(42); } return Result<String, Int>::Ok(to_string(n)); };
+    strings_truncate(trace, 0); assert_true(err(a::try_map(values, fallible)) == 42 && strings_join(trace, ",") == "1,2", "try_map first error");
+    let check_false = fn [trace](n: Int) -> Result<Bool, Int> effects { state } { strings_push(trace, to_string(n)); if n == 2 { return Result<Bool, Int>::Err(42); } return Result<Bool, Int>::Ok(false); };
+    let check_true = fn [trace](n: Int) -> Result<Bool, Int> effects { state } { strings_push(trace, to_string(n)); if n == 2 { return Result<Bool, Int>::Err(42); } return Result<Bool, Int>::Ok(true); };
+    strings_truncate(trace, 0); assert_true(err(a::try_filter(values, check_true)) == 42 && strings_join(trace, ",") == "1,2", "try_filter first error");
+    strings_truncate(trace, 0); assert_true(err(a::try_fold(values, 0, fn [trace](x: Int, n: Int) -> Result<Int, Int> effects { state } { strings_push(trace, to_string(n)); if n == 2 { return Result<Int, Int>::Err(42); } return Result<Int, Int>::Ok(x + n); })) == 42 && strings_join(trace, ",") == "1,2", "try_fold first error");
+    strings_truncate(trace, 0); assert_true(err(a::try_find(values, check_false)) == 42 && strings_join(trace, ",") == "1,2", "try_find first error");
+    strings_truncate(trace, 0); assert_true(err(a::try_any(values, check_false)) == 42 && strings_join(trace, ",") == "1,2", "try_any first error");
+    strings_truncate(trace, 0); assert_true(err(a::try_all(values, check_true)) == 42 && strings_join(trace, ",") == "1,2", "try_all first error");
+    strings_truncate(trace, 0); assert_true(some(ok(a::try_find(values, check_true))) == 1 && strings_join(trace, ",") == "1", "try_find match precedes later error");
+    strings_truncate(trace, 0); assert_true(ok(a::try_any(values, check_true)) && strings_join(trace, ",") == "1", "try_any true precedes error");
+    strings_truncate(trace, 0); assert_true(!ok(a::try_all(values, check_false)) && strings_join(trace, ",") == "1", "try_all false precedes error");
+    let success = ok(a::try_map(values, fn [](n: Int) -> Result<Int, Int> { return Result<Int, Int>::Ok(n * 2); }));
+    assert_true(list_len(success) == 3 && list_get(success, 0) == 2 && list_get(success, 2) == 6, "try_map all success");
+    let selected = ok(a::try_filter(values, fn [](n: Int) -> Result<Bool, Int> { return Result<Bool, Int>::Ok(n != 2); }));
+    assert_true(list_len(selected) == 2 && list_get(selected, 1) == 3, "try_filter success");
+    assert_true(ok(a::try_fold(values, 10, fn [](x: Int, n: Int) -> Result<Int, Int> { return Result<Int, Int>::Ok(x + n); })) == 16, "try_fold success");
+    match ok(a::try_find(values, fn [](n: Int) -> Result<Bool, Int> { return Result<Bool, Int>::Ok(false); })) { Option::Some(_) => { assert_true(false, "try_find missing"); } Option::None => {} }
+    assert_true(!ok(a::try_any(values, fn [](n: Int) -> Result<Bool, Int> { return Result<Bool, Int>::Ok(false); })) && ok(a::try_all(values, fn [](n: Int) -> Result<Bool, Int> { return Result<Bool, Int>::Ok(true); })), "try_any all neutral exhaustion");
+    strings_truncate(trace, 0);
+    assert_true(list_len(ok(a::try_map(empty, fallible))) == 0 && list_len(ok(a::try_filter(empty, check_true))) == 0, "empty fallible lists");
+    assert_true(ok(a::try_fold(empty, 9, fn [](x: Int, n: Int) -> Result<Int, Int> { return Result<Int, Int>::Ok(x + n); })) == 9, "empty try_fold initial");
+    match ok(a::try_find(empty, check_false)) { Option::Some(_) => { assert_true(false, "empty try_find"); } Option::None => {} }
+    assert_true(!ok(a::try_any(empty, check_false)) && ok(a::try_all(empty, check_true)) && strings_len(trace) == 0, "empty fallible no calls");
+    let record_sum = a::fold(mapped, 0, fn [](x: Int, row: Row) -> Int { return x + row.key; });
+    assert_true(record_sum == 12, "record callback accumulator");
+    let io_values = ok(a::try_map(single, fn [](n: Int) -> Result<Int, String> effects { io } { print("fallible io callback"); return Result<Int, String>::Ok(n); }));
+    assert_true(list_get(io_values, 0) == 7, "fallible IO propagated");
+    print("typed traversals passed");
+}

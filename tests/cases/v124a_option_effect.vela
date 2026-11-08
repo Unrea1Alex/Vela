@@ -1,0 +1,3 @@
+import "../../../std/option.vela" as option;
+fn invalid(value: Option<Int>) -> Int { return option::unwrap_or_else(value, fn []() -> Int effects { io } { print(1); return 1; }); }
+fn main() -> Unit {}

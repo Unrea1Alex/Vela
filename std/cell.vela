@@ -1,0 +1,14 @@
+pub opaque struct Cell<T> {
+    slot: List<T>
+}
+pub fn create<T>(value: T) -> Cell<T> effects { state } {
+    let slot = list_new<T>();
+    list_push(slot, value);
+    return Cell<T>(slot: slot);
+}
+pub fn get<T>(value: Cell<T>) -> T effects { state } {
+    return list_get(value.slot, 0);
+}
+pub fn set<T>(value: Cell<T>, item: T) -> Unit effects { state } {
+    list_set(value.slot, 0, item);
+}

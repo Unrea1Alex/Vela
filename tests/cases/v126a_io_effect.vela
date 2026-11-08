@@ -1,0 +1,2 @@
+import "../../../std/io.vela" as io;
+fn main() -> Unit { let value=io::memory_reader("",1,1); }

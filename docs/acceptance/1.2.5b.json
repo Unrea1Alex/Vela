@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.5b",
+  "status": "verified",
+  "date": "2026-11-07",
+  "contract": "../contracts/STDLIB-EVOLUTION-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1324,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 485735,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/125b-verify.log",
+  "focused": {
+    "linux": "GCC/musl passed",
+    "other_checks": "empty/duplicates/reinsert order, values/algebra isolation, shared aliases, Unicode/raw bytes/NUL, Int extrema, distinct Int/Bool/String",
+    "positive": "v125b_set",
+    "linux_log": "build/stage12/125b-linux.log",
+    "rejections": {
+      "record": "E210",
+      "Int32": "E210",
+      "construction": "E232",
+      "effect": "E209",
+      "private_field": "E223",
+      "enum": "E210",
+      "distinct_float": "E201",
+      "float": "E201"
+    },
+    "independent_oracle": "200 insert/remove steps and twelve nontrivial algebra pairs against independent ordered linear lists",
+    "expected": "typed set passed"
+  },
+  "gc": {
+    "report": "build/stage12/125b-gc.err",
+    "stress": 1,
+    "peak_managed_bytes": 39869,
+    "collections": 301084,
+    "live_managed_bytes_at_report": 20129
+  },
+  "retained_key_gc": {
+    "collections": 302405,
+    "report": "build/stage12/125b-retained-gc.err",
+    "check": "Dynamic String keys survive the creator scope and repeated collections; alias removal preserves updated order",
+    "live_managed_bytes_at_report": 20538,
+    "peak_managed_bytes": 37000,
+    "source": "tests/library12/set-gc.vela",
+    "expected": "set GC roots passed"
+  },
+  "mcp": {
+    "failed": 0,
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "wire_startup_tokens": 3509,
+    "groups": 3,
+    "installed_set": "passed",
+    "startup_tokens": 1864,
+    "new_api_lookup": "passed",
+    "log": "build/stage12/125b-mcp.log"
+  },
+  "recipes": {
+    "schema_version": 1,
+    "checks": [
+      "recipe basics",
+      "recipe directory",
+      "recipe json",
+      "recipe bytes",
+      "recipe result",
+      "recipe callable",
+      "recipe http",
+      "recipe cli",
+      "recipe sort",
+      "recipe traversals",
+      "recipe set",
+      "generic/effect/opaque/method/async interface",
+      "reject invalid interface before emission",
+      "all embedded builtin rows",
+      "all shipped modules and recipe IDs resolve to verified catalog"
+    ],
+    "passed": 15
+  },
+  "api_search": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 97,
+    "negative_checks": 2
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 115,
+    "links": 795,
+    "missing": []
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "next": "1.2.5c"
+}

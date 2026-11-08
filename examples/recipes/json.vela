@@ -1,0 +1,12 @@
+import "../../std/json_stream.vela" as json;
+fn main() -> Int effects { io, state } {
+    match json::create("{\"ignored\":1e9999}", json::Limits(bytes: 128, depth: 16, nodes: 16)) {
+        Result::Err(error) => { eprint(json::describe(error)); return 1; }
+        Result::Ok(reader) => {
+            match json::skip_value(reader) { Result::Ok(_) => {} Result::Err(_) => { return 2; } }
+            match json::finish(reader) { Result::Ok(_) => {} Result::Err(_) => { return 3; } }
+        }
+    }
+    print("valid JSON");
+    return 0;
+}

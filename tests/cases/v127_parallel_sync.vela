@@ -1,0 +1,4 @@
+import "../../../std/parallel.vela" as p;
+import "../../../std/task_group.vela" as group;
+fn action(scope:group::Scope,value:Int,index:Int)->Result<Int,Int>{return Result<Int,Int>::Ok(value);}
+fn main()->Unit effects {state}{let job=p::create(list_new<Int>(),2,0,100,p::Policy::Collect,action);}

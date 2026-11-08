@@ -1,0 +1,27 @@
+import "../../../std/parallel.vela" as p;
+import "../../../std/task_group.vela" as group;
+import "../../../std/cell.vela" as cell;
+struct Cause { code: Int }
+fn must<T,E>(r:Result<T,E>)->T { match r { Result::Ok(v)=>{return v;} Result::Err(_)=>{assert_true(false,"parallel fixture failure");} }return must(r); }
+fn inputs(n:Int)->List<Int> effects {state} {let values=list_new<Int>();var i=0;while i<n {list_push(values,i);i=i+1;}return values;}
+fn finish<T,U,E>(job:p::Job<T,U,E>)->p::Completion<U,E> effects {state,io,process} {var now=0;while now<10000 {let ready=must(p::tick(job,now));if ready {match p::outcome(job){Option::Some(c)=>{return c;}Option::None=>{assert_true(false,"ready without outcome");}}}now=now+1;}assert_true(false,"job failed to drain");return finish(job);}
+fn main()->Unit effects {state,io,process} {
+    let calls=cell::create(0);
+    let callback=async fn [calls](scope:group::Scope,value:Int,index:Int)->Result<Int,Cause> effects {state} {cell::set(calls,cell::get(calls)+1);await sleep_ms(5-index%3);if value==3 {return Result<Int,Cause>::Err(Cause(code:73));}return Result<Int,Cause>::Ok(value*10+index);};
+    let empty=must(p::create(inputs(0),2,0,100,p::Policy::Collect,callback));let completed=finish(empty);assert_true(completed.reason==p::Finish::Complete && completed.started==0 && completed.admitted==0 && list_len(completed.items)==0,"empty no callback");
+    let invalid=p::create(inputs(0),0,0,100,p::Policy::Collect,callback);match invalid {Result::Err(e)=>{assert_true(e==p::Error::InvalidLimit,"invalid concurrency");}Result::Ok(_)=>{assert_true(false,"invalid limit accepted");}}
+    match p::tick(empty,-1){Result::Err(e)=>{assert_true(e==p::Error::Clock,"backwards clock");}Result::Ok(_)=>{assert_true(false,"backwards clock accepted");}}
+    let values=inputs(9);let job=must(p::create(values,3,0,1000,p::Policy::Collect,callback));list_set(values,0,999);list_truncate(values,0);
+    let done=finish(job);
+    if platform()!="windows" {assert_true(done.reason==p::Finish::Driver && done.started==0,"Linux explicitly unsupported fiber driver");print("bounded parallel mapping passed");return;}
+    assert_true(done.reason==p::Finish::Complete && done.started==9 && done.admitted==9 && done.peak_tasks==3 && list_len(done.cleanup)==0 && cell::get(calls)==9,"collect bounded invocation count");
+    var i=0;while i<9 { match list_get(done.items,i){p::Item::Value(v)=>{assert_true(i!=3 && v==i*11,"input snapshot and result order");}p::Item::Error(e)=>{assert_true(i==3 && e.code==73,"typed item cause");}p::Item::Cancelled=>{assert_true(false,"unexpected cancelled");}p::Item::TimedOut=>{assert_true(false,"unexpected timeout");}p::Item::Driver(_)=>{assert_true(false,"unexpected driver");}p::Item::NotStarted=>{assert_true(false,"unexpected not started");}}i=i+1;}
+    list_truncate(done.items,0);match p::outcome(job){Option::Some(again)=>{assert_true(list_len(again.items)==9,"detached result outer list");}Option::None=>{assert_true(false,"lost terminal");}}
+    let fast=must(p::create(inputs(40),2,0,1000,p::Policy::FailFast,async fn [](scope:group::Scope,value:Int,index:Int)->Result<Int,Cause> effects {state}{if index==0{return Result<Int,Cause>::Err(Cause(code:88));}await sleep_ms(100);return Result<Int,Cause>::Ok(index);}));let failed=finish(fast);assert_true(failed.reason==p::Finish::FailedFast && failed.admitted==2 && failed.started<=2,"fail fast stops queue");assert_true(error_code(list_get(failed.items,0))==88,"first error retained");assert_true(label(list_get(failed.items,39))=="not-started","queued item launched");
+    let cancelled=must(p::create(inputs(3),2,0,100,callback_policy(),callback));assert_true(p::cancel(cancelled) && !p::cancel(cancelled),"idempotent cancel request");let cancelled_done=finish(cancelled);assert_true(cancelled_done.reason==p::Finish::Cancelled && cancelled_done.started==0 && cancelled_done.admitted==0,"cancel before admission");
+    let deadline=must(p::create(inputs(4),2,0,4,p::Policy::Collect,async fn [](scope:group::Scope,value:Int,index:Int)->Result<Int,Cause> effects {state}{await sleep_ms(100);return Result<Int,Cause>::Ok(index);}));let timed=finish(deadline);assert_true(timed.reason==p::Finish::TimedOut && timed.admitted==2 && timed.started<=2,"overall deadline includes queued work");assert_true(label(list_get(timed.items,0))=="timeout","deadline item category");
+    print("bounded parallel mapping passed");
+}
+fn callback_policy()->p::Policy{return p::Policy::Collect;}
+fn label<T,E>(item:p::Item<T,E>)->String{return match item {p::Item::Value(_)=>"value",p::Item::Error(_)=>"error",p::Item::Cancelled=>"cancelled",p::Item::TimedOut=>"timeout",p::Item::Driver(_)=>"driver",p::Item::NotStarted=>"not-started"};}
+fn error_code(item:p::Item<Int,Cause>)->Int{return match item {p::Item::Value(_)=>-1,p::Item::Error(e)=>e.code,p::Item::Cancelled=>-1,p::Item::TimedOut=>-1,p::Item::Driver(_)=>-1,p::Item::NotStarted=>-1};}

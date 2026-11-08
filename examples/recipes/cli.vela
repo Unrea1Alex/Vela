@@ -1,0 +1,25 @@
+import "../../std/cli_schema.vela" as cli;
+fn run() -> Result<Int, cli::Error> effects { args, state, io } {
+    let parameters = list_new<cli::Parameter>();
+    list_push(parameters, cli::integer("repeat", "Repetitions", 1, 10, Option<Int>::Some(3)));
+    let schema = cli::create("sample", "Typed CLI example", parameters,
+        list_new<cli::LessEqual>())?;
+    let parsed = cli::current(schema)?;
+    if cli::is_help(parsed) {
+        print(cli::help(parsed));
+        return Result<Int, cli::Error>::Ok(0);
+    }
+    print("repeat=" + to_string(cli::int_value(parsed, "repeat")?));
+    return Result<Int, cli::Error>::Ok(0);
+}
+fn main() -> Int effects { args, state, io } {
+    match run() {
+        Result::Ok(code) => {
+            return code;
+        }
+        Result::Err(error) => {
+            eprint(cli::describe(error));
+            return 2;
+        }
+    }
+}

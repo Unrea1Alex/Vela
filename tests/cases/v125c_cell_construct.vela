@@ -1,0 +1,2 @@
+import "../../../std/cell.vela" as cell;
+fn main() -> Unit effects { state } { let value = cell::Cell<Int>(slot: list_new<Int>()); }

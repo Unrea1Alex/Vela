@@ -1,0 +1,3 @@
+import "../../../std/set.vela" as sets;
+struct Key { id: Int }
+fn main() -> Unit effects { state } { let value = sets::create<Key>(); }

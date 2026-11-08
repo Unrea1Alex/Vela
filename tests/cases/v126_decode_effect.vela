@@ -1,0 +1,4 @@
+import "../../../std/json_decode.vela" as d;
+import "../../../std/json_stream.vela" as stream;
+fn invalid(decoder: d::Decoder<Int>, data: String) -> Result<Int, d::Error> { return d::decode(decoder, data, stream::default_limits()); }
+fn main() -> Unit {}

@@ -1,0 +1,62 @@
+import "../../std/io.vela" as io;
+import "../../std/stream_lines.vela" as lines;
+fn run() -> Result<Int, io::Error> effects { state, io } {
+    let source = io::memory_reader("one\r\ntwo", 1, 64)?;
+    let sink = io::memory_writer(64)?;
+    let answer = io::copy(source, io::sink_writer(sink), 8);
+    let closed_source = io::close_reader(source);
+    let closed_target = io::close_writer(io::sink_writer(sink));
+    let stats = answer?;
+    closed_source?;
+    closed_target?;
+    assert_true(io::output(sink) == "one\r\ntwo", "byte copy preserves input");
+    let text_source = io::memory_reader("one\r\ntwo", 1, 64)?;
+    match lines::reader(text_source, 8, 64) {
+        Result::Err(e) => {
+            let closed = io::close_reader(text_source);
+            return Result<Int, io::Error>::Err(io::error(io::ErrorKind::Read, e.offset,
+                lines::describe(e)));
+        }
+        Result::Ok(reader) => {
+            let first = lines::next(reader);
+            let closed = lines::close(reader);
+            match first {
+                Result::Err(e) => {
+                    return Result<Int, io::Error>::Err(io::error(io::ErrorKind::Read, e.offset,
+                        lines::describe(e)));
+                }
+                Result::Ok(line) => {
+                    match line {
+                        Option::Some(value) => {
+                            assert_true(value.data == "one" && value.offset == 0,
+                                "typed CRLF record");
+                        }
+                        Option::None => {
+                            assert_true(false, "missing record");
+                        }
+                    }
+                }
+            }
+            match closed {
+                Result::Err(e) => {
+                    return Result<Int, io::Error>::Err(io::error(io::ErrorKind::Close, e.offset,
+                        lines::describe(e)));
+                }
+                Result::Ok(_) => {}
+            }
+        }
+    }
+    return Result<Int, io::Error>::Ok(stats.bytes);
+}
+fn main() -> Int effects { state, io } {
+    match run() {
+        Result::Ok(bytes) => {
+            print("copied=" + to_string(bytes));
+            return 0;
+        }
+        Result::Err(e) => {
+            eprint(io::describe(e));
+            return 2;
+        }
+    }
+}

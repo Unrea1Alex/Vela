@@ -32,22 +32,36 @@ function createServer() {
   const server = new McpServer({ name: 'vela', version: host.compilerVersion });
   const annotations = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
   server.registerTool('vela_get_context', {
-    description: 'Read this before writing Vela. Current compiler, syntax, limits and first working example.',
+    description: 'Start here: installed version, help and execution availability.',
     inputSchema: z.object({}).strict(), outputSchema, annotations
-  }, async () => basic(() => ({version:host.compilerVersion,quickstart:host.docs.get('quickstart'),limits,
+  }, async () => basic(() => ({version:host.compilerVersion,quickstart:host.docs.get('start'),limits,
     aliases:host.config.aliases,topics:Object.keys(topics),capabilities:['check','format','symbols','help','query','plan',...(execution?.sandbox.ready?['build','test','run','read_output']:[])],
     execution:execution?.sandbox.ready??false,execution_reason:execution?.reason??'Execution backend is not configured.',
     execution_limits:executionLimits,output_limits:outputLimits})));
   server.registerTool('vela_get_help', {
-    description: 'Version-matched Vela language/project help or exact builtin catalog. Never guess APIs.',
-    inputSchema: z.object({topic:z.enum(['quickstart','language','projects','modules','memory','builtins','idioms','numbers','stdlib','testing','ffi'])}).strict(),
+    description: 'Fetch matching recipes, capabilities or reference help.',
+    inputSchema: z.object({topic:z.enum(['api','start','capabilities','recipes','migration','quickstart','language','projects','modules','memory','builtins','idioms','numbers','stdlib','testing','ffi']),
+      query:z.string().max(128).refine(s=>Buffer.from(s,'utf8').toString('utf8')===s&&!s.includes('\0')).optional(),name:z.string().max(256).refine(s=>Buffer.from(s,'utf8').toString('utf8')===s&&!s.includes('\0')).optional(),
+      offset:z.number().int().min(0).max(4000).optional(),limit:z.number().int().min(1).max(8).optional(),max_bytes:z.number().int().min(1024).max(16384).optional(),version:z.string().max(64).refine(s=>Buffer.from(s,'utf8').toString('utf8')===s&&!s.includes('\0')).optional(),fingerprint:z.string().regex(/^[a-f0-9]{64}$/).optional()
+    }).strict().superRefine((value,ctx)=>{
+      if(value.query!==undefined&&value.name!==undefined)ctx.addIssue({code:'custom',message:'Use query or name, not both.'});
+      if(value.topic!=='api'&&Object.keys(value).length>1)ctx.addIssue({code:'custom',message:'Search arguments require topic api.'});
+    }),
     outputSchema, annotations
-  }, async ({topic}) => basic(() => ({topic,text:host.docs.get(topic)})));
+  }, async ({topic,...input},ctx) => {
+    if(topic!=='api')return basic(()=>({topic,text:host.docs.get(topic)}));
+    const pending=host.findApi(input,ctx.mcpReq.signal);host.pending.add(pending);
+    try{
+      const result=await pending;const response=wrap(result);
+      if(Buffer.byteLength(JSON.stringify(response))>(input.max_bytes??8192))return wrap({...result,status:'limit',data:{},message:'API response bound.'});
+      return response;
+    }finally{host.pending.delete(pending);}
+  });
   for (const [tool,kind] of [['vela_check','check'],['vela_format','fmt'],['vela_symbols','symbols']] as const) {
     server.registerTool(tool, {
-      description: kind === 'fmt' ? 'Return formatted Vela source without writing files.' :
-        kind === 'check' ? 'Check Vela source or manifest using the native compiler on a bounded snapshot.' : 'Get native declared symbol/type/module information.',
-      inputSchema:z.object({path:z.string().min(1).max(1024),text:z.string().max(2*1024*1024).optional().describe('Optional unsaved source text, analyzed only in the snapshot; never written to the workspace.'),overlay_path:z.string().min(1).max(1024).optional().describe('Source path for text when analyzing a project manifest; defaults to path.')}).strict(),outputSchema,annotations
+      description: kind === 'fmt' ? 'Preview formatting; source stays unchanged.' :
+        kind === 'check' ? 'Native check of source/manifest or unsaved text.' : 'Read declared symbols and types.',
+      inputSchema:z.object({path:z.string().min(1).max(1024),text:z.string().max(2*1024*1024).optional(),overlay_path:z.string().min(1).max(1024).optional()}).strict(),outputSchema,annotations
     }, async ({path,text,overlay_path},ctx) => {
       const promise=host.analyze(kind,path,ctx.mcpReq.signal,text,overlay_path);
       host.pending.add(promise);
@@ -58,7 +72,7 @@ function createServer() {
     overlay_path:z.string().min(1).max(1024).optional()};
   const id=z.string().regex(/^[a-f0-9]{64}$/);
   server.registerTool('vela_query',{
-    description:'Native definitions, references, calls, types, effects and imports in the entry graph. Inspect scope.excluded_test_roots. Optionally focus at a zero-based UTF-16 position.',
+    description:'Query definitions/references/types/effects. Positions are zero-based UTF-16.',
     inputSchema:z.object({...sourceFields,at:z.object({path:sourceFields.path,line:z.number().int().min(0),character:z.number().int().min(0)}).strict().optional()}).strict(),
     outputSchema,annotations
   },async ({path,text,overlay_path,at},ctx)=>{
@@ -68,15 +82,16 @@ function createServer() {
   });
   const planFields={...sourceFields,snapshot_id:id,revision:id,document:z.number().int().min(0).max(255)};
   server.registerTool('vela_plan',{
-    description:'Preview and recheck an edit on the exact vela_query snapshot. The preview covers the entry graph and reports excluded test roots. Source stays unchanged.',
-    inputSchema:z.discriminatedUnion('kind',[
-      z.object({...planFields,kind:z.literal('rename'),byte:z.number().int().min(0),new_name:z.string().min(1).max(256)}).strict(),
-      z.object({...planFields,kind:z.literal('format')}).strict()
-    ]),
+    description:'Explain diagnostics or preview checked edits on exact query revision; rename needs byte/new_name.',
+    inputSchema:z.object({...planFields,kind:z.enum(['rename','format','diagnose']),byte:z.number().int().min(0).optional(),new_name:z.string().min(1).max(256).optional()}).strict().superRefine((value,ctx)=>{
+      if(value.kind==='rename'&&(value.byte===undefined||value.new_name===undefined))ctx.addIssue({code:'custom',message:'Rename requires byte and new_name.'});
+      if(value.kind==='format'&&(value.byte!==undefined||value.new_name!==undefined))ctx.addIssue({code:'custom',message:'Format does not accept rename fields.'});
+      if(value.kind==='diagnose'&&(value.byte!==undefined||value.new_name!==undefined))ctx.addIssue({code:'custom',message:'Diagnose does not accept rename fields.'});
+    }),
     outputSchema,annotations
   },async (input,ctx)=>{
     const {path,text,overlay_path,snapshot_id,revision,document}=input;
-    const plan={snapshot_id,revision,document,...(input.kind==='rename'?{byte:input.byte,new_name:input.new_name}:{})};
+    const plan={snapshot_id,revision,document,...(input.kind==='diagnose'?{diagnose:true}:{}),...(input.kind==='rename'?{byte:input.byte,new_name:input.new_name}:{})};
     const promise=host.analyze('plan',path,ctx.mcpReq.signal,text,overlay_path,{plan});
     host.pending.add(promise);
     try{return wrap(await promise);}finally{host.pending.delete(promise);}

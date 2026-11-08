@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.4a",
+  "status": "verified",
+  "date": "2026-11-07",
+  "contract": "../contracts/STDLIB-EVOLUTION-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1288,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 485735,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/124a-verify.log",
+  "focused": {
+    "linux_log": "build/stage12/124a-linux.log",
+    "positive": "v124a_combinators",
+    "rejections": {
+      "option_argument_type": "E201",
+      "option_effect": "E209",
+      "result_error_type": "E201",
+      "result_effect": "E209"
+    },
+    "payload_aliases": "Ok nested List and Context<List<Int>> cause remain shared",
+    "legacy": "map_error and explain passed unchanged",
+    "expected_stdout_normalized": "result io callback\noption io callback\nresult option combinators passed\n",
+    "linux": "GCC/musl passed",
+    "exact_ordered_trace": "map,then,then,eager,eager-error,recover,legacy,map,choose,option-eager,option-none,produce"
+  },
+  "gc": {
+    "live_managed_bytes_at_report": 1038,
+    "stdout": "build/stage12/124a-gc.out",
+    "report": "build/stage12/124a-gc.err",
+    "stress": 1,
+    "collections": 595,
+    "peak_managed_bytes": 1110
+  },
+  "mcp": {
+    "log": "build/stage12/124a-mcp.log",
+    "groups": 3,
+    "failed": 0,
+    "new_api_lookup": "passed",
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "installed_combinators_check": "passed",
+    "wire_startup_tokens": 3503,
+    "startup_tokens": 1858
+  },
+  "examples": {
+    "metadata_contexts": "native check passed",
+    "unchanged_other_recipes": "previous stage 1.2.4 all eight passed; not repeated",
+    "changed_result_recipe": "check/build/run code=7 passed"
+  },
+  "api_search": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 95,
+    "negative_checks": 2
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 115,
+    "links": 780,
+    "missing": []
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "next": "1.2.5"
+}

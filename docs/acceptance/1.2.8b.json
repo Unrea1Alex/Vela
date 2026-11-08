@@ -1,0 +1,263 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.8b",
+  "status": "verified",
+  "date": "2026-11-08",
+  "contract": "../contracts/COMPILER-AUDIT-1.2.md",
+  "inventory": "../COMPILER-AUDIT-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1401,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 511657,
+    "tests_run": true
+  },
+  "seed": {
+    "schema_version": 1,
+    "status": "passed",
+    "bootstrap": {
+      "schema_version": 1,
+      "version": "1.2.0-dev.1",
+      "orchestrator": "Vela",
+      "fixed_point": true,
+      "bundler_fixed_point": true,
+      "source_bytes": 511657,
+      "tests_run": true
+    },
+    "files": {
+      "seed.exe": {
+        "bytes": 4178944,
+        "sha256": "de25492bcce34c21c3aa6c857e1adb2b9c5bc1af8eb9c3550387f1de6ed1f5cc"
+      },
+      "stage1.exe": {
+        "bytes": 4179968,
+        "sha256": "a2593f567377d5e9ba3dde94ef3504dd57eb18ff391d0cc21c5591971ce49e0d"
+      },
+      "stage2.exe": {
+        "bytes": 4179968,
+        "sha256": "292a40ac3d609fa4935a8b21707ffee1c0d1fd89a6dfea9ddf82e4f9480713d0"
+      },
+      "stage3.exe": {
+        "bytes": 4179968,
+        "sha256": "7434a65d601313b102ffc922bce173749577f506b743b271a65da67a0354fa53"
+      },
+      "stage1.c": {
+        "bytes": 6026178,
+        "sha256": "010a0a7f8357d53b02079d27e09950de1bff1eb6c7501ecf0576cb62aeaf632e"
+      },
+      "stage2.c": {
+        "bytes": 6026178,
+        "sha256": "010a0a7f8357d53b02079d27e09950de1bff1eb6c7501ecf0576cb62aeaf632e"
+      },
+      "stage3.c": {
+        "bytes": 6026178,
+        "sha256": "010a0a7f8357d53b02079d27e09950de1bff1eb6c7501ecf0576cb62aeaf632e"
+      },
+      "compiler.vela": {
+        "bytes": 511657,
+        "sha256": "94da346a65fbc443a35d7e54d945fc5c29263cb47434a33d993ffea9b2dce0a0"
+      },
+      "rebundled.vela": {
+        "bytes": 511657,
+        "sha256": "94da346a65fbc443a35d7e54d945fc5c29263cb47434a33d993ffea9b2dce0a0"
+      }
+    },
+    "scope": "mandatory verify transition from installed compiler through bundle seed and authored stages; independent hash comparisons"
+  },
+  "focused": {
+    "schema_version": 1,
+    "status": "passed",
+    "checks": [
+      {
+        "name": "v05f_depth",
+        "code": "E101",
+        "no_C_output": true
+      },
+      {
+        "name": "v03_list_type_arity",
+        "code": "E210",
+        "no_C_output": true
+      },
+      {
+        "name": "v03_generic_type_arity",
+        "code": "E200",
+        "no_C_output": true
+      },
+      {
+        "name": "v128a_nominal",
+        "code": "E201",
+        "no_C_output": true
+      },
+      {
+        "name": "v102_opaque_ctor",
+        "code": "E232",
+        "no_C_output": true
+      },
+      {
+        "name": "v102_opaque_read",
+        "code": "E223",
+        "no_C_output": true
+      },
+      {
+        "name": "v102_opaque_write",
+        "code": "E223",
+        "no_C_output": true
+      },
+      {
+        "name": "v102_opaque_public_leak",
+        "code": "E224",
+        "no_C_output": true
+      },
+      {
+        "name": "v102_opaque_cycle",
+        "code": "E204",
+        "no_C_output": true
+      },
+      {
+        "name": "v104_no_impl",
+        "code": "E234",
+        "no_C_output": true
+      },
+      {
+        "name": "v104_no_bound",
+        "code": "E234",
+        "no_C_output": true
+      },
+      {
+        "name": "v104_signature",
+        "code": "E236",
+        "no_C_output": true
+      },
+      {
+        "name": "v104_effect_widen",
+        "code": "E236",
+        "no_C_output": true
+      },
+      {
+        "name": "v104_transitive",
+        "code": "E234",
+        "no_C_output": true
+      },
+      {
+        "name": "v106_implicit",
+        "code": "E237",
+        "no_C_output": true
+      },
+      {
+        "name": "v106_wrong_interface",
+        "code": "E237",
+        "no_C_output": true
+      },
+      {
+        "name": "v106_ffi_callable",
+        "code": "E228",
+        "no_C_output": true
+      },
+      {
+        "name": "v124a_option_effect",
+        "code": "E209",
+        "no_C_output": true
+      },
+      {
+        "name": "v127_parallel_sync",
+        "code": "E201",
+        "no_C_output": true
+      },
+      {
+        "name": "module EOF cannot consume next source",
+        "code": "E100",
+        "range": {
+          "document": 1,
+          "start": {
+            "line": 2,
+            "character": 0,
+            "byte": 43
+          },
+          "end": {
+            "line": 2,
+            "character": 0,
+            "byte": 43
+          }
+        }
+      },
+      {
+        "name": "backend boundary source inspection",
+        "scope": "accessor/call guard plus observable no-emission rejection probes; not a formal proof"
+      }
+    ],
+    "passed": 21
+  },
+  "regressions": {
+    "schema_version": 1,
+    "status": "passed",
+    "checks": [
+      {
+        "name": "builtin",
+        "diagnostic": "Unknown enum.",
+        "validated": false,
+        "changes": []
+      },
+      {
+        "name": "parameter",
+        "diagnostic": "Unknown enum.",
+        "validated": false,
+        "changes": []
+      }
+    ]
+  },
+  "lsp": {
+    "schema_version": 1,
+    "status": "passed",
+    "checks": 12,
+    "version": "1.2.0-dev.1",
+    "scope": "real framed LSP: native version, diagnostics/details/UTF16, checked versioned code action, range filter, type explanation, multifile CLI parity, known-type import refused, no writes"
+  },
+  "mcp": {
+    "groups": 3,
+    "startup_tokens": 1881,
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "log": "build/stage12/128b-mcp.log",
+    "checks": "native API/entry plus imported Unicode diagnostic/revision/range parity and known-type import refusal",
+    "passed": 3
+  },
+  "positive": {
+    "gc": {
+      "managed_live": 463,
+      "managed_peak": 650,
+      "collections": 51
+    },
+    "fixture": "tests/cases/v128b_frontend.vela",
+    "stdout": "7:checked"
+  },
+  "linux": {
+    "log": "build/stage12/128b-linux.log",
+    "scope": "native CLI plans, including builtin and generic-parameter namespace refusal; GCC -O0 functional probe",
+    "status": "passed"
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 107,
+    "negative_checks": 2
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 121,
+    "links": 832,
+    "missing": []
+  },
+  "verify_log": "build/stage12/128b-verify.log",
+  "confirmed_fixed": "A02: known type namespace must never be reinterpreted as a module import",
+  "remaining": "A06 tag enums are a proposal; A07 release packaging input is assigned to 1.2.9, no frontend blocker remains",
+  "limits": "finite fixtures and source inspection, not formal correctness; whole compiler is not forced-GC stress tested",
+  "next": "1.2.9"
+}

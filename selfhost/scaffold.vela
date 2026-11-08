@@ -1,0 +1,192 @@
+import "model.vela";
+import "core.vela";
+import "driver.vela";
+import "projects.vela";
+fn scaffold_path(value: StringResult, target: String, json_mode: Bool) -> String effects { state,
+    io, process } {
+    match value {
+        StringResult::Ok(path) => {
+            return path;
+        }
+        StringResult::Err(cause) => {
+            project_fail(target, "E900", cause, json_mode);
+            return "";
+        }
+    }
+}
+fn scaffold_cleanup(stage: String, names: List<String>) -> Bool effects { state, io } {
+    var clean = true;
+    for name in names {
+        match remove_file(stage + "/" + name) {
+            WriteResult::Ok => {}
+            WriteResult::Err(_) => {
+                clean = false;
+            }
+        }
+    }
+    match remove_dir(stage) {
+        WriteResult::Ok => {}
+        WriteResult::Err(_) => {
+            clean = false;
+        }
+    }
+    return clean;
+}
+fn scaffold_error(stage: String, names: List<String>, target: String, message: String,
+    json_mode: Bool) -> Unit effects { state, io, process } {
+    var details = message;
+    if !scaffold_cleanup(stage, names) {
+        details = details + " Staging cleanup incomplete: " + stage;
+    }
+    project_fail(target, "E900", details, json_mode);
+}
+pub fn scaffold_command(input: String) -> Int effects { args, state, io, process } {
+    if input == "--help" {
+        var json = false;
+        for index in 2 .. arg_count() {
+            if io_value(arg(index)) != "--json" || json {
+                project_fail(input, "E225", "init help accepts only one --json.", false);
+            }
+            json = true;
+        }
+        let help = "Usage: vela init NEW_DIRECTORY [--name NAME] [--kind cli|library] [--json]";
+        if json {
+            print("{\"schema_version\":1,\"ok\":true,\"help\":" + json_string(help) + "}");
+        } else {
+            print(help);
+        }
+        return 0;
+    }
+    var json_mode = false;
+    for i in 2 .. arg_count() {
+        if io_value(arg(i)) == "--json" {
+            json_mode = true;
+        }
+    }
+    var name = "";
+    var kind = "cli";
+    var has_name = false;
+    var has_kind = false;
+    var has_json = false;
+    var i = 2;
+    while i < arg_count() {
+        let option = io_value(arg(i));
+        if option == "--json" && !has_json {
+            has_json = true;
+        } else if (option == "--name" && !has_name || option == "--kind" && !has_kind) && i + 1
+            < arg_count() {
+            i = i + 1;
+            let value = io_value(arg(i));
+            if option == "--name" {
+                name = value;
+                has_name = true;
+            } else {
+                kind = value;
+                has_kind = true;
+            }
+        } else {
+            project_fail(input, "E225", "Unknown/repeated option or missing value: " + option,
+                json_mode);
+        }
+        i = i + 1;
+    }
+    if input == "" {
+        project_fail(input, "E225", "init requires a new directory.", json_mode);
+    }
+    if kind != "cli" && kind != "library" {
+        project_fail(input, "E225", "Project kind must be cli or library.", json_mode);
+    }
+    var target = scaffold_path(absolute_path(input), input, json_mode);
+    while str_len(target) > 1 && (str_byte(target, str_len(target) - 1) == 47 || str_byte(target,
+        str_len(target) - 1) == 92) {
+        target = str_slice(target, 0, str_len(target) - 1);
+    }
+    let parent = parent_path(target);
+    if !has_name {
+        name = project_suggest_name(str_slice(target, str_len(parent), str_len(target)));
+    }
+    if !project_identifier(name) {
+        project_fail(target, "E225", "Invalid project name. Suggested name: "
+            + project_suggest_name(name), json_mode);
+    }
+    if scaffold_path(file_identity(target), target, json_mode) != "" {
+        project_fail(target, "E225", "Destination already exists; choose a new directory.",
+            json_mode);
+    }
+    let names = list_new<String>();
+    let contents = list_new<String>();
+    list_push(names, "vela.project");
+    list_push(contents, "vela-project|1\nname|" + name + "\nentry|main.vela\ntest|tests.vela\n");
+    list_push(names, "main.vela");
+    var main = "pub fn answer() -> Int {\n    return 42;\n}\n";
+    var test_import = "main.vela";
+    if kind == "library" {
+        main = "import \"lib.vela\";\n";
+        test_import = "lib.vela";
+    }
+    list_push(contents, main + "fn main() -> Unit effects { io } {\n    print(answer());\n}\n");
+    list_push(names, "tests.vela");
+    list_push(contents, "import \"" + test_import
+        + "\";\ntest \"answer is 42\" {\n    assert_true(answer() == 42, \"answer\");\n}\n");
+    list_push(names, "README.md");
+    list_push(contents, "# " + name
+        + "\n\nvela check vela.project\nvela build vela.project -o app.exe\nvela test vela.project --json\nvela run vela.project\n\n"
+        + "A source-module " + kind + " example; expected stdout: 42.\n");
+    if kind == "library" {
+        list_push(names, "lib.vela");
+        list_push(contents, "pub fn answer() -> Int {\n    return 42;\n}\n");
+    }
+    let stage = scaffold_path(temp_dir(parent), target, json_mode);
+    let written = list_new<String>();
+    for j in 0 .. list_len(names) {
+        let file = list_get(names, j);
+        list_push(written, file);
+        match write_file(stage + "/" + file, list_get(contents, j)) {
+            WriteResult::Ok => {}
+            WriteResult::Err(cause) => {
+                scaffold_error(stage, written, target, cause, json_mode);
+            }
+        }
+    }
+    let p = project_load(stage + "/vela.project", json_mode);
+    list_push(written, "vela.project.lock");
+    match write_file(stage + "/vela.project.lock", project_lock_text(p, json_mode)) {
+        WriteResult::Ok => {}
+        WriteResult::Err(cause) => {
+            scaffold_error(stage, written, target, cause, json_mode);
+        }
+    }
+    match install_file(stage, target) {
+        WriteResult::Ok => {}
+        WriteResult::Err(cause) => {
+            match file_identity(target) {
+                StringResult::Ok(identity) => {
+                    if identity != "" {
+                        let clean = scaffold_cleanup(stage, written);
+                        if clean {
+                            project_fail(target, "E225",
+                                "Destination already exists; choose a new directory.", json_mode);
+                        }
+                        project_fail(target, "E900",
+                            "Destination exists and staging cleanup failed: " + stage, json_mode);
+                    }
+                }
+                StringResult::Err(_) => {}
+            }
+            scaffold_error(stage, written, target, cause, json_mode);
+        }
+    }
+    if json_mode {
+        let files = strings_new();
+        for file in written {
+            strings_push(files, json_string(file));
+        }
+        print("{\"schema_version\":1,\"ok\":true,\"command\":\"init\",\"kind\":" + json_string(kind)
+            + ",\"name\":" + json_string(name) + ",\"directory\":" + json_string(target)
+            + ",\"manifest\":" + json_string(target + "/vela.project") + ",\"files\":["
+            + strings_join(files, ",") + "],\"diagnostics\":[]}");
+    } else {
+        print("Created " + kind + " project: " + target + "/vela.project");
+    }
+    return 0;
+}

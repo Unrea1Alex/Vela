@@ -1,0 +1,291 @@
+// Native documentation search. No language parsing/checking lives in the host.
+import "../std/json.vela" as json;
+import "../std/result.vela" as result;
+import "../std/collections.vela" as collections;
+fn member(name: String, value: json::Value) -> json::Member {
+    return json::Member(name: name, value: value);
+}
+fn string(value: String) -> json::Value {
+    return json::Value::StringValue(value);
+}
+fn get(value: json::Value, name: String) -> Result<json::Value, String> effects { state } {
+    let cursor = result::explain(json::field(json::root(value), name), "invalid_catalog")?;
+    return Result<json::Value, String>::Ok(cursor.value);
+}
+fn text(value: json::Value, name: String) -> Result<String, String> effects { state } {
+    return result::explain(json::as_string(json::root(get(value, name)?)), "invalid_catalog");
+}
+fn array(value: json::Value, name: String) -> Result<List<json::Value>, String> effects { state } {
+    return result::explain(json::as_array(json::root(get(value, name)?)), "invalid_catalog");
+}
+fn optional(value: json::Value, name: String,
+    fallback: json::Value) -> json::Value effects { state } {
+    return match get(value, name) {
+        Result::Ok(item) => item,
+        Result::Err(_) => fallback
+    };
+}
+fn encode(value: json::Value) -> String effects { state, process } {
+    match json::stringify(value) {
+        Result::Ok(data) => {
+            return data;
+        }
+        Result::Err(_) => {
+            panic("Cannot encode API response");
+        }
+    }
+}
+fn load(name: String, limit: Int) -> Result<String, String> effects { io } {
+    return match read_file_bounded(name, limit) {
+        ReadResult::Ok(data) => Result<String, String>::Ok(data),
+        ReadResult::Limit => Result<String, String>::Err("catalog_limit"),
+        ReadResult::Err(_) => Result<String, String>::Err("catalog_io")
+    };
+}
+fn argument(index: Int) -> String effects { args } {
+    return match arg(index) {
+        StringResult::Ok(value) => value,
+        StringResult::Err(_) => ""
+    };
+}
+fn integer(value: String) -> Int {
+    return match parse_int(value) {
+        IntResult::Ok(number) => number,
+        IntResult::Err(_) => -1
+    };
+}
+fn folded(value: String) -> String effects { state } {
+    let parts = strings_new();
+    for i in 0 .. str_len(value) {
+        var byte = str_byte(value, i);
+        if byte >= 65 && byte <= 90 {
+            byte = byte + 32;
+        }
+        strings_push(parts, str_from_byte(byte));
+    }
+    return strings_join(parts, "");
+}
+fn words(value: String) -> List<String> effects { state } {
+    let out = list_new<String>();
+    var start = 0;
+    for i in 0 ..= str_len(value) {
+        var space = i == str_len(value);
+        if !space {
+            let byte = str_byte(value, i);
+            space = byte == 32 || byte == 9 || byte == 10 || byte == 13;
+        }
+        if space {
+            if i > start {
+                list_push(out, folded(str_slice(value, start, i)));
+            }
+            start = i + 1;
+        }
+    }
+    return out;
+}
+fn contains(value: String, query: String) -> Bool {
+    var i = 0;
+    while i <= str_len(value) - str_len(query) {
+        if str_slice(value, i, i + str_len(query)) == query {
+            return true;
+        }
+        i = i + 1;
+    }
+    return false;
+}
+fn error(reason: String, version: String, fingerprint: String) -> json::Value effects { state } {
+    let fields = list_new<json::Member>();
+    list_push(fields, member("ok", json::Value::Boolean(false)));
+    list_push(fields, member("reason", string(reason)));
+    list_push(fields, member("version", string(version)));
+    list_push(fields, member("fingerprint", string(fingerprint)));
+    return json::Value::Object(fields);
+}
+fn search(index: json::Value, metadata: json::Value, query: String, mode: String, offset: Int,
+    limit: Int, budget: Int, version: String, fingerprint: String) -> Result<json::Value,
+    String> effects { state, process } {
+    let policies = dict_new<String, json::Value>();
+    for policy in array(metadata, "modules")? {
+        let name = text(policy, "module")?;
+        let purpose = text(policy, "purpose")?;
+        if dict_has(policies, name) {
+            return Result<json::Value, String>::Err("duplicate_policy");
+        }
+        dict_set(policies, name, policy);
+    }
+    let entries = dict_new<String, json::Value>();
+    let matches = list_new<String>();
+    let terms = words(query);
+    var count = 0;
+    let keys = strings_new();
+    strings_push(keys, "ownership");
+    strings_push(keys, "limits");
+    strings_push(keys, "example");
+    strings_push(keys, "recipe");
+    for module in array(index, "modules")? {
+        let module_name = text(module, "module")?;
+        let api = get(module, "api")?;
+        if text(api, "version")? != version {
+            return Result<json::Value, String>::Err("mixed_versions");
+        }
+        if !dict_has(policies, module_name) {
+            return Result<json::Value, String>::Err("missing_policy");
+        }
+        let policy = dict_get(policies, module_name);
+        for item in array(api, "items")? {
+            count = count + 1;
+            if count > 4000 {
+                return Result<json::Value, String>::Err("catalog_limit");
+            }
+            let name = text(item, "name")?;
+            let id = module_name + ":" + name;
+            if dict_has(entries, id) {
+                return Result<json::Value, String>::Err("duplicate_id");
+            }
+            let fields = list_new<json::Member>();
+            list_push(fields, member("id", string(id)));
+            list_push(fields, member("signature", string(text(item, "signature")?)));
+            list_push(fields, member("kind", string(text(item, "kind")?)));
+            let empty = list_new<json::Value>();
+            var required_effects = optional(item, "effects", json::Value::Array(empty));
+            if module_name == "builtin" {
+                let raw = text(item, "effect_parameters")?;
+                var start = 0;
+                for i in 0 ..= str_len(raw) {
+                    if i == str_len(raw) {
+                        if i > start {
+                            list_push(empty, string(str_slice(raw, start, i)));
+                        }
+                    } else if str_byte(raw, i) == 59 {
+                        list_push(empty, string(str_slice(raw, start, i)));
+                        start = i + 1;
+                    }
+                }
+                required_effects = json::Value::Array(empty);
+            }
+            let declared = result::explain(json::as_array(json::root(required_effects)),
+                "invalid_catalog")?;
+            for effect_name in declared {
+                let checked = result::explain(json::as_string(json::root(effect_name)),
+                    "invalid_catalog")?;
+            }
+            list_push(fields, member("effects", required_effects));
+            list_push(fields, member("effect_parameters", optional(item, "effect_parameters",
+                string(""))));
+            for key in keys {
+                list_push(fields, member(key, string(text(policy, key)?)));
+            }
+            dict_set(entries, id, json::Value::Object(fields));
+            var include = false;
+            if mode == "name" {
+                include = query != "" && (id == query || name == query);
+            } else if list_len(terms) > 0 {
+                include = true;
+                let haystack = folded(id + " " + text(policy, "purpose")?);
+                for term in terms {
+                    if !contains(haystack, term) {
+                        include = false;
+                    }
+                }
+            }
+            if include {
+                list_push(matches, id);
+            }
+        }
+    }
+    let ordered = collections::sort_strings(matches);
+    let total = list_len(ordered);
+    let selected = list_new<json::Value>();
+    var bytes = 256;
+    var at = offset;
+    while at < total && list_len(selected) < limit {
+        let item = dict_get(entries, list_get(ordered, at));
+        let size = str_len(encode(item)) + 1;
+        if size > budget - bytes {
+            break;
+        }
+        list_push(selected, item);
+        bytes = bytes + size;
+        at = at + 1;
+    }
+    if at < total && list_len(selected) == 0 {
+        return Result<json::Value, String>::Err("response_limit");
+    }
+    var state = "matches";
+    if mode == "name" && total > 1 {
+        state = "ambiguous";
+    }
+    if total == 0 {
+        state = "no_matches";
+        if mode == "name" {
+            state = "not_found";
+        }
+    }
+    if list_len(terms) == 0 {
+        state = "empty";
+    }
+    let fields = list_new<json::Member>();
+    list_push(fields, member("ok", json::Value::Boolean(true)));
+    list_push(fields, member("state", string(state)));
+    list_push(fields, member("version", string(version)));
+    list_push(fields, member("fingerprint", string(fingerprint)));
+    list_push(fields, member("total", json::Value::Integer(total)));
+    list_push(fields, member("offset", json::Value::Integer(offset)));
+    list_push(fields, member("items", json::Value::Array(selected)));
+    var next = json::Value::Null;
+    if at < total {
+        next = json::Value::Integer(at);
+    }
+    list_push(fields, member("next_offset", next));
+    return Result<json::Value, String>::Ok(json::Value::Object(fields));
+}
+fn execute() -> Result<json::Value, String> effects { args, state, io, process } {
+    if arg_count() != 9 {
+        return Result<json::Value, String>::Err("invalid_input");
+    }
+    let raw = load(argument(0), 1048576)?;
+    let purpose = load(argument(1), 262144)?;
+    let fingerprint = sha256(raw + "\n" + purpose);
+    let index = result::explain(json::parse(raw), "invalid_catalog")?;
+    let metadata = result::explain(json::parse(purpose), "invalid_catalog")?;
+    let modules = array(index, "modules")?;
+    if list_len(modules) == 0 {
+        return Result<json::Value, String>::Err("invalid_catalog");
+    }
+    let version = text(get(list_get(modules, 0), "api")?, "version")?;
+    if argument(7) != "" && argument(7) != version {
+        return Result<json::Value, String>::Ok(error("stale_version", version, fingerprint));
+    }
+    if argument(8) != "" && argument(8) != fingerprint {
+        return Result<json::Value, String>::Ok(error("stale_fingerprint", version, fingerprint));
+    }
+    let mode = argument(3);
+    let query = argument(2);
+    let offset = integer(argument(4));
+    let limit = integer(argument(5));
+    let budget = integer(argument(6));
+    if (mode != "name" && mode != "query") || str_len(query) > 1024 || offset < 0 || offset > 4000
+        || limit < 1 || limit > 8 || budget < 128 || budget > 16384 {
+        return Result<json::Value, String>::Err("invalid_input");
+    }
+    match search(index, metadata, query, mode, offset, limit, budget, version, fingerprint) {
+        Result::Ok(value) => {
+            return Result<json::Value, String>::Ok(value);
+        }
+        Result::Err(reason) => {
+            return Result<json::Value, String>::Ok(error(reason, version, fingerprint));
+        }
+    }
+}
+fn main() -> Int effects { args, state, io, process } {
+    match execute() {
+        Result::Err(reason) => {
+            print(encode(error(reason, "", "")));
+            return 2;
+        }
+        Result::Ok(value) => {
+            print(encode(value));
+        }
+    }
+    return 0;
+}

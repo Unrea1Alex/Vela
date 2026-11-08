@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.3",
+  "status": "verified",
+  "date": "2026-11-07",
+  "contract": "../contracts/PROJECT-INIT-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1272,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 485735,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/123-verify.log",
+  "focused": {
+    "schema_version": 1,
+    "stage": "1.2.3",
+    "checks": 33,
+    "platform": "win32",
+    "compiler": "G:\\Vela\\build\\stage12\\compiler123.exe",
+    "directory": "G:\\Vela\\build\\stage12\\scaffold-3tB7ld"
+  },
+  "linux": {
+    "checks": "cli/library check/build/test/run; Unicode/spaces/relative/other cwd; invalid-name suggestion; file/empty directory/repeat; concurrent publication exactly one winner",
+    "initial_intermediate_run": "Rejected directory install with the pre-bundle runtime; rerun with freshly bundled seed passed",
+    "log": "build/stage12/123-linux.log",
+    "status": "passed"
+  },
+  "mcp": {
+    "startup_tokens": 1872,
+    "groups": 2,
+    "failed": 0,
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "max_startup_tokens": 2000,
+    "log": "build/stage12/123-mcp.log"
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 91,
+    "negative_checks": 2
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 114,
+    "links": 771,
+    "missing": []
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "compiler_sha256": "4a57a7048e5c6ff727ca2250b6f149dfed54a3e8263f3f7f81ef9e3dac52c938",
+  "next": "1.2.4"
+}

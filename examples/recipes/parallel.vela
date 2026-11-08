@@ -1,0 +1,51 @@
+import "../../std/parallel.vela" as parallel;
+import "../../std/task_group.vela" as group;
+fn main() -> Int effects { state, io, process } {
+    let values = list_new<Int>();
+    list_push(values, 1);
+    list_push(values, 2);
+    let created = parallel::create(values, 2, 0, 100, parallel::Policy::Collect, async fn [ ](
+        scope: group::Scope, value: Int, index: Int) -> Result<Int, String> effects { state } {
+        await sleep_ms(1);
+        return Result<Int, String>::Ok(value * 10);
+    });
+    match created {
+        Result::Err(_) => {
+            return 2;
+        }
+        Result::Ok(job) => {
+            var now = 0;
+            while now < 100 {
+                match parallel::tick(job, now) {
+                    Result::Err(_) => {
+                        return 2;
+                    }
+                    Result::Ok(ready) => {
+                        if ready {
+                            match parallel::outcome(job) {
+                                Option::None => {
+                                    return 2;
+                                }
+                                Option::Some(done) => {
+                                    if done.reason == parallel::Finish::Driver && platform()
+                                        != "windows" {
+                                        print("parallel requires Windows");
+                                        return 0;
+                                    }
+                                    if done.reason != parallel::Finish::Complete || list_len(
+                                        done.cleanup) != 0 {
+                                        return 2;
+                                    }
+                                    print("parallel=" + to_string(done.started));
+                                    return 0;
+                                }
+                            }
+                        }
+                    }
+                }
+                now = now + 1;
+            }
+        }
+    }
+    return 2;
+}

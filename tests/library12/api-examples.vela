@@ -1,0 +1,70 @@
+// Checked contexts for purpose-metadata snippets. OS calls are not run by main.
+import "../../std/directory.vela" as directory;
+import "../../std/path.vela" as path;
+import "../../std/fs.vela" as fs;
+import "../../std/text.vela" as text;
+import "../../std/json.vela" as json;
+import "../../std/json_stream.vela" as stream;
+import "../../std/json_decode.vela" as decode;
+import "../../std/io.vela" as io;
+import "../../std/stream_lines.vela" as stream_lines;
+import "../../std/parallel.vela" as parallel;
+import "../../std/collections.vela" as collections;
+import "../../std/algorithms.vela" as algorithms;
+import "../../std/set.vela" as sets;
+import "../../std/cell.vela" as cell;
+import "../../std/result.vela" as result;
+import "../../std/result_ops.vela" as result_ops;
+import "../../std/option.vela" as option;
+import "../../std/lines.vela" as lines;
+import "../../std/cli.vela" as cli;
+import "../../std/cli_schema.vela" as cli_schema;
+import "../../std/config.vela" as config;
+import "../../std/services.vela" as services;
+import "../../std/replay.vela" as replay;
+import "../../std/process.vela" as process;
+import "../../std/event_loop.vela" as event_loop;
+import "../../std/task_group.vela" as task_group;
+import "../../std/async_io.vela" as async_io;
+import "../../std/http.vela" as http;
+import "../../std/http_server.vela" as http_server;
+import "../../std/gui.vela" as gui;
+fn directory_example(root: String) -> Result<List<directory::Entry>, directory::Error> effects { state, io } {
+    return directory::entries_bounded(path::Path(value: root), 100);
+}
+fn skip_example(reader: stream::Reader) -> Result<Bool, stream::Error> effects { state } { return stream::skip_value(reader); }
+fn source_example() -> Result<io::Reader,io::Error> effects {state} { return io::memory_reader("bytes",1,64); }
+fn typed_lines_example(source:io::Reader) -> Result<stream_lines::Reader,stream_lines::Error> effects {state} { return stream_lines::reader(source,8192,65536); }
+fn parallel_example(job:parallel::Job<Int,Int,String>,now:Int)->Result<Bool,parallel::Error> effects {state,io,process}{return parallel::tick(job,now);}
+fn json_example() -> Result<json::Value, json::Error> effects { state } { return json::parse("{\"value\":42}"); }
+fn http_example() -> Result<http::Request, http::Error> { return http::from_url("http://127.0.0.1/health", 100, 1024); }
+fn bytes_example(input: String) -> Result<text::Bytes, fs::Error> effects { io } { return fs::read_bytes(path::Path(value: input), 1024); }
+fn path_example(input: String) -> Result<path::Path, path::Error> { return path::checked(input); }
+fn text_example(input: String) -> Result<text::Text, text::Error> { return text::checked(input); }
+fn sort_example(values: List<String>) -> List<String> effects { state } { return collections::sort_strings(values); }
+fn result_example(value: Result<Int, Int>, transform: fn(Int) -> String effects { state }) -> Result<Int, String> effects { state } { return result::map_error(value, transform); }
+fn line_example(reader: lines::Reader, pull: fn(Int) -> Result<String, String> effects { state }) -> Result<Option<lines::Line>, String> effects { state } { return lines::next(reader, pull); }
+fn cli_example(values: List<String>, specs: List<cli::Spec>) -> Result<cli::Arguments, cli::Error> effects { state } { return cli::parse(values, specs); }
+fn config_example(settings: config::Config) -> Result<Int, config::Error> effects { state } { return config::integer(settings, "count"); }
+fn service_example() -> services::MemoryFiles effects { state } { return services::memory_files(); }
+fn replay_example(recorder: replay::Recorder, request: replay::Request) -> Result<replay::Answer, replay::Failure> effects { io, process, state } { return replay::record(recorder, request); }
+fn process_example(argv: List<String>, cwd: path::Path, stdout: path::Path, stderr: path::Path) -> Result<process::Completed, process::Error> effects { io, process, state } { return process::run(argv, cwd, stdout, stderr, 1000); }
+fn loop_example() -> Result<event_loop::Loop<Int>, event_loop::Error> effects { state } { return event_loop::create<Int>(0); }
+async fn task_example() -> Int { return 42; }
+fn group_example() -> Result<task_group::Group, task_group::Error> effects { state } { return task_group::create(0, 8); }
+async fn async_example(scope: task_group::Scope, transport: dyn http::Transport, request: http::Request, directory: path::Path) -> Result<http::Response, async_io::Error<http::Error>> effects { state } { return await async_io::fetch(scope, transport, request, directory, 1000); }
+fn server_example(handler: fn(http_server::Request) -> http_server::Response effects { state }) -> Result<http_server::Server, http_server::Error> effects { io, process, state } { return http_server::listen(0, 0, 1000, handler); }
+fn gui_example(config: gui::Config) -> Result<gui::Window, String> effects { io, process, state } { return gui::open(config); }
+fn main() -> Unit effects { io, state } {
+    let bounded_integer = decode::integer(0, 5);
+    let counter = cell::create(1);
+    let keys = sets::create<String>();
+    let total = algorithms::fold(list_new<Int>(), 0, fn [](sum: Int, value: Int) -> Int { return sum + value; });
+    let sorted = algorithms::sort(list_new<String>(), collections::compare);
+    let context = result_ops::with_context(Result<Int, Int>::Err(7), "load");
+    let fallback = option::unwrap_or(Option<Int>::Some(3), 0);
+    let repeat = cli_schema::integer("repeat", "Repetitions", 1, 10, Option<Int>::Some(3));
+    let values = list_new<Int>();
+    assert_true(2 + 2 == 4, "sum");
+    print("API examples checked");
+}

@@ -1,9 +1,13 @@
+import "../../std/json_decode.vela" as decode;
+import "../../std/cli_schema.vela" as cli;
+import "../../std/result.vela" as result;
 import "../../std/json_stream.vela" as stream;
 import "../../std/json.vela" as json;
 import "../../std/fs.vela" as fs;
 import "../../std/path.vela" as path;
 import "../../std/text.vela" as text;
 import "../../std/collections.vela" as collections;
+import "../../std/algorithms.vela" as algorithms;
 struct Options {
     input: String,
     output: String,
@@ -22,149 +26,49 @@ struct Group {
     minimum: Int,
     maximum: Int
 }
-fn argument(index: Int) -> String effects { args } {
-    return match arg(index) {
-        StringResult::Ok(value) => value,
-        StringResult::Err(_) => ""
-    };
+fn cli_result<T>(value: Result<T, cli::Error>) -> Result<T, String> {
+    return result::map_error(value, cli::describe);
 }
-fn integer(value: String) -> Int {
-    return match parse_int(value) {
-        IntResult::Ok(n) => n,
-        IntResult::Err(_) => -1
-    };
+fn options() -> Result<Option<Options>, String> effects { args, state, io } {
+    let parameters = list_new<cli::Parameter>();
+    list_push(parameters, cli::positional("input", "NDJSON input", Option<String>::None));
+    list_push(parameters, cli::positional("output", "JSON destination", Option<String>::None));
+    list_push(parameters, cli::integer("min-level", "Minimum level", 0, 5, Option<Int>::Some(0)));
+    list_push(parameters, cli::integer("max-level", "Maximum level", 0, 5, Option<Int>::Some(5)));
+    list_push(parameters, cli::integer("repeat", "Repetitions", 1, 1000, Option<Int>::Some(1)));
+    let relations = list_new<cli::LessEqual>();
+    list_push(relations, cli::LessEqual(minimum: "min-level", maximum: "max-level"));
+    let schema = cli_result(cli::create("log-summary", "Aggregate bounded NDJSON records.",
+        parameters, relations))?;
+    let parsed = cli_result(cli::current(schema))?;
+    if cli::is_help(parsed) {
+        print(cli::help(parsed));
+        return Result<Option<Options>, String>::Ok(Option<Options>::None);
+    }
+    return Result<Option<Options>, String>::Ok(Option<Options>::Some(Options(input: cli_result(
+        cli::text_value(parsed, "input"))?, output: cli_result(cli::text_value(parsed, "output"))?,
+        minimum: cli_result(cli::int_value(parsed, "min-level"))?, maximum: cli_result(
+        cli::int_value(parsed, "max-level"))?, repeat: cli_result(cli::int_value(parsed,
+        "repeat"))?)));
 }
-fn options() -> Result<Options, String> effects { args } {
-    if arg_count() < 2 {
-        return Result<Options, String>::Err(
-            "usage: INPUT OUTPUT [--min-level N] [--max-level N] [--repeat N]");
-    }
-    var minimum = 0;
-    var maximum = 5;
-    var repeat = 1;
-    var at = 2;
-    while at < arg_count() {
-        if at + 1 >= arg_count() {
-            return Result<Options, String>::Err("missing option value");
-        }
-        let option = argument(at);
-        let value = integer(argument(at + 1));
-        if option == "--min-level" {
-            if value < 0 || value > 5 {
-                return Result<Options, String>::Err("invalid minimum level");
-            }
-            minimum = value;
-        } else if option == "--max-level" {
-            if value < 0 || value > 5 {
-                return Result<Options, String>::Err("invalid maximum level");
-            }
-            maximum = value;
-        } else if option == "--repeat" {
-            if value < 1 || value > 1000 {
-                return Result<Options, String>::Err("invalid repetition count");
-            }
-            repeat = value;
-        } else {
-            return Result<Options, String>::Err("unknown option");
-        }
-        at = at + 2;
-    }
-    if minimum > maximum {
-        return Result<Options, String>::Err("minimum exceeds maximum");
-    }
-    return Result<Options, String>::Ok(Options(input: argument(0), output: argument(1),
-        minimum: minimum, maximum: maximum, repeat: repeat));
+fn record_schema() -> Result<decode::Decoder<Record>, decode::Error> effects { state } {
+    let names = list_new<String>();
+    list_push(names, "service");
+    list_push(names, "level");
+    list_push(names, "value");
+    let level = decode::integer(0, 5)?;
+    let amount = decode::integer(-1000000, 1000000)?;
+    return decode::object(names, decode::Unknown::Ignore, fn [ level, amount ](
+        fields: decode::Fields) -> Result<Record, decode::Error> effects { state } {
+        return Result<Record, decode::Error>::Ok(Record(service: decode::required(fields, "service",
+            decode::string())?, level: decode::required(fields, "level", level)?,
+            value: decode::required(fields, "value", amount)?));
+    });
 }
-fn parsed<T>(value: Result<T, stream::Error>) -> Result<T, String> {
-    return match value {
-        Result::Ok(found) => Result<T, String>::Ok(found),
-        Result::Err(error) => Result<T, String>::Err(stream::describe(error))
-    };
-}
-fn next(reader: stream::Reader) -> Result<stream::Token, String> effects { state } {
-    match parsed(stream::next(reader))? {
-        Option::Some(found) => {
-            return Result<stream::Token, String>::Ok(found);
-        }
-        Option::None => {
-            return Result<stream::Token, String>::Err("unexpected end of record");
-        }
-    }
-}
-fn object_start(event: stream::Event) -> Bool {
-    return match event {
-        stream::Event::ObjectStart => true,
-        stream::Event::ObjectEnd => false,
-        stream::Event::ArrayStart => false,
-        stream::Event::ArrayEnd => false,
-        stream::Event::Key(_) => false,
-        stream::Event::StringValue(_) => false,
-        stream::Event::NumberLiteral(_) => false,
-        stream::Event::Boolean(_) => false,
-        stream::Event::Null => false
-    };
-}
-fn member(reader: stream::Reader) -> Result<Option<String>, String> effects { state } {
-    let found = next(reader)?;
-    match found.event {
-        stream::Event::Key(name) => {
-            return Result<Option<String>, String>::Ok(Option<String>::Some(name));
-        }
-        stream::Event::ObjectEnd => {
-            return Result<Option<String>, String>::Ok(Option<String>::None);
-        }
-        stream::Event::ObjectStart => {}
-        stream::Event::ArrayStart => {}
-        stream::Event::ArrayEnd => {}
-        stream::Event::StringValue(_) => {}
-        stream::Event::NumberLiteral(_) => {}
-        stream::Event::Boolean(_) => {}
-        stream::Event::Null => {}
-    }
-    return Result<Option<String>, String>::Err(found.path + ": expected object member");
-}
-fn record(data: String) -> Result<Record, String> effects { state } {
-    let reader = parsed(stream::create(data, stream::Limits(bytes: 4096, depth: 4096,
-        nodes: 8192)))?;
-    if !object_start(next(reader)?.event) {
-        return Result<Record, String>::Err("expected record object");
-    }
-    var service = "";
-    var level = 0;
-    var value = 0;
-    var have_service = false;
-    var have_level = false;
-    var have_value = false;
-    var ended = false;
-    while !ended {
-        match member(reader)? {
-            Option::None => {
-                ended = true;
-            }
-            Option::Some(name) => {
-                if name == "service" {
-                    service = parsed(stream::read_string(reader))?;
-                    have_service = true;
-                } else if name == "level" {
-                    level = parsed(stream::read_integer(reader))?;
-                    have_level = true;
-                } else if name == "value" {
-                    value = parsed(stream::read_integer(reader))?;
-                    have_value = true;
-                } else {
-                    let skipped = parsed(stream::skip_value(reader))?;
-                }
-            }
-        }
-    }
-    let complete = parsed(stream::finish(reader))?;
-    if !have_service || !have_level || !have_value {
-        return Result<Record, String>::Err("missing required field");
-    }
-    if level < 0 || level > 5 || value < -1000000 || value > 1000000 {
-        return Result<Record, String>::Err("record field out of range");
-    }
-    return Result<Record, String>::Ok(Record(service: service, level: level, value: value));
+fn record(schema: decode::Decoder<Record>, data: String) -> Result<Record,
+    String> effects { state } {
+    return result::map_error(decode::decode(schema, data, stream::Limits(bytes: 4096, depth: 4096,
+        nodes: 8192)), decode::describe);
 }
 fn blank(line: String) -> Bool {
     for i in 0 .. str_len(line) {
@@ -195,6 +99,7 @@ fn iteration(config: Options) -> Result<String, String> effects { io, state } {
         Result::Ok(parts) => Result<List<text::Text>, String>::Ok(parts),
         Result::Err(_) => Result<List<text::Text>, String>::Err("invalid input text")
     };
+    let schema = result::map_error(record_schema(), decode::describe)?;
     let groups = dict_new<String, Group>();
     let names = list_new<String>();
     var count = 0;
@@ -203,7 +108,7 @@ fn iteration(config: Options) -> Result<String, String> effects { io, state } {
         if blank(line.data) {
             continue;
         }
-        let item = record(line.data)?;
+        let item = record(schema, line.data)?;
         // Every record is fully validated before either filter applies.
         if item.level < config.minimum || item.level > config.maximum {
             continue;
@@ -226,20 +131,20 @@ fn iteration(config: Options) -> Result<String, String> effects { io, state } {
         }
         dict_set(groups, item.service, group);
     }
-    let parts = strings_new();
-    strings_push(parts, "{\"count\":" + to_string(count) + ",\"sum\":" + to_string(sum)
+    let prefix = strings_new();
+    strings_push(prefix, "{\"count\":" + to_string(count) + ",\"sum\":" + to_string(sum)
         + ",\"services\":[");
-    var first = true;
-    for name in collections::sort_strings(names) {
+    let parts = algorithms::try_fold(collections::sort_strings(names), prefix, fn [ groups ](
+        output: StringList, name: String) -> Result<StringList, String> effects { state } {
         let group = dict_get(groups, name);
-        if !first {
-            strings_push(parts, ",");
+        if strings_len(output) > 1 {
+            strings_push(output, ",");
         }
-        first = false;
-        strings_push(parts, "{\"name\":" + quote(name)? + ",\"count\":" + to_string(group.count)
+        strings_push(output, "{\"name\":" + quote(name)? + ",\"count\":" + to_string(group.count)
             + ",\"sum\":" + to_string(group.sum) + ",\"min\":" + to_string(group.minimum)
             + ",\"max\":" + to_string(group.maximum) + "}");
-    }
+        return Result<StringList, String>::Ok(output);
+    })?;
     strings_push(parts, "]}");
     return Result<String, String>::Ok(strings_join(parts, ""));
 }
@@ -259,14 +164,21 @@ fn main() -> Int effects { args, state, io } {
             eprint(message);
             return 2;
         }
-        Result::Ok(config) => {
-            match run(config) {
-                Result::Ok(_) => {
+        Result::Ok(value) => {
+            match value {
+                Option::None => {
                     return 0;
                 }
-                Result::Err(message) => {
-                    eprint(message);
-                    return 1;
+                Option::Some(config) => {
+                    match run(config) {
+                        Result::Ok(_) => {
+                            return 0;
+                        }
+                        Result::Err(message) => {
+                            eprint(message);
+                            return 1;
+                        }
+                    }
                 }
             }
         }

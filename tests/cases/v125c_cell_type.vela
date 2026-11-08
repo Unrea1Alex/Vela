@@ -1,0 +1,3 @@
+import "../../../std/cell.vela" as cell;
+fn invalid(value: cell::Cell<Int>) -> Unit effects { state } { cell::set(value, "wrong"); }
+fn main() -> Unit {}

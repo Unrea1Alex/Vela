@@ -1,0 +1,209 @@
+import "model.vela";
+import "core.vela";
+import "source.vela";
+import "types.vela";
+import "embedded.vela";
+// This is a frontend interface serializer, never a source-consuming backend.
+pub fn compiler_version() -> String {
+    return "1.2.0";
+}
+fn api_public(c: Context, owner: Int, name: String) -> Bool effects { state } {
+    for declaration in c.declarations {
+        if declaration.owner == owner && declaration.name == name {
+            return declaration.exported;
+        }
+    }
+    return false;
+}
+fn api_parameters(parameters: List<TypeParameter>) -> String effects { state } {
+    let out = strings_new();
+    for parameter in parameters {
+        var item = parameter.name;
+        if parameter.bound == "$effect" {
+            item = "effect " + item;
+        } else if parameter.bound != "" && parameter.bound != "Any" {
+            item = item + ":" + parameter.bound;
+        }
+        strings_push(out, item);
+    }
+    if strings_len(out) == 0 {
+        return "";
+    }
+    return "<" + strings_join(out, ",") + ">";
+}
+fn api_effects(pattern: String) -> String effects { state } {
+    let terms = split_text(pattern, 43);
+    let mask = match parse_int(list_get(terms, 0)) {
+        IntResult::Ok(value) => value,
+        IntResult::Err(_) => 0
+    };
+    let names = effect_names(mask % 16);
+    for i in 1 .. list_len(terms) {
+        strings_push(names, list_get(terms, i));
+    }
+    if strings_len(names) == 0 {
+        return "";
+    }
+    return " effects {" + strings_join(names, ",") + "}";
+}
+fn api_type(name: String) -> String effects { state } {
+    let parts = type_parts(name);
+    let base = list_get(parts, 0);
+    if str_len(base) >= 4 && str_slice(base, 0, 4) == "@fn:" {
+        let parameters = strings_new();
+        for i in 2 .. list_len(parts) {
+            strings_push(parameters, api_type(list_get(parts, i)));
+        }
+        let pattern = str_slice(base, 4, str_len(base));
+        let bits = match parse_int(list_get(split_text(pattern, 43), 0)) {
+            IntResult::Ok(value) => value,
+            IntResult::Err(_) => 0
+        };
+        var prefix = "fn(";
+        if bits >= 16 {
+            prefix = "async fn(";
+        }
+        return prefix + strings_join(parameters, ",") + ")->" + api_type(list_get(parts, 1))
+            + api_effects(pattern);
+    }
+    if str_len(base) >= 5 && str_slice(base, 0, 5) == "@dyn:" {
+        return "dyn " + str_slice(base, 5, str_len(base));
+    }
+    if list_len(parts) == 1 {
+        return base;
+    }
+    let parameters = strings_new();
+    for i in 1 .. list_len(parts) {
+        strings_push(parameters, api_type(list_get(parts, i)));
+    }
+    return base + "<" + strings_join(parameters, ",") + ">";
+}
+pub fn api_interface(c: Context) -> String effects { state, io, process } {
+    let items = strings_new();
+    for declaration in c.syntax_types {
+        let owner = source_unit_at(c, declaration.span.start);
+        if owner == 0 && api_public(c, owner, declaration.name) {
+            var kind = "enum";
+            var opacity = "false";
+            if declaration.opaque {
+                opacity = "true";
+            }
+            if declaration.kind == 76 {
+                kind = "struct";
+            }
+            if declaration.kind == 77 {
+                kind = "distinct";
+            }
+            let fields = strings_new();
+            if !declaration.opaque {
+                for field in declaration.fields {
+                    strings_push(fields, json_string(field.name + ":" + api_type(
+                        field.annotation)));
+                }
+            }
+            let variants = strings_new();
+            for variant in declaration.variants {
+                let payloads = strings_new();
+                for field in variant.fields {
+                    strings_push(payloads, api_type(field));
+                }
+                strings_push(variants, json_string(variant.name + "(" + strings_join(payloads, ",")
+                    + ")"));
+            }
+            strings_push(items, "{\"name\":" + json_string(declaration.name) + ",\"kind\":"
+                + json_string(kind) + ",\"signature\":" + json_string(kind + " " + declaration.name
+                + api_parameters(declaration.type_parameters)) + ",\"base\":" + json_string(
+                api_type(declaration.base)) + ",\"opaque\":" + opacity + ",\"fields\":["
+                + strings_join(fields, ",") + "],\"variants\":[" + strings_join(variants, ",")
+                + "],\"effects\":[],\"span\":" + span_json(c, declaration.span) + "}");
+        }
+    }
+    for declaration in c.syntax_interfaces {
+        let owner = source_unit_at(c, declaration.span.start);
+        if owner == 0 && api_public(c, owner, declaration.name) {
+            strings_push(items, "{\"name\":" + json_string(declaration.name)
+                + ",\"kind\":\"interface\",\"signature\":" + json_string("interface "
+                + declaration.name) + ",\"effects\":[]}");
+            for operation in declaration.operations {
+                let parameters = strings_new();
+                for parameter in operation.parameters {
+                    strings_push(parameters, parameter.name + ":" + api_type(parameter.annotation));
+                }
+                let name = declaration.name + "::" + operation.name;
+                strings_push(items, "{\"name\":" + json_string(name)
+                    + ",\"kind\":\"operation\",\"signature\":" + json_string("fn " + name + "("
+                    + strings_join(parameters, ",") + ")->" + api_type(operation.return_name)
+                    + api_effects(to_string(operation.effect_mask))) + ",\"effects\":"
+                    + effect_json(operation.effect_mask) + ",\"span\":" + span_json(c,
+                    operation.span) + "}");
+            }
+        }
+    }
+    for declaration in c.syntax_functions {
+        let owner = source_unit_at(c, declaration.span.start);
+        var visible = owner == 0 && declaration.test_name == "";
+        var name = declaration.name;
+        if declaration.impl_index < 0 {
+            visible = visible && api_public(c, owner, name);
+        } else {
+            let implementation = list_get(c.syntax_impls, declaration.impl_index);
+            let type_name = list_get(type_parts(implementation.owner), 0);
+            visible = visible && declaration.method_exported && api_public(c, owner, type_name);
+            name = implementation.owner + "::" + name;
+        }
+        if visible {
+            var prefix = "fn ";
+            if declaration.suspending {
+                prefix = "async fn ";
+            }
+            let parameters = strings_new();
+            for parameter in declaration.parameters {
+                strings_push(parameters, parameter.name + ":" + api_type(parameter.annotation));
+            }
+            strings_push(items, "{\"name\":" + json_string(name)
+                + ",\"kind\":\"function\",\"signature\":" + json_string(prefix + name
+                + api_parameters(declaration.type_parameters) + "(" + strings_join(parameters, ",")
+                + ")->" + api_type(declaration.return_name) + api_effects(
+                declaration.effect_pattern)) + ",\"effects\":" + effect_json(
+                declaration.effect_mask) + ",\"effect_parameters\":" + json_string(
+                declaration.effect_pattern) + ",\"span\":" + span_json(c, declaration.span) + "}");
+        }
+    }
+    return "{\"schema_version\":1,\"version\":" + json_string(compiler_version()) + ",\"items\":["
+        + strings_join(items, ",") + "]}";
+}
+pub fn api_builtins() -> String effects { state } {
+    let items = strings_new();
+    for line in split_text(builtin_source(), 10) {
+        if str_len(line) > 0 && str_byte(line, 0) != 35 {
+            let row = split_text(line, 124);
+            if list_len(row) == 8 {
+                let parameters = strings_new();
+                for parameter in split_text(list_get(row, 3), 59) {
+                    if parameter != "" {
+                        strings_push(parameters, api_type(parameter));
+                    }
+                }
+                var variables = "";
+                if list_get(row, 2) != "" {
+                    let names = strings_new();
+                    for name in split_text(list_get(row, 2), 59) {
+                        strings_push(names, name);
+                    }
+                    variables = "<" + strings_join(names, ",") + ">";
+                }
+                var signature = "fn " + list_get(row, 1) + variables + "(" + strings_join(
+                    parameters, ",") + ")->" + api_type(list_get(row, 4));
+                if list_get(row, 0) == "enum" {
+                    signature = "enum " + list_get(row, 1) + variables;
+                }
+                strings_push(items, "{\"name\":" + json_string(list_get(row, 1)) + ",\"kind\":"
+                    + json_string(list_get(row, 0)) + ",\"signature\":" + json_string(signature)
+                    + ",\"effect_parameters\":" + json_string(list_get(row, 5)) + ",\"since\":"
+                    + json_string(list_get(row, 7)) + "}");
+            }
+        }
+    }
+    return "{\"schema_version\":1,\"version\":" + json_string(compiler_version()) + ",\"items\":["
+        + strings_join(items, ",") + "]}";
+}

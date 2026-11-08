@@ -1,7 +1,9 @@
 # Native bootstrap tools
 
 The tracked Windows x64 executables are the working Vela compiler,
-development driver, bundler, test runner and LSP server. They let a clone start with the
+development driver, bundler, test runner, LSP server and native API-search helper.
+The latter is ordinary Vela code using the checked generated catalog; the MCP host
+only launches its pinned bytes. These binaries let a clone start with the
 same compiler bytes as the [MCP compatibility manifest](../integrations/mcp/compatibility.json).
 See the [roadmap](../docs/ROADMAP.md) for the current development stage and
 historical release validation.

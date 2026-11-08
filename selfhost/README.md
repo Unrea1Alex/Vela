@@ -10,13 +10,19 @@
 | source.vela | UTF-8, нормализация BOM/CRLF, загрузка исходника |
 | lexer.vela / parser.vela | Токены и типизированный AST |
 | modules.vela | Граф файлов, imports/pub, разрешение модульных имён |
+| artifacts.vela / incremental.vela | Публикация артефактов и проверяемый локальный кэш |
 | projects.vela / project_cli.vela | Манифест, lock, проектные test/fmt |
 | embedded.vela | Генерируемые bundler функции runtime/catalog; не редактировать |
 | types.vela / semantic.vela | Типы, символы, эффекты, проверка и создание HIR |
 | generics.vela | Конкретные generic-типы, очередь и пределы инстанцирования |
+| interfaces.vela / dynamic.vela | Interface bounds, реализации и динамический dispatch |
+| callables.vela / suspension.vela | Captures, callable effects, проверенный await и граф приостановок |
 | errors.vela / control.vela | Option/Result, распространение ошибок, проверка циклов |
 | emitter.vela / intrinsics.vela | C11 из проверенного HIR |
 | formatter.vela | Каноническое форматирование с сохранением токенов и комментариев |
+| query.vela / repairs.vela | Связанные символы, revision/overlay plans и проверяемые исправления |
+| help.vela | Public API после frontend-проверки и embedded builtin catalog |
+| scaffold.vela | CLI init: шаблоны, staging и публикация нового каталога |
 | driver.vela | CLI, JSON-индекс, toolchain и публикация файлов |
 
 `Context` содержит отдельные `List<T>` таблицы. AstExprId/AstStmtId обозначают
@@ -24,6 +30,8 @@
 канонические типы/символы. Ноль означает отсутствие; чтение нулевого, отрицательного
 или выходящего за границы ID завершает процесс с внутренней ошибкой 70.
 ID действуют только в одном Context. Они не являются устойчивыми ID редактора.
+Принадлежность конкретному Context — инвариант вызывающего кода; runtime-проверка
+таблицы проверяет границы, но не хранит отдельную метку владельца.
 
 Parser создаёт syntax records. Checker читает их и создаёт новые checked records,
 не переписывая AST. Backend принимает только проверенные ID/записи и разрешённые
@@ -32,7 +40,8 @@ Parser создаёт syntax records. Checker читает их и создаё�
 
 Карта старых слотов и полный контракт: [AST-HIR-ID](../docs/contracts/AST-HIR-ID.md).
 Причины выбора: [RFC 0001](../docs/rfcs/0001-typed-compiler.md).
-Память по-прежнему принадлежит процессу; GC не добавлен. Авторские файлы образуют
+Runtime использует точную трассировку с лексическими корнями;
+[модель памяти](../docs/MEMORY.md) относится и к компилятору. Авторские файлы образуют
 обычный граф импортов с входом driver.vela; три поколения собираются из него.
 sources.list и автономный compiler.vela сохраняют путь восстановления старым seed.
 Compiler использует generic `table_get<T>` и `last<T>`, Result-пайплайны загрузки
@@ -41,6 +50,8 @@ Compiler использует generic `table_get<T>` и `last<T>`, Result-пай
 для bootstrap; каталог теперь допускает параметры типов у enum.
 Глубина анализа ограничена 200 активными шагами. JSON-координаты — Unicode code points
 в нормализованном исходнике; внутренние Span — полуоткрытые UTF-8 byte spans.
+Поле `range` дополнительно содержит нулевые UTF-16 позиции для LSP и byte offsets.
+Карта инвариантов и решения аудита 1.2: [COMPILER-AUDIT](../docs/COMPILER-AUDIT-1.2.md).
 
 ## Самосборка
 

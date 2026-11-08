@@ -1,0 +1,12 @@
+import "../../std/set.vela" as sets;
+fn main() -> Unit effects { state, io } {
+    let keys = sets::create<String>();
+    let first = sets::insert(keys, "a");
+    let second = sets::insert(keys, "b");
+    assert_true(!sets::insert(keys, "a"), "duplicates do not add keys");
+    let alias = keys;
+    let removed = sets::remove(alias, "a");
+    let added = sets::insert(keys, "a");
+    let order = sets::values(keys);
+    print("set=" + list_get(order, 0) + "," + list_get(order, 1));
+}

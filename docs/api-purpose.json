@@ -1,0 +1,268 @@
+{
+  "modules": [
+    {
+      "module": "builtin",
+      "purpose": "native primitives collections file stream process clock builtin",
+      "ownership": "Module policy: scalar values or explicit native handles; read the matching builtin/FFI contract.",
+      "limits": "Per-primitive catalog/platform limits; managed storage uses tracing GC.",
+      "example": "let values = list_new<Int>();",
+      "recipe": "basics"
+    },
+    {
+      "module": "std/directory",
+      "purpose": "directory files filesystem enumerate walk metadata каталог файлы обход",
+      "ownership": "Module policy: Scan copies share progress/close; close incremental scans on every exit; walk closes scans.",
+      "limits": "Windows/Linux; no link descent; explicit depth/entry budgets; OS order is unspecified.",
+      "example": "directory::entries_bounded(path::Path(value: root), 100)",
+      "recipe": "directory"
+    },
+    {
+      "module": "std/json_stream",
+      "purpose": "JSON selective streaming validate skip ignored huge numbers NDJSON JSON-reader",
+      "ownership": "Module policy: Reader aliases share progress; Number/string slices retain immutable backing input.",
+      "limits": "UTF-8 buffer <=16 MiB, depth <=4096, values <=1000000; skip still validates syntax.",
+      "example": "json::skip_value(reader)",
+      "recipe": "json"
+    },
+    {
+      "module": "std/json",
+      "purpose": "JSON tree decode field array object number typed path",
+      "ownership": "Module policy: Array/Object contain shared mutable List payloads; ordinary shallow value copies.",
+      "limits": "Legacy bounded tree and numeric ranges; use json_stream for huge ignored numbers.",
+      "example": "json::parse(\"{\\\"value\\\":42}\")",
+      "recipe": "json"
+    },
+    {
+      "module": "std/http",
+      "purpose": "HTTP HTTPS client curl request deadline timeout body headers network сеть",
+      "ownership": "Module policy: Exchange owns supervised process/temp files; cancel/drain to terminal then release.",
+      "limits": "Windows trusted curl 8.4+; curl_transfer preserves exact transfer timeout with bounded helper overhead.",
+      "example": "http::from_url(\"http://127.0.0.1/health\", 100, 1024)",
+      "recipe": "http"
+    },
+    {
+      "module": "std/fs",
+      "purpose": "file read binary bytes text atomic write filesystem files файлы",
+      "ownership": "Module policy: immutable returned bytes; atomic publication owns temporary files and cleanup.",
+      "limits": "Legacy bounded reads <=256 MiB; text validates UTF-8; close/cleanup failures remain typed.",
+      "example": "fs::read_bytes(path::Path(value: input), 1024)",
+      "recipe": "bytes"
+    },
+    {
+      "module": "std/path",
+      "purpose": "path filesystem resource executable join parent directory путь",
+      "ownership": "Module policy: public String record; validation is not proof of OS identity or containment.",
+      "limits": "Nonempty/NUL/UTF-8 validation; preserve platform path rules.",
+      "example": "path::checked(input)",
+      "recipe": "directory"
+    },
+    {
+      "module": "std/text",
+      "purpose": "text UTF-8 bytes encode decode validate builder string",
+      "ownership": "Module policy: immutable String backing; builders share mutable storage; open Text revalidated.",
+      "limits": "Explicit byte/codepoint and builder limits; invalid UTF-8 has an offset.",
+      "example": "text::checked(input)",
+      "recipe": "bytes"
+    },
+    {
+      "module": "std/collections",
+      "purpose": "list copy reverse stable sort strings numbers collections",
+      "ownership": "Module policy: independent outer result list; nested mutable payloads remain shared.",
+      "limits": "State effect; byte string order, NaNs last, signed zeros stable.",
+      "example": "collections::sort_strings(values)",
+      "recipe": "basics"
+    },
+    {
+      "module": "std/result",
+      "purpose": "Result typed error transform map context failure",
+      "ownership": "Module policy: ordinary payload copies/aliases; map_error calls its callback only for Err.",
+      "limits": "Callback effects propagate; explain intentionally replaces the cause with String.",
+      "example": "result::map_error(value, transform)",
+      "recipe": "result"
+    },
+    {
+      "module": "std/lines",
+      "purpose": "lines text stream newline LF CRLF NDJSON reader",
+      "ownership": "Module policy: Reader/pull aliases share cursors; callback failures are sticky.",
+      "limits": "Legacy total <=256 MiB; CR is retained; explicit line/chunk bounds; String errors.",
+      "example": "lines::next(reader, pull)",
+      "recipe": "json"
+    },
+    {
+      "module": "std/cli",
+      "purpose": "CLI command arguments flags options positional parse",
+      "ownership": "Module policy: returned Dict/List are public shared mutable values; input arguments unchanged.",
+      "limits": "Unknown/duplicate flags reject; -- ends option parsing; typed bounds are application policy.",
+      "example": "cli::parse(values, specs)",
+      "recipe": "basics"
+    },
+    {
+      "module": "std/config",
+      "purpose": "configuration config JSON typed fields validate",
+      "ownership": "Module policy: public mutable members; lookups defensively validate shared input.",
+      "limits": "Typed missing/type/unknown/duplicate/text errors; bounded JSON tree.",
+      "example": "config::integer(settings, \"count\")",
+      "recipe": "json"
+    },
+    {
+      "module": "std/testing",
+      "purpose": "test named assertion table cases expected results",
+      "ownership": "Module policy: Case payloads follow ordinary value/alias rules.",
+      "limits": "Specify independent expected values; check is not execution.",
+      "example": "assert_true(2 + 2 == 4, \"sum\");",
+      "recipe": "basics"
+    },
+    {
+      "module": "std/services",
+      "purpose": "services dependency injection file process clock entropy memory test doubles",
+      "ownership": "Module policy: explicitly selected OS/memory implementations; memory stores share state.",
+      "limits": "Use declared interface effects and platform-specific OS adapters.",
+      "example": "services::memory_files()",
+      "recipe": "bytes"
+    },
+    {
+      "module": "std/replay",
+      "purpose": "replay transcript deterministic services record test",
+      "ownership": "Module policy: explicit transcript/cursor ownership; finish verifies complete consumption.",
+      "limits": "Typed events, bounded service responses; not ambient OS replay.",
+      "example": "replay::record(recorder, request)",
+      "recipe": "result"
+    },
+    {
+      "module": "std/process",
+      "purpose": "process execute command supervised worker cancellation job",
+      "ownership": "Module policy: owned jobs/files; copies share progress; cancel then drain/release.",
+      "limits": "Windows supervised OS adapter; explicit argv/output/deadline bounds.",
+      "example": "process::run(argv, cwd, stdout, stderr, 1000)",
+      "recipe": "callable"
+    },
+    {
+      "module": "std/event_loop",
+      "purpose": "event loop scheduling continuations poll completion",
+      "ownership": "Module policy: host-driven queues own continuations until completion.",
+      "limits": "Bounded scheduler, not native worker threads; explicit tick/shutdown.",
+      "example": "event_loop::create<Int>(0)",
+      "recipe": "callable"
+    },
+    {
+      "module": "std/tasks",
+      "purpose": "async task await fiber suspension",
+      "ownership": "Module policy: task copies share identity and suspension state.",
+      "limits": "Windows fibers; host lifecycle; no arbitrary blocking io inside async.",
+      "example": "async fn value()->Int { return 42; }",
+      "recipe": "callable"
+    },
+    {
+      "module": "std/task_group",
+      "purpose": "task group structured cancellation scope children drain",
+      "ownership": "Module policy: Scope owns child hierarchy; terminal outcomes wait for cleanup.",
+      "limits": "Windows driven async runtime; explicit shutdown and tick until idle.",
+      "example": "task_group::create(0, 8)",
+      "recipe": "callable"
+    },
+    {
+      "module": "std/async_io",
+      "purpose": "async HTTP process await network cancellation cleanup",
+      "ownership": "Module policy: adapters retain owned operations until terminal release.",
+      "limits": "Typed operation/cleanup failures; blocking arbitrary io is rejected.",
+      "example": "await async_io::fetch(scope, transport, request, directory, 1000)",
+      "recipe": "http"
+    },
+    {
+      "module": "std/http_server",
+      "purpose": "HTTP loopback server requests responses handler network",
+      "ownership": "Module policy: Windows DLL owns listener/queue/callback; close explicitly.",
+      "limits": "Loopback bounded GET/HEAD server; explicit content_type; no request bodies.",
+      "example": "http_server::listen(0, 0, 1000, handler)",
+      "recipe": "http"
+    },
+    {
+      "module": "std/gui",
+      "purpose": "GUI window form controls events user interface",
+      "ownership": "Module policy: Window aliases share idempotent close and native callback/queue.",
+      "limits": "Windows trusted vela-gui.dll; drain tasks before window close.",
+      "example": "gui::open(config)",
+      "recipe": "callable"
+    },
+    {
+      "module": "std/cli_schema",
+      "purpose": "typed CLI command line arguments options flags help defaults integer bounds positional schema параметры аргументы",
+      "ownership": "Module policy: opaque schema snapshots descriptors; parsed values are private; input arguments are preserved.",
+      "limits": "64 descriptors/relations, 4096 arguments; inclusive Int ranges; no library I/O, current adds args.",
+      "example": "cli_schema::integer(\"repeat\", \"Repetitions\", 1, 10, Option<Int>::Some(3))",
+      "recipe": "cli"
+    },
+    {
+      "module": "std/result_ops",
+      "purpose": "Result map and_then short circuit eager lazy default unwrap typed error context причина ошибка",
+      "ownership": "Module policy: ordinary payload aliases; callbacks are synchronous, called zero/one time and never retained.",
+      "limits": "O(1) plus callback; unwrap_or eagerly evaluates default; unwrap_or_else invokes recover only on Err.",
+      "example": "result_ops::with_context(Result<Int, Int>::Err(7), \"load\")",
+      "recipe": "result"
+    },
+    {
+      "module": "std/option",
+      "purpose": "Option map and_then Some None optional eager lazy defaults unwrap",
+      "ownership": "Module policy: ordinary payload aliases; synchronous callbacks are not retained; Some/None selects zero/one call.",
+      "limits": "O(1) plus callback; unwrap_or is eager, unwrap_or_else produces only for None.",
+      "example": "option::unwrap_or(Option<Int>::Some(3), 0)",
+      "recipe": "result"
+    },
+    {
+      "module": "std/algorithms",
+      "purpose": "stable generic sort comparator ordering records collection map filter transform fold reduce find any all predicate try typed failure ошибка обход сортировка",
+      "ownership": "Module policy: fresh shallow outer snapshot; nested mutable payloads stay shared; comparator is not retained.",
+      "limits": "Sort requires strict weak ordering and <=n*ceil(log2(n)) comparisons; traversals <=n calls; eager O(n) snapshot even on short circuit; state plus callback effects; first typed error stops.",
+      "example": "algorithms::sort(values, collections::compare)",
+      "recipe": "traversals"
+    },
+    {
+      "module": "std/set",
+      "purpose": "set membership unique deduplicate union intersection difference ordered keys множество уникальные ключи",
+      "ownership": "Module policy: Set copies share Dict/order-list identity; values and binary algebra results have independent outer storage.",
+      "limits": "Existing Dict key types Int/Bool/String and distinct wrappers; state required; expected hash costs, removal O(n), no worst-case O(1) promise.",
+      "example": "sets::create<String>()",
+      "recipe": "set"
+    },
+    {
+      "module": "std/cell",
+      "purpose": "shared mutable value cell get set state closure capture ячейка разделяемое состояние",
+      "ownership": "Module policy: copies/captures share opaque one-slot identity; nested payloads keep ordinary aliases; no native resource ownership.",
+      "limits": "O(1) container work; state required for create/get/set; no public internal List, atomics or cross-thread transfer.",
+      "example": "cell::create(1)",
+      "recipe": "cell"
+    },
+    {
+      "module": "std/json_decode",
+      "purpose": "typed JSON record schema decoder required optional default nullable array integer range unknown fields путь ошибка JSON декодер",
+      "ownership": "Module policy: opaque immutable span maps retain input backing; typed stateful builders run after syntax validation; payloads use ordinary aliases, no resource rollback.",
+      "limits": "Input <=16 MiB/depth4096/nodes1000000 via json_stream; selected decoder nesting128; arrays65536/fields256/key1024/outer path65536; first typed error stops.",
+      "example": "decode::integer(0, 5)",
+      "recipe": "json-schema"
+    },
+    {
+      "module": "std/io",
+      "purpose": "synchronous byte Reader Writer memory file copy short reads writes EOF close поток копирование",
+      "ownership": "Opaque shared cursor/failure/close; borrowed copy, copy_owned preserves operation and both cleanup causes; explicit close required.",
+      "limits": "buffer 1..65536, positive Int64 total; file read chunks <=8192; old 256 MiB stream cap unchanged. Typed sticky errors, no retry/rollback.",
+      "example": "io::memory_reader(\"bytes\", 1, 64)",
+      "recipe": "streams"
+    },
+    {
+      "module": "std/stream_lines",
+      "purpose": "typed streaming lines UTF8 BOM CRLF record byte offset bounded строка поток",
+      "ownership": "Opaque shared line cursor borrows io Reader; close explicitly closes shared source; retains current bounded record/chunks only.",
+      "limits": "record 1..1048576, buffer 1..65536; total via io Reader. Typed error category, physical byte offset, 1-based line and unchanged io cause.",
+      "example": "lines::reader(source, 8192, 65536)",
+      "recipe": "streams"
+    },
+    {
+      "module": "std/parallel",
+      "purpose": "bounded parallel async map ordered results concurrency cancellation deadline fail fast collect queue параллельно отмена очередь",
+      "ownership": "Job copies share explicit host-driven lifecycle. Snapshot outer input; per-item Scope owns child operations. Tick after cancel until drained outcome. Fresh outer completion lists, nested aliases ordinary.",
+      "limits": "concurrency 1..128, inputs <=65536; overall queue-inclusive timeout <=2147483647; at most one group turn/tick, no sleep. Fibers/HTTP Windows only; typed errors and all cleanup causes retained.",
+      "example": "parallel::tick(job, now)",
+      "recipe": "parallel"
+    }
+  ]
+}

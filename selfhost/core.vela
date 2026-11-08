@@ -1,5 +1,7 @@
 import "model.vela";
 import "parser.vela";
+import "query.vela";
+import "repairs.vela";
 // Source coordinates and diagnostics shared by typed compiler phases.
 pub fn cat(a: String, b: String) -> String {
     return str_concat(a, b);
@@ -41,7 +43,8 @@ pub fn filename_at(c: Context, position: Int) -> String effects { state } {
     return list_get(c.source_units, source_unit_at(c, position)).name;
 }
 pub fn line_at(c: Context, position: Int) -> Int effects { state } {
-    return global_line_at(c, position) - list_get(c.source_units, source_unit_at(c, position)).line_base;
+    return global_line_at(c, position) - list_get(c.source_units, source_unit_at(c,
+        position)).line_base;
 }
 pub fn column_at(c: Context, position: Int) -> Int effects { state } {
     var i = list_get(c.lines, global_line_at(c, position) - 1);
@@ -91,7 +94,11 @@ pub fn json_string(value: String) -> String effects { state } {
     return strings_join(parts, "");
 }
 pub fn empty_details() -> DiagnosticDetails effects { state } {
-    return DiagnosticDetails(effect_parameter: "", capture: "", expected: "", actual: "", interface_name: "", implementor: "", type_parameter: "", operation: "", reason: "", owner: "", member: "", method: "", exposed_type: "", expected_type: "", actual_type: "", callee: "", required_effects: 0, allowed_effects: 0, missing_effects: 0, missing_variants: list_new<String>(), related: list_new<RelatedLocation>());
+    return DiagnosticDetails(effect_parameter: "", capture: "", expected: "", actual: "",
+        interface_name: "", implementor: "", type_parameter: "", operation: "", reason: "",
+        owner: "", member: "", method: "", exposed_type: "", expected_type: "", actual_type: "",
+        callee: "", required_effects: 0, allowed_effects: 0, missing_effects: 0,
+        missing_variants: list_new<String>(), related: list_new<RelatedLocation>());
 }
 pub fn effect_names(mask: Int) -> StringList effects { state } {
     let items = strings_new();
@@ -116,25 +123,49 @@ pub fn effect_json(mask: Int) -> String effects { state } {
         strings_set(names, i, json_string(strings_get(names, i)));
         i = i + 1;
     }
-    return "[" + strings_join(names,",") + "]";
+    return "[" + strings_join(names, ",") + "]";
 }
 pub fn span_json(c: Context, span: Span) -> String effects { state } {
     return f"{{\"start\":{codepoint_at(c, span.start):d},\"end\":{codepoint_at(c, span.end):d},\"line\":{line_at(c, span.start):d},\"column\":{column_at(c, span.start):d},\"end_line\":{line_at(c, span.end):d},\"end_column\":{column_at(c, span.end):d}}}";
 }
 pub fn details_json(details: DiagnosticDetails) -> String effects { state } {
     let items = strings_new();
-    if details.effect_parameter != "" { strings_push(items, "\"effect_parameter\":" + json_string(details.effect_parameter)); }
-    if details.capture != "" { strings_push(items, "\"capture\":" + json_string(details.capture)); }
-    if details.expected != "" { strings_push(items, "\"expected\":" + json_string(details.expected)); }
-    if details.actual != "" { strings_push(items, "\"actual\":" + json_string(details.actual)); }
-    if details.reason != "" { strings_push(items, "\"reason\":" + json_string(details.reason)); }
-    if details.owner != "" { strings_push(items, "\"owner\":" + json_string(details.owner)); }
-    if details.member != "" { strings_push(items, "\"member\":" + json_string(details.member)); }
-    if details.method != "" { strings_push(items, "\"method\":" + json_string(details.method)); }
-    if details.exposed_type != "" { strings_push(items, "\"type\":" + json_string(details.exposed_type)); }
-    if details.interface_name != "" { strings_push(items, "\"interface\":" + json_string(details.interface_name)); }
-    if details.implementor != "" { strings_push(items, "\"implementor\":" + json_string(details.implementor)); }
-    if details.type_parameter != "" { strings_push(items, "\"type_parameter\":" + json_string(details.type_parameter)); }
+    if details.effect_parameter != "" {
+        strings_push(items, "\"effect_parameter\":" + json_string(details.effect_parameter));
+    }
+    if details.capture != "" {
+        strings_push(items, "\"capture\":" + json_string(details.capture));
+    }
+    if details.expected != "" {
+        strings_push(items, "\"expected\":" + json_string(details.expected));
+    }
+    if details.actual != "" {
+        strings_push(items, "\"actual\":" + json_string(details.actual));
+    }
+    if details.reason != "" {
+        strings_push(items, "\"reason\":" + json_string(details.reason));
+    }
+    if details.owner != "" {
+        strings_push(items, "\"owner\":" + json_string(details.owner));
+    }
+    if details.member != "" {
+        strings_push(items, "\"member\":" + json_string(details.member));
+    }
+    if details.method != "" {
+        strings_push(items, "\"method\":" + json_string(details.method));
+    }
+    if details.exposed_type != "" {
+        strings_push(items, "\"type\":" + json_string(details.exposed_type));
+    }
+    if details.interface_name != "" {
+        strings_push(items, "\"interface\":" + json_string(details.interface_name));
+    }
+    if details.implementor != "" {
+        strings_push(items, "\"implementor\":" + json_string(details.implementor));
+    }
+    if details.type_parameter != "" {
+        strings_push(items, "\"type_parameter\":" + json_string(details.type_parameter));
+    }
     if details.operation != "" {
         strings_push(items, "\"operation\":" + json_string(details.operation));
         strings_push(items, "\"actual_type\":" + json_string(details.actual_type));
@@ -156,62 +187,73 @@ pub fn details_json(details: DiagnosticDetails) -> String effects { state } {
             strings_push(names, json_string(list_get(details.missing_variants, i)));
             i = i + 1;
         }
-        strings_push(items, "\"missing_variants\":[" + strings_join(names,",") + "]");
+        strings_push(items, "\"missing_variants\":[" + strings_join(names, ",") + "]");
     }
-    return "{" + strings_join(items,",") + "}";
+    return "{" + strings_join(items, ",") + "}";
 }
-pub fn fail_details(c: Context, code: String, message: String, span: Span, details: DiagnosticDetails) -> Unit effects { state, io, process } {
-    let related = strings_new();
-    var i = 0;
-    while i < list_len(details.related) {
-        let item = list_get(details.related, i);
-        strings_push(related, f"{{\"message\":{json_string(item.message):s},\"source\":{json_string(filename_at(c, item.span.start)):s},\"span\":{span_json(c, item.span):s}}}");
-        i = i + 1;
+pub fn fail_details(c: Context, code: String, message: String, span: Span,
+    details: DiagnosticDetails) -> Unit effects { state, io, process } {
+    if c.repair_mode {
+        print(repair_plan(c, code, message, span, details));
+        exit(0);
     }
+    var i = 0;
     if c.json_mode {
-        print(f"{{\"schema_version\":1,\"ok\":false,\"source\":{json_string(filename_at(c, span.start)):s},\"diagnostics\":[{{\"severity\":\"error\",\"code\":{json_string(code):s},\"message\":{json_string(message):s},\"source\":{json_string(filename_at(c, span.start)):s},\"span\":{span_json(c, span):s},\"notes\":[],\"details\":{details_json(details):s},\"related\":[{strings_join(related,","):s}]}}]}}");
+        print(
+            f"{{\"schema_version\":1,\"ok\":false,\"source\":{json_string(filename_at(c, span.start)):s},\"revision\":\"{query_revision(c):s}\",\"documents\":{repair_documents(c):s},\"diagnostics\":[{repair_diagnostic(c,code,message,span,details):s}]}}");
     } else {
-        eprint(f"{filename_at(c, span.start):s}:{line_at(c, span.start):d}:{column_at(c, span.start):d}: {code:s}: {message:s}");
+        eprint(
+            f"{filename_at(c, span.start):s}:{line_at(c, span.start):d}:{column_at(c, span.start):d}: {code:s}: {message:s}");
         i = 0;
         while i < list_len(details.related) {
             let item = list_get(details.related, i);
-            eprint(f"{filename_at(c, item.span.start):s}:{line_at(c, item.span.start):d}:{column_at(c, item.span.start):d}: note: {item.message:s}");
+            eprint(
+                f"{filename_at(c, item.span.start):s}:{line_at(c, item.span.start):d}:{column_at(c, item.span.start):d}: note: {item.message:s}");
             i = i + 1;
         }
     }
     exit(1);
 }
-pub fn fail(c: Context, code: String, message: String, start: Int, end: Int) -> Unit effects { state, io, process } {
+pub fn fail(c: Context, code: String, message: String, start: Int,
+    end: Int) -> Unit effects { state, io, process } {
     fail_details(c, code, message, Span(start: start, end: end), empty_details());
 }
-pub fn bad(c: Context, code: String, message: String, span: Span) -> Unit effects { state, io, process } {
+pub fn bad(c: Context, code: String, message: String, span: Span) -> Unit effects { state, io,
+    process } {
     fail_details(c, code, message, span, empty_details());
 }
-pub fn method_error(c: Context, reason: String, owner: String, member: String, message: String, span: Span, related: Span) -> Unit effects { state, io, process } {
+pub fn method_error(c: Context, reason: String, owner: String, member: String, message: String,
+    span: Span, related: Span) -> Unit effects { state, io, process } {
     var details = empty_details();
     details.reason = reason;
     details.owner = owner;
     details.method = member;
     if related.end > related.start {
-        list_push(details.related, RelatedLocation(message: "Related declaration is here.", span: related));
+        list_push(details.related, RelatedLocation(message: "Related declaration is here.",
+            span: related));
     }
     fail_details(c, "E233", message, span, details);
 }
-pub fn interface_error(c: Context, code: String, reason: String, interface_name: String, implementor: String, method: String, message: String, span: Span, related: Span) -> Unit effects { state, io, process } {
+pub fn interface_error(c: Context, code: String, reason: String, interface_name: String,
+    implementor: String, method: String, message: String, span: Span,
+    related: Span) -> Unit effects { state, io, process } {
     var details = empty_details();
     details.reason = reason;
     details.interface_name = interface_name;
     details.implementor = implementor;
     details.method = method;
     if related.end > related.start {
-        list_push(details.related, RelatedLocation(message: "Related interface or implementation declaration.", span: related));
+        list_push(details.related, RelatedLocation(
+            message: "Related interface or implementation declaration.", span: related));
     }
     fail_details(c, code, message, span, details);
 }
-pub fn duplicate(c: Context, message: String, span: Span, previous: Span) -> Unit effects { state, io, process } {
+pub fn duplicate(c: Context, message: String, span: Span, previous: Span) -> Unit effects { state,
+    io, process } {
     let details = empty_details();
     if previous.end > previous.start {
-        list_push(details.related, RelatedLocation(message: "Previous declaration is here.", span: previous));
+        list_push(details.related, RelatedLocation(message: "Previous declaration is here.",
+            span: previous));
     }
     fail_details(c, "E202", message, span, details);
 }
@@ -239,8 +281,33 @@ pub fn make_context(code: String, name: String, json_mode: Bool) -> Context effe
         i = i + 1;
     }
     let control = list_new<Control>();
-    list_push(control, Control(in_async: false, await_site: empty_span(), scope_base: 0, loop_depth: 0, in_contract: false, in_defer: false, instance_depth: 0, type_mapping: dict_new<String, TypeId>(), type_depth: 0, type_instances: 0, cursor: 0, previous_end: 0, depth: 0, return_type: no_type(), allowed_effects: 0, temporary: 0, function_index: 0));
+    list_push(control, Control(in_async: false, await_site: empty_span(), scope_base: 0,
+        loop_depth: 0, in_contract: false, in_defer: false, instance_depth: 0,
+        type_mapping: dict_new<String, TypeId>(), type_depth: 0, type_instances: 0, cursor: 0,
+        previous_end: 0, depth: 0, return_type: no_type(), allowed_effects: 0, temporary: 0,
+        function_index: 0));
     let units = list_new<SourceUnit>();
-    list_push(units, SourceUnit(path: name, name: name, identity: "", code: code, start: 0, end: str_len(code), line_base: 0));
-    return Context(debug_codegen: false, query_mode: false, query_uses: list_new<QueryUse>(), query_types: list_new<SyntaxName>(), generic_tokens: dict_new<Int, Bool>(), arm_commas: dict_new<Int, Bool>(), source_units: units, imports: list_new<ModuleImport>(), declarations: list_new<ModuleDeclaration>(), bound_types: list_new<SyntaxType>(), bound_functions: list_new<SyntaxFunction>(), bound_interfaces: list_new<SyntaxInterface>(), bound_impls: list_new<SyntaxImpl>(), interface_operations: list_new<InterfaceOperation>(), loop_labels: list_new<String>(), loop_cleanup_depths: list_new<Int>(), cleanup_blocks: list_new<StmtId>(), instances: list_new<FunctionInstance>(), generic_functions: dict_new<String, SymbolId>(), source_text: code, source_name: name, json_mode: json_mode, lines: lines, output: strings_new(), tokens: list_new<Token>(), comments: list_new<Token>(), syntax_exprs: list_new<SyntaxExpr>(), syntax_stmts: list_new<SyntaxStmt>(), syntax_types: list_new<SyntaxType>(), syntax_impls: list_new<SyntaxImpl>(), syntax_closures: list_new<SyntaxClosure>(), syntax_interfaces: list_new<SyntaxInterface>(), syntax_functions: list_new<SyntaxFunction>(), expressions: list_new<CheckedExpr>(), statements: list_new<CheckedStmt>(), types: list_new<TypeInfo>(), symbols: list_new<Symbol>(), functions: list_new<CheckedFunction>(), signatures: list_new<SymbolId>(), scopes: list_new<List<SymbolId>>(), type_order: list_new<TypeId>(), control: control);
+    list_push(units, SourceUnit(path: name, name: name, identity: "", code: code, start: 0,
+        end: str_len(code), line_base: 0));
+    return Context(repair_mode: false, repair_root: "", repair_document: -1,
+        repair_overlays: list_new<QueryOverlay>(), debug_codegen: false, query_mode: false,
+        query_uses: list_new<QueryUse>(), query_types: list_new<SyntaxName>(),
+        generic_tokens: dict_new<Int, Bool>(), arm_commas: dict_new<Int, Bool>(),
+        source_units: units, imports: list_new<ModuleImport>(),
+        declarations: list_new<ModuleDeclaration>(), bound_types: list_new<SyntaxType>(),
+        bound_functions: list_new<SyntaxFunction>(), bound_interfaces: list_new<SyntaxInterface>(),
+        bound_impls: list_new<SyntaxImpl>(), interface_operations: list_new<InterfaceOperation>(),
+        loop_labels: list_new<String>(), loop_cleanup_depths: list_new<Int>(),
+        cleanup_blocks: list_new<StmtId>(), instances: list_new<FunctionInstance>(),
+        generic_functions: dict_new<String, SymbolId>(), source_text: code, source_name: name,
+        json_mode: json_mode, lines: lines, output: strings_new(), tokens: list_new<Token>(),
+        comments: list_new<Token>(), syntax_exprs: list_new<SyntaxExpr>(),
+        syntax_stmts: list_new<SyntaxStmt>(), syntax_types: list_new<SyntaxType>(),
+        syntax_impls: list_new<SyntaxImpl>(), syntax_closures: list_new<SyntaxClosure>(),
+        syntax_interfaces: list_new<SyntaxInterface>(),
+        syntax_functions: list_new<SyntaxFunction>(), expressions: list_new<CheckedExpr>(),
+        statements: list_new<CheckedStmt>(), types: list_new<TypeInfo>(),
+        symbols: list_new<Symbol>(), functions: list_new<CheckedFunction>(),
+        signatures: list_new<SymbolId>(), scopes: list_new<List<SymbolId>>(),
+        type_order: list_new<TypeId>(), control: control);
 }

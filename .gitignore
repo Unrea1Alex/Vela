@@ -32,3 +32,4 @@ vela-codex.mjs
 !/bin/vela-bundle.exe
 !/bin/vela-test.exe
 !/bin/vela-lsp.exe
+!/bin/vela-api.exe

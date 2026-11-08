@@ -1,0 +1,71 @@
+import "../../tools/test.vela";
+pub fn scaffold_checks(suite: Suite) -> Suite effects { state, io, process } {
+    var s = suite;
+    for kind in project_kinds() {
+        let dir = s.dir + "/новый проект " + kind;
+        let args = compiler_command(s, "init", dir);
+        strings_push(args, "--kind");
+        strings_push(args, kind);
+        strings_push(args, "--json");
+        let created = invoke(s, args, 15000);
+        s = record(s, "scaffold_create_" + kind, created.code == 0 && contains(created.out,
+            "\"command\":\"init\"") && contains(created.out, "\"ok\":true"), created.out
+            + created.err);
+        if created.code == 0 {
+            let manifest = dir + "/vela.project";
+            let initial = value(read_file(manifest));
+            let checked = invoke(s, compiler_command(s, "check", manifest), 15000);
+            s = record(s, "scaffold_check_" + kind, checked.code == 0, checked.out + checked.err);
+            let output = dir + "/app.exe";
+            let built = build(s, manifest, output);
+            s = record(s, "scaffold_build_" + kind, built.code == 0, built.out + built.err);
+            if built.code == 0 {
+                let ran = invoke(s, command(output), 15000);
+                s = record(s, "scaffold_run_" + kind, ran.code == 0 && ran.out == "42\n", ran.out
+                    + ran.err);
+            }
+            let tests = compiler_command(s, "test", manifest);
+            strings_push(tests, "--json");
+            let tested = invoke(s, tests, 30000);
+            s = record(s, "scaffold_test_" + kind, tested.code == 0 && contains(tested.out,
+                "\"passed\":1,\"failed\":0"), tested.out + tested.err);
+            let repeated = invoke(s, args, 15000);
+            s = record(s, "scaffold_repeat_" + kind, repeated.code == 1 && contains(repeated.out,
+                "E225") && value(read_file(manifest)) == initial, repeated.out + repeated.err);
+        }
+    }
+    let invalid = compiler_command(s, "init", s.dir + "/invalid-name");
+    strings_push(invalid, "--name");
+    strings_push(invalid, "my-project");
+    strings_push(invalid, "--json");
+    let rejected = invoke(s, invalid, 15000);
+    s = record(s, "scaffold_name_suggestion", rejected.code == 1 && contains(rejected.out, "E225")
+        && contains(rejected.out, "my_project"), rejected.out + rejected.err);
+    let existing = s.dir + "/existing.txt";
+    done(write_file(existing, "preserved"));
+    let conflict = compiler_command(s, "init", existing);
+    strings_push(conflict, "--json");
+    let preserved = invoke(s, conflict, 15000);
+    s = record(s, "scaffold_file_conflict", preserved.code == 1 && contains(preserved.out, "E225")
+        && value(read_file(existing)) == "preserved", preserved.out + preserved.err);
+    let bad_kind = compiler_command(s, "init", s.dir + "/bad-kind");
+    strings_push(bad_kind, "--kind");
+    strings_push(bad_kind, "gui");
+    strings_push(bad_kind, "--json");
+    let wrong = invoke(s, bad_kind, 15000);
+    s = record(s, "scaffold_kind", wrong.code == 1 && contains(wrong.out, "E225"), wrong.out
+        + wrong.err);
+    strings_set(bad_kind, 4, "cli");
+    strings_push(bad_kind, "--kind");
+    strings_push(bad_kind, "library");
+    let duplicate = invoke(s, bad_kind, 15000);
+    s = record(s, "scaffold_duplicate", duplicate.code == 1 && contains(duplicate.out, "E225"),
+        duplicate.out + duplicate.err);
+    return s;
+}
+fn project_kinds() -> List<String> effects { state } {
+    let kinds = list_new<String>();
+    list_push(kinds, "cli");
+    list_push(kinds, "library");
+    return kinds;
+}

@@ -9,16 +9,16 @@ build driver and test runner are written in Vela. The language makes types,
 side effects and error paths visible so that people and agents can reason about
 a small piece of code from its local context.
 
-**Vela 1.1.0** adds bounded native directory traversal on Windows /
-Linux, a selective JSON pull reader and opt-in complete-transfer HTTP deadlines.
-It includes working file-index, NDJSON-summary and HTTP-collector applications.
-The compiler and a clean C-recovered build each passed **1240 native checks**;
-three independent agents each passed 12 initial and 26 maintenance indexer checks.
-The 1.0 language/source/project/lock/FFI baseline is retained. See the
-[1.1 contract](docs/contracts/LIBRARY-1.1.md) and [acceptance](docs/VALIDATION-1.1.md)
-for platform scope and measured results. Verified local archives are
-`vela-1.1.0-windows-x64.zip`, `vela-1.1.0-linux-x64-musl.tar.gz`, and
-`vela-mcp-1.1.0.zip` under `dist/`, with `SHA256SUMS-1.1.0.txt`.
+**Vela 1.2.0** adds compact agent entry, native API discovery/project scaffolding,
+checked diagnostic previews, typed CLI/JSON schemas, stable generic sorting and
+traversals, Set/Cell, bounded streams and ordered parallel jobs. The three
+acceptance applications use these libraries while retaining their original
+functional oracles. The 1.0/1.1 API and source baseline remains in force.
+See [current acceptance](docs/VALIDATION-1.2.md), [agent entry](docs/AGENT-START.md)
+and [library map](docs/STDLIB-MAP-1.2.md) for measured results and platform scope.
+Package names under `dist/`: `vela-1.2.0-windows-x64.zip`,
+`vela-1.2.0-linux-x64-musl.tar.gz`, `vela-mcp-1.2.0.zip`,
+with `SHA256SUMS-1.2.0.txt`. [Historical 1.1 acceptance](docs/VALIDATION-1.1.md).
 
 The [stable 1.0 API contract](docs/contracts/STABLE-1.0.md),
 [compatibility policy](docs/COMPATIBILITY.md) and

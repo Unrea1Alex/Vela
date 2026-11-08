@@ -5,6 +5,9 @@ import "../tests/cases/testing-cases.vela";
 import "../tests/cases/ffi-cases.vela";
 import "../tests/cases/cache-cases.vela";
 import "../tests/cases/gui-cases.vela";
+import "../tests/cases/api-cases.vela";
+import "../tests/cases/scaffold-cases.vela";
+import "../tests/cases/diagnostic-cases.vela";
 // Native black-box language/driver tests. No Python modules or subprocesses.
 pub struct Outcome {
     code: Int,
@@ -254,6 +257,16 @@ pub fn protocol(suite: Suite) -> Suite effects { state, io, process } {
     done(write_file(input, code));
     let symbols = invoke(s, compiler_command(s, "symbols", input), 15000);
     s = record(s, "symbols_contracts", symbols.code == 0 && contains(symbols.out, "\"verification\":\"runtime\"") && contains(symbols.out, "\"ensures\":1"), symbols.out + symbols.err);
+    done(write_file(input, "pub opaque struct Box { secret: Int } impl Box { pub fn get(self: Box)->Int{return self.secret;} } fn hidden()->Int{return 7;} pub fn identity<T>(value:T)->T{return value;}"));
+    let api = compiler_command(s, "api", input);
+    strings_push(api, "--json");
+    let public_api = invoke(s, api, 15000);
+    s = record(s, "api_verified_generic_and_method", public_api.code == 0 && contains(public_api.out, "fn identity<T>(value:T)->T") && contains(public_api.out, "Box::get"), public_api.out + public_api.err);
+    s = record(s, "api_opaque_and_private_hidden", public_api.code == 0 && contains(public_api.out, "\"opaque\":true,\"fields\":[]") && !contains(public_api.out, "secret") && !contains(public_api.out, "hidden"), public_api.out + public_api.err);
+    done(write_file(input, "pub fn invalid()->Int{return true;}"));
+    let invalid_api = invoke(s, api, 15000);
+    s = record(s, "api_rejects_unchecked_interface", invalid_api.code == 1 && contains(invalid_api.out, "E201"), invalid_api.out + invalid_api.err);
+    done(write_file(input, code));
     let a = compiler_command(s, "emit-c", input);
     strings_push(a, "-o");
     strings_push(a, s.dir + "/a.c");
@@ -545,7 +558,7 @@ pub fn diagnostics(suite: Suite) -> Suite effects { state, io, process } {
 }
 pub fn typed_tables(suite: Suite) -> Suite effects { state, io, process } {
     var s = suite;
-    let prefix = source_body(value(read_file(s.root + "/selfhost/model.vela"))) + "\n" + source_body(value(read_file(s.root + "/selfhost/core.vela")));
+    let prefix = "import \"../../../selfhost/model.vela\";\nimport \"../../../selfhost/core.vela\";\n";
     let input = s.dir + "/typed-tables.vela";
     let exe = s.dir + "/typed-tables.exe";
     let types = split("AstExprId;AstStmtId;ExprId;StmtId;TypeId;SymbolId", 59);
@@ -759,6 +772,9 @@ pub fn main() -> Int effects { args, state, io, process } {
     suite = testing_checks(suite);
     suite = ffi_checks(suite);
     suite = gui_checks(suite);
+    suite = api_checks(suite);
+    suite = scaffold_checks(suite);
+    suite = diagnostic_plan_checks(suite);
     let report = f"{{\"schema_version\":1,\"runner\":\"Vela\",\"passed\":{suite.passed:d},\"failed\":{suite.failed:d},\"skipped\":0}}\n";
     done(write_file(root + "/build/native/tests.json", report));
     print(report);

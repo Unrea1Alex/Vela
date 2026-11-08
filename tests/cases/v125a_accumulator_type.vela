@@ -1,0 +1,3 @@
+import "../../../std/algorithms.vela" as a;
+fn invalid(values: List<Int>) -> Int effects { state } { return a::fold(values, 0, fn [](x: Int, n: Int) -> String { return "wrong"; }); }
+fn main() -> Unit {}

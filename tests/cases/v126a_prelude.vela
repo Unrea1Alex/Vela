@@ -1,0 +1,5 @@
+fn stream_create(value: Int) -> Int { return value+1; }
+fn stream_write(value: Int) -> Int { return value+2; }
+fn stream_write_close(value: Int) -> Int { return value+3; }
+fn stream_open_large(value: Int) -> Int { return value+4; }
+fn main() -> Unit effects {io} { print(stream_create(1)+stream_write(1)+stream_write_close(1)+stream_open_large(1)); }

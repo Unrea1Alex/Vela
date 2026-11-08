@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.5c",
+  "status": "verified",
+  "date": "2026-11-08",
+  "contract": "../contracts/STDLIB-EVOLUTION-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1336,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 485735,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/125c-verify.log",
+  "focused": {
+    "rejections": {
+      "set_effect": "E209",
+      "construction": "E232",
+      "private_field": "E223",
+      "payload_type": "E201",
+      "get_effect": "E209"
+    },
+    "linux": "GCC/musl passed",
+    "positive": "v125c_cell",
+    "expected": "shared cell passed",
+    "linux_log": "build/stage12/125c-linux.log",
+    "checks": "copies/closures share identity; separate creates/factories independent; payload List aliases and replacement; captured dynamic String, record/opaque Set and callable survive creator scopes and GC"
+  },
+  "gc": {
+    "stress": 1,
+    "peak_managed_bytes": 6103,
+    "live_managed_bytes_at_report": 4532,
+    "collections": 13727,
+    "report": "build/stage12/125c-gc.err"
+  },
+  "mcp": {
+    "wire_startup_tokens": 3511,
+    "startup_tokens": 1866,
+    "new_api_lookup": "passed",
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "installed_cell": "passed",
+    "groups": 3,
+    "failed": 0,
+    "log": "build/stage12/125c-mcp.log"
+  },
+  "recipes": {
+    "schema_version": 1,
+    "checks": [
+      "recipe basics",
+      "recipe directory",
+      "recipe json",
+      "recipe bytes",
+      "recipe result",
+      "recipe callable",
+      "recipe http",
+      "recipe cli",
+      "recipe sort",
+      "recipe traversals",
+      "recipe set",
+      "recipe cell",
+      "generic/effect/opaque/method/async interface",
+      "reject invalid interface before emission",
+      "all embedded builtin rows",
+      "all shipped modules and recipe IDs resolve to verified catalog"
+    ],
+    "passed": 16
+  },
+  "api_search": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 98,
+    "negative_checks": 2
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 115,
+    "links": 800,
+    "missing": []
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "next": "1.2.6"
+}

@@ -14,6 +14,8 @@ import "formatter.vela";
 import "query.vela";
 import "incremental.vela";
 import "artifacts.vela";
+import "help.vela";
+import "scaffold.vela";
 pub fn io_value(r: StringResult) -> String effects { io, process } {
     return io_result(from_string(r), "");
 }
@@ -343,17 +345,33 @@ pub fn main() -> Int effects { args, state, io, process } {
     if arg_count() == 1 {
         let option = io_value(arg(0));
         if option == "--version" {
-            print("Vela 1.1.0 (self-hosted)");
+            print("Vela " + compiler_version() + " (self-hosted)");
+            return 0;
+        }
+        if option == "--help" {
+            print(
+                "Usage: vela check|symbols|api|query|plan|emit-c|build|run|test|fmt|lock SOURCE_OR_PROJECT");
+            print("       vela api --builtins");
+            print("       vela init DIRECTORY [--name NAME] [--kind cli|library] [--json]");
             return 0;
         }
     }
     if arg_count() < 2 {
         eprint(
-            "Usage: vela check|symbols|query|plan|emit-c|build|run|test|fmt|lock SOURCE_OR_PROJECT");
+            "Usage: vela check|symbols|api|query|plan|emit-c|build|run|test|fmt|lock SOURCE_OR_PROJECT");
+        eprint("       vela api --builtins");
+        eprint("       vela init DIRECTORY [--name NAME] [--kind cli|library] [--json]");
         return 2;
     }
     let command = io_value(arg(0));
     let input = io_value(arg(1));
+    if command == "init" {
+        return scaffold_command(input);
+    }
+    if command == "api" && input == "--builtins" && arg_count() == 2 {
+        print(api_builtins());
+        return 0;
+    }
     if command == "query" || command == "plan" {
         return query_command(command, input);
     }
@@ -411,7 +429,8 @@ pub fn main() -> Int effects { args, state, io, process } {
         index = index + 1;
     }
     if command != "check" && command != "symbols" && command != "emit-c" && command != "build"
-        && command != "run" && command != "fmt" && command != "lock" && command != "test" {
+        && command != "run" && command != "fmt" && command != "lock" && command != "test" && command
+        != "api" {
         eprint("Unknown compiler command.");
         return 2;
     }
@@ -547,7 +566,11 @@ pub fn main() -> Int effects { args, state, io, process } {
         write_stdout(formatted);
         return 0;
     }
-    analyze_mode(c, command != "symbols");
+    analyze_mode(c, command != "symbols" && command != "api");
+    if command == "api" {
+        print(api_interface(c));
+        return 0;
+    }
     if command == "check" {
         cache_store(cache, key, "ok", kind);
         return checked_output(input, source_name, json_mode);

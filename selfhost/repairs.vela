@@ -1,0 +1,372 @@
+import "model.vela";
+import "core.vela";
+import "query.vela";
+import "projects.vela";
+import "source.vela";
+import "driver.vela";
+import "lexer.vela";
+// Diagnostic rendering and one-edit candidates. No invalid checked IR is emitted.
+pub fn repair_documents(c: Context) -> String effects { state } {
+    let parts = strings_new();
+    for i in 0 .. list_len(c.source_units) {
+        let unit = list_get(c.source_units, i);
+        strings_push(parts,
+            f"{{\"id\":{i:d},\"path\":{json_string(unit.path):s},\"revision\":\"{sha256(unit.code):s}\"}}");
+    }
+    return "[" + strings_join(parts, ",") + "]";
+}
+pub fn repair_validate(c: Context, revision: String, document: Int) -> Unit effects { state, io,
+    process } {
+    if query_revision(c) != revision {
+        plan_reject(c, "Stale analysis revision.");
+    }
+    if document < 0 || document >= list_len(c.source_units) {
+        plan_reject(c, "Unknown document.");
+    }
+}
+pub fn repair_project_reject(root: String, revision: String, document: Int,
+    overlays: List<QueryOverlay>, code: String, message: String,
+    text: String) -> Unit effects { state, io, process } {
+    var c = repair_project_error_context(text, root, true);
+    if revision != "" {
+        if str_len(text) > 1048576 {
+            plan_reject(c, "Manifest exceeds the diagnostic-plan byte budget.");
+        }
+        repair_validate(c, revision, document);
+        c.repair_mode = true;
+        c.repair_root = root;
+        c.repair_document = document;
+        c.repair_overlays = overlays;
+    }
+    bad(c, code, message, repair_project_span(c, message));
+}
+pub fn repair_project_error_context(text: String, path: String,
+    json_mode: Bool) -> Context effects { state } {
+    if str_len(text) > 1048576 {
+        return make_context("", path, json_mode);
+    }
+    return make_context(text, path, json_mode);
+}
+fn repair_alias(c: Context, code: String, message: String, span: Span) -> String effects { state,
+    io, process } {
+    if code == "E222" && repair_prefix(message, "Unknown module alias: ") {
+        return str_slice(message, str_len("Unknown module alias: "), str_len(message));
+    }
+    // Unknown enum means the qualifier already resolved to a non-enum type.
+    // An import must not reinterpret that known type as a module namespace.
+    if code == "E200" && repair_prefix(message, "Unknown type: ") {
+        for expression in c.syntax_exprs {
+            if expression.kind == 7 && expression.span.start == span.start && expression.span.end
+                == span.end {
+                let target = ast_expr(c, expression.left);
+                if project_identifier(target.qualifier) {
+                    return target.qualifier;
+                }
+            }
+        }
+    }
+    return "";
+}
+pub fn repair_explanation(c: Context, code: String, message: String, span: Span,
+    details: DiagnosticDetails) -> String effects { state, io, process } {
+    var category = "general";
+    var expected = details.expected_type;
+    var actual = details.actual_type;
+    var guidance = "Inspect the original diagnostic and related source positions.";
+    if code == "E201" {
+        category = "types";
+        guidance =
+            "Choose whether the value or its declared type is wrong. No implicit cast or literal replacement is proposed.";
+    }
+    if code == "E209" {
+        category = "effects";
+        expected = effect_json(details.required_effects);
+        actual = effect_json(details.allowed_effects);
+        guidance =
+            "The call requires the listed effects. Only private ordinary root main may receive args/io/state; public, callable, async and process expansion need an explicit edit.";
+    }
+    if code == "E222" || repair_alias(c, code, message, span) != "" {
+        category = "imports";
+        guidance =
+            "The qualifier must name a declared type or explicit import. A unique checked sibling or installed module can be proposed; bare names, conflicting aliases and ambiguous files are not guessed.";
+    }
+    if code == "E225" {
+        category = "project";
+        expected =
+            "vela-project|1; name|identifier; entry|relative path; dep|alias|path; native/resource/test fields";
+        actual = message;
+        if repair_prefix(message, "Invalid project name.") {
+            expected = "ASCII identifier";
+            actual = str_slice(c.source_text, span.start, span.end);
+        } else if repair_prefix(message, "Unknown, duplicate or malformed manifest field: ")
+            && span.end > span.start {
+            expected = "name, entry, dep, native, resource or test";
+            actual = str_slice(c.source_text, span.start, span.end);
+        }
+        guidance =
+            "Project names use ASCII identifiers. Review a deterministic name normalization or a unique one-character field spelling; dependency locks are never updated by a plan.";
+    }
+    return f"{{\"category\":{json_string(category):s},\"root_cause\":{json_string(message):s},\"expected\":{json_string(expected):s},\"actual\":{json_string(actual):s},\"guidance\":{json_string(guidance):s}}}";
+}
+pub fn repair_diagnostic(c: Context, code: String, message: String, span: Span,
+    details: DiagnosticDetails) -> String effects { state, io, process } {
+    let related = strings_new();
+    for item in details.related {
+        strings_push(related,
+            f"{{\"message\":{json_string(item.message):s},\"source\":{json_string(filename_at(c,item.span.start)):s},\"span\":{span_json(c,item.span):s},\"range\":{query_range(c,item.span):s}}}");
+    }
+    return f"{{\"severity\":\"error\",\"code\":{json_string(code):s},\"message\":{json_string(message):s},\"source\":{json_string(filename_at(c,span.start)):s},\"span\":{span_json(c,span):s},\"range\":{query_range(c,span):s},\"notes\":[],\"details\":{details_json(details):s},\"related\":[{strings_join(related,","):s}],\"explanation\":{repair_explanation(c,code,message,span,details):s}}}";
+}
+pub fn repair_project_span(c: Context, message: String) -> Span effects { state } {
+    var position = 0;
+    for line in project_split(c.source_text, 10) {
+        if repair_prefix(message, "Invalid project name.") && repair_prefix(line, "name|") {
+            return Span(start: position + 5, end: position + str_len(line));
+        }
+        let prefix = "Unknown, duplicate or malformed manifest field: ";
+        if repair_prefix(message, prefix) {
+            let key = str_slice(message, str_len(prefix), str_len(message));
+            if key != "name" && key != "entry" && key != "dep" && key != "native" && key
+                != "resource" && key != "test" && repair_prefix(line, key + "|") {
+                return Span(start: position, end: position + str_len(key));
+            }
+        }
+        position = position + str_len(line) + 1;
+    }
+    return empty_span();
+}
+fn repair_one_character(a: String, b: String) -> Bool {
+    let n = str_len(a);
+    let m = str_len(b);
+    if n > m + 1 || m > n + 1 || a == b {
+        return false;
+    }
+    var i = 0;
+    while i < n && i < m && str_byte(a, i) == str_byte(b, i) {
+        i = i + 1;
+    }
+    if n == m {
+        return str_slice(a, i + 1, n) == str_slice(b, i + 1, m) || i + 1 < n && str_byte(a, i)
+            == str_byte(b, i + 1) && str_byte(a, i + 1) == str_byte(b, i) && str_slice(a, i + 2, n)
+            == str_slice(b, i + 2, m);
+    }
+    if n < m {
+        return str_slice(a, i, n) == str_slice(b, i + 1, m);
+    }
+    return str_slice(a, i + 1, n) == str_slice(b, i, m);
+}
+fn repair_candidate(c: Context, code: String, message: String, span: Span,
+    details: DiagnosticDetails) -> List<PlanEdit> effects { state, io, process } {
+    let edits = list_new<PlanEdit>();
+    let owner = source_unit_at(c, span.start);
+    let unit = list_get(c.source_units, owner);
+    if code == "E225" && project_is_manifest(unit.path) && span.end >= span.start {
+        let current = str_slice(c.source_text, span.start, span.end);
+        if repair_prefix(message, "Invalid project name.") {
+            list_push(edits, PlanEdit(span: span, text: project_suggest_name(current)));
+            return edits;
+        }
+        if repair_prefix(message, "Unknown, duplicate or malformed manifest field: ") {
+            var replacement = "";
+            var matches = 0;
+            for key in project_split("name|entry|dep|native|resource|test", 124) {
+                if repair_one_character(current, key) {
+                    replacement = key;
+                    matches = matches + 1;
+                }
+            }
+            if matches == 1 {
+                list_push(edits, PlanEdit(span: span, text: replacement));
+            }
+        }
+        return edits;
+    }
+    let alias = repair_alias(c, code, message, span);
+    if alias != "" {
+        if !project_identifier(alias) {
+            return edits;
+        }
+        let candidates = list_new<String>();
+        for relative in project_split(alias + ".vela|vela-stdlib/" + alias + ".vela", 124) {
+            let path = io_value(absolute_path(parent_path(unit.path) + "/" + relative));
+            if source_inside_boundary(path) {
+                match query_source_text(path, c.repair_overlays) {
+                    Result::Ok(_) => {
+                        list_push(candidates, relative);
+                    }
+                    Result::Err(_) => {}
+                }
+            }
+        }
+        if list_len(candidates) == 1 && str_len(unit.code) > 0 {
+            let width = utf8_width(str_byte(unit.code, 0));
+            let first = str_slice(unit.code, 0, width);
+            list_push(edits, PlanEdit(span: Span(start: unit.start, end: unit.start + width),
+                text: "import " + json_string(list_get(candidates, 0)) + " as " + alias + ";\n"
+                + first));
+        }
+        return edits;
+    }
+    if code == "E209" && details.missing_effects > 0 && details.missing_effects < 8
+        && details.effect_parameter == "" && owner == 0 {
+        let index = query_enclosing_function(c, span.start);
+        if index < 0 {
+            return edits;
+        }
+        let fnc = list_get(c.bound_functions, index);
+        if fnc.name != "main" || fnc.suspending || fnc.foreign_library != "" || fnc.test_name != ""
+            || list_len(fnc.parameters) != 0 || list_len(fnc.type_parameters) != 0
+            || fnc.return_name != "Int" && fnc.return_name != "Unit" {
+            return edits;
+        }
+        for declaration in c.declarations {
+            if declaration.canonical == fnc.name && declaration.exported {
+                return edits;
+            }
+        }
+        var mask = fnc.effect_mask;
+        for bit in project_split("1|2|4", 124) {
+            let value = plan_integer(bit);
+            if details.missing_effects / value % 2 == 1 && mask / value % 2 == 0 {
+                mask = mask + value;
+            }
+        }
+        var lexical = c;
+        lexical.tokens = list_new<Token>();
+        lexical.comments = list_new<Token>();
+        lex_range(lexical, unit.start, unit.end);
+        let names = effect_names(mask);
+        let text = "effects {" + strings_join(names, ", ") + "}";
+        var i = 0;
+        while i < list_len(lexical.tokens) {
+            let token = list_get(lexical.tokens, i);
+            if token.span.start > fnc.name_span.end && token.span.start < fnc.span.end {
+                if token.text == "requires" || token.text == "ensures" {
+                    return edits;
+                }
+                if token.text == "effects" {
+                    let start = token.span.start;
+                    i = i + 1;
+                    while i < list_len(lexical.tokens) && list_get(lexical.tokens, i).text != "}" {
+                        i = i + 1;
+                    }
+                    if i < list_len(lexical.tokens) {
+                        list_push(edits, PlanEdit(span: Span(start: start, end: list_get(
+                            lexical.tokens, i).span.end), text: text));
+                    }
+                    return edits;
+                }
+                if token.text == "{" {
+                    list_push(edits, PlanEdit(span: token.span, text: text + " {"));
+                    return edits;
+                }
+            }
+            i = i + 1;
+        }
+    }
+    return edits;
+}
+fn repair_recheck(c: Context, edit: PlanEdit) -> Bool effects { state, io, process } {
+    let directory_result = temp_dir("");
+    var directory = "";
+    match directory_result {
+        StringResult::Ok(value) => {
+            directory = value;
+        }
+        StringResult::Err(_) => {
+            return false;
+        }
+    }
+    let files = list_new<String>();
+    let overlays = list_new<QueryOverlay>();
+    let unit = list_get(c.source_units, source_unit_at(c, edit.span.start));
+    let text = str_slice(unit.code, 0, edit.span.start - unit.start) + edit.text + str_slice(
+        unit.code, edit.span.end - unit.start, str_len(unit.code));
+    list_push(overlays, QueryOverlay(path: unit.path, code: text));
+    for overlay in c.repair_overlays {
+        if path_key(overlay.path) != path_key(unit.path) {
+            list_push(overlays, overlay);
+        }
+    }
+    var ok = list_len(overlays) <= 32;
+    let args = strings_new();
+    match executable_path() {
+        StringResult::Ok(exe) => {
+            strings_push(args, exe);
+        }
+        StringResult::Err(_) => {
+            ok = false;
+        }
+    }
+    strings_push(args, "query");
+    strings_push(args, c.repair_root);
+    strings_push(args, "--validate");
+    var i = 0;
+    for overlay in overlays {
+        let file = directory + "/overlay-" + to_string(i);
+        list_push(files, file);
+        match write_file(file, overlay.code) {
+            WriteResult::Ok => {}
+            WriteResult::Err(_) => {
+                ok = false;
+            }
+        }
+        strings_push(args, "--overlay");
+        strings_push(args, overlay.path);
+        strings_push(args, file);
+        i = i + 1;
+    }
+    let output = directory + "/stdout";
+    let errors = directory + "/stderr";
+    if ok {
+        list_push(files, output);
+        list_push(files, errors);
+        ok = process_run_files(args, output, errors, 15000) == 0;
+    }
+    for file in files {
+        match remove_file(file) {
+            WriteResult::Ok => {}
+            WriteResult::Err(_) => {
+                ok = false;
+            }
+        }
+    }
+    match remove_dir(directory) {
+        WriteResult::Ok => {}
+        WriteResult::Err(_) => {
+            ok = false;
+        }
+    }
+    return ok;
+}
+pub fn repair_plan(c: Context, code: String, message: String, span: Span,
+    details: DiagnosticDetails) -> String effects { state, io, process } {
+    let original = repair_diagnostic(c, code, message, span, details);
+    let explanations = "[" + repair_explanation(c, code, message, span, details) + "]";
+    let revision = query_revision(c);
+    if c.repair_document != source_unit_at(c, span.start) {
+        var rejected = c;
+        rejected.repair_mode = false;
+        plan_reject(rejected, "First diagnostic is in a different document.");
+    }
+    let edits = repair_candidate(c, code, message, span, details);
+    var changes = "[]";
+    var validated = false;
+    var reason = "explanation_only";
+    if list_len(edits) == 1 {
+        let edit = list_get(edits, 0);
+        if repair_recheck(c, edit) {
+            validated = true;
+            reason = "checked_preview";
+            let unit = list_get(c.source_units, source_unit_at(c, edit.span.start));
+            changes =
+                f"[{{\"path\":{json_string(unit.path):s},\"revision\":\"{sha256(unit.code):s}\",\"edits\":[{{\"range\":{query_range(c,edit.span):s},\"new_text\":{json_string(edit.text):s}}}]}}]";
+        } else {
+            reason = "preview_rejected_or_cleanup_failed";
+        }
+    }
+    return f"{{\"schema_version\":1,\"ok\":true,\"revision\":\"{revision:s}\",\"documents\":{repair_documents(c):s},\"validated\":{validated:b},\"reason\":{json_string(reason):s},\"diagnostics\":[{original:s}],\"explanations\":{explanations:s},\"changes\":{changes:s}}}";
+}
+fn repair_prefix(value: String, prefix: String) -> Bool {
+    return str_len(value) >= str_len(prefix) && str_slice(value, 0, str_len(prefix)) == prefix;
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "subject": "Vela 1.1 authored std and applications",
+  "baseline_commit": "106890ecb19566a91b4b59ca5d942efd614a7a08",
+  "interface_producer": "verified native 1.2.0-dev.1; metadata inventory only",
+  "source_files": {
+    "std/async_io.vela": "52dfd3f70ad80c5fadfb7d63b86efd5581da5253dd6fdfa4283fd27823926a5a",
+    "std/cli.vela": "0f1e63ea76a01fe9f3c0addd5840147bb66b73006cf62a5da6dfef8e11781e88",
+    "std/collections.vela": "6f1455003baa002042c3f02f827f57180e871ca1aa9de210e627073b1fed3f48",
+    "std/config.vela": "5db9ca475459b0199de2e483a5c066f6c90c11cd78d9d653bd6b7cbf0eb3039f",
+    "std/directory.vela": "ee2dcb8e394b1fdb28a6ee3d7985b94dfe00105c2cafb69cf6a2d040a83ce484",
+    "std/event_loop.vela": "1e1d431ca1672c53dc4565288d0304d85ca056d813e4f49380e8fc1e82df6d05",
+    "std/fs.vela": "408bed63894beb49cecdc9e8edd12cedff27825f7923770b2b66d1019d1b5b59",
+    "std/gui.vela": "2e66ace9d9709f4ee138486e909d3bee9aa22dbc93c939e54caec6cfa33920df",
+    "std/http_server.vela": "369601a72e2df6a4b82a720998b286d22d41e5224d1b17da892abf496a5e5a19",
+    "std/http.vela": "9fdf4d8464fe1ff85cfe734054802e4be5d0ef68227994258c96e348b024f2be",
+    "std/json_stream.vela": "05981fb8588152a179ff6a6c1e78ec38b7edf4613a7519d2f883d9eaed4ac315",
+    "std/json.vela": "93b9e59fe7570b8ea31c4b32931091d74d9b248395bf2e92a6fb751893747ced",
+    "std/lines.vela": "64c7abd172ccf5739b3d0689dde97d4655700b65470e77c038a0ff8d120cc89c",
+    "std/path.vela": "5c90ac7ad88ac1b4eab9c69f02aa024a1ce7a34b4c44a1bb8cf4eaa6de6c86a7",
+    "std/process.vela": "31414f3963aefbed54fa505db59d034efbf996fae5323919cd340572e8461d4b",
+    "std/replay.vela": "758a26f2579fc8c2d7ac498032ebc193de383a6591b08329c2bb571d7dbd1650",
+    "std/result.vela": "9182b585a7d51bbf99f39e4e769c95612b8285409451a28d49cb3d1bb7d56b55",
+    "std/services.vela": "3f01d7d04e7e0d42af4aae70aa0677a50d3ec12ab17403548c51f906b92acb4c",
+    "std/task_group.vela": "fb289b356caf1eefcfbc8d926350eedb27039c663e72e0f5c4372df165450be8",
+    "std/tasks.vela": "2f62ae967f5135ba131acc230247255933b890edda66bf79c877cc5cbbff7b46",
+    "std/testing.vela": "6ceea6af4572e9b3536e272fb7cb86209778d55feae015ee36681bb1d866b1d3",
+    "std/text.vela": "d354a40a7f843853c403031658f0ffa3b4ce3d4e6309e4185abbf89606f62519"
+  },
+  "catalog_sha256": "c39004cd96ccc13eecf3656b1ecaef7868556bbbc6ac8495c64f91a38c541f03",
+  "fixtures": {
+    "tests/cases/v121a_library_compat.vela": "0510a1cec13f062652c172dd3b1f5bc838f4bcdf0ffd685c99a37f6d16358644",
+    "tests/cases/v121a_library_compat.out": "deb9eee071e06096a4e9a854225eb75e946c950d47b905c3e66265d9ef73f1ce",
+    "tests/cases/v121a_library_compat.args": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/cases/v121a_legacy_effect.vela": "354ebb01f5619a942cfcaefae69ff29418e4315b430c53bce2df1655bd9c798f"
+  },
+  "independent_golden": "legacy library APIs passed LF; E209 on omitted state",
+  "legacy_compiler_sha256": "7fe0c19a4d1346450433e84f5d1a83934494631e2e99f738c60ea30603b66315",
+  "app_archive_sha256": "2bab56510284760f7e81cb388730f510d8d39748cbedf12364092c759938a051",
+  "interface_sha256": "c1659a1842d980904f5a8b8c79f79349f3ef95187bed8bf71e5528b9be526c88",
+  "application_metrics": {
+    "tree-index": {
+      "source_sha256": "6569a7b3600904395cdc1e9f4296ba8c3b1fe317e16c2783be23922f93b4d98b",
+      "bytes": 5104,
+      "nonblank_lines": 95,
+      "function_headings": 9,
+      "control_flow_lines": 20
+    },
+    "log-summary": {
+      "source_sha256": "20027e21f261e9fee2faa42eafab6fd940ff2979df0a45ac5883715ed284a80d",
+      "bytes": 9589,
+      "nonblank_lines": 274,
+      "function_headings": 13,
+      "control_flow_lines": 30
+    },
+    "http-collector": {
+      "source_sha256": "9af860f550be42305a6c46cf16fea394c202b2db392381a03c646315c23a7926",
+      "bytes": 15948,
+      "nonblank_lines": 437,
+      "function_headings": 16,
+      "control_flow_lines": 48
+    }
+  },
+  "metrics_definition": "UTF-8 bytes, nonblank source lines, line-start function headings and control-flow lines; lexical source-volume measures, not AST/performance claims"
+}

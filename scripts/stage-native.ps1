@@ -9,6 +9,9 @@ $Entries += @('vela-lsp.cmd','scripts/verify-lsp.mjs','integrations/vscode')
 $Entries += @('apps/tree-index','apps/log-summary','apps/http-collector','tests/library11',
     'scripts/stage-native.ps1','scripts/package-1.1-windows.ps1','scripts/package-1.1-linux.sh','scripts/verify-1.1-recovery.ps1')
 $Entries += 'integrations/mcp/compatibility.json'
+$Entries += @('tests/library12','scripts/package-1.2-windows.ps1',
+    'scripts/package-1.2-linux.sh','scripts/verify-1.2-recovery.ps1','scripts/update-release-docs-1.2.ps1',
+    'scripts/finalize-1.2-linux.sh')
 $Entries += @('README.md','main.vela','route.vela','audit.vela','tests.vela','soak.vela','verify.ps1','validation.json','demo.ndjson','demo-report.tsv') |
     ForEach-Object { 'apps/route-audit/' + $_ }
 $MeasureLab = @('README.md','AGENTS.md','VALIDATION.json','main.vela','model.vela',
@@ -45,7 +48,7 @@ foreach ($Entry in $Entries) {
     Copy-Item -LiteralPath (Join-Path $SourceRoot $Entry) -Destination $Target -Recurse
 }
 New-Item -ItemType Directory -Force -Path (Join-Path $PackageRoot 'bin'),(Join-Path $PackageRoot 'vela/backends') | Out-Null
-foreach ($Binary in @('velac.exe','vela-dev.exe','vela-bundle.exe','vela-test.exe','vela-lsp.exe')) {
+foreach ($Binary in @('velac.exe','vela-dev.exe','vela-bundle.exe','vela-test.exe','vela-lsp.exe','vela-api.exe')) {
     Copy-Item -LiteralPath (Join-Path $SourceRoot "bin/$Binary") -Destination (Join-Path $PackageRoot "bin/$Binary")
 }
 Copy-Item -LiteralPath (Join-Path $SourceRoot 'vela/builtins.def') -Destination (Join-Path $PackageRoot 'vela/builtins.def')

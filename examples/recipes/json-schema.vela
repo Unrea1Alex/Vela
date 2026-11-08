@@ -1,0 +1,35 @@
+import "../../std/json_decode.vela" as decode;
+import "../../std/json_stream.vela" as stream;
+struct Settings {
+    name: String,
+    retries: Int
+}
+fn schema() -> Result<decode::Decoder<Settings>, decode::Error> effects { state } {
+    let fields = list_new<String>();
+    list_push(fields, "name");
+    list_push(fields, "retries");
+    let retries = decode::integer(0, 5)?;
+    return decode::object(fields, decode::Unknown::Ignore, fn [ retries ](
+        fields: decode::Fields) -> Result<Settings, decode::Error> effects { state } {
+        return Result<Settings, decode::Error>::Ok(Settings(name: decode::required(fields, "name",
+            decode::string())?, retries: decode::defaulted(fields, "retries", retries, 3)?));
+    });
+}
+fn run() -> Result<Int, decode::Error> effects { state, io } {
+    let typed = schema()?;
+    let settings = decode::decode(typed, "{\"name\":\"demo\",\"ignored\":1e9999}",
+        stream::default_limits())?;
+    print("record=" + settings.name + ":" + to_string(settings.retries));
+    return Result<Int, decode::Error>::Ok(0);
+}
+fn main() -> Int effects { state, io } {
+    match run() {
+        Result::Ok(code) => {
+            return code;
+        }
+        Result::Err(error) => {
+            eprint(decode::describe(error));
+            return 1;
+        }
+    }
+}

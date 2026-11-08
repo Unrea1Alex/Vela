@@ -1,0 +1,81 @@
+import "../../../std/set.vela" as sets;
+type User = distinct Int;
+type Label = distinct String;
+type Flag = distinct Bool;
+fn same(actual: List<Int>, expected: List<Int>) -> Unit effects { state } {
+    assert_true(list_len(actual) == list_len(expected), "set length");
+    for i in 0 .. list_len(actual) { assert_true(list_get(actual, i) == list_get(expected, i), "set order"); }
+}
+fn reference_insert(values: List<Int>, key: Int) -> Bool effects { state } {
+    for i in 0 .. list_len(values) { if list_get(values, i) == key { return false; } }
+    list_push(values, key); return true;
+}
+fn reference_contains(values: List<Int>, key: Int) -> Bool effects { state } {
+    for i in 0 .. list_len(values) { if list_get(values, i) == key { return true; } }
+    return false;
+}
+fn reference_remove(values: List<Int>, key: Int) -> Bool effects { state } {
+    var found = -1;
+    for i in 0 .. list_len(values) { if list_get(values, i) == key { found = i; } }
+    if found < 0 { return false; }
+    var i = found;
+    while i + 1 < list_len(values) { list_set(values, i, list_get(values, i + 1)); i = i + 1; }
+    list_truncate(values, list_len(values) - 1); return true;
+}
+fn main() -> Unit effects { state, io } {
+    let value = sets::create<Int>();
+    assert_true(sets::size(value) == 0 && !sets::contains(value, 7) && !sets::remove(value, 7), "empty set");
+    assert_true(sets::insert(value, 7) && !sets::insert(value, 7), "duplicate insertion status");
+    let alias = value;
+    let added = sets::insert(alias, 9); assert_true(sets::contains(value, 9), "copies share membership");
+    assert_true(sets::remove(alias, 7) && !sets::remove(value, 7), "copies share removal");
+    let reinserted = sets::insert(value, 7);
+    let ordered = sets::values(alias); assert_true(list_get(ordered, 0) == 9 && list_get(ordered, 1) == 7, "reinsertion appends and shared order");
+    list_set(ordered, 0, 100); list_truncate(ordered, 0); assert_true(sets::size(value) == 2 && sets::contains(value, 9), "values storage detached");
+    let other = sets::create<Int>(); let nine = sets::insert(other, 9); let ten = sets::insert(other, 10);
+    let both = sets::union(value, other); let common = sets::intersection(value, other); let only = sets::difference(value, other);
+    assert_true(sets::size(both) == 3 && list_get(sets::values(both), 0) == 9 && list_get(sets::values(both), 1) == 7 && list_get(sets::values(both), 2) == 10, "union order");
+    assert_true(sets::size(common) == 1 && list_get(sets::values(common), 0) == 9, "intersection left order");
+    assert_true(sets::size(only) == 1 && list_get(sets::values(only), 0) == 7, "difference left order");
+    let removed = sets::remove(both, 9); assert_true(sets::contains(value, 9) && sets::contains(other, 9), "algebra result independent");
+    assert_true(sets::size(sets::difference(value, value)) == 0 && sets::size(sets::intersection(value, value)) == 2, "self algebra");
+    let empty = sets::create<Int>(); assert_true(sets::size(sets::intersection(value, empty)) == 0 && sets::size(sets::union(empty, value)) == 2, "empty algebra");
+    let extrema = sets::create<Int>(); let min = sets::insert(extrema, -9223372036854775808); let max = sets::insert(extrema, 9223372036854775807);
+    assert_true(sets::contains(extrema, -9223372036854775808) && sets::contains(extrema, 9223372036854775807), "Int extrema");
+    let words = sets::create<String>(); let w1 = sets::insert(words, "я"); let w2 = sets::insert(words, "é"); let w3 = sets::insert(words, "é"); let w4 = sets::insert(words, "a\0b"); let w5 = sets::insert(words, str_from_byte(255));
+    assert_true(sets::size(words) == 5 && !sets::insert(words, "я") && sets::contains(words, "a\0b"), "Unicode exact bytes NUL and invalid UTF8 keys");
+    let booleans = sets::create<Bool>(); let t = sets::insert(booleans, true); let f = sets::insert(booleans, false); assert_true(sets::size(booleans) == 2 && !sets::insert(booleans, true), "Bool keys");
+    let users = sets::create<User>(); let u = sets::insert(users, User(7)); assert_true(sets::contains(users, User(7)), "distinct Int");
+    let labels = sets::create<Label>(); let l = sets::insert(labels, Label("文")); assert_true(sets::contains(labels, Label("文")), "distinct String");
+    let flags = sets::create<Flag>(); let fl = sets::insert(flags, Flag(true)); assert_true(sets::contains(flags, Flag(true)), "distinct Bool");
+    let source = list_new<Int>(); list_push(source, 2); list_push(source, 1); list_push(source, 2);
+    let from = sets::from_list(source); list_set(source, 0, 99); assert_true(list_get(sets::values(from), 0) == 2 && sets::size(from) == 2, "from_list independent ordered deduplication");
+    let actual = sets::create<Int>(); let expected = list_new<Int>();
+    for step in 0 .. 200 {
+        let key = (step * 17) % 37;
+        if step % 3 == 0 { assert_true(sets::remove(actual, key) == reference_remove(expected, key), "reference removal"); }
+        else { assert_true(sets::insert(actual, key) == reference_insert(expected, key), "reference insertion"); }
+        same(sets::values(actual), expected);
+        assert_true(sets::size(actual) == list_len(expected), "reference membership count");
+    }
+    for round in 0 .. 12 {
+        let left = sets::create<Int>(); let right = sets::create<Int>();
+        let left_reference = list_new<Int>(); let right_reference = list_new<Int>();
+        for i in 0 .. 23 {
+            let lk = (i * 7 + round) % 37; let rk = (i * 11 + round * 3) % 41;
+            let a = sets::insert(left, lk); let b = sets::insert(right, rk);
+            let c = reference_insert(left_reference, lk); let d = reference_insert(right_reference, rk);
+        }
+        let expected_union = list_new<Int>(); let expected_intersection = list_new<Int>(); let expected_difference = list_new<Int>();
+        for i in 0 .. list_len(left_reference) {
+            let key = list_get(left_reference, i); let pushed = reference_insert(expected_union, key);
+            if reference_contains(right_reference, key) { list_push(expected_intersection, key); }
+            else { list_push(expected_difference, key); }
+        }
+        for i in 0 .. list_len(right_reference) { let pushed = reference_insert(expected_union, list_get(right_reference, i)); }
+        same(sets::values(sets::union(left, right)), expected_union);
+        same(sets::values(sets::intersection(left, right)), expected_intersection);
+        same(sets::values(sets::difference(left, right)), expected_difference);
+    }
+    print("typed set passed");
+}

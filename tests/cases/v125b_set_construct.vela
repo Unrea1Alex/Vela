@@ -1,0 +1,2 @@
+import "../../../std/set.vela" as sets;
+fn main() -> Unit effects { state } { let value = sets::Set<Int>(members: dict_new<Int, Bool>(), order: list_new<Int>()); }

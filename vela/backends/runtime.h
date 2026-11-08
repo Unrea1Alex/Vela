@@ -275,6 +275,9 @@ static int v_exit_code(int64_t value, const char *f, int l, int c) {
 #include <signal.h>
 #include <time.h>
 #include <dirent.h>
+#if defined(__linux__)
+#include <sys/syscall.h>
+#endif
 #endif
 
 typedef void (*v_gc_visit)(const void *);
@@ -667,7 +670,19 @@ static v_io_result v_install_file(v_string from, v_string to, const char *f, int
 #ifdef _WIN32
     ok = MoveFileExW(v_wide(from, f, l, c), v_wide(to, f, l, c), 0) != 0;
 #else
-    ok = link(v_c_string(from, f, l, c), v_c_string(to, f, l, c)) == 0;
+    const char *source = v_c_string(from, f, l, c);
+    const char *destination = v_c_string(to, f, l, c);
+    struct stat info;
+    if (lstat(source, &info) == 0 && S_ISDIR(info.st_mode)) {
+#if defined(__linux__) && defined(SYS_renameat2)
+        /* RENAME_NOREPLACE=1: never fall back to an overwriting rename. */
+        ok = syscall(SYS_renameat2, -100, source, -100, destination, 1) == 0;
+#else
+        ok = 0;
+#endif
+    } else {
+        ok = link(source, destination) == 0;
+    }
 #endif
     return ok ? v_io(1, v_text("", 0)) : v_io_error("cannot install file without replacing");
 }
@@ -941,9 +956,20 @@ static v_io_result v_temp_dir(v_string parent, const char *f, int l, int c) {
     if (!parent.length) {
         DWORD count = GetTempPathW(MAX_PATH, base); if (!count || count >= MAX_PATH) return v_io_error("cannot find temporary directory"); directory = base;
     } else { directory = v_wide(parent, f, l, c); }
-    if (!GetTempFileNameW(directory, L"vla", 0, name)) return v_io_error("cannot create temporary name");
-    if (!DeleteFileW(name) || !CreateDirectoryW(name, NULL)) return v_io_error("cannot create temporary directory");
-    return v_io(1, v_utf8(name, f, l, c));
+    {
+        int attempt;
+        for (attempt = 0; attempt < 32; ++attempt) {
+            DWORD error;
+            if (!GetTempFileNameW(directory, L"vla", 0, name)) return v_io_error("cannot create temporary name");
+            if (!DeleteFileW(name)) return v_io_error("cannot create temporary directory");
+            if (CreateDirectoryW(name, NULL)) return v_io(1, v_utf8(name, f, l, c));
+            error = GetLastError();
+            /* The reservation no longer belongs to us. Never unlink a rival. */
+            if (error != ERROR_ALREADY_EXISTS && error != ERROR_FILE_EXISTS && error != ERROR_ACCESS_DENIED)
+                return v_io_error("cannot create temporary directory");
+        }
+        return v_io_error("cannot create temporary directory");
+    }
 #else
     v_string base = parent.length ? parent : v_text("/tmp", 4);
     char *name = v_c_string(v_str_concat(base, v_text("/vela-XXXXXX", 12), f, l, c), f, l, c);
@@ -1342,6 +1368,7 @@ static unsigned v_callback_depth;
 static v_foreign_library *v_foreign_libraries;
 static v_foreign_handle *v_foreign_roots;
 static v_foreign_library v_stream_owner;
+static v_foreign_library v_writer_owner;
 static size_t v_stream_count;
 static v_foreign_library v_directory_owner;
 static size_t v_directory_count;
@@ -1478,7 +1505,7 @@ static v_callback_result v_ffi_callback_register(v_foreign_handle *owner, void (
     (void)f; (void)l; (void)c;
 #if defined(_WIN32) && defined(_M_X64)
     v_callback_entry *entry;
-    if (!owner || !owner->pointer || owner->closed || owner->owner == &v_stream_owner || owner->owner == &v_directory_owner || owner->owner == &v_process_owner || owner->owner == &v_fiber_owner) {
+    if (!owner || !owner->pointer || owner->closed || owner->owner == &v_stream_owner || owner->owner == &v_writer_owner || owner->owner == &v_directory_owner || owner->owner == &v_process_owner || owner->owner == &v_fiber_owner) {
         result.error = v_text("callback requires a live DLL resource", 37);
         return result;
     }
@@ -1529,7 +1556,7 @@ static int v_foreign_name(v_string name, int library) {
 static void v_foreign_shutdown(void) {
     v_foreign_handle *handle;
     for (handle = v_foreign_roots; handle; handle = handle->retained_next) {
-        if (handle->owner == &v_stream_owner) fclose((FILE *)handle->pointer);
+        if (handle->owner == &v_stream_owner || handle->owner == &v_writer_owner) fclose((FILE *)handle->pointer);
         else if (handle->owner == &v_directory_owner) v_directory_dispose((v_directory *)handle->pointer);
 #ifdef _WIN32
         else if (handle->owner == &v_process_owner) v_process_shutdown((v_child_process *)handle->pointer);
@@ -1630,6 +1657,7 @@ static v_io_result v_ffi_retain(v_foreign_handle *h, const char *f, int l, int c
     if (!h || !h->pointer || h->closed) return v_io_error("retain requires a live foreign handle");
     if (h->owner == &v_directory_owner) return v_io_error("directory handles have explicit ownership");
     if (h->owner == &v_stream_owner) return v_io_error("stream handles have explicit stream ownership");
+    if (h->owner == &v_writer_owner) return v_io_error("writer handles have explicit stream ownership");
     if (h->owner == &v_process_owner) return v_io_error("process handles have explicit process ownership");
     if (h->owner == &v_fiber_owner) return v_io_error("fiber handles have explicit task ownership");
     if (*v_foreign_root_slot(h)) return v_io_error("foreign handle already retained");
@@ -1641,6 +1669,7 @@ static v_io_result v_ffi_release(v_foreign_handle *h, const char *f, int l, int 
     if (!h || !h->pointer || h->closed) return v_io_error("release requires a live foreign handle");
     if (h->owner == &v_directory_owner) return v_io_error("directory handles have explicit ownership");
     if (h->owner == &v_stream_owner) return v_io_error("stream handles have explicit stream ownership");
+    if (h->owner == &v_writer_owner) return v_io_error("writer handles have explicit stream ownership");
     if (h->owner == &v_process_owner) return v_io_error("process handles have explicit process ownership");
     if (h->owner == &v_fiber_owner) return v_io_error("fiber handles have explicit task ownership");
     if (!v_foreign_unroot(h)) return v_io_error("foreign handle is not retained");
@@ -1653,6 +1682,7 @@ static v_io_result v_ffi_close(v_foreign_handle *h, v_string name, const char *f
     if (h->closed) return v_io_error("foreign handle already closed");
     if (h->owner == &v_directory_owner) return v_io_error("directory handles require directory_close");
     if (h->owner == &v_stream_owner) return v_io_error("stream handles require stream_close");
+    if (h->owner == &v_writer_owner) return v_io_error("writer handles require stream_write_close");
     if (h->owner == &v_process_owner) return v_io_error("process handles require process_close");
     if (h->owner == &v_fiber_owner) return v_io_error("fiber handles require fiber_close");
     for (i = 0; i < v_callback_count; ++i)
@@ -1668,7 +1698,7 @@ static v_io_result v_ffi_close(v_foreign_handle *h, v_string name, const char *f
     return v_io(1,v_text("",0));
 }
 typedef struct { int kind; v_foreign_handle *handle; v_string error; } v_stream_result;
-static v_stream_result v_stream_open(v_string path, int64_t limit, const char *f, int l, int c) {
+static v_stream_result v_stream_open_large(v_string path, int64_t limit, const char *f, int l, int c) {
     v_stream_result result = {2, NULL, v_text("cannot open stream", 18)};
     FILE *file;
 #ifdef _WIN32
@@ -1676,7 +1706,7 @@ static v_stream_result v_stream_open(v_string path, int64_t limit, const char *f
 #else
     struct stat info;
 #endif
-    if (limit < 1 || limit > 268435456) { result.kind = 1; return result; }
+    if (limit < 1) { result.kind = 1; return result; }
     if (v_stream_count >= 128) {
         result.error = v_text("too many open streams", 21);
         return result;
@@ -1699,6 +1729,48 @@ static v_stream_result v_stream_open(v_string path, int64_t limit, const char *f
     v_foreign_roots = result.handle;
     ++v_stream_count;
     return result;
+}
+static v_stream_result v_stream_open(v_string path, int64_t limit, const char *f, int l, int c) {
+    if (limit < 1 || limit > 268435456) {
+        v_stream_result result = {1, NULL, v_text("", 0)};
+        return result;
+    }
+    return v_stream_open_large(path, limit, f, l, c);
+}
+static v_stream_result v_stream_create(v_string path, const char *f, int l, int c) {
+    v_stream_result result = {2, NULL, v_text("cannot create stream", 20)};
+    FILE *file;
+    if (v_stream_count >= 128) { result.error = v_text("too many open streams", 21); return result; }
+    file = v_open(path, 1, f, l, c);
+    if (!file) return result;
+    result.kind = 0;
+    result.handle = v_foreign_wrap(file, &v_writer_owner, f, l, c);
+    result.handle->retained_next = v_foreign_roots;
+    v_foreign_roots = result.handle;
+    ++v_stream_count;
+    return result;
+}
+static v_parse_result v_stream_write(v_foreign_handle *h, v_string data) {
+    v_parse_result result = {0};
+    size_t count;
+    result.error = v_text("invalid or closed writer", 24);
+    if (!h || h->owner != &v_writer_owner || h->closed) return result;
+    if (data.length > 65536) { result.error = v_text("write exceeds buffer limit", 26); return result; }
+    count = fwrite(data.data, 1, data.length, (FILE *)h->pointer);
+    if (ferror((FILE *)h->pointer)) { result.error = v_text("cannot write stream", 19); return result; }
+    result.ok = 1;
+    result.value = (int64_t)count;
+    return result;
+}
+static v_io_result v_stream_write_close(v_foreign_handle *h, const char *f, int l, int c) {
+    int status;
+    (void)f; (void)l; (void)c;
+    if (!h || h->owner != &v_writer_owner || h->closed) return v_io_error("invalid or closed writer");
+    status = fclose((FILE *)h->pointer);
+    h->closed = 1;
+    (void)v_foreign_unroot(h);
+    --v_stream_count;
+    return status ? v_io_error("cannot close writer") : v_io(1, v_text("", 0));
 }
 /* OS enumeration and storage only. Envelope decoding and traversal are Vela. */
 static v_stream_result v_directory_open(v_string path, const char *f, int l, int c) {

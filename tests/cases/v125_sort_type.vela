@@ -1,0 +1,3 @@
+import "../../../std/algorithms.vela" as algorithms;
+fn invalid(values: List<Int>) -> List<Int> effects { state } { return algorithms::sort(values, fn [](a: Int, b: Int) -> Bool { return true; }); }
+fn main() -> Unit {}

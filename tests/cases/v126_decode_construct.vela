@@ -1,0 +1,2 @@
+import "../../../std/json_decode.vela" as d;
+fn main() -> Unit { let decoder = d::Decoder<Int>(); }

@@ -1,0 +1,14 @@
+import "interface-owner.vela" as api;
+import "opaque-owner.vela" as owner;
+fn identity<T>(value:T)->T { return value; }
+fn factory<T>(value:T)->fn(Int)->T {
+    return fn [value](unused:Int)->T {return value;};
+}
+fn read<T:api::Reader>(value:T)->String effects {io,state} {
+    return api::Reader::read(identity(value),"key");
+}
+fn main()->Unit effects {state,io} {
+    let get = factory(owner::wrap(owner::create(7)));
+    let boxed = get(0);
+    print(to_string(owner::number(owner::unwrap(boxed))) + ":" + read(api::memory("checked")));
+}

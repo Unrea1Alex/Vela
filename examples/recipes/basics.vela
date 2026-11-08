@@ -1,0 +1,11 @@
+import "../../std/algorithms.vela" as algorithms;
+fn main() -> Int effects { io, state } {
+    let values = list_new<Int>();
+    list_push(values, 20);
+    list_push(values, 22);
+    let total = algorithms::fold(values, 0, fn [ ](accumulated: Int, value: Int) -> Int {
+        return accumulated + value;
+    });
+    print(f"total={total:d}");
+    return 0;
+}

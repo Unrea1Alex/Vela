@@ -1,0 +1,2 @@
+import "../../../std/stream_lines.vela" as lines;
+fn main() -> Unit { let value=lines::Reader(); }

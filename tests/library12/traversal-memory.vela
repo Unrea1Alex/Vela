@@ -1,0 +1,14 @@
+import "../../std/algorithms.vela" as algorithms;
+fn main() -> Int effects { args, state, io } {
+    let mode = match arg(0) { StringResult::Ok(value) => value, StringResult::Err(_) => "" };
+    let size = match arg_int(1) { IntResult::Ok(value) => value, IntResult::Err(_) => 0 };
+    if size < 1 || size > 10000 { return 2; }
+    let values = list_new<Int>(); for i in 0 .. size { list_push(values, i); }
+    let calls = list_new<Int>(); list_push(calls, 0);
+    if mode == "any" {
+        let found = algorithms::any(values, fn [calls](n: Int) -> Bool effects { state } { list_set(calls, 0, list_get(calls, 0) + 1); return true; });
+        assert_true(found, "first match");
+    }
+    print("{\"size\":" + to_string(list_len(values)) + ",\"calls\":" + to_string(list_get(calls, 0)) + "}");
+    return 0;
+}

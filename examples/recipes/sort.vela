@@ -1,0 +1,23 @@
+import "../../std/algorithms.vela" as algorithms;
+struct Row {
+    key: Int,
+    name: String
+}
+fn main() -> Unit effects { state, io } {
+    let rows = list_new<Row>();
+    list_push(rows, Row(key: 2, name: "A"));
+    list_push(rows, Row(key: 1, name: "B"));
+    list_push(rows, Row(key: 2, name: "C"));
+    let sorted = algorithms::sort(rows, fn [ ](a: Row, b: Row) -> Int {
+        if a.key < b.key {
+            return -1;
+        }
+        if a.key > b.key {
+            return 1;
+        }
+        return 0;
+    });
+    assert_true(list_get(rows, 0).name == "A", "input is preserved");
+    print("stable=" + list_get(sorted, 0).name + "," + list_get(sorted, 1).name + "," + list_get(
+        sorted, 2).name);
+}

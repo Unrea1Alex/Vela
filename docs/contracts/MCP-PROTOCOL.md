@@ -30,6 +30,14 @@ Tools and input schemas (all objects reject unknown fields):
 - vela_get_help {topic}: enum quickstart/language/projects/modules/memory/builtins/idioms/numbers/stdlib/testing/ffi.
   Returns the corresponding version-matched text. The same topics are resources
   at vela://help/TOPIC; clients need not auto-load them.
+  Working-tree 1.2 also adds start/capabilities/recipes/migration. Context quickstart
+  is the short start text; the full quickstart remains explicitly retrievable.
+  Plan discovery shares source fields once; rename still requires byte/new_name,
+  format still rejects those fields, and every former input bound is enforced.
+  [Startup measurement and generated API](AGENT-ENTRY-1.2.md).
+  Topic api adds native name/purpose lookup with bounded pages and a catalog
+  fingerprint; it returns data.native rather than loading the full catalog.
+  Old topic responses remain data.text. See [API search](API-SEARCH-1.2.md).
 - vela_check {path}: source/manifest, native check --json.
 - vela_symbols {path}: source/manifest, native symbols --json.
 - vela_format {path}: source file only, native fmt; returns text, never writes back.
@@ -98,7 +106,11 @@ Sources: [SDK stdio](https://ts.sdk.modelcontextprotocol.io/v2/serving/stdio.htm
 `vela_symbols`, plus optional `at: {path, line, character}` in UTF-16.
 It wraps the native [semantic index](SEMANTIC-QUERIES.md).
 `vela_plan` takes the returned `snapshot_id` and native `revision`, the
-graph `document` ID, and either `kind: "format"` or
+  graph `document` ID, and `kind: "diagnose"`, `kind: "format"` or
 `kind: "rename"` with `byte` and `new_name`. Supply the same overlay if
 the query used one. Changes to workspace bytes reject the stale plan.
 No preview writes the workspace. Native diagnostics are preserved.
+  In 1.2, rejected native queries also supply revision/documents. Diagnose keeps
+  the original diagnostic and explanation; only validated=true with nonempty
+  changes is actionable. It rejects rename-only fields. Type/unsafe-effect and
+  ambiguous cases explain without edits. [Native contract](DIAGNOSTIC-PLANS-1.2.md).

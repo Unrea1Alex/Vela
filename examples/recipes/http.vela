@@ -1,0 +1,8 @@
+import "../../std/http.vela" as http;
+fn main() -> Int effects { io } {
+    match http::from_url("http://127.0.0.1/health", 100, 1024) {
+        Result::Err(_) => { return 1; }
+        Result::Ok(_) => { print("request prepared"); }
+    }
+    return 0;
+}

@@ -1,0 +1,10 @@
+fn touch(trace: StringList, name: String, value: Int) -> Int effects {state} {
+    strings_push(trace, name); return value;
+}
+fn pair(left: Int, right: Int) -> Int { return left * 10 + right; }
+fn main() -> Unit effects {state, io} {
+    let trace = strings_new();
+    let paired = pair(touch(trace, "left", 2), touch(trace, "right", 3));
+    let skipped = false && touch(trace, "skipped", 1) == 1;
+    print(to_string(paired) + ":" + strings_join(trace, ","));
+}

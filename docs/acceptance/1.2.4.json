@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.4",
+  "status": "verified",
+  "date": "2026-11-07",
+  "contract": "../contracts/CLI-SCHEMA-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1278,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 485735,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/124-verify.log",
+  "native_fixture": {
+    "expected": "cli schema passed",
+    "linux": "GCC/musl fixture passed including Int extrema and argument bounds",
+    "linux_log": "build/stage12/124-linux.log",
+    "rejections": {
+      "effect": "E209",
+      "type": "E201"
+    },
+    "source": "tests/cases/v124_cli_schema.vela"
+  },
+  "cli": {
+    "schema_version": 1,
+    "checks": 49,
+    "status": "passed",
+    "directory": "G:\\Vela\\build\\stage12\\cli-apps-6rsHoj"
+  },
+  "apps": {
+    "index": {
+      "total": 26,
+      "passed": 26,
+      "failed": 0,
+      "log": "build/stage12/124-index.json"
+    },
+    "logs": {
+      "total": 46,
+      "passed": 46,
+      "failed": 0,
+      "log": "build/stage12/124-logs.json"
+    },
+    "http": {
+      "total": 44,
+      "passed": 44,
+      "failed": 0,
+      "log": "build/stage12/124-http.json"
+    }
+  },
+  "mcp": {
+    "groups": 7,
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "wire_startup_tokens": 3509,
+    "cancellations": 25,
+    "log": "build/stage12/124-mcp.log",
+    "failed": 0,
+    "sequential_requests": 1000,
+    "startup_tokens": 1864,
+    "installed_cli_schema_check": "passed"
+  },
+  "recipes": {
+    "schema_version": 1,
+    "checks": [
+      "recipe basics",
+      "recipe directory",
+      "recipe json",
+      "recipe bytes",
+      "recipe result",
+      "recipe callable",
+      "recipe http",
+      "recipe cli",
+      "generic/effect/opaque/method/async interface",
+      "reject invalid interface before emission",
+      "all embedded builtin rows",
+      "all shipped modules and recipe IDs resolve to verified catalog"
+    ],
+    "passed": 12
+  },
+  "recipe_harness": "The stale fixed 23-module count was replaced with comparison to the complete authored std filename inventory after adding cli_schema.",
+  "api_search": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 93,
+    "negative_checks": 2
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 115,
+    "links": 777,
+    "missing": []
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "next": "1.2.4a"
+}

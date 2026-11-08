@@ -1,0 +1,4971 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.8a",
+  "status": "verified",
+  "date": "2026-11-08",
+  "contract": "../contracts/COMPILER-AUDIT-1.2.md",
+  "inventory": "../COMPILER-AUDIT-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1397,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 511535,
+    "tests_run": true
+  },
+  "baseline": {
+    "schema_version": 1,
+    "status": "passed",
+    "checks": [
+      "nominal: E201 before emission",
+      "unicode: E201 before emission",
+      "missing-effect: E209 before emission",
+      "multifile diagnostic owner/span",
+      "cold/warm/edit, three independent caches",
+      "whole compiler cold/warm/edit, three independent caches"
+    ],
+    "compiler_sha256": "4e28f3dbc2ff489ec16e00cbae81d50bef01a6a92ee4a4a2d81307c4b4e098db",
+    "modules": [
+      {
+        "name": "model",
+        "bytes": 15063,
+        "sha256": "0cbe7409a07b30cc5c734c877109fedbd634ec492e9dfd1a0bd4d38b4e0e297b",
+        "functions": 48
+      },
+      {
+        "name": "core",
+        "bytes": 13238,
+        "sha256": "3115450169d74468a7cf106c25029450bcd9ece9d754056a7ad55d42721b6988",
+        "functions": 25
+      },
+      {
+        "name": "source",
+        "bytes": 4677,
+        "sha256": "2274b38e20fed51d59ee2896331f0c28795d8c9549948547d34586c880a41745",
+        "functions": 10
+      },
+      {
+        "name": "lexer",
+        "bytes": 8747,
+        "sha256": "8e69d37ee7fcde774c7cf31368f8436dcd4229a05cc12471dd6585b969ddc60e",
+        "functions": 10
+      },
+      {
+        "name": "parser",
+        "bytes": 32817,
+        "sha256": "703767193f56e6f44b520a0355f8d58708afcc2f6b8335219ad43df30ab618d7",
+        "functions": 35
+      },
+      {
+        "name": "modules",
+        "bytes": 24371,
+        "sha256": "57ca31de84e656b9fafe65d252b8d0d6cf40e86e8361fd4daaf8ef9b258fd7e8",
+        "functions": 16
+      },
+      {
+        "name": "artifacts",
+        "bytes": 8676,
+        "sha256": "f6ea9d33508b1c9d7f649e5d37c47dd411670b387bb20dcf559c9b41e1b118d6",
+        "functions": 14
+      },
+      {
+        "name": "projects",
+        "bytes": 14675,
+        "sha256": "d8258606e2004c8669da39c4c8da8f1f3348f9bc3aa4b5060c512e7612a5f185",
+        "functions": 12
+      },
+      {
+        "name": "incremental",
+        "bytes": 5509,
+        "sha256": "461f6e09fec4660da57ab70da9d745882b5f50f7946a1fa3b3395e123774b6a7",
+        "functions": 8
+      },
+      {
+        "name": "project_cli",
+        "bytes": 8372,
+        "sha256": "143aa80404692b709e99389ded1da9aeeca0ce10adf2e5037c68470fe4556f76",
+        "functions": 4
+      },
+      {
+        "name": "types",
+        "bytes": 23472,
+        "sha256": "2b5b1bc21a29f67a27af80144a2fee6f454a10a80d47009d70be52863ec956c1",
+        "functions": 28
+      },
+      {
+        "name": "generics",
+        "bytes": 12914,
+        "sha256": "2eb4efcd609db1fe9da8343b6735cc0340cd9e20c43acad98a10d3f7dc725a0a",
+        "functions": 9
+      },
+      {
+        "name": "interfaces",
+        "bytes": 15989,
+        "sha256": "a46edd1bb9c7e664ca59079804b17871f57ac0faa5827a7fd1130c2a42e750cc",
+        "functions": 15
+      },
+      {
+        "name": "dynamic",
+        "bytes": 4423,
+        "sha256": "c7c6261025e8138355e8b3dbf0ab605b2b641370a1b7af182fc1be086062dcc3",
+        "functions": 7
+      },
+      {
+        "name": "callables",
+        "bytes": 14487,
+        "sha256": "2ec95c242e180bb76ae34cb4c13e24e273e23c05d881a1103fb060c124527096",
+        "functions": 20
+      },
+      {
+        "name": "suspension",
+        "bytes": 6576,
+        "sha256": "1a4272f6828d157220008637cfc4b6cf889017d08ebc8adbdd05439868244eb2",
+        "functions": 8
+      },
+      {
+        "name": "semantic",
+        "bytes": 34092,
+        "sha256": "3086d000413263bd7134b6b11fb6930ad4f97c5f2c4919e442651d828ac6be6f",
+        "functions": 24
+      },
+      {
+        "name": "errors",
+        "bytes": 2374,
+        "sha256": "64e982313d5652cf929b4c9b725245e9353f1f7c803a021b2fda7995d7a5efc9",
+        "functions": 5
+      },
+      {
+        "name": "control",
+        "bytes": 1853,
+        "sha256": "7bd095b636fc576774ad4de487e8eb9d7f7f70603796cde74a080450d16604c0",
+        "functions": 4
+      },
+      {
+        "name": "emitter",
+        "bytes": 37928,
+        "sha256": "b33b28b4383bbe569265c5b82ed9b9528550ef19b2e5a4d63083c9b6ef803661",
+        "functions": 44
+      },
+      {
+        "name": "intrinsics",
+        "bytes": 7899,
+        "sha256": "1d67c93e6ded331a72edb082694d17c5bcad2c7b66a1ba4f467475cc5316eb24",
+        "functions": 5
+      },
+      {
+        "name": "formatter",
+        "bytes": 10928,
+        "sha256": "9d48b89f72b414265c3b2e3ae49769ebb7074828bd56f7c53de0a196a61c7f8c",
+        "functions": 7
+      },
+      {
+        "name": "query",
+        "bytes": 33462,
+        "sha256": "749d2925efca055bb17cc25dc527069349659c5abe4a539632a9f3548d3d36cd",
+        "functions": 31
+      },
+      {
+        "name": "repairs",
+        "bytes": 16167,
+        "sha256": "0d2adb817579fb3892571d70962436dbf20c417ff9b1ce3e98aece58501d7d94",
+        "functions": 13
+      },
+      {
+        "name": "help",
+        "bytes": 9308,
+        "sha256": "857c44a9b19fe863aa7fafd82efbb66371e261af89384e21a03cca051b565c8e",
+        "functions": 7
+      },
+      {
+        "name": "scaffold",
+        "bytes": 7362,
+        "sha256": "6cc565c247784bb20fbe885488055d6c94836e2edec814a311b11d3d1a6aeef4",
+        "functions": 4
+      },
+      {
+        "name": "driver",
+        "bytes": 21799,
+        "sha256": "4d0c2603e6fc539e3a04f1a8b808bb026d62ce496c2b1197d54ce2237f735391",
+        "functions": 14
+      }
+    ],
+    "profiles": [
+      {
+        "round": 0,
+        "profile": "cold",
+        "elapsed_ms": 23.601499999999987,
+        "dependency_sha256": "82d3181faeeafea235f3ecb017e966e40c5d2469a01c46b93a80191c0864d28a",
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "af4c29af3bac23abe8bac97e3aeef36a6d9aef4ddd3f4dc4a17b49cbffa0aff2",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "af4c29af3bac23abe8bac97e3aeef36a6d9aef4ddd3f4dc4a17b49cbffa0aff2",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "bd610df8065cf7dfdda77eb0b23aece2ae757da6c33253479429accdd24d29b0",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "bd610df8065cf7dfdda77eb0b23aece2ae757da6c33253479429accdd24d29b0",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "7bd7346d29223585a421b621b41b5cfec2ff0619006d4d02eae145130cea264f",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "check-v1",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "7bd7346d29223585a421b621b41b5cfec2ff0619006d4d02eae145130cea264f",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "round": 0,
+        "profile": "warm",
+        "elapsed_ms": 18.569799999999987,
+        "dependency_sha256": "82d3181faeeafea235f3ecb017e966e40c5d2469a01c46b93a80191c0864d28a",
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "af4c29af3bac23abe8bac97e3aeef36a6d9aef4ddd3f4dc4a17b49cbffa0aff2",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "bd610df8065cf7dfdda77eb0b23aece2ae757da6c33253479429accdd24d29b0",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "7bd7346d29223585a421b621b41b5cfec2ff0619006d4d02eae145130cea264f",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "round": 0,
+        "profile": "edit",
+        "elapsed_ms": 21.480500000000006,
+        "dependency_sha256": "d3dfae329c78b0bc731960fb72d961c4847ed9a8ba88b49651ed8a972e253f66",
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "af4c29af3bac23abe8bac97e3aeef36a6d9aef4ddd3f4dc4a17b49cbffa0aff2",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "600656de4c3e24c17a7e18976ae96794314983d20f1a7cec57c98e8ab5647b9c",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "600656de4c3e24c17a7e18976ae96794314983d20f1a7cec57c98e8ab5647b9c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "3487378f783467713ea2ed9abf4d9b4c221e3789e61df15fbab73bbf6af7abdf",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "check-v1",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache0",
+            "key": "3487378f783467713ea2ed9abf4d9b4c221e3789e61df15fbab73bbf6af7abdf",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "round": 1,
+        "profile": "cold",
+        "elapsed_ms": 24.835099999999983,
+        "dependency_sha256": "d3dfae329c78b0bc731960fb72d961c4847ed9a8ba88b49651ed8a972e253f66",
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "af4c29af3bac23abe8bac97e3aeef36a6d9aef4ddd3f4dc4a17b49cbffa0aff2",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "af4c29af3bac23abe8bac97e3aeef36a6d9aef4ddd3f4dc4a17b49cbffa0aff2",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "600656de4c3e24c17a7e18976ae96794314983d20f1a7cec57c98e8ab5647b9c",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "600656de4c3e24c17a7e18976ae96794314983d20f1a7cec57c98e8ab5647b9c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "3487378f783467713ea2ed9abf4d9b4c221e3789e61df15fbab73bbf6af7abdf",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "check-v1",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "3487378f783467713ea2ed9abf4d9b4c221e3789e61df15fbab73bbf6af7abdf",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "round": 1,
+        "profile": "warm",
+        "elapsed_ms": 19.310099999999977,
+        "dependency_sha256": "d3dfae329c78b0bc731960fb72d961c4847ed9a8ba88b49651ed8a972e253f66",
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "af4c29af3bac23abe8bac97e3aeef36a6d9aef4ddd3f4dc4a17b49cbffa0aff2",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "600656de4c3e24c17a7e18976ae96794314983d20f1a7cec57c98e8ab5647b9c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "3487378f783467713ea2ed9abf4d9b4c221e3789e61df15fbab73bbf6af7abdf",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "round": 1,
+        "profile": "edit",
+        "elapsed_ms": 29.034400000000005,
+        "dependency_sha256": "55ee9b16505138189be6bff1d6c67945297578114957130216a2b21cd4a76116",
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "af4c29af3bac23abe8bac97e3aeef36a6d9aef4ddd3f4dc4a17b49cbffa0aff2",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "5db0c9d980dba96d3e4535fa1a2224bc37a67b975bcc2b63f0861dbba1ac6e99",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "5db0c9d980dba96d3e4535fa1a2224bc37a67b975bcc2b63f0861dbba1ac6e99",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "641dbe14cb6df0605dbc548151e63a7fe93a848dda1fd424180e266858506d72",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "check-v1",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache1",
+            "key": "641dbe14cb6df0605dbc548151e63a7fe93a848dda1fd424180e266858506d72",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "round": 2,
+        "profile": "cold",
+        "elapsed_ms": 22.72890000000001,
+        "dependency_sha256": "55ee9b16505138189be6bff1d6c67945297578114957130216a2b21cd4a76116",
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "af4c29af3bac23abe8bac97e3aeef36a6d9aef4ddd3f4dc4a17b49cbffa0aff2",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "af4c29af3bac23abe8bac97e3aeef36a6d9aef4ddd3f4dc4a17b49cbffa0aff2",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "5db0c9d980dba96d3e4535fa1a2224bc37a67b975bcc2b63f0861dbba1ac6e99",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "5db0c9d980dba96d3e4535fa1a2224bc37a67b975bcc2b63f0861dbba1ac6e99",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "641dbe14cb6df0605dbc548151e63a7fe93a848dda1fd424180e266858506d72",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "check-v1",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "641dbe14cb6df0605dbc548151e63a7fe93a848dda1fd424180e266858506d72",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "round": 2,
+        "profile": "warm",
+        "elapsed_ms": 20.23240000000004,
+        "dependency_sha256": "55ee9b16505138189be6bff1d6c67945297578114957130216a2b21cd4a76116",
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "af4c29af3bac23abe8bac97e3aeef36a6d9aef4ddd3f4dc4a17b49cbffa0aff2",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "5db0c9d980dba96d3e4535fa1a2224bc37a67b975bcc2b63f0861dbba1ac6e99",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "641dbe14cb6df0605dbc548151e63a7fe93a848dda1fd424180e266858506d72",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "round": 2,
+        "profile": "edit",
+        "elapsed_ms": 20.625999999999976,
+        "dependency_sha256": "3fe0ab1b5ef8f74443874fa9d0c8517bebb670fd1b2f3c2a36dad8993322696f",
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "af4c29af3bac23abe8bac97e3aeef36a6d9aef4ddd3f4dc4a17b49cbffa0aff2",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "f0b5d7bdd6f0eb141689cf3a203a442bc2913beb3d8ed3875cbc8dea6f2af8ca",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "f0b5d7bdd6f0eb141689cf3a203a442bc2913beb3d8ed3875cbc8dea6f2af8ca",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "1b1ed95bcd05e0eb339fbbeeaced1886f8454552b856bc8f91671c8207324394",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "check-v1",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\cache2",
+            "key": "1b1ed95bcd05e0eb339fbbeeaced1886f8454552b856bc8f91671c8207324394",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "corpus": "authored compiler, copied without repository edits",
+        "round": 0,
+        "profile": "cold",
+        "elapsed_ms": 1936.5872000000002,
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0d7ac9466e82ef1810433efc9a52bfde6d4dcad93b98f619bfe94860a7957f94",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0d7ac9466e82ef1810433efc9a52bfde6d4dcad93b98f619bfe94860a7957f94",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "20b4bdc6bebc04bc3c95b5998ad2149f96fa183338112681bddbf23a2fa1d0a4",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "20b4bdc6bebc04bc3c95b5998ad2149f96fa183338112681bddbf23a2fa1d0a4",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "69ce9c57bbc958dfc7d51aefbbcc71cead59658cc6ac58f40c99dc5800175d1c",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "69ce9c57bbc958dfc7d51aefbbcc71cead59658cc6ac58f40c99dc5800175d1c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0f5ce282de1ee3cfecd5fa9c4299798b9cc299870a5db6ce8ec52fc4654d1d8d",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0f5ce282de1ee3cfecd5fa9c4299798b9cc299870a5db6ce8ec52fc4654d1d8d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "1ed0df38aed5dc1ebace8c6f509d13b0e050483922340bad2be2a5d44ac55822",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "1ed0df38aed5dc1ebace8c6f509d13b0e050483922340bad2be2a5d44ac55822",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "3ccae418491c898f38922ddb116741b38b620075c0ed6259809b875ecd6fb4ac",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "3ccae418491c898f38922ddb116741b38b620075c0ed6259809b875ecd6fb4ac",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "aacef2e6b94e7bc960aac759f4d038601b51a173de4497a5b27b1af712c76211",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "aacef2e6b94e7bc960aac759f4d038601b51a173de4497a5b27b1af712c76211",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "812e310194fb6c36f78be4e7067119319a53bb888b038bae802b7e21151f2018",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "812e310194fb6c36f78be4e7067119319a53bb888b038bae802b7e21151f2018",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "fd52e80fe8005f45018c5415fa34493fcc88cd872c0c614f4f1c93c0381b4385",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "fd52e80fe8005f45018c5415fa34493fcc88cd872c0c614f4f1c93c0381b4385",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0b4ca702d804acd9bd67c72082c5da60777ad9fef286718b6d1e7a9fe1b2d9af",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0b4ca702d804acd9bd67c72082c5da60777ad9fef286718b6d1e7a9fe1b2d9af",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "845a3a9f5c129216b13f609289ea1742aed5a799cbcb44a5e43181bde96bff99",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "845a3a9f5c129216b13f609289ea1742aed5a799cbcb44a5e43181bde96bff99",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "292bf19fd5d60ebd056019b38bd8fa95405d8a470522efedadb7a103f65dedbd",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "292bf19fd5d60ebd056019b38bd8fa95405d8a470522efedadb7a103f65dedbd",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "5b9f24e492641cf8d310a8e212184ef904b1143ef5ba8ac4ae1a5ef3af293ea5",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "5b9f24e492641cf8d310a8e212184ef904b1143ef5ba8ac4ae1a5ef3af293ea5",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "6cc78f2509a3273468d24aceaeb6235c34f043c698e617fe916f3313efc3f283",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "6cc78f2509a3273468d24aceaeb6235c34f043c698e617fe916f3313efc3f283",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "e43a5c1ff368cb890eebe6cf158d90a03d94061fc75ac98d4108a81b25b516cf",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "e43a5c1ff368cb890eebe6cf158d90a03d94061fc75ac98d4108a81b25b516cf",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "bee76285660cd972e7ce7b5654bda1b2ae5f9953bb54c1a0be365a83a6ad439d",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "bee76285660cd972e7ce7b5654bda1b2ae5f9953bb54c1a0be365a83a6ad439d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "98709c37bfe17dc18a85cc2e52f079fb04513d21527ed54fb8efbcdcb973109e",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "98709c37bfe17dc18a85cc2e52f079fb04513d21527ed54fb8efbcdcb973109e",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "46ea885887ca2ac553b5dee64fd38a5c71f438a85db54938733ae186a67812eb",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "46ea885887ca2ac553b5dee64fd38a5c71f438a85db54938733ae186a67812eb",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "93ffe75b3f32604650e17d580c7d758003de0a58977b489aba7fea1b1b4f6da9",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "93ffe75b3f32604650e17d580c7d758003de0a58977b489aba7fea1b1b4f6da9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "4712811fe2e30df6a999de4f31e6a433b6036131115478fdde0e7a408554a1ad",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "4712811fe2e30df6a999de4f31e6a433b6036131115478fdde0e7a408554a1ad",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "17fc906b013addd6d3764616cba4d9a9fe36eb1498c7f1f94c3417738e0cc552",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "17fc906b013addd6d3764616cba4d9a9fe36eb1498c7f1f94c3417738e0cc552",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "7e073fb29e34b75606588c6da78d4c7f4fbfafe29cfdfe0dcc742e3e59df0116",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "7e073fb29e34b75606588c6da78d4c7f4fbfafe29cfdfe0dcc742e3e59df0116",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "381ccc0de48d337abb92beda9abe9f7b896b7a98cb666d29e001c142d0e2422c",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "381ccc0de48d337abb92beda9abe9f7b896b7a98cb666d29e001c142d0e2422c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "71bb201c614f60e0525bded9f8a028fdc9754c4dcf35c4188103c725f8bbfec3",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "71bb201c614f60e0525bded9f8a028fdc9754c4dcf35c4188103c725f8bbfec3",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "7d22e381ac303a266484b8600570d942f4781e21c871e6f412363786ca2cdc22",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "7d22e381ac303a266484b8600570d942f4781e21c871e6f412363786ca2cdc22",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "21d67178a97331267a8c9139bbd2bfe855ea7136510ed05c8da6cc3b8ad23370",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "21d67178a97331267a8c9139bbd2bfe855ea7136510ed05c8da6cc3b8ad23370",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "833ebb22a9da15d83be2f1f39bffd1ab89ba8789f199c0aeb5b1bdb9e99935d9",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "833ebb22a9da15d83be2f1f39bffd1ab89ba8789f199c0aeb5b1bdb9e99935d9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "8c5dff7464aa498fd95462b19387d3b5bebe67b2102ff7d87248a730d39723ea",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "8c5dff7464aa498fd95462b19387d3b5bebe67b2102ff7d87248a730d39723ea",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0b384623f4f13f0e306a01018b7ba4a373a7721b6085f4654fe6c180375b2df1",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "check-v1",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0b384623f4f13f0e306a01018b7ba4a373a7721b6085f4654fe6c180375b2df1",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "corpus": "authored compiler, copied without repository edits",
+        "round": 0,
+        "profile": "warm",
+        "elapsed_ms": 230.23839999999973,
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0d7ac9466e82ef1810433efc9a52bfde6d4dcad93b98f619bfe94860a7957f94",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "20b4bdc6bebc04bc3c95b5998ad2149f96fa183338112681bddbf23a2fa1d0a4",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "69ce9c57bbc958dfc7d51aefbbcc71cead59658cc6ac58f40c99dc5800175d1c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0f5ce282de1ee3cfecd5fa9c4299798b9cc299870a5db6ce8ec52fc4654d1d8d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "1ed0df38aed5dc1ebace8c6f509d13b0e050483922340bad2be2a5d44ac55822",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "3ccae418491c898f38922ddb116741b38b620075c0ed6259809b875ecd6fb4ac",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "aacef2e6b94e7bc960aac759f4d038601b51a173de4497a5b27b1af712c76211",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "812e310194fb6c36f78be4e7067119319a53bb888b038bae802b7e21151f2018",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "fd52e80fe8005f45018c5415fa34493fcc88cd872c0c614f4f1c93c0381b4385",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0b4ca702d804acd9bd67c72082c5da60777ad9fef286718b6d1e7a9fe1b2d9af",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "845a3a9f5c129216b13f609289ea1742aed5a799cbcb44a5e43181bde96bff99",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "292bf19fd5d60ebd056019b38bd8fa95405d8a470522efedadb7a103f65dedbd",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "5b9f24e492641cf8d310a8e212184ef904b1143ef5ba8ac4ae1a5ef3af293ea5",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "6cc78f2509a3273468d24aceaeb6235c34f043c698e617fe916f3313efc3f283",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "e43a5c1ff368cb890eebe6cf158d90a03d94061fc75ac98d4108a81b25b516cf",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "bee76285660cd972e7ce7b5654bda1b2ae5f9953bb54c1a0be365a83a6ad439d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "98709c37bfe17dc18a85cc2e52f079fb04513d21527ed54fb8efbcdcb973109e",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "46ea885887ca2ac553b5dee64fd38a5c71f438a85db54938733ae186a67812eb",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "93ffe75b3f32604650e17d580c7d758003de0a58977b489aba7fea1b1b4f6da9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "4712811fe2e30df6a999de4f31e6a433b6036131115478fdde0e7a408554a1ad",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "17fc906b013addd6d3764616cba4d9a9fe36eb1498c7f1f94c3417738e0cc552",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "7e073fb29e34b75606588c6da78d4c7f4fbfafe29cfdfe0dcc742e3e59df0116",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "381ccc0de48d337abb92beda9abe9f7b896b7a98cb666d29e001c142d0e2422c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "71bb201c614f60e0525bded9f8a028fdc9754c4dcf35c4188103c725f8bbfec3",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "7d22e381ac303a266484b8600570d942f4781e21c871e6f412363786ca2cdc22",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "21d67178a97331267a8c9139bbd2bfe855ea7136510ed05c8da6cc3b8ad23370",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "833ebb22a9da15d83be2f1f39bffd1ab89ba8789f199c0aeb5b1bdb9e99935d9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "8c5dff7464aa498fd95462b19387d3b5bebe67b2102ff7d87248a730d39723ea",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0b384623f4f13f0e306a01018b7ba4a373a7721b6085f4654fe6c180375b2df1",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "corpus": "authored compiler, copied without repository edits",
+        "round": 0,
+        "profile": "edit",
+        "elapsed_ms": 1578.0346999999997,
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "8cca8f2e131ec7b786a20eb0e4fde64900f0c692241fad759c0efc3a0e4a9f0b",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "8cca8f2e131ec7b786a20eb0e4fde64900f0c692241fad759c0efc3a0e4a9f0b",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "20b4bdc6bebc04bc3c95b5998ad2149f96fa183338112681bddbf23a2fa1d0a4",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "69ce9c57bbc958dfc7d51aefbbcc71cead59658cc6ac58f40c99dc5800175d1c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0f5ce282de1ee3cfecd5fa9c4299798b9cc299870a5db6ce8ec52fc4654d1d8d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "1ed0df38aed5dc1ebace8c6f509d13b0e050483922340bad2be2a5d44ac55822",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "3ccae418491c898f38922ddb116741b38b620075c0ed6259809b875ecd6fb4ac",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "aacef2e6b94e7bc960aac759f4d038601b51a173de4497a5b27b1af712c76211",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "812e310194fb6c36f78be4e7067119319a53bb888b038bae802b7e21151f2018",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "fd52e80fe8005f45018c5415fa34493fcc88cd872c0c614f4f1c93c0381b4385",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "0b4ca702d804acd9bd67c72082c5da60777ad9fef286718b6d1e7a9fe1b2d9af",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "845a3a9f5c129216b13f609289ea1742aed5a799cbcb44a5e43181bde96bff99",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "292bf19fd5d60ebd056019b38bd8fa95405d8a470522efedadb7a103f65dedbd",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "5b9f24e492641cf8d310a8e212184ef904b1143ef5ba8ac4ae1a5ef3af293ea5",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "6cc78f2509a3273468d24aceaeb6235c34f043c698e617fe916f3313efc3f283",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "e43a5c1ff368cb890eebe6cf158d90a03d94061fc75ac98d4108a81b25b516cf",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "bee76285660cd972e7ce7b5654bda1b2ae5f9953bb54c1a0be365a83a6ad439d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "98709c37bfe17dc18a85cc2e52f079fb04513d21527ed54fb8efbcdcb973109e",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "46ea885887ca2ac553b5dee64fd38a5c71f438a85db54938733ae186a67812eb",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "93ffe75b3f32604650e17d580c7d758003de0a58977b489aba7fea1b1b4f6da9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "4712811fe2e30df6a999de4f31e6a433b6036131115478fdde0e7a408554a1ad",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "17fc906b013addd6d3764616cba4d9a9fe36eb1498c7f1f94c3417738e0cc552",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "7e073fb29e34b75606588c6da78d4c7f4fbfafe29cfdfe0dcc742e3e59df0116",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "381ccc0de48d337abb92beda9abe9f7b896b7a98cb666d29e001c142d0e2422c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "71bb201c614f60e0525bded9f8a028fdc9754c4dcf35c4188103c725f8bbfec3",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "7d22e381ac303a266484b8600570d942f4781e21c871e6f412363786ca2cdc22",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "21d67178a97331267a8c9139bbd2bfe855ea7136510ed05c8da6cc3b8ad23370",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "833ebb22a9da15d83be2f1f39bffd1ab89ba8789f199c0aeb5b1bdb9e99935d9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "8c5dff7464aa498fd95462b19387d3b5bebe67b2102ff7d87248a730d39723ea",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "1085ead0ec79fce94be4b2e9ca25f8987b58a9f10138a5eb9f26f1569f3893b6",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "check-v1",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache0",
+            "key": "1085ead0ec79fce94be4b2e9ca25f8987b58a9f10138a5eb9f26f1569f3893b6",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "corpus": "authored compiler, copied without repository edits",
+        "round": 1,
+        "profile": "cold",
+        "elapsed_ms": 1648.2323999999999,
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0d7ac9466e82ef1810433efc9a52bfde6d4dcad93b98f619bfe94860a7957f94",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0d7ac9466e82ef1810433efc9a52bfde6d4dcad93b98f619bfe94860a7957f94",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "20b4bdc6bebc04bc3c95b5998ad2149f96fa183338112681bddbf23a2fa1d0a4",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "20b4bdc6bebc04bc3c95b5998ad2149f96fa183338112681bddbf23a2fa1d0a4",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "69ce9c57bbc958dfc7d51aefbbcc71cead59658cc6ac58f40c99dc5800175d1c",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "69ce9c57bbc958dfc7d51aefbbcc71cead59658cc6ac58f40c99dc5800175d1c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0f5ce282de1ee3cfecd5fa9c4299798b9cc299870a5db6ce8ec52fc4654d1d8d",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0f5ce282de1ee3cfecd5fa9c4299798b9cc299870a5db6ce8ec52fc4654d1d8d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "1ed0df38aed5dc1ebace8c6f509d13b0e050483922340bad2be2a5d44ac55822",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "1ed0df38aed5dc1ebace8c6f509d13b0e050483922340bad2be2a5d44ac55822",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "3ccae418491c898f38922ddb116741b38b620075c0ed6259809b875ecd6fb4ac",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "3ccae418491c898f38922ddb116741b38b620075c0ed6259809b875ecd6fb4ac",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "aacef2e6b94e7bc960aac759f4d038601b51a173de4497a5b27b1af712c76211",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "aacef2e6b94e7bc960aac759f4d038601b51a173de4497a5b27b1af712c76211",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "812e310194fb6c36f78be4e7067119319a53bb888b038bae802b7e21151f2018",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "812e310194fb6c36f78be4e7067119319a53bb888b038bae802b7e21151f2018",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "fd52e80fe8005f45018c5415fa34493fcc88cd872c0c614f4f1c93c0381b4385",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "fd52e80fe8005f45018c5415fa34493fcc88cd872c0c614f4f1c93c0381b4385",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0b4ca702d804acd9bd67c72082c5da60777ad9fef286718b6d1e7a9fe1b2d9af",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0b4ca702d804acd9bd67c72082c5da60777ad9fef286718b6d1e7a9fe1b2d9af",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "845a3a9f5c129216b13f609289ea1742aed5a799cbcb44a5e43181bde96bff99",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "845a3a9f5c129216b13f609289ea1742aed5a799cbcb44a5e43181bde96bff99",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "292bf19fd5d60ebd056019b38bd8fa95405d8a470522efedadb7a103f65dedbd",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "292bf19fd5d60ebd056019b38bd8fa95405d8a470522efedadb7a103f65dedbd",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "5b9f24e492641cf8d310a8e212184ef904b1143ef5ba8ac4ae1a5ef3af293ea5",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "5b9f24e492641cf8d310a8e212184ef904b1143ef5ba8ac4ae1a5ef3af293ea5",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "6cc78f2509a3273468d24aceaeb6235c34f043c698e617fe916f3313efc3f283",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "6cc78f2509a3273468d24aceaeb6235c34f043c698e617fe916f3313efc3f283",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "e43a5c1ff368cb890eebe6cf158d90a03d94061fc75ac98d4108a81b25b516cf",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "e43a5c1ff368cb890eebe6cf158d90a03d94061fc75ac98d4108a81b25b516cf",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "bee76285660cd972e7ce7b5654bda1b2ae5f9953bb54c1a0be365a83a6ad439d",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "bee76285660cd972e7ce7b5654bda1b2ae5f9953bb54c1a0be365a83a6ad439d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "98709c37bfe17dc18a85cc2e52f079fb04513d21527ed54fb8efbcdcb973109e",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "98709c37bfe17dc18a85cc2e52f079fb04513d21527ed54fb8efbcdcb973109e",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "46ea885887ca2ac553b5dee64fd38a5c71f438a85db54938733ae186a67812eb",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "46ea885887ca2ac553b5dee64fd38a5c71f438a85db54938733ae186a67812eb",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "93ffe75b3f32604650e17d580c7d758003de0a58977b489aba7fea1b1b4f6da9",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "93ffe75b3f32604650e17d580c7d758003de0a58977b489aba7fea1b1b4f6da9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "4712811fe2e30df6a999de4f31e6a433b6036131115478fdde0e7a408554a1ad",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "4712811fe2e30df6a999de4f31e6a433b6036131115478fdde0e7a408554a1ad",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "17fc906b013addd6d3764616cba4d9a9fe36eb1498c7f1f94c3417738e0cc552",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "17fc906b013addd6d3764616cba4d9a9fe36eb1498c7f1f94c3417738e0cc552",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "7e073fb29e34b75606588c6da78d4c7f4fbfafe29cfdfe0dcc742e3e59df0116",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "7e073fb29e34b75606588c6da78d4c7f4fbfafe29cfdfe0dcc742e3e59df0116",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "381ccc0de48d337abb92beda9abe9f7b896b7a98cb666d29e001c142d0e2422c",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "381ccc0de48d337abb92beda9abe9f7b896b7a98cb666d29e001c142d0e2422c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "71bb201c614f60e0525bded9f8a028fdc9754c4dcf35c4188103c725f8bbfec3",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "71bb201c614f60e0525bded9f8a028fdc9754c4dcf35c4188103c725f8bbfec3",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "7d22e381ac303a266484b8600570d942f4781e21c871e6f412363786ca2cdc22",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "7d22e381ac303a266484b8600570d942f4781e21c871e6f412363786ca2cdc22",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "21d67178a97331267a8c9139bbd2bfe855ea7136510ed05c8da6cc3b8ad23370",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "21d67178a97331267a8c9139bbd2bfe855ea7136510ed05c8da6cc3b8ad23370",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "833ebb22a9da15d83be2f1f39bffd1ab89ba8789f199c0aeb5b1bdb9e99935d9",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "833ebb22a9da15d83be2f1f39bffd1ab89ba8789f199c0aeb5b1bdb9e99935d9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "8c5dff7464aa498fd95462b19387d3b5bebe67b2102ff7d87248a730d39723ea",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "8c5dff7464aa498fd95462b19387d3b5bebe67b2102ff7d87248a730d39723ea",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0b384623f4f13f0e306a01018b7ba4a373a7721b6085f4654fe6c180375b2df1",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "check-v1",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0b384623f4f13f0e306a01018b7ba4a373a7721b6085f4654fe6c180375b2df1",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "corpus": "authored compiler, copied without repository edits",
+        "round": 1,
+        "profile": "warm",
+        "elapsed_ms": 226.40480000000025,
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0d7ac9466e82ef1810433efc9a52bfde6d4dcad93b98f619bfe94860a7957f94",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "20b4bdc6bebc04bc3c95b5998ad2149f96fa183338112681bddbf23a2fa1d0a4",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "69ce9c57bbc958dfc7d51aefbbcc71cead59658cc6ac58f40c99dc5800175d1c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0f5ce282de1ee3cfecd5fa9c4299798b9cc299870a5db6ce8ec52fc4654d1d8d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "1ed0df38aed5dc1ebace8c6f509d13b0e050483922340bad2be2a5d44ac55822",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "3ccae418491c898f38922ddb116741b38b620075c0ed6259809b875ecd6fb4ac",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "aacef2e6b94e7bc960aac759f4d038601b51a173de4497a5b27b1af712c76211",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "812e310194fb6c36f78be4e7067119319a53bb888b038bae802b7e21151f2018",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "fd52e80fe8005f45018c5415fa34493fcc88cd872c0c614f4f1c93c0381b4385",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0b4ca702d804acd9bd67c72082c5da60777ad9fef286718b6d1e7a9fe1b2d9af",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "845a3a9f5c129216b13f609289ea1742aed5a799cbcb44a5e43181bde96bff99",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "292bf19fd5d60ebd056019b38bd8fa95405d8a470522efedadb7a103f65dedbd",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "5b9f24e492641cf8d310a8e212184ef904b1143ef5ba8ac4ae1a5ef3af293ea5",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "6cc78f2509a3273468d24aceaeb6235c34f043c698e617fe916f3313efc3f283",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "e43a5c1ff368cb890eebe6cf158d90a03d94061fc75ac98d4108a81b25b516cf",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "bee76285660cd972e7ce7b5654bda1b2ae5f9953bb54c1a0be365a83a6ad439d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "98709c37bfe17dc18a85cc2e52f079fb04513d21527ed54fb8efbcdcb973109e",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "46ea885887ca2ac553b5dee64fd38a5c71f438a85db54938733ae186a67812eb",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "93ffe75b3f32604650e17d580c7d758003de0a58977b489aba7fea1b1b4f6da9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "4712811fe2e30df6a999de4f31e6a433b6036131115478fdde0e7a408554a1ad",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "17fc906b013addd6d3764616cba4d9a9fe36eb1498c7f1f94c3417738e0cc552",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "7e073fb29e34b75606588c6da78d4c7f4fbfafe29cfdfe0dcc742e3e59df0116",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "381ccc0de48d337abb92beda9abe9f7b896b7a98cb666d29e001c142d0e2422c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "71bb201c614f60e0525bded9f8a028fdc9754c4dcf35c4188103c725f8bbfec3",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "7d22e381ac303a266484b8600570d942f4781e21c871e6f412363786ca2cdc22",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "21d67178a97331267a8c9139bbd2bfe855ea7136510ed05c8da6cc3b8ad23370",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "833ebb22a9da15d83be2f1f39bffd1ab89ba8789f199c0aeb5b1bdb9e99935d9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "8c5dff7464aa498fd95462b19387d3b5bebe67b2102ff7d87248a730d39723ea",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0b384623f4f13f0e306a01018b7ba4a373a7721b6085f4654fe6c180375b2df1",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "corpus": "authored compiler, copied without repository edits",
+        "round": 1,
+        "profile": "edit",
+        "elapsed_ms": 1624.3559999999998,
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "cd5a862e3c606b59c564e1bf99181fd661322b582dcc8211bd1c683b83600fd0",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "cd5a862e3c606b59c564e1bf99181fd661322b582dcc8211bd1c683b83600fd0",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "20b4bdc6bebc04bc3c95b5998ad2149f96fa183338112681bddbf23a2fa1d0a4",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "69ce9c57bbc958dfc7d51aefbbcc71cead59658cc6ac58f40c99dc5800175d1c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0f5ce282de1ee3cfecd5fa9c4299798b9cc299870a5db6ce8ec52fc4654d1d8d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "1ed0df38aed5dc1ebace8c6f509d13b0e050483922340bad2be2a5d44ac55822",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "3ccae418491c898f38922ddb116741b38b620075c0ed6259809b875ecd6fb4ac",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "aacef2e6b94e7bc960aac759f4d038601b51a173de4497a5b27b1af712c76211",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "812e310194fb6c36f78be4e7067119319a53bb888b038bae802b7e21151f2018",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "fd52e80fe8005f45018c5415fa34493fcc88cd872c0c614f4f1c93c0381b4385",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "0b4ca702d804acd9bd67c72082c5da60777ad9fef286718b6d1e7a9fe1b2d9af",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "845a3a9f5c129216b13f609289ea1742aed5a799cbcb44a5e43181bde96bff99",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "292bf19fd5d60ebd056019b38bd8fa95405d8a470522efedadb7a103f65dedbd",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "5b9f24e492641cf8d310a8e212184ef904b1143ef5ba8ac4ae1a5ef3af293ea5",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "6cc78f2509a3273468d24aceaeb6235c34f043c698e617fe916f3313efc3f283",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "e43a5c1ff368cb890eebe6cf158d90a03d94061fc75ac98d4108a81b25b516cf",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "bee76285660cd972e7ce7b5654bda1b2ae5f9953bb54c1a0be365a83a6ad439d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "98709c37bfe17dc18a85cc2e52f079fb04513d21527ed54fb8efbcdcb973109e",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "46ea885887ca2ac553b5dee64fd38a5c71f438a85db54938733ae186a67812eb",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "93ffe75b3f32604650e17d580c7d758003de0a58977b489aba7fea1b1b4f6da9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "4712811fe2e30df6a999de4f31e6a433b6036131115478fdde0e7a408554a1ad",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "17fc906b013addd6d3764616cba4d9a9fe36eb1498c7f1f94c3417738e0cc552",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "7e073fb29e34b75606588c6da78d4c7f4fbfafe29cfdfe0dcc742e3e59df0116",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "381ccc0de48d337abb92beda9abe9f7b896b7a98cb666d29e001c142d0e2422c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "71bb201c614f60e0525bded9f8a028fdc9754c4dcf35c4188103c725f8bbfec3",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "7d22e381ac303a266484b8600570d942f4781e21c871e6f412363786ca2cdc22",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "21d67178a97331267a8c9139bbd2bfe855ea7136510ed05c8da6cc3b8ad23370",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "833ebb22a9da15d83be2f1f39bffd1ab89ba8789f199c0aeb5b1bdb9e99935d9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "8c5dff7464aa498fd95462b19387d3b5bebe67b2102ff7d87248a730d39723ea",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "60e5bae4d11d3d99201a53044839c175252095562e763ed907b5f74da2cdafc9",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "check-v1",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache1",
+            "key": "60e5bae4d11d3d99201a53044839c175252095562e763ed907b5f74da2cdafc9",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "corpus": "authored compiler, copied without repository edits",
+        "round": 2,
+        "profile": "cold",
+        "elapsed_ms": 1707.4799999999996,
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0d7ac9466e82ef1810433efc9a52bfde6d4dcad93b98f619bfe94860a7957f94",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0d7ac9466e82ef1810433efc9a52bfde6d4dcad93b98f619bfe94860a7957f94",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "20b4bdc6bebc04bc3c95b5998ad2149f96fa183338112681bddbf23a2fa1d0a4",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "20b4bdc6bebc04bc3c95b5998ad2149f96fa183338112681bddbf23a2fa1d0a4",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "69ce9c57bbc958dfc7d51aefbbcc71cead59658cc6ac58f40c99dc5800175d1c",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "69ce9c57bbc958dfc7d51aefbbcc71cead59658cc6ac58f40c99dc5800175d1c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0f5ce282de1ee3cfecd5fa9c4299798b9cc299870a5db6ce8ec52fc4654d1d8d",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0f5ce282de1ee3cfecd5fa9c4299798b9cc299870a5db6ce8ec52fc4654d1d8d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "1ed0df38aed5dc1ebace8c6f509d13b0e050483922340bad2be2a5d44ac55822",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "1ed0df38aed5dc1ebace8c6f509d13b0e050483922340bad2be2a5d44ac55822",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "3ccae418491c898f38922ddb116741b38b620075c0ed6259809b875ecd6fb4ac",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "3ccae418491c898f38922ddb116741b38b620075c0ed6259809b875ecd6fb4ac",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "aacef2e6b94e7bc960aac759f4d038601b51a173de4497a5b27b1af712c76211",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "aacef2e6b94e7bc960aac759f4d038601b51a173de4497a5b27b1af712c76211",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "812e310194fb6c36f78be4e7067119319a53bb888b038bae802b7e21151f2018",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "812e310194fb6c36f78be4e7067119319a53bb888b038bae802b7e21151f2018",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "fd52e80fe8005f45018c5415fa34493fcc88cd872c0c614f4f1c93c0381b4385",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "fd52e80fe8005f45018c5415fa34493fcc88cd872c0c614f4f1c93c0381b4385",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0b4ca702d804acd9bd67c72082c5da60777ad9fef286718b6d1e7a9fe1b2d9af",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0b4ca702d804acd9bd67c72082c5da60777ad9fef286718b6d1e7a9fe1b2d9af",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "845a3a9f5c129216b13f609289ea1742aed5a799cbcb44a5e43181bde96bff99",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "845a3a9f5c129216b13f609289ea1742aed5a799cbcb44a5e43181bde96bff99",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "292bf19fd5d60ebd056019b38bd8fa95405d8a470522efedadb7a103f65dedbd",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "292bf19fd5d60ebd056019b38bd8fa95405d8a470522efedadb7a103f65dedbd",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "5b9f24e492641cf8d310a8e212184ef904b1143ef5ba8ac4ae1a5ef3af293ea5",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "5b9f24e492641cf8d310a8e212184ef904b1143ef5ba8ac4ae1a5ef3af293ea5",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "6cc78f2509a3273468d24aceaeb6235c34f043c698e617fe916f3313efc3f283",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "6cc78f2509a3273468d24aceaeb6235c34f043c698e617fe916f3313efc3f283",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "e43a5c1ff368cb890eebe6cf158d90a03d94061fc75ac98d4108a81b25b516cf",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "e43a5c1ff368cb890eebe6cf158d90a03d94061fc75ac98d4108a81b25b516cf",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "bee76285660cd972e7ce7b5654bda1b2ae5f9953bb54c1a0be365a83a6ad439d",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "bee76285660cd972e7ce7b5654bda1b2ae5f9953bb54c1a0be365a83a6ad439d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "98709c37bfe17dc18a85cc2e52f079fb04513d21527ed54fb8efbcdcb973109e",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "98709c37bfe17dc18a85cc2e52f079fb04513d21527ed54fb8efbcdcb973109e",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "46ea885887ca2ac553b5dee64fd38a5c71f438a85db54938733ae186a67812eb",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "46ea885887ca2ac553b5dee64fd38a5c71f438a85db54938733ae186a67812eb",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "93ffe75b3f32604650e17d580c7d758003de0a58977b489aba7fea1b1b4f6da9",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "93ffe75b3f32604650e17d580c7d758003de0a58977b489aba7fea1b1b4f6da9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "4712811fe2e30df6a999de4f31e6a433b6036131115478fdde0e7a408554a1ad",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "4712811fe2e30df6a999de4f31e6a433b6036131115478fdde0e7a408554a1ad",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "17fc906b013addd6d3764616cba4d9a9fe36eb1498c7f1f94c3417738e0cc552",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "17fc906b013addd6d3764616cba4d9a9fe36eb1498c7f1f94c3417738e0cc552",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "7e073fb29e34b75606588c6da78d4c7f4fbfafe29cfdfe0dcc742e3e59df0116",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "7e073fb29e34b75606588c6da78d4c7f4fbfafe29cfdfe0dcc742e3e59df0116",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "381ccc0de48d337abb92beda9abe9f7b896b7a98cb666d29e001c142d0e2422c",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "381ccc0de48d337abb92beda9abe9f7b896b7a98cb666d29e001c142d0e2422c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "71bb201c614f60e0525bded9f8a028fdc9754c4dcf35c4188103c725f8bbfec3",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "71bb201c614f60e0525bded9f8a028fdc9754c4dcf35c4188103c725f8bbfec3",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "7d22e381ac303a266484b8600570d942f4781e21c871e6f412363786ca2cdc22",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "7d22e381ac303a266484b8600570d942f4781e21c871e6f412363786ca2cdc22",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "21d67178a97331267a8c9139bbd2bfe855ea7136510ed05c8da6cc3b8ad23370",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "21d67178a97331267a8c9139bbd2bfe855ea7136510ed05c8da6cc3b8ad23370",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "833ebb22a9da15d83be2f1f39bffd1ab89ba8789f199c0aeb5b1bdb9e99935d9",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "833ebb22a9da15d83be2f1f39bffd1ab89ba8789f199c0aeb5b1bdb9e99935d9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "8c5dff7464aa498fd95462b19387d3b5bebe67b2102ff7d87248a730d39723ea",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "8c5dff7464aa498fd95462b19387d3b5bebe67b2102ff7d87248a730d39723ea",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0b384623f4f13f0e306a01018b7ba4a373a7721b6085f4654fe6c180375b2df1",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "check-v1",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0b384623f4f13f0e306a01018b7ba4a373a7721b6085f4654fe6c180375b2df1",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "corpus": "authored compiler, copied without repository edits",
+        "round": 2,
+        "profile": "warm",
+        "elapsed_ms": 235.98300000000017,
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0d7ac9466e82ef1810433efc9a52bfde6d4dcad93b98f619bfe94860a7957f94",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "20b4bdc6bebc04bc3c95b5998ad2149f96fa183338112681bddbf23a2fa1d0a4",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "69ce9c57bbc958dfc7d51aefbbcc71cead59658cc6ac58f40c99dc5800175d1c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0f5ce282de1ee3cfecd5fa9c4299798b9cc299870a5db6ce8ec52fc4654d1d8d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "1ed0df38aed5dc1ebace8c6f509d13b0e050483922340bad2be2a5d44ac55822",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "3ccae418491c898f38922ddb116741b38b620075c0ed6259809b875ecd6fb4ac",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "aacef2e6b94e7bc960aac759f4d038601b51a173de4497a5b27b1af712c76211",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "812e310194fb6c36f78be4e7067119319a53bb888b038bae802b7e21151f2018",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "fd52e80fe8005f45018c5415fa34493fcc88cd872c0c614f4f1c93c0381b4385",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0b4ca702d804acd9bd67c72082c5da60777ad9fef286718b6d1e7a9fe1b2d9af",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "845a3a9f5c129216b13f609289ea1742aed5a799cbcb44a5e43181bde96bff99",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "292bf19fd5d60ebd056019b38bd8fa95405d8a470522efedadb7a103f65dedbd",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "5b9f24e492641cf8d310a8e212184ef904b1143ef5ba8ac4ae1a5ef3af293ea5",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "6cc78f2509a3273468d24aceaeb6235c34f043c698e617fe916f3313efc3f283",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "e43a5c1ff368cb890eebe6cf158d90a03d94061fc75ac98d4108a81b25b516cf",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "bee76285660cd972e7ce7b5654bda1b2ae5f9953bb54c1a0be365a83a6ad439d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "98709c37bfe17dc18a85cc2e52f079fb04513d21527ed54fb8efbcdcb973109e",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "46ea885887ca2ac553b5dee64fd38a5c71f438a85db54938733ae186a67812eb",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "93ffe75b3f32604650e17d580c7d758003de0a58977b489aba7fea1b1b4f6da9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "4712811fe2e30df6a999de4f31e6a433b6036131115478fdde0e7a408554a1ad",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "17fc906b013addd6d3764616cba4d9a9fe36eb1498c7f1f94c3417738e0cc552",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "7e073fb29e34b75606588c6da78d4c7f4fbfafe29cfdfe0dcc742e3e59df0116",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "381ccc0de48d337abb92beda9abe9f7b896b7a98cb666d29e001c142d0e2422c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "71bb201c614f60e0525bded9f8a028fdc9754c4dcf35c4188103c725f8bbfec3",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "7d22e381ac303a266484b8600570d942f4781e21c871e6f412363786ca2cdc22",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "21d67178a97331267a8c9139bbd2bfe855ea7136510ed05c8da6cc3b8ad23370",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "833ebb22a9da15d83be2f1f39bffd1ab89ba8789f199c0aeb5b1bdb9e99935d9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "8c5dff7464aa498fd95462b19387d3b5bebe67b2102ff7d87248a730d39723ea",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0b384623f4f13f0e306a01018b7ba4a373a7721b6085f4654fe6c180375b2df1",
+            "message": ""
+          }
+        ]
+      },
+      {
+        "corpus": "authored compiler, copied without repository edits",
+        "round": 2,
+        "profile": "edit",
+        "elapsed_ms": 1603.5762999999988,
+        "events": [
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "directory",
+            "layer": "all",
+            "status": "ready",
+            "reason": "available",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "495fe3ecd36e81b9039e8eabcbc2b204c921954edbff2cae17218c7e1e720a7d",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "imports",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "495fe3ecd36e81b9039e8eabcbc2b204c921954edbff2cae17218c7e1e720a7d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "20b4bdc6bebc04bc3c95b5998ad2149f96fa183338112681bddbf23a2fa1d0a4",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "69ce9c57bbc958dfc7d51aefbbcc71cead59658cc6ac58f40c99dc5800175d1c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0f5ce282de1ee3cfecd5fa9c4299798b9cc299870a5db6ce8ec52fc4654d1d8d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "1ed0df38aed5dc1ebace8c6f509d13b0e050483922340bad2be2a5d44ac55822",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "3ccae418491c898f38922ddb116741b38b620075c0ed6259809b875ecd6fb4ac",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "aacef2e6b94e7bc960aac759f4d038601b51a173de4497a5b27b1af712c76211",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "812e310194fb6c36f78be4e7067119319a53bb888b038bae802b7e21151f2018",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "fd52e80fe8005f45018c5415fa34493fcc88cd872c0c614f4f1c93c0381b4385",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "0b4ca702d804acd9bd67c72082c5da60777ad9fef286718b6d1e7a9fe1b2d9af",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "845a3a9f5c129216b13f609289ea1742aed5a799cbcb44a5e43181bde96bff99",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "292bf19fd5d60ebd056019b38bd8fa95405d8a470522efedadb7a103f65dedbd",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "5b9f24e492641cf8d310a8e212184ef904b1143ef5ba8ac4ae1a5ef3af293ea5",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "6cc78f2509a3273468d24aceaeb6235c34f043c698e617fe916f3313efc3f283",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "e43a5c1ff368cb890eebe6cf158d90a03d94061fc75ac98d4108a81b25b516cf",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "bee76285660cd972e7ce7b5654bda1b2ae5f9953bb54c1a0be365a83a6ad439d",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "98709c37bfe17dc18a85cc2e52f079fb04513d21527ed54fb8efbcdcb973109e",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "46ea885887ca2ac553b5dee64fd38a5c71f438a85db54938733ae186a67812eb",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "93ffe75b3f32604650e17d580c7d758003de0a58977b489aba7fea1b1b4f6da9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "4712811fe2e30df6a999de4f31e6a433b6036131115478fdde0e7a408554a1ad",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "17fc906b013addd6d3764616cba4d9a9fe36eb1498c7f1f94c3417738e0cc552",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "7e073fb29e34b75606588c6da78d4c7f4fbfafe29cfdfe0dcc742e3e59df0116",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "381ccc0de48d337abb92beda9abe9f7b896b7a98cb666d29e001c142d0e2422c",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "71bb201c614f60e0525bded9f8a028fdc9754c4dcf35c4188103c725f8bbfec3",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "7d22e381ac303a266484b8600570d942f4781e21c871e6f412363786ca2cdc22",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "21d67178a97331267a8c9139bbd2bfe855ea7136510ed05c8da6cc3b8ad23370",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "833ebb22a9da15d83be2f1f39bffd1ab89ba8789f199c0aeb5b1bdb9e99935d9",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "imports",
+            "status": "hit",
+            "reason": "reused",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "8c5dff7464aa498fd95462b19387d3b5bebe67b2102ff7d87248a730d39723ea",
+            "message": ""
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "read",
+            "layer": "check-v1",
+            "status": "miss",
+            "reason": "read_error",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "2a7ad5a66fe539cb1ebc3cd46f5aa61b2d4e1e7062af323464974ec3c6865a2f",
+            "message": "cannot read file"
+          },
+          {
+            "schema_version": 1,
+            "kind": "cache",
+            "phase": "write",
+            "layer": "check-v1",
+            "status": "stored",
+            "reason": "published",
+            "directory": "G:\\Vela\\build\\stage12\\audit-doUTcj\\compiler-cache2",
+            "key": "2a7ad5a66fe539cb1ebc3cd46f5aa61b2d4e1e7062af323464974ec3c6865a2f",
+            "message": ""
+          }
+        ]
+      }
+    ],
+    "scope": "local wall-time frontend/cache microprofiles; seed transition measured by mandatory native verify"
+  },
+  "seed": {
+    "schema_version": 1,
+    "status": "passed",
+    "bootstrap": {
+      "schema_version": 1,
+      "version": "1.2.0-dev.1",
+      "orchestrator": "Vela",
+      "fixed_point": true,
+      "bundler_fixed_point": true,
+      "source_bytes": 511535,
+      "tests_run": true
+    },
+    "files": {
+      "seed.exe": {
+        "bytes": 4179456,
+        "sha256": "cbe46c405233dbc07793adafefa79bdd82138706e93e2b6815f8771c0a2405be"
+      },
+      "stage1.exe": {
+        "bytes": 4180480,
+        "sha256": "8d3b32c41b63a050fccccbd924d2f4ca8e0e2dc6e9111aedb49cf46d6d237044"
+      },
+      "stage2.exe": {
+        "bytes": 4180480,
+        "sha256": "e33db46b33f6376102b303aa96da21dd55ab192e9cec8d2dbd2f65302e9b6905"
+      },
+      "stage3.exe": {
+        "bytes": 4180480,
+        "sha256": "4e28f3dbc2ff489ec16e00cbae81d50bef01a6a92ee4a4a2d81307c4b4e098db"
+      },
+      "stage1.c": {
+        "bytes": 6026701,
+        "sha256": "250e15f1b343a20002a62c747663653ea794d3b7915d1f471593f5ee738247d4"
+      },
+      "stage2.c": {
+        "bytes": 6026701,
+        "sha256": "250e15f1b343a20002a62c747663653ea794d3b7915d1f471593f5ee738247d4"
+      },
+      "stage3.c": {
+        "bytes": 6026701,
+        "sha256": "250e15f1b343a20002a62c747663653ea794d3b7915d1f471593f5ee738247d4"
+      },
+      "compiler.vela": {
+        "bytes": 511535,
+        "sha256": "3717667a6df62b5213061a89fe951c100c0679a27b43bbe9d7b111dbd88e5795"
+      },
+      "rebundled.vela": {
+        "bytes": 511535,
+        "sha256": "3717667a6df62b5213061a89fe951c100c0679a27b43bbe9d7b111dbd88e5795"
+      }
+    },
+    "scope": "mandatory verify transition from installed compiler through bundle seed and authored stages; independent hash comparisons"
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 107,
+    "negative_checks": 2
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 121,
+    "links": 830,
+    "missing": []
+  },
+  "verify_log": "build/stage12/128a-verify.log",
+  "positive_stdout": "23:left,right",
+  "typed_tables": "25 existing checks retained: build, 18 invalid-ID exit 70 and six mixed-ID E201",
+  "unperformed": "Linux full frontend microprofiles and independent clean recovery are reserved for release acceptance; local timing is not a performance guarantee",
+  "next": "1.2.8b"
+}

@@ -1,0 +1,12 @@
+import "../../std/cell.vela" as cell;
+fn main() -> Unit effects { state, io } {
+    let value = cell::create(40);
+    let alias = value;
+    let increment = fn [ alias ]() -> Int effects { state } {
+        let next = cell::get(alias) + 2;
+        cell::set(alias, next);
+        return next;
+    };
+    print("cell=" + to_string(increment()));
+    assert_true(cell::get(value) == 42, "copies and closures share identity");
+}

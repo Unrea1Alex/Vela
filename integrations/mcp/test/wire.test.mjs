@@ -6,7 +6,7 @@ import os from 'node:os';
 import {spawn} from 'node:child_process';
 import {Client} from '@modelcontextprotocol/client';
 import {StdioClientTransport} from '@modelcontextprotocol/client/stdio';
-const root=path.resolve('../..'),pkg=path.resolve('.');
+const root=path.resolve(process.env.VELA_TEST_NATIVE_ROOT??'../..'),pkg=path.resolve('.');
 const work=await fs.mkdtemp(path.join(os.tmpdir(),'vela-wire-test-'));
 const workspace=path.join(work,'workspace');await fs.mkdir(workspace);
 const configPath=path.join(work,'config.json');

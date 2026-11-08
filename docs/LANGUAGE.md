@@ -1,4 +1,4 @@
-# Язык Vela 1.1
+# Язык Vela 1.x
 
 Контракт 1.0 зафиксирован в [индексе стабильных API](contracts/STABLE-1.0.md).
 Исторические номера ниже указывают, когда возможность появилась.
@@ -63,6 +63,12 @@ generic-функции до подстановки конкретного тип
 С 0.10.0-dev.7 встроенные операции `clock_millis` и `entropy_u32`
 наблюдают ОС с эффектом `io`. `stream_open`, `stream_next` и
 `stream_close` читают ограниченные порции с эффектами `io, state`.
+С 1.2 opt-in `stream_open_large(path,total)` принимает положительный Int64 limit;
+`stream_create`, `stream_write` (до 65536 bytes) и `stream_write_close` владеют
+отдельно помеченными writer handles. Общий бюджет read/write — 128, handles
+нельзя передавать в другие FFI/stream operations; close снимает root даже при
+ошибке. `io`/`stream_lines` предоставляют проверяемый typed API поверх этих
+примитивов; [контракт](contracts/IO-1.2.md). Старые signatures/лимиты не меняются.
 Интерфейсы для подмены зависимостей, владение потоками и бюджет JSON описаны
 в [контракте сервисов](contracts/SERVICES.md).
 
@@ -267,7 +273,9 @@ fn main() -> Unit effects { io } {
 Список захватов обязателен. Значение локальной переменной копируется в
 момент создания замыкания. Вложенные списки, словари и handles сохраняют общую
 идентичность. Сборщик удерживает захваты, пока достижимо замыкание, и освобождает
-недостижимые циклы.
+недостижимые циклы. Библиотечный `cell::Cell<T>` (1.2) использует
+это разделение для явного изменяемого состояния: create/get/set требуют state;
+Cell не добавляет ссылки, атомарность или передачу между потоками.
 
 Параметр `effect E` позволяет generic-алгоритму переносить эффекты вызываемого
 аргумента в собственную сигнатуру. При выводе по нескольким аргументам берётся
@@ -397,6 +405,11 @@ fn main() -> Int effects { io, args } {
 | `process_run_to_stderr(arguments: StringList) -> Int` | `process, state` | То же с перенаправлением stdout ребёнка в stderr родителя |
 | `exit(code: Int) -> Unit` | `process` | Завершить процесс с кодом 0–255 |
 | `platform() -> String` | нет | `windows` или `posix` |
+
+С 1.2 `install_file(from, to)` также переносит каталог без замены существующего
+назначения на Windows/Linux; неподдерживаемый Linux filesystem отклоняет
+операцию. Прежняя публикация обычных файлов не меняется.
+[Контракт создания проекта](contracts/PROJECT-INIT-1.2.md).
 
 Процессы запускаются без shell с наследованием окружения и потоков. Отрицательное значение `process_run` означает ошибку запуска/ожидания; на POSIX ошибка `exec` в ребёнке даёт 127. Возможны платформенные коды аварийного завершения больше 255; их нельзя напрямую возвращать из `main -> Int`. Чтение и запись файлов закрывают дескриптор до возврата. `write_file` сам по себе не атомарен; драйвер компилятора пишет во временный файл и применяет `replace_file` после успеха. Функция `exit` не имеет отдельного типа `Never`, поэтому анализ возвратов может требовать следующий `return`.
 
@@ -596,6 +609,10 @@ fn main() -> Unit effects { io } {
 ## Task-group composition (1.0.0-dev.1)
 
 The library `task_group` and `async_io` compose existing typed async functions.
+The opt-in `parallel` module adds ordered bounded mapping on that ownership
+protocol: per-item scopes, Collect/FailFast, queue-inclusive deadline and explicit
+host tick/cancel/drain. It adds no syntax, thread or blocking-async exception.
+See [the mapping contract](contracts/PARALLEL-1.2.md).
 No syntax or suspension-safety exemption is added: posting captures callbacks,
 and the host invokes them only after the fiber yields. Language task outcomes
 are withheld until owned child operations have stopped and cleaned up.
@@ -606,3 +623,10 @@ See [TASK-GROUPS](contracts/TASK-GROUPS.md) for ownership and cancellation.
 HTTP 1.1 добавляет чистую фабрику http::curl_transfer с прежними Result<Curl,Error> и Transport. Она отделяет полный transfer timeout от ограниченного бюджета помощника; http::curl сохраняет контракт 1.0. Новых эффектов, синтаксиса и вариантов прежних enum нет.
 
 Совместимость prelude в 1.1: builtin-функции с since >=1.1 из каталога являются fallback и не резервируют имена прежних пользовательских объявлений. Свои объявления и видимые импорты имеют прежний приоритет; резервации builtin 1.0 сохраняются. Внутреннее имя корневого объявления разделяется с builtin до semantic analysis, без изменения spans, порядка вычислений и публичного отображения имён.
+
+Диагностики 1.2 сохраняют коды/typed details и добавляют source revision, документы,
+UTF-16/byte range, expected/actual explanation и related locations. Диагностический
+plan проверяет source overlay нативным frontend; типы, effects и правила исполнения
+языка остаются строгими. [Контракт](contracts/DIAGNOSTIC-PLANS-1.2.md).
+Import-подсказка не переопределяет уже разрешённый тип, включая builtin и
+generic-параметр; `Unknown enum.` получает объяснение без импорта одноимённого файла.

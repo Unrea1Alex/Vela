@@ -1,0 +1,33 @@
+import "../../std/parallel.vela" as p;
+import "../../std/task_group.vela" as group;
+import "../../std/async_io.vela" as aio;
+import "../../std/http.vela" as http;
+import "../../std/path.vela" as path;
+import "../../std/gui.vela" as gui;
+fn must<T,E>(r:Result<T,E>)->T{match r{Result::Ok(v)=>{return v;}Result::Err(_)=>{assert_true(false,"parallel HTTP fixture failure");}}return must(r);}
+fn argument(n:Int)->String effects {args}{match arg(n){StringResult::Ok(v)=>{return v;}StringResult::Err(e)=>{assert_true(false,e);}}return argument(n);}
+fn clock()->Int effects {io}{match monotonic_millis(){IntResult::Ok(v)=>{return v;}IntResult::Err(e)=>{assert_true(false,e);}}return 0;}
+fn error(e:aio::Error<http::Error>)->String{return match e{aio::Error::Queue(_)=>"queue",aio::Error::Operation(_)=>"operation",aio::Error::Cancelled=>"cancelled",aio::Error::TimedOut=>"timeout",aio::Error::Cleanup(message)=>message,aio::Error::Driver(message)=>message};}
+fn main()->Unit effects {args,state,io,process}{
+    let mode=argument(0);let base=argument(1);let directory=path::Path(value:argument(2));let transport=must(http::curl_transfer(path::Path(value:env("SystemRoot")+"\\System32\\curl.exe"),Option<path::Path>::None));
+    let windows=list_new<gui::Window>();if mode=="normal" {let buttons=list_new<gui::Button>();list_push(buttons,gui::Button(id:101,label:"Heartbeat"));list_push(buttons,gui::Button(id:103,label:"Close"));list_push(windows,must(gui::open(gui::Config(title:"Vela parallel acceptance",caption:"Pending requests",width:420,height:260,read_only:true,text_limit:1024,buttons:buttons,close_id:103,changed_id:0))));}
+    let values=list_new<Int>();var i=0;while i<6{list_push(values,i);i=i+1;}
+    let action=async fn [mode,base,directory,transport](scope:group::Scope,value:Int,index:Int)->Result<Int,String> effects {state}{if mode=="error" && index==0{await sleep_ms(20);return Result<Int,String>::Err("fixture-error");}let request=must(http::from_url(base+"/"+to_string(index),5000,1024));return match await aio::fetch(scope,dyn http::Transport(transport),request,directory,6000){Result::Ok(response)=>Result<Int,String>::Ok(response.status),Result::Err(e)=>Result<Int,String>::Err(error(e))};};
+    var timeout=10000;if mode=="deadline"{timeout=100;}
+    let started=clock();let job=must(p::create(values,2,started,timeout,p::Policy::FailFast,action));var ready=false;var turns=0;var clicks=0;var cancellation=false;
+    while !ready {
+        let now=clock();if mode=="cancel" && !cancellation && now-started>=100{assert_true(p::cancel(job),"cancel accepted");cancellation=true;}
+        ready=must(p::tick(job,now));turns=turns+1;
+        for window in windows {for event in must(gui::pump(window,0)){if event==101{clicks=clicks+1;}}assert_true(gui::status(window,"ticks="+to_string(turns)),"GUI heartbeat update");}
+        if !ready{let slept=host_sleep(1);}
+    }
+    let completions=list_new<p::Completion<Int,String>>();match p::outcome(job){Option::Some(value)=>{list_push(completions,value);}Option::None=>{assert_true(false,"terminal not published");}}let done=list_get(completions,0);
+    assert_true(list_len(done.cleanup)==0 && done.peak_tasks<=2 && done.peak_operations<=2,"HTTP cleanup and bounds");
+    if mode=="normal"{assert_true(done.reason==p::Finish::Complete && done.started==6 && clicks>=5,"GUI processes queued clicks during HTTP");var at=0;for item in done.items{match item{p::Item::Value(status)=>{assert_true(status==200+at,"input order despite reverse completion");}p::Item::Error(e)=>{assert_true(false,e);}p::Item::Cancelled=>{assert_true(false,"unexpected cancellation");}p::Item::TimedOut=>{assert_true(false,"unexpected timeout");}p::Item::Driver(e)=>{assert_true(false,e);}p::Item::NotStarted=>{assert_true(false,"unexpected queued item");}}at=at+1;}}
+    if mode=="cancel"{assert_true(done.reason==p::Finish::Cancelled && done.admitted==2,"cancel stops admission");}
+    if mode=="deadline"{assert_true(done.reason==p::Finish::TimedOut && done.admitted==2,"deadline stops admission");}
+    if mode=="error"{assert_true(done.reason==p::Finish::FailedFast && done.admitted==2,"typed failure cancels sibling");}
+    for window in windows{let closed=must(gui::close(window));}
+    match remove_dir(directory.value){WriteResult::Ok=>{}WriteResult::Err(e)=>{assert_true(false,e);}}
+    print(f"{{\"mode\":\"{mode:s}\",\"started\":{done.started:d},\"admitted\":{done.admitted:d},\"peak_tasks\":{done.peak_tasks:d},\"peak_operations\":{done.peak_operations:d},\"turns\":{turns:d},\"clicks\":{clicks:d},\"elapsed_ms\":{clock()-started:d}}}");
+}

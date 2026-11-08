@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.6a",
+  "status": "verified",
+  "date": "2026-11-08",
+  "contract": "../contracts/IO-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1368,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 488398,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/126a-verify.log",
+  "focused": {
+    "prelude_compatibility": "v126a_prelude: 14",
+    "checks": "short reads/writes and binary bytes; EOF/no-final-LF; empty/oversized Data and invalid write count; no progress vs EOF; sticky failures and accepted offsets; callback reentrancy; shared idempotent close; operation and both cleanup causes; typed invalid paths; split UTF8/BOM/CRLF, record/total/encoding/mid-record/close locations",
+    "positive": "v126a_io",
+    "rejections": {
+      "callback_type": "E201",
+      "private": "E223",
+      "lines_construct": "E232",
+      "state": "E209",
+      "reader_construct": "E232",
+      "io": "E209"
+    }
+  },
+  "host": {
+    "checks": "opposite-owner operations and FFI/callback rejection; shared 128 read/write budget; failed OS close retires root/count",
+    "linux_log": "build/stage12/126a-linux.log",
+    "source": "tests/library12/io-host.c",
+    "windows_log": "build/stage12/126a-host.log"
+  },
+  "streaming": {
+    "schema_version": 1,
+    "status": "passed",
+    "observations": [
+      {
+        "mode": "file-copy",
+        "input_owned": 0,
+        "output_owned": 0,
+        "bytes": 28311552,
+        "reads": 3457,
+        "writes": 3456,
+        "peak_chunk": 8192,
+        "collections": 27,
+        "managed_peak": 1053442,
+        "managed_live": 450565
+      },
+      {
+        "mode": "file-lines",
+        "input_owned": 0,
+        "bytes": 28311552,
+        "lines": 27648,
+        "payload": 28283904,
+        "reads": 3457,
+        "peak_chunk": 8192,
+        "peak_record": 1023,
+        "peak_working_payload": 9218,
+        "peak_parts": 1,
+        "collections": 70,
+        "managed_peak": 1055801,
+        "managed_live": 558895
+      },
+      {
+        "mode": "file-copy",
+        "input_owned": 0,
+        "output_owned": 0,
+        "bytes": 283115520,
+        "reads": 34561,
+        "writes": 34560,
+        "peak_chunk": 8192,
+        "collections": 274,
+        "managed_peak": 1053372,
+        "managed_live": 302248
+      },
+      {
+        "mode": "file-lines",
+        "input_owned": 0,
+        "bytes": 283115520,
+        "lines": 276480,
+        "payload": 282839040,
+        "reads": 34561,
+        "peak_chunk": 8192,
+        "peak_record": 1023,
+        "peak_working_payload": 9218,
+        "peak_parts": 1,
+        "collections": 705,
+        "managed_peak": 1055728,
+        "managed_live": 325171
+      },
+      {
+        "mode": "memory",
+        "input_owned": 47360,
+        "output_owned": 47360,
+        "bytes": 47360,
+        "reads": 7,
+        "writes": 6,
+        "peak_chunk": 8192,
+        "collections": 0,
+        "managed_peak": 251914,
+        "managed_live": 251914
+      },
+      {
+        "mode": "memory-lines",
+        "input_owned": 47360,
+        "bytes": 47360,
+        "lines": 1280,
+        "payload": 46080,
+        "reads": 7,
+        "peak_chunk": 8192,
+        "peak_record": 36,
+        "peak_working_payload": 16423,
+        "peak_parts": 2,
+        "collections": 0,
+        "managed_peak": 971965,
+        "managed_live": 971965
+      },
+      {
+        "mode": "memory",
+        "input_owned": 473600,
+        "output_owned": 473600,
+        "bytes": 473600,
+        "reads": 59,
+        "writes": 58,
+        "peak_chunk": 8192,
+        "collections": 2,
+        "managed_peak": 1855395,
+        "managed_live": 1429547
+      },
+      {
+        "mode": "memory-lines",
+        "input_owned": 473600,
+        "bytes": 473600,
+        "lines": 12800,
+        "payload": 460800,
+        "reads": 59,
+        "peak_chunk": 8192,
+        "peak_record": 36,
+        "peak_working_payload": 16423,
+        "peak_parts": 2,
+        "collections": 14,
+        "managed_peak": 1737233,
+        "managed_live": 947941
+      }
+    ],
+    "scope": "actual chunk/record/retained-part counters; normal managed GC peaks separately; input/output-owned storage excluded from working payload; SHA256 file copies, legacy cap and >256 MiB tested"
+  },
+  "linux": {
+    "file_line_peak_working_payload": 9218,
+    "log": "build/stage12/126a-linux.log",
+    "status": "passed",
+    "small_bytes": 28311552,
+    "distribution": "VelaRelease100 GCC/musl",
+    "large_bytes": 283115520,
+    "legacy_256_MiB_rejection": "passed",
+    "memory_line_peak_working_payload": 16423,
+    "paths": "Cyrillic, CJK, emoji",
+    "sha256": "copies equal",
+    "file_peak_chunk": 8192
+  },
+  "gc": {
+    "scope": "Forced GC bounded probes separate from normal-GC 27/270 MiB runs. Caller-owned input/output, actual payload bounds and managed peaks reported separately.",
+    "bounded_file_copy": {
+      "collections": 4041,
+      "live_managed_bytes": 1474,
+      "log": "build/stage12/126a-file-gc-copy.err",
+      "peak_managed_bytes": 12698,
+      "bytes": 65536
+    },
+    "bounded_file_lines": {
+      "peak_managed_bytes": 13973,
+      "bytes": 65536,
+      "live_managed_bytes": 1475,
+      "collections": 1918562,
+      "log": "build/stage12/126a-file-gc-lines.err",
+      "lines": 64
+    },
+    "memory_focus": {
+      "collections": 38193,
+      "live_managed_bytes": 48136,
+      "log": "build/stage12/126a-gc.err",
+      "peak_managed_bytes": 51525
+    }
+  },
+  "memory": "Existing immutable String byte backing and tracing; opaque shared managed handles, explicit native owner/root lifecycle. Line joining temporarily retains parts plus joined record; exact bound documented, descriptor counts observed. No ownership/ABI expansion.",
+  "mcp": {
+    "installed_stream_modules": "passed",
+    "groups": 3,
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "failed": 0,
+    "log": "build/stage12/126a-mcp.log",
+    "wire_startup_tokens": 3499,
+    "startup_tokens": 1854
+  },
+  "recipes": {
+    "schema_version": 1,
+    "checks": [
+      "recipe basics",
+      "recipe directory",
+      "recipe json",
+      "recipe bytes",
+      "recipe result",
+      "recipe callable",
+      "recipe http",
+      "recipe cli",
+      "recipe sort",
+      "recipe traversals",
+      "recipe set",
+      "recipe cell",
+      "recipe json-schema",
+      "recipe streams",
+      "generic/effect/opaque/method/async interface",
+      "reject invalid interface before emission",
+      "all embedded builtin rows",
+      "all shipped modules and recipe IDs resolve to verified catalog"
+    ],
+    "passed": 18
+  },
+  "api_search": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 103,
+    "negative_checks": 2
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 117,
+    "links": 812,
+    "missing": []
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "next": "1.2.7"
+}

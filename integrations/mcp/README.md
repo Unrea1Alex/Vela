@@ -10,6 +10,13 @@ Unpack the separate MCP archive, run `npm ci --omit=dev` in its root. Compiled
 The lock fixes the official SDK and all dependencies. Native Windows delivery
 is tested; other platforms are not declared supported by the Windows gate.
 Language help and examples are read from the matching native installation.
+
+The 1.2 development adapter starts with compact context. Fetch capabilities or
+recipes on demand; `vela_get_help` with `topic="api"` and query or name runs the
+native Vela search helper. offset/limit paginate; version/fingerprint detect stale
+catalogs; max_bytes bounds both response forms. The Windows native delivery must
+include its matching `bin/vela-api.exe`, generated index and purpose metadata.
+See the [native search contract](../../docs/contracts/API-SEARCH-1.2.md).
 That installation also contains the compiler sources and recovery seed.
 
 Recommended setup (run from this package, use an existing application directory):
@@ -83,7 +90,7 @@ apply the proposed replacement through the host editor.
 Use `vela_query` for definitions, references, direct calls and types/effects.
 Its optional `at` uses a workspace-relative path and zero-based UTF-16 coordinates.
 `vela_plan` takes that query's `snapshot_id` and native `revision` to preview
-a rename or formatting edit. It rechecks the proposed source and writes nothing.
+a rename, formatting edit or diagnostic correction (kind=diagnose). Rejected queries also provide revision/documents. Diagnose preserves the original explanation and returns edits only with validated=true. It rechecks the proposed source and writes nothing.
 Inspect `data.native.scope.excluded_test_roots` when planning a project rename.
 The native CLI supports pages for large indexes.
 Projects with declared `resource` rows build and run through the local CLI.

@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.1",
+  "status": "verified",
+  "date": "2026-11-07",
+  "contract": "../contracts/AGENT-ENTRY-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1244,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 477645,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/121-verify.log",
+  "focused": {
+    "schema_version": 1,
+    "checks": [
+      "recipe basics",
+      "recipe directory",
+      "recipe json",
+      "recipe bytes",
+      "recipe result",
+      "recipe callable",
+      "recipe http",
+      "generic/effect/opaque/method/async interface",
+      "reject invalid interface before emission",
+      "all embedded builtin rows",
+      "recipe IDs resolve to verified catalog"
+    ],
+    "passed": 11
+  },
+  "startup": {
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "published": {
+      "version": "1.0.21",
+      "dist.integrity": "sha512-biOj/6M5qdgx5TKjDnFT1ymSpM5tbd3ylwDtrQvFQSu0Z7bBYko2dF+W/aUkXUPuk6IVpRxk/3Q2sHOzGlS36g==",
+      "dist.tarball": "https://registry.npmjs.org/js-tiktoken/-/js-tiktoken-1.0.21.tgz"
+    },
+    "projection": "complete skill + mandatory analysis tool name/description/inputSchema + actual context text AND structuredContent; compact JSON joined by LF",
+    "parts": {
+      "skill": 134,
+      "tools": 842,
+      "context": 701
+    },
+    "total": 1677,
+    "limit": 2000,
+    "full_wire_total": 3322,
+    "full_wire_tools": 2487,
+    "response_forms": "preserved; no mandatory response removed"
+  },
+  "mcp": {
+    "legacy_sdk_groups": 5,
+    "entry_group": 1,
+    "failed": 0,
+    "sequential": 1000,
+    "cancellations": 25,
+    "logs": [
+      "build/stage12/121-mcp-sdk.log",
+      "build/stage12/121-mcp-entry.log"
+    ]
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 110,
+    "links": 754,
+    "missing": []
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 88,
+    "negative_checks": 2
+  },
+  "fresh_client": {
+    "agent": "/root/entry121_client",
+    "session_id": "01a1b71f-9253-7d40-bc1e-c6bdc3513fce",
+    "compiler_sha256": "8e1257f4279a61b5f5fdc20f92e239f39d8ab9f8df891050c26333383c36d1ed",
+    "route": "skill -> START/QUICKSTART -> CAPABILITIES -> RECIPES -> directory.vela -> native api",
+    "transport": "native CLI fallback; Vela MCP tools not exposed",
+    "check_build_run": "passed; stdout files=2",
+    "named_tests": 2,
+    "failed": 0,
+    "provider_usage": {
+      "input_tokens": 434940,
+      "cached_input_tokens": 409344,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 3110,
+      "reasoning_output_tokens": 439,
+      "total_tokens": 438050
+    },
+    "corrective_cycle": "One E100 match-expression block corrected to documented match statement",
+    "help_probe": "Legacy --help rejected; documented help/API route worked",
+    "report": "build/stage12/new-client121/app/CLIENT-RESULTS.md"
+  },
+  "harness_correction": "Direct bin/velac.exe test without initialized MSVC produced build_error; the documented SDK vela.cmd wrapper passed both named tests.",
+  "next": "1.2.1a",
+  "unperformed": "Optional execution/GUI/network release gates not repeated in this entry-only stage; required again for final 1.2.9 release."
+}

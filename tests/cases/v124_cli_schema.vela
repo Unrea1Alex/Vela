@@ -1,0 +1,94 @@
+import "../../../std/cli_schema.vela" as cli;
+fn must<T>(value: Result<T, cli::Error>) -> T {
+    match value { Result::Ok(v) => { return v; } Result::Err(e) => { assert_true(false, cli::describe(e)); } }
+    return must(value);
+}
+fn inputs(a: String, b: String) -> List<String> effects { state } {
+    let values = list_new<String>(); list_push(values, a); list_push(values, b); return values;
+}
+fn schema() -> cli::Schema effects { state } {
+    let p = list_new<cli::Parameter>();
+    list_push(p, cli::positional("input", "Source", Option<String>::None));
+    list_push(p, cli::text("text", "Text", Option<String>::Some("default")));
+    list_push(p, cli::flag("flag", "Flag", false));
+    list_push(p, cli::integer("min", "Minimum", -10, 10, Option<Int>::Some(-10)));
+    list_push(p, cli::integer("max", "Maximum", -10, 10, Option<Int>::Some(10)));
+    let pairs = list_new<cli::LessEqual>();
+    list_push(pairs, cli::LessEqual(minimum: "min", maximum: "max"));
+    let created = must(cli::create("sample", "Sample command", p, pairs));
+    list_truncate(p, 0); list_truncate(pairs, 0);
+    return created;
+}
+fn category(value: Result<cli::Arguments, cli::Error>) -> Int {
+    match value { Result::Ok(_) => { return 0; } Result::Err(e) => {
+        return match e {
+            cli::Error::InvalidSchema(_) => 1, cli::Error::Parse(_) => 2,
+            cli::Error::Required(_) => 3, cli::Error::Positionals(_, _) => 4,
+            cli::Error::Integer(_, _) => 5, cli::Error::Range(_, _, _, _) => 6,
+            cli::Error::Relation(_, _, _, _) => 7, cli::Error::Lookup(_, _) => 8,
+            cli::Error::System(_) => 9
+        };
+    } }
+}
+fn main() -> Unit effects { state, io } {
+    let s = schema();
+    let a = list_new<String>(); list_push(a, "文件");
+    let defaults = must(cli::parse(a, s));
+    assert_true(must(cli::text_value(defaults, "input")) == "文件", "Unicode positional");
+    assert_true(must(cli::text_value(defaults, "text")) == "default", "default text");
+    assert_true(must(cli::int_value(defaults, "min")) == -10 && must(cli::int_value(defaults, "max")) == 10, "default limits");
+    assert_true(!must(cli::flag_value(defaults, "flag")), "default flag");
+    list_push(a, "--min"); list_push(a, "-2"); list_push(a, "--max=0"); list_push(a, "--text="); list_push(a, "--flag");
+    let parsed = must(cli::parse(a, s));
+    assert_true(must(cli::int_value(parsed, "min")) == -2 && must(cli::int_value(parsed, "max")) == 0, "negative integers");
+    assert_true(must(cli::text_value(parsed, "text")) == "" && must(cli::flag_value(parsed, "flag")), "empty and flag");
+    assert_true(list_len(a) == 6 && list_get(a, 2) == "-2", "input preserved");
+    let escaped = must(cli::parse(inputs("--", "--flag"), s));
+    assert_true(must(cli::text_value(escaped, "input")) == "--flag", "terminator");
+    let help = must(cli::parse(inputs("--help", "--min=oops"), s));
+    assert_true(cli::is_help(help) && str_len(cli::help(help)) > 80, "help no input");
+    assert_true(category(cli::parse(inputs("x", "--what"), s)) == 2, "unknown");
+    assert_true(category(cli::parse(inputs("x", "--min"), s)) == 2, "missing value");
+    assert_true(category(cli::parse(inputs("x", "--min="), s)) == 5, "empty integer");
+    assert_true(category(cli::parse(inputs("x", "--min=9223372036854775808"), s)) == 5, "overflow");
+    assert_true(category(cli::parse(inputs("x", "--min=-9223372036854775808"), s)) == 6, "minimum parses then range");
+    assert_true(category(cli::parse(inputs("x", "--min=11"), s)) == 6, "range");
+    assert_true(category(cli::parse(inputs("x", "--min=10"), s)) == 0, "inclusive boundary");
+    let relation = inputs("x", "--min=2"); list_push(relation, "--max=1");
+    assert_true(category(cli::parse(relation, s)) == 7, "min max relation");
+    assert_true(category(cli::parse(list_new<String>(), s)) == 3, "required positional");
+    assert_true(category(cli::parse(inputs("x", "extra"), s)) == 4, "extra positional");
+    let duplicate = inputs("x", "--flag"); list_push(duplicate, "--flag");
+    assert_true(category(cli::parse(duplicate, s)) == 2, "duplicate flag");
+    assert_true(category(cli::parse(inputs("x", "--flag=false"), s)) == 2, "flag value");
+    match cli::int_value(parsed, "text") { Result::Ok(_) => { assert_true(false, "wrong type lookup"); } Result::Err(_) => {} }
+    let bad = list_new<cli::Parameter>(); list_push(bad, cli::integer("n", "N", 10, 1, Option<Int>::None));
+    match cli::create("x", "", bad, list_new<cli::LessEqual>()) { Result::Ok(_) => { assert_true(false, "invalid schema range"); } Result::Err(_) => {} }
+    list_truncate(bad, 0); list_push(bad, cli::integer("n", "N", 0, 1, Option<Int>::Some(2)));
+    match cli::create("x", "", bad, list_new<cli::LessEqual>()) { Result::Ok(_) => { assert_true(false, "invalid default"); } Result::Err(_) => {} }
+    list_truncate(bad, 0); list_push(bad, cli::text("bad name", "", Option<String>::None));
+    match cli::create("x", "", bad, list_new<cli::LessEqual>()) { Result::Ok(_) => { assert_true(false, "invalid name"); } Result::Err(_) => {} }
+    list_truncate(bad, 0); list_push(bad, cli::text("help", "", Option<String>::None));
+    match cli::create("x", "", bad, list_new<cli::LessEqual>()) { Result::Ok(_) => { assert_true(false, "reserved help"); } Result::Err(_) => {} }
+    list_truncate(bad, 0); list_push(bad, cli::positional("a", "", Option<String>::Some(""))); list_push(bad, cli::positional("b", "", Option<String>::None));
+    match cli::create("x", "", bad, list_new<cli::LessEqual>()) { Result::Ok(_) => { assert_true(false, "positional ordering"); } Result::Err(_) => {} }
+    let optional = list_new<cli::Parameter>(); list_push(optional, cli::positional("value", "", Option<String>::Some("fallback")));
+    let os = must(cli::create("optional", "", optional, list_new<cli::LessEqual>()));
+    assert_true(must(cli::text_value(must(cli::parse(list_new<String>(), os)), "value")) == "fallback", "optional positional");
+    let required = list_new<cli::Parameter>();
+    list_push(required, cli::integer("n", "Full Int", -9223372036854775808, 9223372036854775807, Option<Int>::None));
+    let full = must(cli::create("full", "", required, list_new<cli::LessEqual>()));
+    let edge = list_new<String>(); list_push(edge, "--n=9223372036854775807");
+    assert_true(must(cli::int_value(must(cli::parse(edge, full)), "n")) == 9223372036854775807, "full Int max");
+    list_set(edge, 0, "--n=-9223372036854775808");
+    assert_true(must(cli::int_value(must(cli::parse(edge, full)), "n")) == -9223372036854775808, "full Int min");
+    assert_true(category(cli::parse(list_new<String>(), full)) == 3, "required option");
+    list_push(required, cli::text("n", "Duplicate", Option<String>::None));
+    match cli::create("x", "", required, list_new<cli::LessEqual>()) { Result::Ok(_) => { assert_true(false, "duplicate schema"); } Result::Err(_) => {} }
+    list_truncate(required, 0); list_push(required, cli::text("n", "", Option<String>::None));
+    let invalid_relation = list_new<cli::LessEqual>(); list_push(invalid_relation, cli::LessEqual(minimum: "n", maximum: "missing"));
+    match cli::create("x", "", required, invalid_relation) { Result::Ok(_) => { assert_true(false, "relation schema"); } Result::Err(_) => {} }
+    let huge = list_new<String>(); for i in 0 .. 4097 { list_push(huge, ""); }
+    assert_true(category(cli::parse(huge, s)) == 1, "argument bound");
+    print("cli schema passed");
+}

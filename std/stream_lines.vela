@@ -1,0 +1,297 @@
+import "io.vela" as io;
+import "text.vela" as text;
+fn empty() -> Unit {}
+pub enum ErrorKind {
+    InvalidLimit,
+    Encoding,
+    RecordLimit,
+    TotalLimit,
+    Adapter,
+    NoProgress,
+    Close,
+    Closed,
+    Busy
+}
+pub struct Error {
+    kind: ErrorKind,
+    offset: Int,
+    line: Int,
+    message: String,
+    cause: Option<io::Error>
+}
+pub struct Line {
+    data: String,
+    offset: Int,
+    number: Int
+}
+pub struct Statistics {
+    consumed: Int,
+    lines: Int,
+    peak_chunk: Int,
+    peak_record: Int,
+    peak_working_payload: Int,
+    peak_parts: Int
+}
+struct Cursor {
+    chunk: String,
+    position: Int,
+    offset: Int,
+    number: Int,
+    eof: Bool,
+    closed: Bool,
+    busy: Bool,
+    failed: Option<Error>,
+    close_error: Option<Error>,
+    lines: Int,
+    peak_chunk: Int,
+    peak_record: Int,
+    peak_working_payload: Int,
+    peak_parts: Int
+}
+pub opaque struct Reader {
+    source: io::Reader,
+    shared: List<Cursor>,
+    buffer: Int,
+    record: Int
+}
+pub fn describe(value: Error) -> String {
+    return "line " + to_string(value.line) + " byte " + to_string(value.offset) + ": "
+        + value.message;
+}
+fn error(kind: ErrorKind, offset: Int, line: Int, message: String) -> Error {
+    return Error(kind: kind, offset: offset, line: line, message: message,
+        cause: Option<io::Error>::None);
+}
+pub fn reader(source: io::Reader, buffer: Int, record: Int) -> Result<Reader,
+    Error> effects { state } {
+    if buffer < 1 || buffer > 65536 || record < 1 || record > 1048576 {
+        return Result<Reader, Error>::Err(error(ErrorKind::InvalidLimit, 0, 1,
+            "invalid buffer or record limit"));
+    }
+    let shared = list_new<Cursor>();
+    list_push(shared, Cursor(chunk: "", position: 0, offset: 0, number: 1, eof: false,
+        closed: false, busy: false, failed: Option<Error>::None, close_error: Option<Error>::None,
+        lines: 0, peak_chunk: 0, peak_record: 0, peak_working_payload: 0, peak_parts: 0));
+    return Result<Reader, Error>::Ok(Reader(source: source, shared: shared, buffer: buffer,
+        record: record));
+}
+fn adapter(cause: io::Error, offset: Int, line: Int, closing: Bool) -> Error {
+    var kind = ErrorKind::Adapter;
+    if cause.kind == io::ErrorKind::NoProgress {
+        kind = ErrorKind::NoProgress;
+    }
+    if cause.kind == io::ErrorKind::TotalLimit {
+        kind = ErrorKind::TotalLimit;
+    }
+    if cause.kind == io::ErrorKind::Closed {
+        kind = ErrorKind::Closed;
+    }
+    if closing {
+        kind = ErrorKind::Close;
+    }
+    return Error(kind: kind, offset: offset, line: line, message: io::describe(cause),
+        cause: Option<io::Error>::Some(cause));
+}
+fn gather(value: Reader) -> Result<Option<Line>, Error> effects { state, io } {
+    var s = list_get(value.shared, 0);
+    let parts = strings_new();
+    var size = 0;
+    var newline = false;
+    var prefix = "";
+    var retained = 0;
+    var counted = false;
+    while !newline {
+        if s.position == str_len(s.chunk) {
+            s.chunk = "";
+            s.position = 0;
+            counted = false;
+            if s.eof {
+                break;
+            }
+            match io::read(value.source, value.buffer) {
+                Result::Err(e) => {
+                    return Result<Option<Line>, Error>::Err(adapter(e, s.offset + size, s.number,
+                        false));
+                }
+                Result::Ok(chunk) => {
+                    match chunk {
+                        io::Chunk::End => {
+                            s.eof = true;
+                            break;
+                        }
+                        io::Chunk::Data(data) => {
+                            s.chunk = data;
+                            if str_len(data) > s.peak_chunk {
+                                s.peak_chunk = str_len(data);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        let start = s.position;
+        var end = start;
+        while end < str_len(s.chunk) && str_byte(s.chunk, end) != 10 {
+            end = end + 1;
+        }
+        let length = end - start;
+        if str_len(prefix) < 3 {
+            var take = 3 - str_len(prefix);
+            if take > length {
+                take = length;
+            }
+            prefix = prefix + str_slice(s.chunk, start, start + take);
+        }
+        if length > value.record + 4 - size {
+            var bom = 0;
+            if s.offset == 0 && str_len(prefix) == 3 && str_byte(prefix, 0) == 239 && str_byte(
+                prefix, 1) == 187 && str_byte(prefix, 2) == 191 {
+                bom = 3;
+            }
+            return Result<Option<Line>, Error>::Err(error(ErrorKind::RecordLimit, s.offset + bom
+                + value.record, s.number, "record limit"));
+        }
+        if length > 0 {
+            strings_push(parts, str_slice(s.chunk, start, end));
+            if !counted {
+                retained = retained + str_len(s.chunk);
+                counted = true;
+            }
+        }
+        size = size + length;
+        s.position = end;
+        newline = end < str_len(s.chunk);
+        if newline {
+            s.position = end + 1;
+        }
+    }
+    if size > s.peak_record {
+        s.peak_record = size;
+    }
+    var working = retained + size + str_len(prefix);
+    if !counted {
+        working = working + str_len(s.chunk);
+    }
+    if working > s.peak_working_payload {
+        s.peak_working_payload = working;
+    }
+    if strings_len(parts) > s.peak_parts {
+        s.peak_parts = strings_len(parts);
+    }
+    if size == 0 && !newline {
+        s.busy = false;
+        list_set(value.shared, 0, s);
+        return Result<Option<Line>, Error>::Ok(Option<Line>::None);
+    }
+    let raw = strings_join(parts, "");
+    var start = 0;
+    var end = str_len(raw);
+    if s.offset == 0 && end >= 3 && str_byte(raw, 0) == 239 && str_byte(raw, 1) == 187 && str_byte(
+        raw, 2) == 191 {
+        start = 3;
+    }
+    if newline && end > start && str_byte(raw, end - 1) == 13 {
+        end = end - 1;
+    }
+    if end - start > value.record {
+        return Result<Option<Line>, Error>::Err(error(ErrorKind::RecordLimit, s.offset + start
+            + value.record, s.number, "record limit"));
+    }
+    let invalid = text::invalid_offset(raw);
+    if invalid >= 0 {
+        return Result<Option<Line>, Error>::Err(error(ErrorKind::Encoding, s.offset + invalid,
+            s.number, "invalid UTF-8"));
+    }
+    let line = Line(data: str_slice(raw, start, end), offset: s.offset, number: s.number);
+    var consumed = size;
+    if newline {
+        consumed = consumed + 1;
+    }
+    if consumed > 9223372036854775807 - s.offset || s.number == 9223372036854775807 {
+        return Result<Option<Line>, Error>::Err(error(ErrorKind::TotalLimit, s.offset, s.number,
+            "line counter limit"));
+    }
+    s.offset = s.offset + consumed;
+    s.number = s.number + 1;
+    s.lines = s.lines + 1;
+    s.busy = false;
+    if s.position == str_len(s.chunk) {
+        s.chunk = "";
+        s.position = 0;
+    }
+    list_set(value.shared, 0, s);
+    return Result<Option<Line>, Error>::Ok(Option<Line>::Some(line));
+}
+pub fn next(value: Reader) -> Result<Option<Line>, Error> effects { state, io } {
+    var s = list_get(value.shared, 0);
+    if s.closed {
+        return Result<Option<Line>, Error>::Err(error(ErrorKind::Closed, s.offset, s.number,
+            "line reader closed"));
+    }
+    if s.busy {
+        return Result<Option<Line>, Error>::Err(error(ErrorKind::Busy, s.offset, s.number,
+            "line reader active"));
+    }
+    match s.failed {
+        Option::Some(e) => {
+            return Result<Option<Line>, Error>::Err(e);
+        }
+        Option::None => {}
+    }
+    s.busy = true;
+    list_set(value.shared, 0, s);
+    let answer = gather(value);
+    match answer {
+        Result::Err(e) => {
+            s = list_get(value.shared, 0);
+            s.busy = false;
+            s.chunk = "";
+            s.position = 0;
+            s.failed = Option<Error>::Some(e);
+            list_set(value.shared, 0, s);
+        }
+        Result::Ok(_) => {}
+    }
+    return answer;
+}
+pub fn close(value: Reader) -> Result<Unit, Error> effects { state, io } {
+    var s = list_get(value.shared, 0);
+    if s.busy {
+        return Result<Unit, Error>::Err(error(ErrorKind::Busy, s.offset, s.number,
+            "line reader active"));
+    }
+    if s.closed {
+        match s.close_error {
+            Option::Some(e) => {
+                return Result<Unit, Error>::Err(e);
+            }
+            Option::None => {
+                return Result<Unit, Error>::Ok(empty());
+            }
+        }
+    }
+    s.closed = true;
+    s.busy = true;
+    s.chunk = "";
+    s.position = 0;
+    list_set(value.shared, 0, s);
+    let answer = io::close_reader(value.source);
+    s.busy = false;
+    match answer {
+        Result::Err(e) => {
+            let failure = adapter(e, s.offset, s.number, true);
+            s.close_error = Option<Error>::Some(failure);
+            list_set(value.shared, 0, s);
+            return Result<Unit, Error>::Err(failure);
+        }
+        Result::Ok(_) => {}
+    }
+    list_set(value.shared, 0, s);
+    return Result<Unit, Error>::Ok(empty());
+}
+pub fn statistics(value: Reader) -> Statistics effects { state } {
+    let s = list_get(value.shared, 0);
+    return Statistics(consumed: s.offset, lines: s.lines, peak_chunk: s.peak_chunk,
+        peak_record: s.peak_record, peak_working_payload: s.peak_working_payload,
+        peak_parts: s.peak_parts);
+}

@@ -1,0 +1,21 @@
+import "../../../std/parallel.vela" as p;
+import "../../../std/task_group.vela" as group;
+import "../../../std/cell.vela" as cell;
+struct Counts { active:Int, peak:Int, cleanup:Int, stops:Int, calls:Int }
+fn must<T,E>(r:Result<T,E>)->T {match r{Result::Ok(v)=>{return v;}Result::Err(_)=>{assert_true(false,"parallel child fixture failure");}}return must(r);}
+fn values(n:Int)->List<Int> effects {state}{let out=list_new<Int>();var i=0;while i<n{list_push(out,i);i=i+1;}return out;}
+fn drive(job:p::Job<Int,Int,Int>,start:Int)->p::Completion<Int,Int> effects {state,io,process}{var now=start;while now<10000{let ready=must(p::tick(job,now));if ready{match p::outcome(job){Option::Some(c)=>{return c;}Option::None=>{assert_true(false,"missing completion");}}}now=now+1;}assert_true(false,"drain limit");return drive(job,start);}
+fn main()->Unit effects {state,io,process}{
+    let counts=cell::create(Counts(active:0,peak:0,cleanup:0,stops:0,calls:0));
+    let action=async fn [counts](scope:group::Scope,value:Int,index:Int)->Result<Int,Int> effects {state}{
+        var c=cell::get(counts);c.calls=c.calls+1;cell::set(counts,c);let begun=cell::create(false);let acknowledgements=cell::create(0);
+        let child=must(group::post(scope,9000,fn [counts,begun]()->group::Step<Int,Int> effects {state}{if !cell::get(begun){cell::set(begun,true);var c=cell::get(counts);c.active=c.active+1;if c.active>c.peak{c.peak=c.active;}cell::set(counts,c);}return group::Step<Int,Int>::Wait(100);},fn [counts,acknowledgements]()->Bool effects {state}{let n=cell::get(acknowledgements)+1;cell::set(acknowledgements,n);var c=cell::get(counts);c.stops=c.stops+1;cell::set(counts,c);return n>=3;},fn [counts,begun,index]()->Result<Bool,String> effects {state}{var c=cell::get(counts);if cell::get(begun){c.active=c.active-1;}c.cleanup=c.cleanup+1;cell::set(counts,c);if index==7{return Result<Bool,String>::Err("child cleanup #7");}return Result<Bool,String>::Ok(true);}));
+        await sleep_ms(150);return Result<Int,Int>::Ok(value);
+    };
+    let job=must(p::create(values(260),128,0,9000,p::Policy::Collect,action));let done=drive(job,0);
+    if platform()!="windows"{assert_true(done.reason==p::Finish::Driver,"unsupported driver explicit");print("parallel child ownership passed");return;}
+    let observed=cell::get(counts);assert_true(done.reason==p::Finish::Cleanup && done.started==260 && done.admitted==260 && done.peak_tasks==128,"128 task capacity is reusable");assert_true(observed.calls==260 && observed.cleanup==260 && observed.active==0 && observed.stops==780 && observed.peak<=128 && observed.peak>1,"every child stopped/cleaned once before completion");assert_true(done.peak_operations<=128 && list_len(done.cleanup)==1 && list_get(done.cleanup,0).message=="child cleanup #7","cleanup cause retained independently");
+    var i=0;while i<260{match list_get(done.items,i){p::Item::Value(v)=>{assert_true(v==i,"child completion result order");}p::Item::Error(_)=>{assert_true(false,"unexpected item error");}p::Item::Cancelled=>{assert_true(false,"unexpected item cancellation");}p::Item::TimedOut=>{assert_true(false,"unexpected item deadline");}p::Item::Driver(_)=>{assert_true(false,"metadata capacity failure");}p::Item::NotStarted=>{assert_true(false,"missing callback");}}i=i+1;}
+    let cancelled=must(p::create(values(20),2,0,9000,p::Policy::Collect,action));let first=must(p::tick(cancelled,0));let second=must(p::tick(cancelled,1));assert_true(p::cancel(cancelled),"inflight cancellation request");let stopped=drive(cancelled,2);assert_true(stopped.reason==p::Finish::Cancelled && stopped.admitted==2 && stopped.started==1,"cancel preserves queue and never starts second fiber");assert_true(cell::get(counts).active==0 && cell::get(counts).cleanup==261,"cancel drains child cleanup");
+    print("parallel child ownership passed");
+}

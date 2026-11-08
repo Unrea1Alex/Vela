@@ -1,0 +1,287 @@
+import "task_group.vela" as group;
+import "event_loop.vela" as loop;
+import "cell.vela" as cell;
+pub enum Policy {
+    Collect,
+    FailFast
+}
+pub enum Finish {
+    Complete,
+    FailedFast,
+    Cancelled,
+    TimedOut,
+    Driver,
+    Cleanup
+}
+pub enum Error {
+    InvalidLimit,
+    Clock,
+    Busy
+}
+pub enum Item<T, E> {
+    Value(T),
+    Error(E),
+    Cancelled,
+    TimedOut,
+    Driver(String),
+    NotStarted
+}
+pub struct Completion<T, E> {
+    items: List<Item<T, E>>,
+    reason: Finish,
+    cleanup: List<group::CleanupError>,
+    started: Int,
+    admitted: Int,
+    peak_tasks: Int,
+    peak_operations: Int,
+    driver: Option<group::Error>
+}
+struct Control {
+    now: Int,
+    deadline: Int,
+    next: Int,
+    ready: Bool,
+    stopping: Bool,
+    shut: Bool,
+    reason: Finish,
+    cancel: Bool,
+    busy: Bool,
+    peak_tasks: Int,
+    driver: Option<group::Error>
+}
+struct Slot<T, E> {
+    index: Int,
+    task: group::Task<Result<T, E>>
+}
+pub opaque struct Job<T, U, E> {
+    source: List<T>,
+    action: async fn(group::Scope, T, Int) -> Result<U, E> effects { state },
+    group: group::Group,
+    active: List<Slot<U, E>>,
+    items: List<Item<U, E>>,
+    control: cell::Cell<Control>,
+    started: cell::Cell<Int>,
+    limit: Int,
+    policy: Policy
+}
+pub fn create<T, U, E>(values: List<T>, limit: Int, now: Int, timeout: Int, policy: Policy,
+    action: async fn(group::Scope, T, Int) -> Result<U, E> effects { state }) -> Result<Job<T, U,
+    E>, Error> effects { state } {
+    if limit < 1 || limit > 128 || list_len(values) > 65536 || timeout < 1 || timeout > 2147483647 {
+        return Result<Job<T, U, E>, Error>::Err(Error::InvalidLimit);
+    }
+    if now < 0 || now > 9223372034707292160 - timeout {
+        return Result<Job<T, U, E>, Error>::Err(Error::Clock);
+    }
+    let source = list_new<T>();
+    let items = list_new<Item<U, E>>();
+    var i = 0;
+    while i < list_len(values) {
+        list_push(source, list_get(values, i));
+        list_push(items, Item<U, E>::NotStarted);
+        i = i + 1;
+    }
+    match group::create(now, limit) {
+        Result::Err(_) => {
+            return Result<Job<T, U, E>, Error>::Err(Error::InvalidLimit);
+        }
+        Result::Ok(owner) => {
+            return Result<Job<T, U, E>, Error>::Ok(Job<T, U, E>(source: source, action: action,
+                group: owner, active: list_new<Slot<U, E>>(), items: items, control: cell::create(
+                Control(now: now, deadline: now + timeout, next: 0, ready: false, stopping: false,
+                shut: false, reason: Finish::Complete, cancel: false, busy: false, peak_tasks: 0,
+                driver: Option<group::Error>::None)), started: cell::create(0), limit: limit,
+                policy: policy));
+        }
+    }
+}
+pub fn cancel<T, U, E>(job: Job<T, U, E>) -> Bool effects { state } {
+    var c = cell::get(job.control);
+    if c.ready || c.stopping || c.cancel {
+        return false;
+    }
+    c.cancel = true;
+    cell::set(job.control, c);
+    return true;
+}
+fn stop<T, U, E>(job: Job<T, U, E>, reason: Finish) -> Unit effects { state } {
+    var c = cell::get(job.control);
+    if !c.stopping {
+        c.stopping = true;
+        c.reason = reason;
+        cell::set(job.control, c);
+    }
+}
+fn harvest<T, U, E>(job: Job<T, U, E>) -> Unit effects { state } {
+    let kept = list_new<Slot<U, E>>();
+    var i = 0;
+    while i < list_len(job.active) {
+        let slot = list_get(job.active, i);
+        match group::task_outcome(slot.task) {
+            Option::None => {
+                list_push(kept, slot);
+            }
+            Option::Some(outcome) => {
+                var item = Item<U, E>::NotStarted;
+                var failed = false;
+                match outcome {
+                    loop::Outcome::Done(answer) => {
+                        match answer {
+                            Result::Ok(value) => {
+                                item = Item<U, E>::Value(value);
+                            }
+                            Result::Err(e) => {
+                                item = Item<U, E>::Error(e);
+                                failed = true;
+                            }
+                        }
+                    }
+                    loop::Outcome::Cancelled => {
+                        if cell::get(job.control).reason == Finish::TimedOut {
+                            item = Item<U, E>::TimedOut;
+                        } else {
+                            item = Item<U, E>::Cancelled;
+                        }
+                    }
+                    loop::Outcome::TimedOut => {
+                        item = Item<U, E>::TimedOut;
+                        failed = true;
+                    }
+                    loop::Outcome::Failed(message) => {
+                        item = Item<U, E>::Driver(message);
+                        stop(job, Finish::Driver);
+                    }
+                }
+                list_set(job.items, slot.index, item);
+                if failed && job.policy == Policy::FailFast {
+                    stop(job, Finish::FailedFast);
+                }
+            }
+        }
+        i = i + 1;
+    }
+    list_truncate(job.active, 0);
+    i = 0;
+    while i < list_len(kept) {
+        list_push(job.active, list_get(kept, i));
+        i = i + 1;
+    }
+}
+fn admit<T, U, E>(job: Job<T, U, E>, allowance: Int) -> Unit effects { state, io, process } {
+    var c = cell::get(job.control);
+    var left = allowance;
+    while left > 0 && !c.stopping && c.next < list_len(job.source) && list_len(job.active)
+        < job.limit {
+        let index = c.next;
+        let value = list_get(job.source, index);
+        let action = job.action;
+        let started = job.started;
+        let body = async fn [ action, index, value, started ](scope: group::Scope) -> Result<U,
+            E> effects { state } {
+            cell::set(started, cell::get(started) + 1);
+            return await action(scope, value, index);
+        };
+        match group::spawn(job.group, c.deadline - c.now, body) {
+            Result::Err(e) => {
+                c.stopping = true;
+                c.reason = Finish::Driver;
+                c.driver = Option<group::Error>::Some(e);
+            }
+            Result::Ok(task) => {
+                list_push(job.active, Slot<U, E>(index: index, task: task));
+                left = left - 1;
+                c.next = c.next + 1;
+                if list_len(job.active) > c.peak_tasks {
+                    c.peak_tasks = list_len(job.active);
+                }
+            }
+        }
+        cell::set(job.control, c);
+    }
+}
+pub fn tick<T, U, E>(job: Job<T, U, E>, now: Int) -> Result<Bool, Error> effects { state, io,
+    process } {
+    var c = cell::get(job.control);
+    if c.busy {
+        return Result<Bool, Error>::Err(Error::Busy);
+    }
+    if now < c.now || now > 9223372034707292160 {
+        return Result<Bool, Error>::Err(Error::Clock);
+    }
+    if c.ready {
+        c.now = now;
+        cell::set(job.control, c);
+        return Result<Bool, Error>::Ok(true);
+    }
+    c.now = now;
+    c.busy = true;
+    cell::set(job.control, c);
+    defer {
+        var latest = cell::get(job.control);
+        latest.busy = false;
+        cell::set(job.control, latest);
+    }
+    if c.cancel {
+        stop(job, Finish::Cancelled);
+    } else if now >= c.deadline {
+        stop(job, Finish::TimedOut);
+    }
+    c = cell::get(job.control);
+    if c.stopping && !c.shut {
+        let closed = group::shutdown(job.group);
+        c.shut = true;
+        cell::set(job.control, c);
+    }
+    let allowance = job.limit - list_len(job.active);
+    let idle = match group::tick(job.group, now) {
+        Result::Ok(done) => done,
+        Result::Err(_) => false
+    };
+    harvest(job);
+    c = cell::get(job.control);
+    if c.cancel {
+        stop(job, Finish::Cancelled);
+    } else if now >= c.deadline {
+        stop(job, Finish::TimedOut);
+    }
+    c = cell::get(job.control);
+    if !c.stopping {
+        admit(job, allowance);
+    }
+    c = cell::get(job.control);
+    if c.next == list_len(job.source) && list_len(job.active) == 0 {
+        stop(job, Finish::Complete);
+    }
+    c = cell::get(job.control);
+    if c.stopping {
+        if !c.shut {
+            let closed = group::shutdown(job.group);
+            c.shut = true;
+            cell::set(job.control, c);
+        }
+        if idle && list_len(job.active) == 0 {
+            if c.reason == Finish::Complete && list_len(group::cleanup_errors(job.group)) > 0 {
+                c.reason = Finish::Cleanup;
+            }
+            c.ready = true;
+            cell::set(job.control, c);
+        }
+    }
+    return Result<Bool, Error>::Ok(cell::get(job.control).ready);
+}
+pub fn outcome<T, U, E>(job: Job<T, U, E>) -> Option<Completion<U, E>> effects { state } {
+    let c = cell::get(job.control);
+    if !c.ready {
+        return Option<Completion<U, E>>::None;
+    }
+    let items = list_new<Item<U, E>>();
+    var i = 0;
+    while i < list_len(job.items) {
+        list_push(items, list_get(job.items, i));
+        i = i + 1;
+    }
+    return Option<Completion<U, E>>::Some(Completion<U, E>(items: items, reason: c.reason,
+        cleanup: group::cleanup_errors(job.group), started: cell::get(job.started),
+        admitted: c.next, peak_tasks: c.peak_tasks, peak_operations: group::peak(job.group),
+        driver: c.driver));
+}

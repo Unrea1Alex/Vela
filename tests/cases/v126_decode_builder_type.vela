@@ -1,0 +1,2 @@
+import "../../../std/json_decode.vela" as d;
+fn main() -> Unit effects { state } { let decoder = d::object<String>(list_new<String>(), d::Unknown::Ignore, fn [](fields: d::Fields) -> Result<Int, d::Error> { return Result<Int, d::Error>::Ok(1); }); }

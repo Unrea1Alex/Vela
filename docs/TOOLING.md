@@ -1,5 +1,18 @@
 # Интерфейс для инструментов
 
+Рабочая версия 1.2 добавляет `vela api SOURCE_OR_PROJECT --json`: проверенный
+public-интерфейс entry-модуля без требования main. `vela api --builtins` читает
+embedded-каталог. Generic/effect signatures, методы и скрытые opaque-поля
+обрабатывает frontend; C compiler не участвует. `tools/help.vela` генерирует
+единый `docs/api-index.json`. [Контракт](contracts/AGENT-ENTRY-1.2.md).
+Нативный `bin/vela-api.exe` выполняет поиск в этом индексе с purpose/ownership
+метаданными. MCP `vela_get_help(topic="api", query=...)` передаёт запрос ему;
+алгоритм поиска не находится в TypeScript. [Протокол](contracts/API-SEARCH-1.2.md).
+`vela init DIRECTORY [--name NAME] [--kind cli|library] [--json]` создаёт
+готовый проект в новом каталоге; `vela --help` показывает краткий CLI.
+Имена проверяются до записи; существующие назначения сохраняются.
+[Контракт и JSON](contracts/PROJECT-INIT-1.2.md).
+
 Активный интерфейс — `vela.cmd` / `velac.cmd` / `bin/velac.exe`. Нативный компилятор поддерживает `check --json`, `symbols`, `emit-c`, `build`, `run` без Python. Служебный параметр `--source-name NAME` задаёт имя виртуального исходника независимо от временного пути. Исторический Python frontend 0.2, его API и обёртки удалены из текущего дерева; для интеграции используйте документированные CLI/LSP/MCP протоколы.
 
 ## Подсветка в VS Code
@@ -110,6 +123,7 @@ E201 сообщает `expected_type`/`actual_type`; E209 — `callee`, `require
 | E227 | Недопустимая тестовая декларация |
 | E228 | Недопустимое extern-объявление или FFI-тип/эффект |
 | E229 | Передача управления или вложенный defer в отложенном блоке |
+| E231 | Устаревшая revision, неверная позиция или отклонённый plan |
 | E232 | Вызов конструктора opaque-структуры за пределами модуля владельца |
 | E233 | Недопустимый владелец, получатель, параметры или коллизия метода |
 | E234 | Операция недоступна по generic-ограничению или отсутствует реализация |
@@ -210,6 +224,7 @@ E224 — private тип в public API. Выходной файл не может
 
 `vela plan ROOT REVISION DOCUMENT BYTE NEW_NAME` проверяет переименование;
 `vela plan ROOT REVISION DOCUMENT fmt` готовит правку форматирования.
+`vela plan ROOT REVISION DOCUMENT diagnose` объясняет первую ошибку выбранного документа и предлагает только проверенную однозначную правку. Ошибочный JSON-анализ возвращает revision/documents и UTF-16/byte range. `query ROOT --validate` выполняет frontend-check без C/index output; overlays могут включать manifest, parser/lock checks сохраняются. [Контракт](contracts/DIAGNOSTIC-PLANS-1.2.md).
 Обе команды возвращают JSON и не записывают исходники. Применять правки
 следует к той же версии буфера или к тем же исходным байтам.
 

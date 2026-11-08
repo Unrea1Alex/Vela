@@ -1,0 +1,82 @@
+pub opaque struct Set<K: Scalar> {
+    members: Dict<K, Bool>,
+    order: List<K>
+}
+pub fn create<K: Scalar>() -> Set<K> effects { state } {
+    return Set<K>(members: dict_new<K, Bool>(), order: list_new<K>());
+}
+pub fn size<K: Scalar>(value: Set<K>) -> Int effects { state } {
+    return dict_len(value.members);
+}
+pub fn contains<K: Scalar>(value: Set<K>, key: K) -> Bool effects { state } {
+    return dict_has(value.members, key);
+}
+pub fn insert<K: Scalar>(value: Set<K>, key: K) -> Bool effects { state } {
+    if dict_has(value.members, key) {
+        return false;
+    }
+    dict_set(value.members, key, true);
+    list_push(value.order, key);
+    return true;
+}
+pub fn remove<K: Scalar>(value: Set<K>, key: K) -> Bool effects { state } {
+    if !dict_remove(value.members, key) {
+        return false;
+    }
+    let kept = list_new<K>();
+    for i in 0 .. list_len(value.order) {
+        let item = list_get(value.order, i);
+        if item != key {
+            list_push(kept, item);
+        }
+    }
+    list_truncate(value.order, 0);
+    for i in 0 .. list_len(kept) {
+        list_push(value.order, list_get(kept, i));
+    }
+    return true;
+}
+pub fn values<K: Scalar>(value: Set<K>) -> List<K> effects { state } {
+    let output = list_new<K>();
+    for i in 0 .. list_len(value.order) {
+        list_push(output, list_get(value.order, i));
+    }
+    return output;
+}
+pub fn from_list<K: Scalar>(items: List<K>) -> Set<K> effects { state } {
+    let output = create<K>();
+    for i in 0 .. list_len(items) {
+        let added = insert(output, list_get(items, i));
+    }
+    return output;
+}
+pub fn union<K: Scalar>(left: Set<K>, right: Set<K>) -> Set<K> effects { state } {
+    let output = create<K>();
+    for i in 0 .. list_len(left.order) {
+        let added = insert(output, list_get(left.order, i));
+    }
+    for i in 0 .. list_len(right.order) {
+        let added = insert(output, list_get(right.order, i));
+    }
+    return output;
+}
+pub fn intersection<K: Scalar>(left: Set<K>, right: Set<K>) -> Set<K> effects { state } {
+    let output = create<K>();
+    for i in 0 .. list_len(left.order) {
+        let key = list_get(left.order, i);
+        if contains(right, key) {
+            let added = insert(output, key);
+        }
+    }
+    return output;
+}
+pub fn difference<K: Scalar>(left: Set<K>, right: Set<K>) -> Set<K> effects { state } {
+    let output = create<K>();
+    for i in 0 .. list_len(left.order) {
+        let key = list_get(left.order, i);
+        if !contains(right, key) {
+            let added = insert(output, key);
+        }
+    }
+    return output;
+}

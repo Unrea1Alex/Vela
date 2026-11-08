@@ -7,7 +7,7 @@ import {execFileSync,spawn} from 'node:child_process';
 import {Client} from '@modelcontextprotocol/client';
 import {StdioClientTransport} from '@modelcontextprotocol/client/stdio';
 import {Host,limits} from '../dist/host.js';
-const root=path.resolve('../..'), pkg=path.resolve('.');
+const root=path.resolve(process.env.VELA_TEST_NATIVE_ROOT??'../..'), pkg=path.resolve('.');
 const work=await fs.mkdtemp(path.join(os.tmpdir(),'vela-mcp-test-'));
 const workspace=path.join(work,'workspace'); await fs.mkdir(workspace);
 const config={schema_version:1,toolchain:root,workspace,aliases:{app:'main.vela'}};
@@ -99,7 +99,7 @@ test('MCP native equivalence, bounds, lifecycle and 1000-request gate', {timeout
     check('explicit repacking rejected through MCP',rejected.status==='rejected'&&rejected.data.native.diagnostics[0].code==='E237'&&rejected.data.native.diagnostics[0].details.reason==='dynamic_repack');
   }
   const resources=await client.listResources();
-  check('version-matched help resources',resources.resources.length===11 && resources.resources.some(r=>r.uri==='vela://help/idioms') && resources.resources.some(r=>r.uri==='vela://help/numbers') && resources.resources.some(r=>r.uri==='vela://help/stdlib') && resources.resources.some(r=>r.uri==='vela://help/testing') && resources.resources.some(r=>r.uri==='vela://help/ffi'));
+  check('version-matched help resources',resources.resources.length===16 && resources.resources.some(r=>r.uri==='vela://help/idioms') && resources.resources.some(r=>r.uri==='vela://help/numbers') && resources.resources.some(r=>r.uri==='vela://help/stdlib') && resources.resources.some(r=>r.uri==='vela://help/testing') && resources.resources.some(r=>r.uri==='vela://help/ffi') && resources.resources.some(r=>r.uri==='vela://help/recipes') && resources.resources.some(r=>r.uri==='vela://help/capabilities'));
   const resource=await client.readResource({uri:'vela://help/builtins'});
   const help=await call('vela_get_help',{topic:'builtins'});
   check('resource/help catalog identical',resource.contents[0].text===help.data.text);

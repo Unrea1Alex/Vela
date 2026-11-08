@@ -1,0 +1,3 @@
+import "../../../std/cli_schema.vela" as cli;
+fn invalid(value: cli::Arguments) -> Result<Int, cli::Error> { return cli::int_value(value, "x"); }
+fn main() -> Unit {}

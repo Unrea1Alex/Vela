@@ -1,0 +1,8 @@
+fn apply<effect E>(value: Int, action: fn(Int) -> Int effects E) -> Int effects E {
+    return action(value);
+}
+fn main() -> Int effects { io } {
+    let offset = 2;
+    print(apply(40, fn [offset](value: Int) -> Int { return value + offset; }));
+    return 0;
+}

@@ -1,5 +1,56 @@
 # Changelog
 
+## 1.2.0 — compact agent entry and standard library
+
+1.2.1 adds compact installed entry instructions, on-demand capabilities/recipes
+and historical migration help. Native `api SOURCE --json` verifies exported
+interfaces; `api --builtins` uses the embedded catalog. The Vela documentation
+generator produces the signature/effects index. Existing MCP response envelopes,
+topics, input bounds and conditional plan validation remain compatible.
+1.2.1a freezes old API/application fixtures and specifies opt-in library evolution.
+1.2.2 adds native Vela API discovery through MCP help: exact/purpose queries,
+stable pages, version/fingerprint, explicit empty/missing/ambiguous states and
+complete response-size bounds. Old help/resources and both response forms remain.
+1.2.3 adds native `init` for CLI/source-library projects, named smoke tests and
+locks; existing targets reject. E225 invalid names suggest a valid identifier.
+Directory publication is atomic without replacement on Windows/Linux.
+1.2.4 adds opt-in cli_schema with typed descriptors/getters, defaults, required
+positionals, integer bounds/relations and generated help. Three acceptance apps
+use it; the original cli API remains unchanged.
+1.2.4a adds opt-in result_ops/option combinators with callback effects, eager and
+lazy defaults and typed error context; existing result::map_error/explain remain.
+1.2.5 adds stable generic comparator sorting with a shallow snapshot and an
+O(n log n) comparison bound. Existing collection sorts delegate without changing
+their public signatures, unsigned string-byte order or NaN/signed-zero behavior.
+1.2.5a adds eager map/filter/fold/find/any/all and typed fallible variants. Ordered
+callbacks use a detached shallow snapshot; short circuits/errors stop callbacks.
+The basics sum and LogSummary JSON builder now use fold/try_fold.
+1.2.5b adds opaque Set<K> on existing Dict keys, with ordered enumeration,
+shared identity and independent union/intersection/difference results.
+1.2.5c adds opaque Cell<T> with shared copy/capture identity and stateful
+create/get/set, preserving ordinary nested payload aliases and tracing GC.
+1.2.6 adds typed JSON decoders with explicit record builders, arrays, nullability,
+required/optional/default fields, bounds and original-input error paths/offsets.
+Full syntax validation precedes callbacks; HTTP/log apps replace manual event chains.
+1.2.6a adds io Reader/Writer, memory/file adapters, bounded copy and independent
+operation/cleanup causes; stream_lines adds typed locations and split UTF-8,
+BOM/CRLF support. New native read/write owners allow explicit Int64 file bounds;
+legacy read limits and String line errors remain unchanged.
+1.2.7 adds host-driven ordered parallel mapping, Collect/FailFast policy,
+cancellation/deadline and per-item child cleanup. HTTP collector now uses
+parallel and async_io instead of managing slots/exchanges itself.
+1.2.8 adds native diagnostic explanations and revision-bound diagnose previews
+for deterministic project/import/private-main corrections. Unsafe effects and
+type choices stay explicit. LSP exposes versioned code actions and the actual
+compiler version; MCP forwards diagnose. init --help no longer creates a project.
+Windows temp_dir now retries bounded exclusive-creation collisions between
+workers and preserves a competing caller's path. A native injected-collision
+regression covers ownership and the retry bound.
+The compiler inventory/frontend audit records arena, tag and source-location
+invariants. Checked import previews never reinterpret a known type namespace as
+a module; builtin/generic-parameter regressions preserve explanation-only results.
+The [roadmap](ROADMAP.md) and [acceptance](VALIDATION-1.2.md) record actual gates.
+
 ## 1.1.0 — 2026-11-07
 
 Compatible library additions: Windows/Linux directory metadata and bounded

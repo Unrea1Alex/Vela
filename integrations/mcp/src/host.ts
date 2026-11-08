@@ -6,6 +6,8 @@ import { spawn, ChildProcess } from 'node:child_process';
 import { z } from 'zod';
 
 export const topics = {
+  api: 'docs/contracts/API-SEARCH-1.2.md',
+  start: 'docs/AGENT-START.md', capabilities: 'docs/CAPABILITIES.md', recipes: 'docs/RECIPES.md', migration: 'docs/AGENT-MIGRATION.md',
   quickstart: 'docs/AGENT-QUICKSTART.md', language: 'docs/LANGUAGE.md',
   projects: 'docs/PROJECTS.md', modules: 'docs/contracts/MODULES.md',
   memory: 'docs/MEMORY.md', builtins: 'vela/builtins.def',
@@ -40,6 +42,7 @@ export class Host {
   pins: Record<string, string> = {};
   docs = new Map<string,string>();
   private compilerBytes = Buffer.alloc(0);
+  private apiBytes = Buffer.alloc(0);
   private tempReady?: Promise<void>;
   constructor(public config: Config, public bounds = limits) {}
   async init(manifestPath: string) {
@@ -48,7 +51,7 @@ export class Host {
     this.config.toolchain = await fs.realpath(this.config.toolchain);
     const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
     if (manifest.schema_version !== 1 || typeof manifest.version !== 'string'
-        || !/^(0\.9\.0|0\.10\.0(?:-dev\.\d+)?|0\.11\.0(?:-dev\.[1234])?|1\.0\.0(?:-dev\.[12345]|-rc\.[12])?|1\.1\.0)$/.test(manifest.version)) {
+        || !/^(0\.9\.0|0\.10\.0(?:-dev\.\d+)?|0\.11\.0(?:-dev\.[1234])?|1\.0\.0(?:-dev\.[12345]|-rc\.[12])?|1\.1\.0|1\.2\.0(?:-dev\.1)?)$/.test(manifest.version)) {
       throw new HostError('incompatible', 'Unsupported compatibility manifest.');
     }
     this.compilerVersion = manifest.version;
@@ -61,6 +64,11 @@ export class Host {
     const bytes = await fs.readFile(path.join(this.config.toolchain, executable));
     if (digest(bytes) !== this.compilerId) throw new HostError('incompatible', 'Compiler changed during initialization.');
     this.compilerBytes = bytes;
+    const helper=process.platform==='win32'?'bin/vela-api.exe':'bin/vela-api';
+    if(this.pins[helper]){
+      this.apiBytes=await fs.readFile(path.join(this.config.toolchain,helper));
+      if(digest(this.apiBytes)!==this.pins[helper])throw new HostError('incompatible','API helper changed during initialization.');
+    }
     for (const value of Object.values(this.config.aliases)) this.resolve(value);
   }
   async ensureTemp() {
@@ -68,6 +76,7 @@ export class Host {
       this.base = await fs.mkdtemp(path.join(os.tmpdir(), 'vela-mcp-'));
       this.compiler = path.join(this.base, process.platform === 'win32' ? 'velac.exe' : 'velac');
       await fs.writeFile(this.compiler, this.compilerBytes, { mode: 0o700 });
+      if(this.apiBytes.length)await fs.writeFile(path.join(this.base,process.platform==='win32'?'vela-api.exe':'vela-api'),this.apiBytes,{mode:0o700});
     })();
     await this.tempReady;
   }
@@ -144,12 +153,12 @@ export class Host {
     if (!this.base || !within(this.base, path.resolve(dir))) throw new Error('Refusing cleanup outside owned directory.');
     await fs.rm(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 40 });
   }
-  run(args: string[], cwd: string, signal: AbortSignal): Promise<{code:number;out:string;err:string}> {
+  run(args: string[], cwd: string, signal: AbortSignal, executable=this.compiler): Promise<{code:number;out:string;err:string}> {
     abort(signal);
     return new Promise((resolve, reject) => {
       const env: NodeJS.ProcessEnv = { ...process.env, VELA_SOURCE_ROOT: cwd };
       delete env.VELA_CC; delete env.VELA_CC_KIND;
-      const child = spawn(this.compiler, args, { cwd, env, shell: false, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+      const child = spawn(executable, args, { cwd, env, shell: false, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
       this.children.add(child);
       let failure: unknown; let size = 0; const out: Buffer[] = [], err: Buffer[] = [];
       const cancel = () => { failure = signal.reason instanceof HostError ? signal.reason : new HostError('cancelled', 'Request cancelled.'); child.kill(); };
@@ -169,8 +178,34 @@ export class Host {
       });
     });
   }
+  async findApi(input:{query?:string;name?:string;offset?:number;limit?:number;max_bytes?:number;version?:string;fingerprint?:string},external:AbortSignal){
+    const answer=(status:Status,data:Record<string,unknown>={},message='')=>({schema_version:1 as const,status,compiler_id:this.compilerId,snapshot_id:'',data,message});
+    if(this.active>=this.bounds.active)return answer('limit',{},'Analysis concurrency limit reached.');
+    this.active++;
+    const timeout=new AbortController(),timer=setTimeout(()=>timeout.abort(new HostError('timeout','API lookup timed out.')),this.bounds.timeMs);
+    const signal=AbortSignal.any([external,timeout.signal,this.controller.signal]);
+    try{
+      abort(signal);await this.verify();abort(signal);
+      if(!this.apiBytes.length)throw new HostError('incompatible','Native API helper is not installed.');
+      await this.ensureTemp();
+      const budget=input.max_bytes??8192;
+      const args=[path.join(this.config.toolchain,'docs/api-index.json'),path.join(this.config.toolchain,'docs/api-purpose.json'),
+        input.name??input.query??'',input.name===undefined?'query':'name',String(input.offset??0),String(input.limit??3),
+        String(Math.max(128,Math.floor((budget-512)/4))),input.version??this.compilerVersion,input.fingerprint??''];
+      const result=await this.run(args,this.config.toolchain,signal,path.join(this.base,process.platform==='win32'?'vela-api.exe':'vela-api'));
+      await this.verify();abort(signal);
+      let native:Record<string,unknown>;try{native=JSON.parse(result.out);}catch{throw new HostError('toolchain_error','Native API helper returned invalid JSON.');}
+      const reason=String(native.reason??'');
+      const status:Status=native.ok===true?'ok':reason.startsWith('stale_')?'incompatible':reason==='response_limit'?'limit':'toolchain_error';
+      return answer(status,{topic:'api',native},reason);
+    }catch(error){return answer(error instanceof HostError?error.status:'toolchain_error',{},error instanceof Error?error.message:String(error));}
+    finally{
+      clearTimeout(timer);this.active--;
+      if(this.active===0&&this.base){const finished=this.base;this.base='';this.compiler='';this.tempReady=undefined;await this.removeRoot(finished);}
+    }
+  }
   async analyze(kind: 'check'|'symbols'|'fmt'|'query'|'plan', input: string, external: AbortSignal, text?: string, overlayPath?: string,
-    options: {at?:{path:string;line:number;character:number};plan?:{snapshot_id:string;revision:string;document:number;byte?:number;new_name?:string}} = {}) {
+    options: {at?:{path:string;line:number;character:number};plan?:{snapshot_id:string;revision:string;document:number;byte?:number;new_name?:string;diagnose?:boolean}} = {}) {
     let snapshotId = ''; let dir = '';
     const answer = (status: Status, data: Record<string,unknown>, message='') =>
       ({ schema_version: 1 as const, status, compiler_id: this.compilerId, snapshot_id: snapshotId, data, message });
@@ -214,7 +249,7 @@ export class Host {
         const plan = options.plan!;
         if (plan.snapshot_id !== snapshotId) throw new HostError('source_changed','Analysis snapshot changed; query again.');
         args.push(plan.revision,String(plan.document));
-        if (plan.byte === undefined) args.push('fmt'); else args.push(String(plan.byte),plan.new_name!);
+        if(plan.diagnose)args.push('diagnose');else if (plan.byte === undefined) args.push('fmt'); else args.push(String(plan.byte),plan.new_name!);
       } else {
         args.push('--json');
         if (kind === 'query' && options.at) {

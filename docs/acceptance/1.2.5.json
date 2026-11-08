@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.5",
+  "status": "verified",
+  "date": "2026-11-07",
+  "contract": "../contracts/STDLIB-EVOLUTION-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1296,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 485735,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/125-verify.log",
+  "independent_sort": {
+    "schema_version": 1,
+    "checks": 56,
+    "maxComparisons": 9886,
+    "oracle": "independent O(n²) stable ranks; n*ceil(log2(n)) comparison bound",
+    "status": "passed"
+  },
+  "native_fixture": {
+    "float_oracle": "Reciprocal signs test signed zeros independently of float text formatting; NaNs last. No new number-formatting claim.",
+    "rejections": {
+      "callback_io": "E209",
+      "callback_bool": "E201",
+      "missing_state": "E209"
+    },
+    "trace": "3:1,2:0,1:0,1:2,3:2",
+    "expected": "stable generic sort passed",
+    "positive": "v125_sort",
+    "linux_log": "build/stage12/125-linux.log",
+    "linux": "GCC/musl passed"
+  },
+  "gc": {
+    "report": "build/stage12/125-gc.err",
+    "live_managed_bytes_at_report": 17193,
+    "stress": 1,
+    "peak_managed_bytes": 21767,
+    "collections": 194704
+  },
+  "application_migration": "Current tree-index/log-summary already delegate to collections::sort_strings since 1.1; no authored application merge sort remains. Compatible wrappers now use the common generic merge. Frozen pilot sources remain immutable.",
+  "apps": {
+    "index": {
+      "log": "build/stage12/125-index.json",
+      "total": 26,
+      "failed": 0,
+      "passed": 26
+    },
+    "logs": {
+      "log": "build/stage12/125-logs.json",
+      "total": 46,
+      "failed": 0,
+      "passed": 46
+    },
+    "http": {
+      "log": "build/stage12/125-http.json",
+      "total": 44,
+      "failed": 0,
+      "passed": 44
+    }
+  },
+  "mcp": {
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "installed_sorting_check": "passed",
+    "failed": 0,
+    "startup_tokens": 1876,
+    "groups": 3,
+    "log": "build/stage12/125-mcp.log",
+    "wire_startup_tokens": 3521,
+    "new_api_lookup": "passed"
+  },
+  "recipes": {
+    "schema_version": 1,
+    "checks": [
+      "recipe basics",
+      "recipe directory",
+      "recipe json",
+      "recipe bytes",
+      "recipe result",
+      "recipe callable",
+      "recipe http",
+      "recipe cli",
+      "recipe sort",
+      "generic/effect/opaque/method/async interface",
+      "reject invalid interface before emission",
+      "all embedded builtin rows",
+      "all shipped modules and recipe IDs resolve to verified catalog"
+    ],
+    "passed": 13
+  },
+  "api_search": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 96,
+    "negative_checks": 2
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 115,
+    "links": 787,
+    "missing": []
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "next": "1.2.5a"
+}

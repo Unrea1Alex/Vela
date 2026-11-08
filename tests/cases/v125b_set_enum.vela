@@ -1,0 +1,3 @@
+import "../../../std/set.vela" as sets;
+enum Key { A, B }
+fn main() -> Unit effects { state } { let value = sets::create<Key>(); }

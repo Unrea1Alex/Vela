@@ -1,0 +1,815 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.9",
+  "experiment": "agent reference A/B",
+  "status": "verified",
+  "date": "2026-11-08",
+  "protocol": "../contracts/AGENT-ACCEPTANCE-1.2.md",
+  "protocol_sha256": "51cefe4c2b8c49a2e28409fdc39eab1064afce473608d3cbcb4a0459d6b2c0c9",
+  "oracle_sha256": "c658e621f30a992a6702b9f8524a92a1012a7b0e55c8082c127c18944b39e7a7",
+  "compiler_sha256": "56b3bce46c96b86d8bcc89a0db8af4740d0b0962313a4db7028e285d8863c4ab",
+  "api_sha256": "8857d6313acfb6bf2b5a544414deb1858281f2ae8dab526b385c956536f3139e",
+  "task_sha256": "0981f54ce9090ece609835e355372608d94dd383511a1101c473a45e0db2a5b5",
+  "fresh_sessions": 6,
+  "correctness": {
+    "full": "3/3",
+    "checks_per_trial": 63,
+    "compact": "3/3"
+  },
+  "median_uncached": {
+    "target_percent": 25,
+    "full": 47626,
+    "compact": 32055,
+    "reduction_percent": 32.6943
+  },
+  "usage_source": "provider cumulative token_count, own fresh subagent sessions only",
+  "help_metric": "tool invocations requesting API/help or reading assigned reference/SDK docs/std; call IDs retained",
+  "correction_metric": "tool results with exit code 1 and native E-code, one result per observed compiler correction cycle",
+  "oracle_correction": "The frozen source-pattern check falsely rejected manifest @aliases in five projects. Native query proves actual calls to exact SDK-byte algorithms::sort and cli_schema create/parse/current. Original reports are preserved; literal behavior cases, applications, SDK and task were unchanged. No oracle feedback was supplied to any session.",
+  "scope": "Same default model/reasoning, compiler/API/task/limits, independent nonces, two batches; CLI fallback because delegated native MCP tools were unavailable. Finite single-task comparison, no general model/syntax/speed claim; shared host release load.",
+  "trials": [
+    {
+      "id": "full-1",
+      "variant": "full",
+      "session_id": "01a1b894-3f22-7e41-8c3a-3d37de6e2117",
+      "input": 997551,
+      "cached": 942208,
+      "uncached": 55343,
+      "output": 14664,
+      "reasoning_output": 3504,
+      "wall_seconds": 341.312,
+      "tool_invocations": 17,
+      "help_tool_invocations": 12,
+      "compiler_correction_cycles": 2,
+      "correctness": {
+        "passed": 63,
+        "failed": 0
+      },
+      "reference_read_audit": [
+        {
+          "file": "00-entry.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_509055ceb9ce43f28108885364e7a3a1"
+          ]
+        },
+        {
+          "file": "01-language.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_bc916400ecd9439982c5d32945cc94a9"
+          ]
+        },
+        {
+          "file": "02-language.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_059e6c880bd748058f908fd70199176b"
+          ]
+        },
+        {
+          "file": "03-stdlib.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_107324d9fb4b4d3eb5948c0747e1e1c6"
+          ]
+        },
+        {
+          "file": "04-tooling.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_2d208a93570e41c78d48346f12db36fb"
+          ]
+        },
+        {
+          "file": "05-projects.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_5b054c3867714458b34e91a0a62b41e9"
+          ]
+        }
+      ],
+      "original_oracle": {
+        "passed": 62,
+        "failed": 1
+      },
+      "native_library_proof": [
+        {
+          "module": "algorithms",
+          "functions": [
+            "sort"
+          ],
+          "calls": [
+            {
+              "definition": "4:4439:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-1\\workspace\\report.vela",
+              "range": {
+                "document": 1,
+                "start": {
+                  "line": 156,
+                  "character": 30,
+                  "byte": 6235
+                },
+                "end": {
+                  "line": 156,
+                  "character": 34,
+                  "byte": 6239
+                }
+              }
+            }
+          ],
+          "module_files": [
+            {
+              "path": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-1\\workspace\\vela-stdlib\\algorithms.vela",
+              "exact_sdk_bytes": true
+            }
+          ]
+        },
+        {
+          "module": "cli_schema",
+          "functions": [
+            "create",
+            "parse"
+          ],
+          "calls": [
+            {
+              "definition": "2:2117:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-1\\workspace\\report.vela",
+              "range": {
+                "document": 1,
+                "start": {
+                  "line": 21,
+                  "character": 28,
+                  "byte": 711
+                },
+                "end": {
+                  "line": 21,
+                  "character": 34,
+                  "byte": 717
+                }
+              }
+            },
+            {
+              "definition": "2:6883:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-1\\workspace\\report.vela",
+              "range": {
+                "document": 1,
+                "start": {
+                  "line": 25,
+                  "character": 28,
+                  "byte": 1010
+                },
+                "end": {
+                  "line": 25,
+                  "character": 33,
+                  "byte": 1015
+                }
+              }
+            }
+          ],
+          "module_files": [
+            {
+              "path": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-1\\workspace\\vela-stdlib\\cli_schema.vela",
+              "exact_sdk_bytes": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "compact-1",
+      "variant": "compact",
+      "session_id": "01a1b894-5245-7590-918a-550c3f34a4bf",
+      "input": 967991,
+      "cached": 935936,
+      "uncached": 32055,
+      "output": 15753,
+      "reasoning_output": 3362,
+      "wall_seconds": 369.874,
+      "tool_invocations": 18,
+      "help_tool_invocations": 10,
+      "compiler_correction_cycles": 3,
+      "correctness": {
+        "passed": 63,
+        "failed": 0
+      },
+      "reference_read_audit": [
+        {
+          "file": "00-entry.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_1ef5a084f73142ab95fb46dcab2055fb"
+          ]
+        }
+      ],
+      "original_oracle": {
+        "passed": 63,
+        "failed": 0
+      },
+      "native_library_proof": [
+        {
+          "module": "algorithms",
+          "functions": [
+            "sort"
+          ],
+          "calls": [
+            {
+              "definition": "4:4439:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-1\\workspace\\app.vela",
+              "range": {
+                "document": 1,
+                "start": {
+                  "line": 150,
+                  "character": 29,
+                  "byte": 6027
+                },
+                "end": {
+                  "line": 150,
+                  "character": 33,
+                  "byte": 6031
+                }
+              }
+            }
+          ],
+          "module_files": [
+            {
+              "path": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-1\\workspace\\std\\algorithms.vela",
+              "exact_sdk_bytes": true
+            }
+          ]
+        },
+        {
+          "module": "cli_schema",
+          "functions": [
+            "create",
+            "parse"
+          ],
+          "calls": [
+            {
+              "definition": "2:2117:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-1\\workspace\\app.vela",
+              "range": {
+                "document": 1,
+                "start": {
+                  "line": 40,
+                  "character": 22,
+                  "byte": 1385
+                },
+                "end": {
+                  "line": 40,
+                  "character": 28,
+                  "byte": 1391
+                }
+              }
+            },
+            {
+              "definition": "2:6883:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-1\\workspace\\app.vela",
+              "range": {
+                "document": 1,
+                "start": {
+                  "line": 67,
+                  "character": 22,
+                  "byte": 2539
+                },
+                "end": {
+                  "line": 67,
+                  "character": 27,
+                  "byte": 2544
+                }
+              }
+            }
+          ],
+          "module_files": [
+            {
+              "path": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-1\\workspace\\std\\cli_schema.vela",
+              "exact_sdk_bytes": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "full-2",
+      "variant": "full",
+      "session_id": "01a1b894-671b-77b0-bd26-3a64e31eda40",
+      "input": 1092082,
+      "cached": 1045760,
+      "uncached": 46322,
+      "output": 13757,
+      "reasoning_output": 4046,
+      "wall_seconds": 343.341,
+      "tool_invocations": 17,
+      "help_tool_invocations": 10,
+      "compiler_correction_cycles": 2,
+      "correctness": {
+        "passed": 63,
+        "failed": 0
+      },
+      "reference_read_audit": [
+        {
+          "file": "00-entry.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_c8ca4dfab7c94569bd8d179db9a36809"
+          ]
+        },
+        {
+          "file": "01-language.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_11fff09089b344d7b2d6809d6ce29dbc"
+          ]
+        },
+        {
+          "file": "02-language.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_40a099b728c54c2fa7a0c671fe9b6eb5"
+          ]
+        },
+        {
+          "file": "03-stdlib.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_908fea608cfb4d298737eb70a19d632b"
+          ]
+        },
+        {
+          "file": "04-tooling.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_db5348402197408580c045d32472fdfe"
+          ]
+        },
+        {
+          "file": "05-projects.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_c8ca4dfab7c94569bd8d179db9a36809"
+          ]
+        }
+      ],
+      "original_oracle": {
+        "passed": 62,
+        "failed": 1
+      },
+      "native_library_proof": [
+        {
+          "module": "algorithms",
+          "functions": [
+            "sort"
+          ],
+          "calls": [
+            {
+              "definition": "3:4439:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-2\\workspace\\main.vela",
+              "range": {
+                "document": 0,
+                "start": {
+                  "line": 138,
+                  "character": 30,
+                  "byte": 4177
+                },
+                "end": {
+                  "line": 138,
+                  "character": 34,
+                  "byte": 4181
+                }
+              }
+            }
+          ],
+          "module_files": [
+            {
+              "path": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-2\\workspace\\std\\algorithms.vela",
+              "exact_sdk_bytes": true
+            }
+          ]
+        },
+        {
+          "module": "cli_schema",
+          "functions": [
+            "create",
+            "parse"
+          ],
+          "calls": [
+            {
+              "definition": "1:2117:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-2\\workspace\\main.vela",
+              "range": {
+                "document": 0,
+                "start": {
+                  "line": 159,
+                  "character": 28,
+                  "byte": 5209
+                },
+                "end": {
+                  "line": 159,
+                  "character": 34,
+                  "byte": 5215
+                }
+              }
+            },
+            {
+              "definition": "1:6883:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-2\\workspace\\main.vela",
+              "range": {
+                "document": 0,
+                "start": {
+                  "line": 165,
+                  "character": 28,
+                  "byte": 5495
+                },
+                "end": {
+                  "line": 165,
+                  "character": 33,
+                  "byte": 5500
+                }
+              }
+            }
+          ],
+          "module_files": [
+            {
+              "path": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-2\\workspace\\std\\cli_schema.vela",
+              "exact_sdk_bytes": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "compact-2",
+      "variant": "compact",
+      "session_id": "01a1b89a-5acb-7b30-8c80-7e98c09699cc",
+      "input": 857726,
+      "cached": 814976,
+      "uncached": 42750,
+      "output": 13050,
+      "reasoning_output": 2900,
+      "wall_seconds": 315.872,
+      "tool_invocations": 17,
+      "help_tool_invocations": 13,
+      "compiler_correction_cycles": 2,
+      "correctness": {
+        "passed": 63,
+        "failed": 0
+      },
+      "reference_read_audit": [
+        {
+          "file": "00-entry.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_b322a5e9e5ad41baa60a15128ddf8ae9"
+          ]
+        }
+      ],
+      "original_oracle": {
+        "passed": 62,
+        "failed": 1
+      },
+      "native_library_proof": [
+        {
+          "module": "algorithms",
+          "functions": [
+            "sort"
+          ],
+          "calls": [
+            {
+              "definition": "3:4439:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-2\\workspace\\main.vela",
+              "range": {
+                "document": 0,
+                "start": {
+                  "line": 153,
+                  "character": 30,
+                  "byte": 5583
+                },
+                "end": {
+                  "line": 153,
+                  "character": 34,
+                  "byte": 5587
+                }
+              }
+            }
+          ],
+          "module_files": [
+            {
+              "path": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-2\\workspace\\std\\algorithms.vela",
+              "exact_sdk_bytes": true
+            }
+          ]
+        },
+        {
+          "module": "cli_schema",
+          "functions": [
+            "create",
+            "parse"
+          ],
+          "calls": [
+            {
+              "definition": "1:2117:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-2\\workspace\\main.vela",
+              "range": {
+                "document": 0,
+                "start": {
+                  "line": 53,
+                  "character": 33,
+                  "byte": 1911
+                },
+                "end": {
+                  "line": 53,
+                  "character": 39,
+                  "byte": 1917
+                }
+              }
+            },
+            {
+              "definition": "1:6883:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-2\\workspace\\main.vela",
+              "range": {
+                "document": 0,
+                "start": {
+                  "line": 55,
+                  "character": 33,
+                  "byte": 2036
+                },
+                "end": {
+                  "line": 55,
+                  "character": 38,
+                  "byte": 2041
+                }
+              }
+            }
+          ],
+          "module_files": [
+            {
+              "path": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-2\\workspace\\std\\cli_schema.vela",
+              "exact_sdk_bytes": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "full-3",
+      "variant": "full",
+      "session_id": "01a1b89a-7a05-7150-8768-7e3466177b39",
+      "input": 949258,
+      "cached": 901632,
+      "uncached": 47626,
+      "output": 11639,
+      "reasoning_output": 2435,
+      "wall_seconds": 280.267,
+      "tool_invocations": 15,
+      "help_tool_invocations": 11,
+      "compiler_correction_cycles": 2,
+      "correctness": {
+        "passed": 63,
+        "failed": 0
+      },
+      "reference_read_audit": [
+        {
+          "file": "00-entry.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_941376f7b6a24fb88a3589ab9eb2c553"
+          ]
+        },
+        {
+          "file": "01-language.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_a4464eae4b5d42e49eba0afddea2afe4"
+          ]
+        },
+        {
+          "file": "02-language.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_b4b1681be8e44822876b37b5fbdbe3a9"
+          ]
+        },
+        {
+          "file": "03-stdlib.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_67aab4806f514e709b1fdc2f51c1d65b"
+          ]
+        },
+        {
+          "file": "04-tooling.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_352d4d1677cb4c7ba5f4e9cea4fa42e2"
+          ]
+        },
+        {
+          "file": "05-projects.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_941376f7b6a24fb88a3589ab9eb2c553"
+          ]
+        }
+      ],
+      "original_oracle": {
+        "passed": 62,
+        "failed": 1
+      },
+      "native_library_proof": [
+        {
+          "module": "algorithms",
+          "functions": [
+            "sort"
+          ],
+          "calls": [
+            {
+              "definition": "7:4439:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-3\\workspace\\report.vela",
+              "range": {
+                "document": 6,
+                "start": {
+                  "line": 101,
+                  "character": 29,
+                  "byte": 3721
+                },
+                "end": {
+                  "line": 101,
+                  "character": 33,
+                  "byte": 3725
+                }
+              }
+            }
+          ],
+          "module_files": [
+            {
+              "path": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-3\\workspace\\vela-stdlib\\algorithms.vela",
+              "exact_sdk_bytes": true
+            }
+          ]
+        },
+        {
+          "module": "cli_schema",
+          "functions": [
+            "create",
+            "current"
+          ],
+          "calls": [
+            {
+              "definition": "1:2117:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-3\\workspace\\main.vela",
+              "range": {
+                "document": 0,
+                "start": {
+                  "line": 11,
+                  "character": 35,
+                  "byte": 644
+                },
+                "end": {
+                  "line": 11,
+                  "character": 41,
+                  "byte": 650
+                }
+              }
+            },
+            {
+              "definition": "1:10809:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-3\\workspace\\main.vela",
+              "range": {
+                "document": 0,
+                "start": {
+                  "line": 15,
+                  "character": 34,
+                  "byte": 937
+                },
+                "end": {
+                  "line": 15,
+                  "character": 41,
+                  "byte": 944
+                }
+              }
+            }
+          ],
+          "module_files": [
+            {
+              "path": "G:\\Vela\\build\\stage12\\ab-E22oet\\full-3\\workspace\\vela-stdlib\\cli_schema.vela",
+              "exact_sdk_bytes": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "compact-3",
+      "variant": "compact",
+      "session_id": "01a1b89a-8b97-7cf0-a3a6-6bccb00a281b",
+      "input": 863993,
+      "cached": 834560,
+      "uncached": 29433,
+      "output": 15891,
+      "reasoning_output": 3277,
+      "wall_seconds": 372.391,
+      "tool_invocations": 17,
+      "help_tool_invocations": 10,
+      "compiler_correction_cycles": 3,
+      "correctness": {
+        "passed": 63,
+        "failed": 0
+      },
+      "reference_read_audit": [
+        {
+          "file": "00-entry.md",
+          "complete_text_in_tool_output": true,
+          "call_ids": [
+            "call_8eaa96951ed740acb50b22694d4fef5f"
+          ]
+        }
+      ],
+      "original_oracle": {
+        "passed": 62,
+        "failed": 1
+      },
+      "native_library_proof": [
+        {
+          "module": "algorithms",
+          "functions": [
+            "sort"
+          ],
+          "calls": [
+            {
+              "definition": "2:4439:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-3\\workspace\\app.vela",
+              "range": {
+                "document": 1,
+                "start": {
+                  "line": 146,
+                  "character": 29,
+                  "byte": 4567
+                },
+                "end": {
+                  "line": 146,
+                  "character": 33,
+                  "byte": 4571
+                }
+              }
+            }
+          ],
+          "module_files": [
+            {
+              "path": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-3\\workspace\\std\\algorithms.vela",
+              "exact_sdk_bytes": true
+            }
+          ]
+        },
+        {
+          "module": "cli_schema",
+          "functions": [
+            "create",
+            "parse"
+          ],
+          "calls": [
+            {
+              "definition": "3:2117:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-3\\workspace\\app.vela",
+              "range": {
+                "document": 1,
+                "start": {
+                  "line": 169,
+                  "character": 28,
+                  "byte": 5700
+                },
+                "end": {
+                  "line": 169,
+                  "character": 34,
+                  "byte": 5706
+                }
+              }
+            },
+            {
+              "definition": "3:6883:function",
+              "source": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-3\\workspace\\app.vela",
+              "range": {
+                "document": 1,
+                "start": {
+                  "line": 193,
+                  "character": 28,
+                  "byte": 6743
+                },
+                "end": {
+                  "line": 193,
+                  "character": 33,
+                  "byte": 6748
+                }
+              }
+            }
+          ],
+          "module_files": [
+            {
+              "path": "G:\\Vela\\build\\stage12\\ab-E22oet\\compact-3\\workspace\\std\\cli_schema.vela",
+              "exact_sdk_bytes": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

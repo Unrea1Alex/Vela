@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.5a",
+  "status": "verified",
+  "date": "2026-11-07",
+  "contract": "../contracts/STDLIB-EVOLUTION-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1306,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 485735,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/125a-verify.log",
+  "native_fixture": {
+    "expected_stdout_normalized": "fallible io callback\ntyped traversals passed\n",
+    "operations": [
+      "map",
+      "filter",
+      "fold",
+      "find",
+      "any",
+      "all",
+      "try_map",
+      "try_filter",
+      "try_fold",
+      "try_find",
+      "try_any",
+      "try_all"
+    ],
+    "linux_log": "build/stage12/125a-linux.log",
+    "checks": "empty/singleton/records, exact traces, zero/one call, short circuits, first typed error, source alias mutation, fresh outer results and shared nested payloads",
+    "linux": "GCC/musl passed",
+    "positive": "v125a_traversals",
+    "rejections": {
+      "io": "E209",
+      "predicate": "E201",
+      "state": "E209",
+      "accumulator": "E201"
+    }
+  },
+  "gc": {
+    "collections": 2938,
+    "report": "build/stage12/125a-gc.err",
+    "peak_managed_bytes": 4704,
+    "stress": 1,
+    "live_managed_bytes_at_report": 4504
+  },
+  "allocation": {
+    "schema_version": 1,
+    "status": "passed",
+    "observations": [
+      {
+        "size": 128,
+        "mode": "base",
+        "collections": 426,
+        "peak_managed_bytes": 1839,
+        "live_managed_bytes": 1413
+      },
+      {
+        "size": 128,
+        "mode": "any",
+        "collections": 1100,
+        "peak_managed_bytes": 3188,
+        "live_managed_bytes": 1412
+      },
+      {
+        "size": 1280,
+        "mode": "base",
+        "collections": 3882,
+        "peak_managed_bytes": 24813,
+        "live_managed_bytes": 16773
+      },
+      {
+        "size": 1280,
+        "mode": "any",
+        "collections": 10316,
+        "peak_managed_bytes": 41588,
+        "live_managed_bytes": 16772
+      }
+    ],
+    "capacity_policy": "doubling (<2n slots), so the derived 10x-input ceiling is 20x, not 12x",
+    "scope": "managed peak includes resident input and eager snapshot, not OS process memory; a short-circuit call still allocates the snapshot"
+  },
+  "allocation_harness_correction": "The initial arbitrary 12x peak ceiling for 10x input failed (3188 -> 41588 bytes). Runtime list capacity doubles, 128 -> 2048 slots; the O(n) contract permits this. The guard now uses the derived <20x ceiling and compares snapshot against input-only runs. No streaming constant-buffer promise is claimed.",
+  "migrations": [
+    "examples/recipes/basics.vela: manual sum -> fold",
+    "apps/log-summary/main.vela: manual JSON service traversal -> try_fold"
+  ],
+  "log_summary": {
+    "failed": 0,
+    "log": "build/stage12/125a-logs.json",
+    "passed": 46,
+    "total": 46
+  },
+  "other_apps": "Index/HTTP app sources unchanged; their 26/44 oracles passed in 1.2.5 and were not repeated here. Full release rebuild/oracles remain in 1.2.9.",
+  "mcp": {
+    "groups": 3,
+    "installed_traversals": "passed",
+    "failed": 0,
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "wire_startup_tokens": 3501,
+    "log": "build/stage12/125a-mcp.log",
+    "new_api_lookup": "passed",
+    "startup_tokens": 1856
+  },
+  "recipes": {
+    "schema_version": 1,
+    "checks": [
+      "recipe basics",
+      "recipe directory",
+      "recipe json",
+      "recipe bytes",
+      "recipe result",
+      "recipe callable",
+      "recipe http",
+      "recipe cli",
+      "recipe sort",
+      "recipe traversals",
+      "generic/effect/opaque/method/async interface",
+      "reject invalid interface before emission",
+      "all embedded builtin rows",
+      "all shipped modules and recipe IDs resolve to verified catalog"
+    ],
+    "passed": 14
+  },
+  "api_search": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 96,
+    "negative_checks": 2
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 115,
+    "links": 790,
+    "missing": []
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "next": "1.2.5b"
+}

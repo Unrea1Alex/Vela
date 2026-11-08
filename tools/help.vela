@@ -1,0 +1,89 @@
+// Optional documentation generation; signatures are checked by the native compiler.
+import "../std/directory.vela" as directory;
+import "../std/path.vela" as path;
+import "../std/collections.vela" as collections;
+import "../std/json.vela" as json;
+fn string(value: StringResult) -> String effects { process } {
+    match value {
+        StringResult::Ok(item) => {
+            return item;
+        }
+        StringResult::Err(error) => {
+            panic(error);
+        }
+    }
+}
+fn quote(value: String) -> String effects { state, process } {
+    match json::stringify(json::Value::StringValue(value)) {
+        Result::Ok(item) => {
+            return item;
+        }
+        Result::Err(_) => {
+            panic("JSON quote failed");
+        }
+    }
+}
+fn checked(compiler: String, source: String, log: String) -> String effects { state, io, process } {
+    let command = strings_new();
+    strings_push(command, compiler);
+    strings_push(command, "api");
+    strings_push(command, source);
+    if source != "--builtins" {
+        strings_push(command, "--json");
+    }
+    let code = process_run_files(command, log + ".out", log + ".err", 30000);
+    let out = string(read_file(log + ".out"));
+    let err = string(read_file(log + ".err"));
+    let removed_out = remove_file(log + ".out");
+    let removed_err = remove_file(log + ".err");
+    if code != 0 {
+        panic(source + ": " + out + err);
+    }
+    return out;
+}
+fn main() -> Int effects { args, state, io, process } {
+    if arg_count() != 3 {
+        eprint("Usage: help ROOT COMPILER OUTPUT.json");
+        return 2;
+    }
+    let root = string(absolute_path(string(arg(0))));
+    let compiler = string(absolute_path(string(arg(1))));
+    let output = string(absolute_path(string(arg(2))));
+    let temporary = string(temp_dir(""));
+    let modules = list_new<String>();
+    match directory::entries_bounded(path::Path(value: root + "/std"), 128) {
+        Result::Err(error) => {
+            panic(error.reason);
+        }
+        Result::Ok(entries) => {
+            for entry in entries {
+                if entry.kind == directory::Kind::File && str_len(entry.name) > 5 && str_slice(
+                    entry.name, str_len(entry.name) - 5, str_len(entry.name)) == ".vela" {
+                    list_push(modules, entry.name);
+                }
+            }
+        }
+    }
+    let rows = strings_new();
+    strings_push(rows, "{\"module\":\"builtin\",\"api\":" + checked(compiler, "--builtins",
+        temporary + "/api") + "}");
+    for name in collections::sort_strings(modules) {
+        strings_push(rows, "{\"module\":" + quote("std/" + str_slice(name, 0, str_len(name) - 5))
+            + ",\"api\":" + checked(compiler, root + "/std/" + name, temporary + "/api") + "}");
+    }
+    match write_file(output, "{\"schema_version\":1,\"modules\":[" + strings_join(rows, ",")
+        + "]}\n") {
+        WriteResult::Err(error) => {
+            panic(error);
+        }
+        WriteResult::Ok => {}
+    }
+    match remove_dir(temporary) {
+        WriteResult::Ok => {}
+        WriteResult::Err(error) => {
+            panic(error);
+        }
+    }
+    print("Generated checked API for " + to_string(list_len(modules)) + " standard modules");
+    return 0;
+}

@@ -66,40 +66,27 @@ const stats = pid => process.platform==='win32' ? JSON.parse(execFileSync('power
   {encoding:'utf8',windowsHide:true})) : null;
 
 if(mode === 'refactor') {
-  const workspace=path.resolve('.'), root=path.join(workspace,'selfhost/vela.project');
-  const file=path.join(workspace,'selfhost/query.vela'), semantic=path.join(workspace,'selfhost/semantic.vela');
-  const initial=new Map(await Promise.all([file,semantic].map(async p=>[p,await readFile(p,'utf8')])));
+  const workspace=await mkdtemp(path.join(os.tmpdir(),'vela-lsp-refactor-'));
+  assert.equal(path.dirname(workspace),path.resolve(os.tmpdir()));
+  const root=path.join(workspace,'vela.project'),file=path.join(workspace,'query.vela'),semantic=path.join(workspace,'semantic.vela');
+  await writeFile(root,'vela-project|1\nname|refactor_fixture\nentry|semantic.vela\n');
+  const initial=new Map([[file,'pub fn query_use(value: Int)->Int { return value; }\r\n'],[semantic,'import "query.vela" as query;\r\nfn main()->Int { let label="🧭"; return query::query_use(21)+query::query_use(21); }\r\n']]);
+  for(const [target,text]of initial)await writeFile(target,text);
   const c=client(workspace,root);
   try{
-    await init(c);
-    for(const [p,text] of initial)c.open(p,text);
-    const src=initial.get(file).replaceAll('\r\n','\n');
-    const position=at(src,src.indexOf('fn query_use(')+3);
-    const result=await c.ask('textDocument/rename',{textDocument:doc(file),position,newName:'record_query_use'});
-    assert.ok(result.result,JSON.stringify(result));
-    assert.equal(result.result.documentChanges.length,2);
-    const staged=[];
-    for(const change of result.result.documentChanges){
-      assert.equal(change.textDocument.version,1);
-      const target=[...initial.keys()].find(p=>doc(p).uri===change.textDocument.uri);
-      assert.ok(target);
-      assert.equal(await readFile(target,'utf8'),initial.get(target));
-      const original=initial.get(target).replaceAll('\r\n','\n');
-      let edited=original;
-      for(const edit of [...change.edits].reverse()){
-        const start=toOffset(original,edit.range.start),end=toOffset(original,edit.range.end);
-        assert.equal(original.slice(start,end),'query_use');
-        edited=edited.slice(0,start)+edit.newText+edited.slice(end);
-      }
-      assert.equal(edited,original.replaceAll(/\bquery_use\b/g,'record_query_use'));
-      staged.push([target,initial.get(target).includes('\r\n')?edited.replaceAll('\n','\r\n'):edited,change.edits.length]);
+    await init(c);for(const [target,text]of initial)c.open(target,text);
+    const source=initial.get(file).replaceAll('\r\n','\n'),position=at(source,source.indexOf('fn query_use(')+3);
+    const response=await c.ask('textDocument/rename',{textDocument:doc(file),position,newName:'record_query_use'});
+    assert.ok(response.result,JSON.stringify(response));assert.equal(response.result.documentChanges.length,2);
+    let total=0;
+    for(const change of response.result.documentChanges){
+      assert.equal(change.textDocument.version,1);const target=[...initial.keys()].find(p=>doc(p).uri===change.textDocument.uri);assert.ok(target);assert.equal(await readFile(target,'utf8'),initial.get(target));
+      const original=initial.get(target).replaceAll('\r\n','\n');let edited=original;
+      for(const edit of [...change.edits].reverse()){const start=toOffset(original,edit.range.start),end=toOffset(original,edit.range.end);assert.equal(original.slice(start,end),'query_use');edited=edited.slice(0,start)+edit.newText+edited.slice(end);total++;}
+      assert.equal(edited,original.replaceAll(/\bquery_use\b/g,'record_query_use'));await writeFile(target,edited);
     }
-    assert.equal(staged.length,2);
-    for(const [target,contents] of staged)await writeFile(target,contents);
-    assert.ok(native('check',root,'--json').ok);
-    console.log(JSON.stringify({refactor:'query_use → record_query_use',files:staged.map(([p,,n])=>[path.relative(workspace,p),n]),verified:true}));
-  } finally {await c.end();}
-} else if (mode === 'test-root-scope') {
+    assert.equal(total,3);assert.ok(native('check',root,'--json').ok);console.log(JSON.stringify({refactor:'query_use → record_query_use',fixture:true,files:2,edits:total,verified:true,repository_unchanged:true}));await c.end();
+  }finally{c.child.kill();await rm(workspace,{recursive:true,force:true});}} else if (mode === 'test-root-scope') {
   const workspace=await mkdtemp(path.join(os.tmpdir(),'vela-lsp-scope-'));
   const main=path.join(workspace,'main.vela');
   const project=path.join(workspace,'vela.project');

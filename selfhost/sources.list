@@ -21,4 +21,7 @@ emitter
 intrinsics
 formatter
 query
+repairs
+help
+scaffold
 driver

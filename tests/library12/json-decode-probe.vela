@@ -1,0 +1,20 @@
+import "../../std/json_decode.vela" as decode;
+import "../../std/json_stream.vela" as stream;
+struct Row { name: String, count: Int, notes: Option<Option<String>> }
+fn schema(policy: decode::Unknown) -> Result<decode::Decoder<Row>, decode::Error> effects { state } {
+    let names = list_new<String>(); list_push(names, "name"); list_push(names, "count"); list_push(names, "notes");
+    let number = decode::integer(-5, 5)?;
+    return decode::object(names, policy, fn [number](fields: decode::Fields) -> Result<Row, decode::Error> effects { state } {
+        return Result<Row, decode::Error>::Ok(Row(name: decode::required(fields, "name", decode::string())?, count: decode::defaulted(fields, "count", number, 3)?, notes: decode::optional(fields, "notes", decode::nullable(decode::string()))?));
+    });
+}
+fn main() -> Int effects { state, io } {
+    match schema(decode::Unknown::Ignore) {
+        Result::Err(error) => { eprint(decode::describe(error)); return 2; }
+        Result::Ok(typed) => { match decode::decode(typed, "{\"name\":\"文\",\"notes\":null,\"unknown\":1e999999}", stream::default_limits()) {
+            Result::Err(error) => { eprint(decode::describe(error)); return 1; }
+            Result::Ok(row) => { assert_true(row.name == "文" && row.count == 3, "typed record defaults"); print("typed JSON record passed"); }
+        } }
+    }
+    return 0;
+}

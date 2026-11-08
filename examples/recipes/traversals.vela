@@ -1,0 +1,47 @@
+import "../../std/algorithms.vela" as algorithms;
+fn main() -> Unit effects { state, io } {
+    let values = list_new<Int>();
+    list_push(values, 1);
+    list_push(values, 2);
+    list_push(values, 3);
+    let doubled = algorithms::map(values, fn [ ](n: Int) -> Int {
+        return n * 2;
+    });
+    let selected = algorithms::filter(doubled, fn [ ](n: Int) -> Bool {
+        return n != 4;
+    });
+    let total = algorithms::fold(selected, 0, fn [ ](sum: Int, n: Int) -> Int {
+        return sum + n;
+    });
+    assert_true(total == 8 && list_len(values) == 3, "ordered fresh results");
+    assert_true(algorithms::any(selected, fn [ ](n: Int) -> Bool {
+        return n == 6;
+    }), "short circuit");
+    assert_true(algorithms::all(selected, fn [ ](n: Int) -> Bool {
+        return n > 0;
+    }), "all");
+    match algorithms::find(selected, fn [ ](n: Int) -> Bool {
+        return n == 6;
+    }) {
+        Option::Some(n) => {
+            assert_true(n == 6, "first match");
+        }
+        Option::None => {
+            assert_true(false, "expected first match");
+        }
+    }
+    let checked = algorithms::try_map(doubled, fn [ ](n: Int) -> Result<Int, Int> {
+        if n > 5 {
+            return Result<Int, Int>::Err(n);
+        }
+        return Result<Int, Int>::Ok(n);
+    });
+    match checked {
+        Result::Ok(_) => {
+            assert_true(false, "expected typed failure");
+        }
+        Result::Err(cause) => {
+            print("total=" + to_string(total) + ",error=" + to_string(cause));
+        }
+    }
+}

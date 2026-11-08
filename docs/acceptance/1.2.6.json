@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.6",
+  "status": "verified",
+  "date": "2026-11-08",
+  "contract": "../contracts/JSON-DECODE-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1352,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 485735,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/126-verify.log",
+  "focused": {
+    "checks": "typed records/nested arrays; missing/null/optional/default distinctions; eager defaults; syntax/duplicates/unknown before callbacks; integer extrema/overflow and finite floats; Unicode/escaped key exact paths and byte offsets; unchanged local typed causes; schema/input/selected-depth/path budgets; input spans/backing lifetimes",
+    "linux_log": "build/stage12/126-linux.log",
+    "linux": "GCC/musl passed",
+    "expected": "typed JSON schemas passed",
+    "rejections": {
+      "fields_construct": "E232",
+      "state": "E209",
+      "builder_type": "E201",
+      "decoder_construct": "E232",
+      "result_type": "E201",
+      "builder_effect": "E209",
+      "fields_private": "E223"
+    },
+    "budgets": "normal Windows/Linux: 6000-digit ignored number, ignored depth4096, 127 selected calls accepted/129th rejected at byte832, path65536 cap at byte64828",
+    "positive": "v126_json_decode"
+  },
+  "gc": {
+    "live_managed_bytes_at_report": 3596,
+    "report": "build/stage12/126-gc.err",
+    "scope": "Bounded 64-round dynamic schema/payload/span reuse probe; full depth4096/path65536 fixture was not forced to collect at every safepoint",
+    "collections": 1864629,
+    "source": "tests/library12/json-decode-gc.vela",
+    "peak_managed_bytes": 11985,
+    "stress": 1
+  },
+  "apps": {
+    "logs": {
+      "passed": 46,
+      "log": "build/stage12/126-logs.json",
+      "total": 46,
+      "failed": 0
+    },
+    "http": {
+      "passed": 44,
+      "log": "build/stage12/126-http.json",
+      "total": 44,
+      "failed": 0
+    }
+  },
+  "migrations": "HTTP InputConfig and log Record use typed schema builders; no application stream event/read_* or json field/as_* chains remain. Log schema is reused per file iteration.",
+  "memory": "Eager bounded immutable input; private span views retain backing under existing tracing. Outer paths bounded; raw syntax cause unchanged under existing validator budgets. No reflection, casts, parser delegation to C/Node or resource model changes.",
+  "mcp": {
+    "groups": 3,
+    "log": "build/stage12/126-mcp.log",
+    "startup_tokens": 1862,
+    "failed": 0,
+    "wire_startup_tokens": 3507,
+    "installed_decoder": "passed",
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "new_api_lookup": "passed"
+  },
+  "recipes": {
+    "schema_version": 1,
+    "checks": [
+      "recipe basics",
+      "recipe directory",
+      "recipe json",
+      "recipe bytes",
+      "recipe result",
+      "recipe callable",
+      "recipe http",
+      "recipe cli",
+      "recipe sort",
+      "recipe traversals",
+      "recipe set",
+      "recipe cell",
+      "recipe json-schema",
+      "generic/effect/opaque/method/async interface",
+      "reject invalid interface before emission",
+      "all embedded builtin rows",
+      "all shipped modules and recipe IDs resolve to verified catalog"
+    ],
+    "passed": 17
+  },
+  "api_search": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 100,
+    "negative_checks": 2
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 116,
+    "links": 807,
+    "missing": []
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "next": "1.2.6a"
+}

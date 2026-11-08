@@ -1,0 +1,64 @@
+import "../../../std/io.vela" as io;
+import "../../../std/stream_lines.vela" as lines;
+import "../../../std/cell.vela" as cell;
+fn empty() -> Unit {}
+fn must<T>(value: Result<T,io::Error>) -> T { match value { Result::Ok(v) => { return v; } Result::Err(e) => { assert_true(false,io::describe(e)); } } return must(value); }
+fn bad<T>(value: Result<T,io::Error>) -> io::Error { match value { Result::Err(e) => { return e; } Result::Ok(_) => { assert_true(false,"expected I/O failure"); } } return bad(value); }
+fn lm<T>(value: Result<T,lines::Error>) -> T { match value { Result::Ok(v) => { return v; } Result::Err(e) => { assert_true(false,lines::describe(e)); } } return lm(value); }
+fn lb<T>(value: Result<T,lines::Error>) -> lines::Error { match value { Result::Err(e) => { return e; } Result::Ok(_) => { assert_true(false,"expected line failure"); } } return lb(value); }
+fn noop() -> Result<Unit,io::Error> { return Result<Unit,io::Error>::Ok(empty()); }
+fn line(reader: lines::Reader, expected: String, number: Int, offset: Int) -> Unit effects {state,io} {
+    match lm(lines::next(reader)) { Option::None => { assert_true(false,"missing line"); } Option::Some(value) => { assert_true(value.data==expected && value.number==number && value.offset==offset,"line contents/position"); } }
+}
+fn end(reader: lines::Reader) -> Unit effects {state,io} { match lm(lines::next(reader)) { Option::None => {} Option::Some(_) => { assert_true(false,"extra record"); } } }
+fn main() -> Unit effects {state,io} {
+    let source=must(io::memory_reader("abcdef",2,6));let alias=source;
+    match must(io::read(alias,1)) { io::Chunk::Data(data) => { assert_true(data=="a","shared reader cursor"); } io::Chunk::End => { assert_true(false,"unexpected EOF"); } }
+    let sink=must(io::memory_writer(20));let target=io::sink_writer(sink);
+    let stats=must(io::copy(source,target,5));assert_true(stats.bytes==5 && stats.reads==4 && stats.writes==3 && stats.peak_chunk==2,"short read counts");
+    assert_true(io::output(sink)=="bcdef" && io::output_bytes(sink)==5,"bounded sink");
+    assert_true(io::reader_counters(source).bytes==6 && io::reader_counters(alias).calls==5,"shared counters");
+    must(io::close_reader(alias));must(io::close_reader(source));assert_true(bad(io::read(source,1)).kind==io::ErrorKind::Closed,"closed reader");
+    must(io::close_writer(target));assert_true(bad(io::write(target,"x")).kind==io::ErrorKind::Closed,"closed writer");
+    let bytes=str_from_byte(0)+str_from_byte(255)+"abc";let partial=cell::create("");let write_calls=cell::create(0);
+    let short=io::writer(fn [partial,write_calls](data: String)->Result<Int,io::Error> effects {state} { cell::set(write_calls,cell::get(write_calls)+1);cell::set(partial,cell::get(partial)+str_slice(data,0,1));return Result<Int,io::Error>::Ok(1); },noop);
+    assert_true(must(io::write(short,""))==0,"empty write");
+    let copied=must(io::copy(must(io::memory_reader(bytes,3,5)),short,3));assert_true(copied.bytes==5 && copied.writes==5 && copied.reads==3 && cell::get(partial)==bytes,"short writes exact binary bytes");
+    let calls=cell::create(0);let closes=cell::create(0);
+    let zero=io::writer(fn [calls](data: String)->Result<Int,io::Error> effects {state} { cell::set(calls,cell::get(calls)+1);return Result<Int,io::Error>::Ok(0); },fn [closes]()->Result<Unit,io::Error> effects {state} { cell::set(closes,cell::get(closes)+1);return Result<Unit,io::Error>::Err(io::error(io::ErrorKind::Close,7,"write-close")); });
+    assert_true(bad(io::write(zero,"a")).kind==io::ErrorKind::NoProgress,"zero write");assert_true(bad(io::write(zero,"b")).kind==io::ErrorKind::NoProgress && cell::get(calls)==1,"sticky failure no retry");
+    assert_true(bad(io::close_writer(zero)).cause=="write-close" && bad(io::close_writer(zero)).cause=="write-close" && cell::get(closes)==1,"shared failed close once");
+    let malformed=must(io::reader(fn [](n:Int)->Result<io::Chunk,io::Error>{return Result<io::Chunk,io::Error>::Ok(io::Chunk::Data(""));},noop,100));
+    assert_true(bad(io::read(malformed,1)).kind==io::ErrorKind::NoProgress,"empty Data distinct from EOF");
+    let oversized=must(io::reader(fn [](n:Int)->Result<io::Chunk,io::Error>{return Result<io::Chunk,io::Error>::Ok(io::Chunk::Data("xx"));},noop,100));
+    assert_true(bad(io::read(oversized,1)).kind==io::ErrorKind::Protocol,"oversized read");
+    let invalid=io::writer(fn [](data:String)->Result<Int,io::Error>{return Result<Int,io::Error>::Ok(str_len(data)+1);},noop);assert_true(bad(io::write(invalid,"x")).kind==io::ErrorKind::Protocol,"oversized write");
+    assert_true(bad(io::memory_reader("",0,1)).kind==io::ErrorKind::InvalidLimit && bad(io::memory_writer(0)).kind==io::ErrorKind::InvalidLimit,"invalid limits");
+    assert_true(bad(io::memory_reader("ab",1,1)).kind==io::ErrorKind::TotalLimit,"resident total limit");
+    let limited=must(io::reader(fn [](n:Int)->Result<io::Chunk,io::Error>{return Result<io::Chunk,io::Error>::Ok(io::Chunk::Data("x"));},noop,1));let first_limited=must(io::read(limited,1));assert_true(bad(io::read(limited,1)).kind==io::ErrorKind::TotalLimit,"stream growth total");
+    let own_closes=cell::create(0);
+    let owned=must(io::reader(fn [](n:Int)->Result<io::Chunk,io::Error>{return Result<io::Chunk,io::Error>::Err(io::error(io::ErrorKind::Read,0,"read-failure"));},fn [own_closes]()->Result<Unit,io::Error> effects {state}{cell::set(own_closes,cell::get(own_closes)+1);return Result<Unit,io::Error>::Err(io::error(io::ErrorKind::Close,0,"read-close"));},10));
+    let owned_writer=io::writer(fn [](data:String)->Result<Int,io::Error>{return Result<Int,io::Error>::Ok(1);},fn [own_closes]()->Result<Unit,io::Error> effects {state}{cell::set(own_closes,cell::get(own_closes)+1);return Result<Unit,io::Error>::Err(io::error(io::ErrorKind::Close,0,"write-close"));});
+    match io::copy_owned(owned,owned_writer,2) { Result::Ok(_) => { assert_true(false,"expected three causes"); } Result::Err(e) => { match e.operation { Option::Some(v) => { assert_true(v.cause=="read-failure","original operation"); } Option::None => { assert_true(false,"lost operation"); } } match e.reader_close { Option::Some(v) => { assert_true(v.cause=="read-close","reader cleanup"); } Option::None => { assert_true(false,"lost reader cleanup"); } } match e.writer_close { Option::Some(v) => { assert_true(v.cause=="write-close","writer cleanup"); } Option::None => { assert_true(false,"lost writer cleanup"); } } } }
+    assert_true(cell::get(own_closes)==2 && io::reader_counters(owned).closed && io::writer_counters(owned_writer).closed,"both retired");
+    let bom=str_from_byte(239)+str_from_byte(187)+str_from_byte(191);
+    let input=bom+"я\r\n\n尾\rX\n"+bom;
+    var chunk=1;while chunk<=8 { let reader=lm(lines::reader(must(io::memory_reader(input,chunk,100)),chunk,32));line(reader,"я",1,0);line(reader,"",2,7);line(reader,"尾\rX",3,8);line(reader,bom,4,14);end(reader);let s=lines::statistics(reader);assert_true(s.consumed==17 && s.lines==4 && s.peak_chunk<=chunk && s.peak_record<=36,"observed line bounds");lm(lines::close(reader));lm(lines::close(reader));assert_true(lb(lines::next(reader)).kind==lines::ErrorKind::Closed,"closed lines");chunk=chunk+1; }
+    let empty=lm(lines::reader(must(io::memory_reader("",1,1)),1,1));end(empty);
+    let only_bom=lm(lines::reader(must(io::memory_reader(bom,1,3)),1,1));line(only_bom,"",1,0);end(only_bom);
+    let cr=lm(lines::reader(must(io::memory_reader("x\r",1,2)),1,2));line(cr,"x\r",1,0);end(cr);
+    let bad_utf=lm(lines::reader(must(io::memory_reader("a\n"+str_from_byte(255),1,3)),1,8));line(bad_utf,"a",1,0);let encoding=lb(lines::next(bad_utf));assert_true(encoding.kind==lines::ErrorKind::Encoding && encoding.offset==2 && encoding.line==2,"absolute UTF-8 location");assert_true(lb(lines::next(bad_utf)).offset==2,"sticky line failure");
+    let long=lm(lines::reader(must(io::memory_reader(bom+"abc\r\n",1,8)),1,2));let over=lb(lines::next(long));assert_true(over.kind==lines::ErrorKind::RecordLimit && over.offset==5,"record excludes BOM CRLF");
+    let exact=lm(lines::reader(must(io::memory_reader(bom+"ab\r\n",1,8)),1,2));line(exact,"ab",1,0);end(exact);
+    let progress=cell::create(0);let mid=must(io::reader(fn [progress](n:Int)->Result<io::Chunk,io::Error> effects {state}{let p=cell::get(progress);cell::set(progress,p+1);if p==0{return Result<io::Chunk,io::Error>::Ok(io::Chunk::Data("ab"));}return Result<io::Chunk,io::Error>::Err(io::error(io::ErrorKind::Read,2,"mid-record"));},noop,10));
+    let middle=lb(lines::next(lm(lines::reader(mid,2,10))));assert_true(middle.kind==lines::ErrorKind::Adapter && middle.offset==2 && middle.line==1,"mid-record location");match middle.cause { Option::Some(e) => { assert_true(e.cause=="mid-record" && e.offset==2,"typed original cause"); } Option::None => { assert_true(false,"lost cause"); } }
+    let no_progress=lb(lines::next(lm(lines::reader(malformed,1,5))));assert_true(no_progress.kind==lines::ErrorKind::NoProgress,"typed zero progress");
+    let failed_close=lb(lines::close(lm(lines::reader(owned,1,5))));assert_true(failed_close.kind==lines::ErrorKind::Close,"typed close error");
+    let holder=list_new<io::Reader>();
+    let recursive=must(io::reader(fn [holder](n:Int)->Result<io::Chunk,io::Error> effects {state,io} { assert_true(bad(io::read(list_get(holder,0),1)).kind==io::ErrorKind::Busy,"reentrant read");return Result<io::Chunk,io::Error>::Ok(io::Chunk::End); },noop,1));list_push(holder,recursive);let recursive_end=must(io::read(recursive,1));
+    let wholder=list_new<io::Writer>();let rewriter=io::writer(fn [wholder](data:String)->Result<Int,io::Error> effects {state,io} { assert_true(bad(io::write(list_get(wholder,0),"x")).kind==io::ErrorKind::Busy,"reentrant write");return Result<Int,io::Error>::Ok(str_len(data)); },noop);list_push(wholder,rewriter);assert_true(must(io::write(rewriter,"x"))==1,"outer write succeeds");
+    let accepted=cell::create(0);let failing=io::writer(fn [accepted](data:String)->Result<Int,io::Error> effects {state} { if cell::get(accepted)==0 { cell::set(accepted,1);return Result<Int,io::Error>::Ok(1); }return Result<Int,io::Error>::Err(io::error(io::ErrorKind::Write,99,"unknown partial output")); },noop);assert_true(must(io::write(failing,"abc"))==1,"first partial write");let failure=bad(io::write(failing,"bc"));assert_true(failure.kind==io::ErrorKind::Write && failure.offset==1 && failure.cause=="unknown partial output","known accepted offset, unchanged cause");let sticky=bad(io::write(failing,"bc"));assert_true(io::writer_counters(failing).calls==2,"failure never retried");must(io::close_writer(failing));
+    assert_true(bad(io::open("",1)).kind==io::ErrorKind::Read && bad(io::open(str_from_byte(255),1)).kind==io::ErrorKind::Read && bad(io::create("x"+str_from_byte(0))).kind==io::ErrorKind::Write,"invalid paths typed");
+    let total_source=must(io::reader(fn [](n:Int)->Result<io::Chunk,io::Error>{return Result<io::Chunk,io::Error>::Ok(io::Chunk::Data("x"));},noop,1));let total_lines=lb(lines::next(lm(lines::reader(total_source,1,8))));assert_true(total_lines.kind==lines::ErrorKind::TotalLimit && total_lines.offset==1,"line total distinct from record");
+    print("bounded streams and typed lines passed");
+}

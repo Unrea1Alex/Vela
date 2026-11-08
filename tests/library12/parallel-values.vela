@@ -1,0 +1,22 @@
+import "../../std/parallel.vela" as p;
+import "../../std/task_group.vela" as group;
+struct Payload { values:List<Int>, label:String }
+struct Cause { codes:List<Int> }
+struct Saved { job:p::Job<Payload,Payload,Cause>, inner:List<Int>, codes:List<Int> }
+fn must<T,E>(r:Result<T,E>)->T{match r{Result::Ok(v)=>{return v;}Result::Err(_)=>{assert_true(false,"parallel value fixture failure");}}return must(r);}
+fn failed<T>(r:Result<T,p::Error>)->p::Error{match r{Result::Err(e)=>{return e;}Result::Ok(_)=>{assert_true(false,"expected invalid mapping");}}return failed(r);}
+fn make()->Saved effects {state}{
+ let inner=list_new<Int>();list_push(inner,7);let codes=list_new<Int>();list_push(codes,3);let values=list_new<Payload>();list_push(values,Payload(values:inner,label:"managed:"+to_string(7)));list_push(values,list_get(values,0));
+ let action=async fn [codes](scope:group::Scope,value:Payload,index:Int)->Result<Payload,Cause> effects {state}{await sleep_ms(1);if index==1{assert_true(list_len(value.values)==2,"nested input aliases remain shared");return Result<Payload,Cause>::Err(Cause(codes:codes));}list_push(value.values,8);return Result<Payload,Cause>::Ok(value);};
+ let job=must(p::create(values,1,0,100,p::Policy::Collect,action));list_truncate(values,0);return Saved(job:job,inner:inner,codes:codes);
+}
+async fn identity(scope:group::Scope,value:Int,index:Int)->Result<Int,Int>{return Result<Int,Int>::Ok(value);}
+fn main()->Unit effects {state,io,process}{
+ let empty=list_new<Int>();assert_true(failed(p::create(empty,129,0,1,p::Policy::Collect,identity))==p::Error::InvalidLimit,"upper concurrency");assert_true(failed(p::create(empty,1,0,0,p::Policy::Collect,identity))==p::Error::InvalidLimit,"zero timeout");assert_true(failed(p::create(empty,1,0,9223372036854775807,p::Policy::Collect,identity))==p::Error::InvalidLimit,"timeout bound");assert_true(failed(p::create(empty,1,-1,1,p::Policy::Collect,identity))==p::Error::Clock,"negative clock");assert_true(failed(p::create(empty,1,9223372034707292160,1,p::Policy::Collect,identity))==p::Error::Clock,"deadline fits host clock");
+ if env("VELA_GC_STRESS")==""{let huge=list_new<Int>();var i=0;while i<65537{list_push(huge,i);i=i+1;}assert_true(failed(p::create(huge,1,0,10,p::Policy::Collect,identity))==p::Error::InvalidLimit,"input bound");}
+ let ended=must(p::create(empty,1,0,100,p::Policy::Collect,identity));assert_true(must(p::tick(ended,0)),"empty complete");assert_true(must(p::tick(ended,10)),"ready can advance clock");assert_true(failed(p::tick(ended,9))==p::Error::Clock,"ready clock remains monotonic");
+ let saved=make();var garbage=0;while garbage<32{let discarded=list_new<String>();list_push(discarded,"discard:"+to_string(garbage));garbage=garbage+1;}
+ var now=0;var ready=false;while !ready && now<100{ready=must(p::tick(saved.job,now));now=now+1;}assert_true(ready,"factory job settled");
+ match p::outcome(saved.job){Option::None=>{assert_true(false,"lost result");}Option::Some(done)=>{if platform()=="windows"{assert_true(done.reason==p::Finish::Complete && done.started==2,"factory callbacks retained");for item in done.items{match item{p::Item::Value(value)=>{assert_true(value.label=="managed:7" && list_get(value.values,1)==8,"managed payload survived");list_push(value.values,9);}p::Item::Error(cause)=>{list_push(cause.codes,4);}p::Item::Cancelled=>{assert_true(false,"unexpected cancellation");}p::Item::TimedOut=>{assert_true(false,"unexpected timeout");}p::Item::Driver(e)=>{assert_true(false,e);}p::Item::NotStarted=>{assert_true(false,"unexpected queue");}}}assert_true(list_get(saved.inner,2)==9 && list_get(saved.codes,1)==4,"result/error nested aliases preserved");}else{assert_true(done.reason==p::Finish::Driver,"Linux driver failure explicit");}}}
+ print("parallel values and limits passed");
+}

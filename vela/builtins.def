@@ -85,6 +85,10 @@ fn|read_file_bounded||String;Int|ReadResult|io|read_result|0.7
 fn|stream_open||String;Int|StreamResult|io;state|stream_result|0.10
 fn|stream_next||ForeignHandle;Int|ReadResult|io;state|read_result|0.10
 fn|stream_close||ForeignHandle|WriteResult|io;state|write_result|0.10
+fn|stream_open_large||String;Int|StreamResult|io;state|stream_result|1.2
+fn|stream_create||String|StreamResult|io;state|stream_result|1.2
+fn|stream_write||ForeignHandle;String|IntResult|io;state|int_result|1.2
+fn|stream_write_close||ForeignHandle|WriteResult|io;state|write_result|1.2
 fn|directory_open||String|StreamResult|io;state|stream_result|1.1
 fn|directory_next||ForeignHandle|ReadResult|io;state|read_result|1.1
 fn|directory_close||ForeignHandle|WriteResult|io;state|write_result|1.1

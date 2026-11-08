@@ -1,0 +1,634 @@
+{
+  "schema_version": 1,
+  "stage": "1.2.7",
+  "status": "verified",
+  "date": "2026-11-08",
+  "contract": "../contracts/PARALLEL-1.2.md",
+  "verify": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1382,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0-dev.1",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 488398,
+    "tests_run": true
+  },
+  "verify_log": "build/stage12/127-verify.log",
+  "focused": {
+    "limits_values": "tests/library12/parallel-values.vela",
+    "rejections": {
+      "callback_payload": "E201",
+      "opaque_construct": "E232",
+      "sync_callback": "E201",
+      "opaque_field": "E223",
+      "state": "E209"
+    },
+    "checks": "input snapshot/order; Collect/FailFast; queued/inflight cancellation and global deadline; actual callback/admission/operation counts; detached outer completion; per-item scope waits for abandoned child stop acknowledgement; 260 items with reusable 128-task capacity; typed item cause and independent child cleanup error",
+    "cases": [
+      "v127_parallel",
+      "v127_parallel_children"
+    ],
+    "values_checks": "all constructor limits incl 65537 input; monotonic clock even after ready; factory-held Job/callback/dynamic String; shallow nested List input/result/error aliases"
+  },
+  "http": {
+    "checks": "server limit 2 and one GET per input; ordered status results despite reverse completion; item 2 starts before slower item 0 ends; cancel/deadline/typed error stops admission, sockets/staging drained before outcome; actual GUI message queue receives 5 clicks during HTTP",
+    "network_gui": {
+      "schema_version": 1,
+      "status": "passed",
+      "observations": [
+        {
+          "mode": "normal",
+          "started": 6,
+          "admitted": 6,
+          "peak_tasks": 2,
+          "peak_operations": 2,
+          "turns": 127,
+          "clicks": 5,
+          "elapsed_ms": 1969,
+          "server_peak": 2,
+          "requests": [
+            "/1",
+            "/0",
+            "/2",
+            "/3",
+            "/4",
+            "/5"
+          ],
+          "timeline": [
+            {
+              "kind": "start",
+              "path": "/1",
+              "at": 175.1958
+            },
+            {
+              "kind": "start",
+              "path": "/0",
+              "at": 203.5761
+            },
+            {
+              "kind": "finish",
+              "path": "/1",
+              "at": 541.4026
+            },
+            {
+              "kind": "start",
+              "path": "/2",
+              "at": 640.4319
+            },
+            {
+              "kind": "finish",
+              "path": "/0",
+              "at": 866.6537
+            },
+            {
+              "kind": "start",
+              "path": "/3",
+              "at": 970.3483
+            },
+            {
+              "kind": "finish",
+              "path": "/2",
+              "at": 1305.6956
+            },
+            {
+              "kind": "finish",
+              "path": "/3",
+              "at": 1321.1355
+            },
+            {
+              "kind": "start",
+              "path": "/4",
+              "at": 1392.9216
+            },
+            {
+              "kind": "start",
+              "path": "/5",
+              "at": 1409.0228
+            },
+            {
+              "kind": "finish",
+              "path": "/5",
+              "at": 1761.0617
+            },
+            {
+              "kind": "finish",
+              "path": "/4",
+              "at": 2055.1965
+            }
+          ],
+          "gui": {
+            "messages": 5,
+            "max_response_ms": 15
+          }
+        },
+        {
+          "mode": "cancel",
+          "started": 2,
+          "admitted": 2,
+          "peak_tasks": 2,
+          "peak_operations": 2,
+          "turns": 10,
+          "clicks": 0,
+          "elapsed_ms": 141,
+          "server_peak": 2,
+          "requests": [
+            "/0",
+            "/1"
+          ],
+          "timeline": [
+            {
+              "kind": "start",
+              "path": "/0",
+              "at": 2208.3045
+            },
+            {
+              "kind": "start",
+              "path": "/1",
+              "at": 2222.7114
+            },
+            {
+              "kind": "finish",
+              "path": "/1",
+              "at": 2259.3765
+            },
+            {
+              "kind": "finish",
+              "path": "/0",
+              "at": 2260.2002
+            }
+          ]
+        },
+        {
+          "mode": "deadline",
+          "started": 2,
+          "admitted": 2,
+          "peak_tasks": 2,
+          "peak_operations": 2,
+          "turns": 12,
+          "clicks": 0,
+          "elapsed_ms": 156,
+          "server_peak": 2,
+          "requests": [
+            "/0",
+            "/1"
+          ],
+          "timeline": [
+            {
+              "kind": "start",
+              "path": "/0",
+              "at": 2407.9376
+            },
+            {
+              "kind": "start",
+              "path": "/1",
+              "at": 2420.4129
+            },
+            {
+              "kind": "finish",
+              "path": "/1",
+              "at": 2491.9549
+            },
+            {
+              "kind": "finish",
+              "path": "/0",
+              "at": 2492.1067
+            }
+          ]
+        },
+        {
+          "mode": "error",
+          "started": 2,
+          "admitted": 2,
+          "peak_tasks": 2,
+          "peak_operations": 1,
+          "turns": 9,
+          "clicks": 0,
+          "elapsed_ms": 110,
+          "server_peak": 1,
+          "requests": [
+            "/1"
+          ],
+          "timeline": [
+            {
+              "kind": "start",
+              "path": "/1",
+              "at": 2658.2254
+            },
+            {
+              "kind": "finish",
+              "path": "/1",
+              "at": 2679.0037
+            }
+          ]
+        }
+      ]
+    },
+    "original_oracle": {
+      "passed": 44,
+      "failed": 0,
+      "total": 44,
+      "checks": [
+        {
+          "name": "empty-list",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.02499999999999
+        },
+        {
+          "name": "status-and-byte-counts",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 247.74309999999997
+        },
+        {
+          "name": "preserve-input-order",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 228.47180000000003
+        },
+        {
+          "name": "bounded-concurrency",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 884.8534999999999
+        },
+        {
+          "name": "serial-concurrency",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 368.17409999999995
+        },
+        {
+          "name": "duplicate-urls",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 197.6355000000001
+        },
+        {
+          "name": "timeout",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 185.74620000000004
+        },
+        {
+          "name": "body-timeout",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 184.05939999999964
+        },
+        {
+          "name": "dropped-connection",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 120.7814000000003
+        },
+        {
+          "name": "queue-time-not-timeout",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 681.2804999999998
+        },
+        {
+          "name": "invalid-json",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.915999999999713
+        },
+        {
+          "name": "not-object",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 19.678800000000138
+        },
+        {
+          "name": "missing-urls",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 19.522699999999986
+        },
+        {
+          "name": "urls-not-array",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 20.068899999999758
+        },
+        {
+          "name": "url-not-string",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.195799999999963
+        },
+        {
+          "name": "missing-concurrency",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.07109999999966
+        },
+        {
+          "name": "concurrency-zero",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 19.992299999999886
+        },
+        {
+          "name": "concurrency-nine",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 27.540800000000218
+        },
+        {
+          "name": "concurrency-fraction",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 18.828100000000177
+        },
+        {
+          "name": "concurrency-decimal-literal",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 19.193700000000263
+        },
+        {
+          "name": "timeout-exponent-literal",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 19.48810000000003
+        },
+        {
+          "name": "concurrency-bool",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 18.93209999999999
+        },
+        {
+          "name": "missing-timeout",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 20.484100000000126
+        },
+        {
+          "name": "timeout-low",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 24.38650000000007
+        },
+        {
+          "name": "timeout-high",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 19.8449999999998
+        },
+        {
+          "name": "timeout-string",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 19.184799999999996
+        },
+        {
+          "name": "timeout-null",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 20.465099999999893
+        },
+        {
+          "name": "late-invalid-url",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 19.072499999999764
+        },
+        {
+          "name": "extra-argument",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 18.616500000000087
+        },
+        {
+          "name": "maintenance-flag-empty",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.022500000000036
+        },
+        {
+          "name": "maintenance-flag-all-success",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 174.83289999999988
+        },
+        {
+          "name": "maintenance-flag-http-error",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 105.5628999999999
+        },
+        {
+          "name": "maintenance-flag-server-error",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 74.69250000000011
+        },
+        {
+          "name": "maintenance-flag-network-error",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 120.72670000000016
+        },
+        {
+          "name": "maintenance-flag-timeout",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 185.41930000000048
+        },
+        {
+          "name": "maintenance-no-flag-http-error",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 74.08600000000024
+        },
+        {
+          "name": "maintenance-flag-takes-no-value",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 19.933500000000095
+        },
+        {
+          "name": "maintenance-repeat-two",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 194.71409999999923
+        },
+        {
+          "name": "maintenance-repeat-three",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 292.58899999999994
+        },
+        {
+          "name": "maintenance-repeat-earlier-failure",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 200.1902
+        },
+        {
+          "name": "maintenance-repeat-zero",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 21.108499999999367
+        },
+        {
+          "name": "maintenance-repeat-high",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 19.920600000000377
+        },
+        {
+          "name": "maintenance-repeat-fraction",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 22.591199999999844
+        },
+        {
+          "name": "maintenance-repeat-missing",
+          "passed": true,
+          "detail": "ok",
+          "elapsed_ms": 19.258499999999913
+        }
+      ],
+      "fixtures_summary": {
+        "baseline": {
+          "suite_version": "pilot-1",
+          "task": "http",
+          "root": "G:\\Vela\\build\\stage12\\127-http-maintenance\\fixtures-baseline-http-TyS4ay",
+          "cases": 29,
+          "valid_cases": 10,
+          "invalid_cases": 19
+        },
+        "maintenance": {
+          "suite_version": "pilot-1",
+          "maintenance_version": "pilot-maintenance-2-repeat",
+          "task": "http",
+          "root": "G:\\Vela\\build\\stage12\\127-http-maintenance\\fixtures-maintenance-http-rjtyer",
+          "cases": 15,
+          "valid_cases": 10,
+          "invalid_cases": 5
+        }
+      }
+    },
+    "app": "apps/http-collector/main.vela",
+    "migration": "parallel + async_io.fetch; no application slots/poll/release/cancel-exchange loop"
+  },
+  "gc": {
+    "basic": {
+      "log": "build/stage12/127-gc.err",
+      "collections": 30392,
+      "peak_managed_bytes": 30312,
+      "live_managed_bytes": 24816
+    },
+    "scope": "bounded forced-GC mapping/factory probes separate from normal 260-item child test and actual HTTP/GUI",
+    "nested_factory": {
+      "log": "build/stage12/127-values-gc.err",
+      "collections": 5034,
+      "peak_managed_bytes": 10881,
+      "live_managed_bytes": 7449
+    }
+  },
+  "linux": {
+    "scope": "construction/limits, empty job, ready-clock checks, explicit driver failure; no Linux fiber/HTTP/GUI support claimed",
+    "status": "passed",
+    "logs": [
+      "build/stage12/127-linux.log",
+      "build/stage12/127-values-linux.log"
+    ]
+  },
+  "mcp": {
+    "groups": 3,
+    "log": "build/stage12/127-mcp.log",
+    "installed_parallel": "passed",
+    "startup_tokens": 1860,
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "wire_startup_tokens": 3505,
+    "failed": 0
+  },
+  "recipes": {
+    "schema_version": 1,
+    "checks": [
+      "recipe basics",
+      "recipe directory",
+      "recipe json",
+      "recipe bytes",
+      "recipe result",
+      "recipe callable",
+      "recipe http",
+      "recipe cli",
+      "recipe sort",
+      "recipe traversals",
+      "recipe set",
+      "recipe cell",
+      "recipe json-schema",
+      "recipe streams",
+      "recipe parallel",
+      "generic/effect/opaque/method/async interface",
+      "reject invalid interface before emission",
+      "all embedded builtin rows",
+      "all shipped modules and recipe IDs resolve to verified catalog"
+    ],
+    "passed": 19
+  },
+  "api_search": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 105,
+    "negative_checks": 2
+  },
+  "docs": {
+    "schema_version": 1,
+    "files": 118,
+    "links": 818,
+    "missing": []
+  },
+  "frozen": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "next": "1.2.8"
+}

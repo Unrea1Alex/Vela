@@ -1,0 +1,11 @@
+// Pass a directory containing exactly one regular file named example.txt.
+import "../../std/directory.vela" as directory;
+import "../../std/path.vela" as path;
+fn main() -> Int effects { io, state, args } {
+    let root = match arg(0) { StringResult::Ok(value) => value, StringResult::Err(_) => "." };
+    match directory::entries_bounded(path::Path(value: root), 16) {
+        Result::Err(error) => { eprint(error.reason); return 1; }
+        Result::Ok(entries) => { for entry in entries { print(entry.name); } }
+    }
+    return 0;
+}

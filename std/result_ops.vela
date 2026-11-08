@@ -1,0 +1,37 @@
+import "result.vela" as result;
+pub struct Context<E> {
+    cause: E,
+    message: String
+}
+pub fn map<T, U, E, effect Eff>(value: Result<T, E>, transform: fn(T) -> U effects Eff) -> Result<U,
+    E> effects Eff {
+    return match value {
+        Result::Ok(item) => Result<U, E>::Ok(transform(item)),
+        Result::Err(cause) => Result<U, E>::Err(cause)
+    };
+}
+pub fn and_then<T, U, E, effect Eff>(value: Result<T, E>, transform: fn(T) -> Result<U,
+    E> effects Eff) -> Result<U, E> effects Eff {
+    return match value {
+        Result::Ok(item) => transform(item),
+        Result::Err(cause) => Result<U, E>::Err(cause)
+    };
+}
+pub fn unwrap_or<T, E>(value: Result<T, E>, default: T) -> T {
+    return match value {
+        Result::Ok(item) => item,
+        Result::Err(_) => default
+    };
+}
+pub fn unwrap_or_else<T, E, effect Eff>(value: Result<T, E>, recover: fn(
+    E) -> T effects Eff) -> T effects Eff {
+    return match value {
+        Result::Ok(item) => item,
+        Result::Err(cause) => recover(cause)
+    };
+}
+pub fn with_context<T, E>(value: Result<T, E>, message: String) -> Result<T, Context<E>> {
+    return result::map_error(value, fn [ message ](cause: E) -> Context<E> {
+        return Context<E>(cause: cause, message: message);
+    });
+}

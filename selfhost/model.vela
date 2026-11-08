@@ -278,6 +278,10 @@ pub struct Control {
     function_index: Int
 }
 pub struct Context {
+    repair_mode: Bool,
+    repair_root: String,
+    repair_document: Int,
+    repair_overlays: List<QueryOverlay>,
     debug_codegen: Bool,
     query_mode: Bool,
     query_uses: List<QueryUse>,

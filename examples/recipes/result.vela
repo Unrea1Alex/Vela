@@ -1,0 +1,18 @@
+import "../../std/result_ops.vela" as result;
+import "../../std/option.vela" as option;
+fn main() -> Int effects { io } {
+    let value = result::with_context(Result<Int, Int>::Err(7), "load");
+    assert_true(option::unwrap_or_else(Option<Int>::None, fn [ ]() -> Int {
+        return 3;
+    }) == 3, "lazy default");
+    match value {
+        Result::Ok(_) => {
+            return 1;
+        }
+        Result::Err(error) => {
+            assert_true(error.message == "load", "context");
+            print("code=" + to_string(error.cause));
+        }
+    }
+    return 0;
+}

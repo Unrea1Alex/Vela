@@ -1,0 +1,32 @@
+import "../../std/json_decode.vela" as d;
+import "../../std/json_stream.vela" as stream;
+struct Row { label: String, values: List<Int> }
+struct Saved { schema: d::Decoder<Row>, value: Row, fields: d::Fields }
+fn must<T>(value: Result<T, d::Error>) -> T {
+    match value { Result::Ok(item) => { return item; } Result::Err(error) => { assert_true(false, d::describe(error)); } }
+    return must(value);
+}
+fn make_schema() -> d::Decoder<Row> effects { state } {
+    let names = list_new<String>(); list_push(names, "label"); list_push(names, "values");
+    let values = must(d::array(must(d::integer(-10, 10)), 0, 8));
+    return must(d::object(names, d::Unknown::Ignore, fn [values](fields: d::Fields) -> Result<Row, d::Error> effects { state } { return Result<Row, d::Error>::Ok(Row(label: d::required(fields, "label", d::string())?, values: d::required(fields, "values", values)?)); }));
+}
+fn saved() -> Saved effects { state } {
+    let schema = make_schema();
+    let source = "{\"label\":\"managed:" + to_string(7) + "\",\"values\":[1,2,3]}";
+    let value = must(d::decode(schema, source, stream::default_limits()));
+    let names = list_new<String>(); list_push(names, "value");
+    let spans = must(d::object(names, d::Unknown::Ignore, fn [](fields: d::Fields) -> Result<d::Fields, d::Error> { return Result<d::Fields, d::Error>::Ok(fields); }));
+    let fields = must(d::decode(spans, "{\"value\":\"span:" + to_string(9) + "\"}", stream::default_limits()));
+    return Saved(schema: schema, value: value, fields: fields);
+}
+fn main() -> Unit effects { state, io } {
+    let retained = saved();
+    for i in 0 .. 64 { let garbage = saved(); }
+    assert_true(retained.value.label == "managed:7" && list_get(retained.value.values, 2) == 3, "decoded payload roots survive creator scope");
+    assert_true(must(d::required(retained.fields, "value", d::string())) == "span:9", "retained opaque span views keep backing input alive");
+    let reused = must(d::decode(retained.schema, "{\"label\":\"second\",\"values\":[4]}", stream::default_limits()));
+    list_set(reused.values, 0, 8);
+    assert_true(reused.label == "second" && list_get(retained.value.values, 0) == 1, "schema captures survive and results detach");
+    print("JSON decoder GC roots passed");
+}

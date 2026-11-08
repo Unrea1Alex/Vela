@@ -6,6 +6,7 @@ import "driver.vela";
 import "parser.vela";
 import "errors.vela";
 import "artifacts.vela";
+import "repairs.vela";
 pub struct NativeDependency {
     name: String,
     path: String,
@@ -47,7 +48,31 @@ pub fn project_identifier(text: String) -> Bool {
     }
     return true;
 }
-pub fn project_fail(path: String, code: String, message: String, json_mode: Bool) -> Unit effects { state, io, process } {
+pub fn project_suggest_name(text: String) -> String effects { state } {
+    let parts = strings_new();
+    var meaningful = false;
+    for i in 0 .. str_len(text) {
+        let b = str_byte(text, i);
+        if b >= 65 && b <= 90 || b >= 97 && b <= 122 || b >= 48 && b <= 57 || b == 95 {
+            strings_push(parts, str_from_byte(b));
+            if b != 95 {
+                meaningful = true;
+            }
+        } else {
+            strings_push(parts, "_");
+        }
+    }
+    if !meaningful {
+        return "vela_project";
+    }
+    let name = strings_join(parts, "");
+    if str_byte(name, 0) >= 48 && str_byte(name, 0) <= 57 {
+        return "project_" + name;
+    }
+    return name;
+}
+pub fn project_fail(path: String, code: String, message: String,
+    json_mode: Bool) -> Unit effects { state, io, process } {
     bad(make_context("", path, json_mode), code, message, empty_span());
 }
 pub fn project_relative(path: String, owned: Bool) -> Bool effects { state } {
@@ -74,142 +99,176 @@ pub fn project_relative(path: String, owned: Bool) -> Bool effects { state } {
 }
 pub fn project_is_manifest(path: String) -> Bool {
     let n = str_len(path);
-    return n >= 6 && str_slice(path, n - 6, n) == ".vproj" || n >= 12 && str_slice(path, n - 12, n) == "vela.project" && (n == 12 || str_byte(path, n - 13) == 47 || str_byte(path, n - 13) == 92);
+    return n >= 6 && str_slice(path, n - 6, n) == ".vproj" || n >= 12 && str_slice(path, n - 12, n)
+        == "vela.project" && (n == 12 || str_byte(path, n - 13) == 47 || str_byte(path, n - 13)
+        == 92);
 }
-fn project_artifact(value: Result<String, String>, manifest: String, json_mode: Bool) -> String
-    effects { state, io, process } {
+fn project_artifact_checked(value: Result<String, String>, text: String, reject: fn(String, String,
+    String) -> Unit effects { state, io, process }) -> String effects { state, io, process } {
     match value {
-        Result::Ok(data) => { return data; }
+        Result::Ok(data) => {
+            return data;
+        }
         Result::Err(message) => {
-            project_fail(manifest, "E225", message, json_mode);
+            reject("E225", message, text);
             panic(message);
         }
     }
 }
-pub fn project_load(input: String, json_mode: Bool) -> Project effects { state, io, process } {
-    var p = Project(manifest: "", text: "", name: "", entry: input, dependencies: list_new<ProjectDependency>(), natives: list_new<NativeDependency>(), assets: list_new<Resource>(), tests: list_new<String>());
+pub fn project_load_with(input: String, json_mode: Bool, overlays: List<QueryOverlay>, reject: fn(
+    String, String, String) -> Unit effects { state, io, process }) -> Project effects { state, io,
+    process } {
+    var p = Project(manifest: "", text: "", name: "", entry: input,
+        dependencies: list_new<ProjectDependency>(), natives: list_new<NativeDependency>(),
+        assets: list_new<Resource>(), tests: list_new<String>());
     if !project_is_manifest(input) {
         return p;
     }
     p.manifest = input;
-    p.text = load_source(input, json_mode);
+    match query_source_text(input, overlays) {
+        Result::Ok(text) => {
+            p.text = text;
+        }
+        Result::Err(message) => {
+            source_error(message, json_mode);
+        }
+    }
     p.entry = "";
     if str_len(p.text) > 1048576 {
-        project_fail(input, "E225", "Manifest exceeds 1 MiB.", json_mode);
+        reject("E225", "Manifest exceeds 1 MiB.", p.text);
     }
     var header = false;
     var artifact_size = 0;
     for line in project_split(p.text, 10) {
-        if line != ""&& str_byte(line, 0) != 35 {
+        if line != "" && str_byte(line, 0) != 35 {
             let fields = project_split(line, 124);
             let kind = list_get(fields, 0);
             if !header {
                 if line != "vela-project|1" {
-                    project_fail(input, "E225", "Expected vela-project|1.", json_mode);
+                    reject("E225", "Expected vela-project|1.", p.text);
                 }
                 header = true;
             } else if kind == "name" && list_len(fields) == 2 && p.name == "" {
                 p.name = list_get(fields, 1);
                 if !project_identifier(p.name) {
-                    project_fail(input, "E225", "Invalid project name.", json_mode);
+                    reject("E225", "Invalid project name. Suggested name: " + project_suggest_name(
+                        p.name), p.text);
                 }
             } else if kind == "entry" && list_len(fields) == 2 && p.entry == "" {
                 let path = list_get(fields, 1);
                 if !project_relative(path, true) {
-                    project_fail(input, "E225", "Invalid entry path.", json_mode);
+                    reject("E225", "Invalid entry path.", p.text);
                 }
                 p.entry = io_value(absolute_path(parent_path(input) + "/" + path));
             } else if kind == "dep" && list_len(fields) == 3 {
                 let alias = list_get(fields, 1);
                 let path = list_get(fields, 2);
-                if !project_identifier(alias) || !project_relative(path, false) || list_len(p.dependencies) >= 128 {
-                    project_fail(input, "E225", "Invalid dependency.", json_mode);
+                if !project_identifier(alias) || !project_relative(path, false) || list_len(
+                    p.dependencies) >= 128 {
+                    reject("E225", "Invalid dependency.", p.text);
                 }
                 for dep in p.dependencies {
                     if dep.alias == alias {
-                        project_fail(input, "E225", "Duplicate dependency alias.", json_mode);
+                        reject("E225", "Duplicate dependency alias.", p.text);
                     }
                 }
-                list_push(p.dependencies, ProjectDependency(alias: alias, path: io_value(absolute_path(parent_path(input) + "/" + path)), relative: path));
+                list_push(p.dependencies, ProjectDependency(alias: alias, path: io_value(
+                    absolute_path(parent_path(input) + "/" + path)), relative: path));
             } else if kind == "native" && (list_len(fields) == 3 || list_len(fields) == 6) {
                 let name = list_get(fields, 1);
                 let path = list_get(fields, 2);
-                if !foreign_library_name(name) || !project_relative(path, false) || list_len(p.natives) >= 128 {
-                    project_fail(input, "E225", "Invalid native dependency.", json_mode);
+                if !foreign_library_name(name) || !project_relative(path, false) || list_len(
+                    p.natives) >= 128 {
+                    reject("E225", "Invalid native dependency.", p.text);
                 }
                 for previous in p.natives {
-                    if path_key(previous.name) == path_key(name) { project_fail(input, "E225", "Duplicate native library.", json_mode); }
+                    if path_key(previous.name) == path_key(name) {
+                        reject("E225", "Duplicate native library.", p.text);
+                    }
                 }
                 var target = "";
                 var data = "";
                 var full = io_value(absolute_path(artifact_join(parent_path(input), path)));
                 if list_len(fields) == 6 {
                     target = list_get(fields, 3);
-                    if target != "windows-x64" || platform() != "windows" || list_get(fields, 4) != "1"
-                        || list_get(fields, 5) != "shared" {
-                        project_fail(input, "E225", "Unsupported native target, ABI or artifact kind.", json_mode);
+                    if target != "windows-x64" || platform() != "windows" || list_get(fields, 4)
+                        != "1" || list_get(fields, 5) != "shared" {
+                        reject("E225", "Unsupported native target, ABI or artifact kind.", p.text);
                     }
-                    full = project_artifact(artifact_source(input, path), input, json_mode);
-                    data = project_artifact(artifact_bytes(full), input, json_mode);
+                    full = project_artifact_checked(artifact_source(input, path), p.text, reject);
+                    data = project_artifact_checked(artifact_bytes(full), p.text, reject);
                     if !windows_x64_dll(data) {
-                        project_fail(input, "E225", "Expected a Windows x64 PE DLL.", json_mode);
+                        reject("E225", "Expected a Windows x64 PE DLL.", p.text);
                     }
                     artifact_size = artifact_size + str_len(data);
                 }
-                list_push(p.natives, NativeDependency(name: name, path: full, relative: path, target: target, data: data));
+                list_push(p.natives, NativeDependency(name: name, path: full, relative: path,
+                    target: target, data: data));
             } else if kind == "resource" && list_len(fields) == 3 {
                 let name = list_get(fields, 1);
                 let relative = list_get(fields, 2);
                 if !asset_name(name) || list_len(p.assets) >= 128 {
-                    project_fail(input, "E225", "Invalid resource destination.", json_mode);
+                    reject("E225", "Invalid resource destination.", p.text);
                 }
                 for asset in p.assets {
                     if assets_collide(asset.name, name) {
-                        project_fail(input, "E225", "Colliding resource destinations.", json_mode);
+                        reject("E225", "Colliding resource destinations.", p.text);
                     }
                 }
-                let path = project_artifact(artifact_source(input, relative), input, json_mode);
-                let data = project_artifact(artifact_bytes(path), input, json_mode);
+                let path = project_artifact_checked(artifact_source(input, relative), p.text,
+                    reject);
+                let data = project_artifact_checked(artifact_bytes(path), p.text, reject);
                 artifact_size = artifact_size + str_len(data);
-                list_push(p.assets, Resource(name: name, relative: relative, path: path, data: data));
+                list_push(p.assets, Resource(name: name, relative: relative, path: path,
+                    data: data));
             } else if kind == "test" && list_len(fields) == 2 {
                 let path = list_get(fields, 1);
                 if !project_relative(path, true) || list_len(p.tests) >= 128 {
-                    project_fail(input, "E225", "Invalid test path.", json_mode);
+                    reject("E225", "Invalid test path.", p.text);
                 }
                 let absolute = io_value(absolute_path(parent_path(input) + "/" + path));
                 for previous in p.tests {
                     if path_key(previous) == path_key(absolute) {
-                        project_fail(input, "E225", "Duplicate test.", json_mode);
+                        reject("E225", "Duplicate test.", p.text);
                     }
                 }
                 list_push(p.tests, absolute);
             } else {
-                project_fail(input, "E225", "Unknown, duplicate or malformed manifest field: " + kind, json_mode);
+                reject("E225", "Unknown, duplicate or malformed manifest field: " + kind, p.text);
             }
             if artifact_size > 67108864 {
-                project_fail(input, "E225", "Explicit artifacts exceed 64 MiB.", json_mode);
+                reject("E225", "Explicit artifacts exceed 64 MiB.", p.text);
             }
         }
     }
-    if !header || p.name == ""|| p.entry == "" {
-        project_fail(input, "E225", "Manifest requires header, name and entry.", json_mode);
+    if !header || p.name == "" || p.entry == "" {
+        reject("E225", "Manifest requires header, name and entry.", p.text);
     }
     return p;
+}
+pub fn project_load(input: String, json_mode: Bool) -> Project effects { state, io, process } {
+    return project_load_with(input, json_mode, list_new<QueryOverlay>(), fn [ input, json_mode ](
+        code: String, message: String, text: String) -> Unit effects { state, io, process } {
+        let context = repair_project_error_context(text, input, json_mode);
+        bad(context, code, message, repair_project_span(context, message));
+    });
 }
 pub fn project_lock_text(p: Project, json_mode: Bool) -> String effects { state, io, process } {
     let lines = strings_new();
     strings_push(lines, "vela-lock|1\nmanifest|" + sha256(p.text) + "\n");
     for dep in p.dependencies {
-        let c = project_module_context(dep.path, dep.path, load_source(dep.path, json_mode), json_mode, p.dependencies);
+        let c = project_module_context(dep.path, dep.path, load_source(dep.path, json_mode),
+            json_mode, p.dependencies);
         let graph = strings_new();
         for unit in c.source_units {
             strings_push(graph, sha256(unit.code) + "\n");
         }
         for edge in c.imports {
-            strings_push(graph, to_string(edge.owner) + "|" + to_string(edge.target) + "|" + edge.alias + "\n");
+            strings_push(graph, to_string(edge.owner) + "|" + to_string(edge.target) + "|"
+                + edge.alias + "\n");
         }
-        strings_push(lines, "dep|" + dep.alias + "|" + dep.relative + "|" + sha256(strings_join(graph, "")) + "\n");
+        strings_push(lines, "dep|" + dep.alias + "|" + dep.relative + "|" + sha256(strings_join(
+            graph, "")) + "\n");
     }
     for native in p.natives {
         let prefix = "native|" + native.name + "|" + native.relative + "|";
@@ -220,7 +279,8 @@ pub fn project_lock_text(p: Project, json_mode: Bool) -> String effects { state,
         }
     }
     for asset in p.assets {
-        strings_push(lines, "resource|" + asset.name + "|" + asset.relative + "|" + sha256(asset.data) + "\n");
+        strings_push(lines, "resource|" + asset.name + "|" + asset.relative + "|" + sha256(
+            asset.data) + "\n");
     }
     return strings_join(lines, "");
 }
@@ -237,7 +297,8 @@ pub fn project_verify_lock(p: Project, json_mode: Bool) -> Unit effects { state,
         }
         Result::Err(_) => {}
     }
-    project_fail(p.manifest, "E226", "Missing or stale lock; run vela lock PROJECT after reviewing dependencies.", json_mode);
+    project_fail(p.manifest, "E226",
+        "Missing or stale lock; run vela lock PROJECT after reviewing dependencies.", json_mode);
 }
 pub fn project_write_lock(p: Project, json_mode: Bool) -> Int effects { state, io, process } {
     if p.manifest == "" {
@@ -245,35 +306,41 @@ pub fn project_write_lock(p: Project, json_mode: Bool) -> Int effects { state, i
     }
     let lock = p.manifest + ".lock";
     let identity = io_value(file_identity(lock));
-    let c = project_module_context(p.entry, p.entry, load_source(p.entry, json_mode), json_mode, p.dependencies);
+    let c = project_module_context(p.entry, p.entry, load_source(p.entry, json_mode), json_mode,
+        p.dependencies);
     for unit in c.source_units {
-        if path_key(lock) == path_key(unit.path) || identity != ""&& identity == unit.identity {
+        if path_key(lock) == path_key(unit.path) || identity != "" && identity == unit.identity {
             project_fail(lock, "E226", "Lock must not overwrite source.", json_mode);
         }
     }
     for dep in p.dependencies {
-        let graph = project_module_context(dep.path, dep.path, load_source(dep.path, json_mode), json_mode, p.dependencies);
+        let graph = project_module_context(dep.path, dep.path, load_source(dep.path, json_mode),
+            json_mode, p.dependencies);
         for unit in graph.source_units {
-            if path_key(lock) == path_key(unit.path) || identity != ""&& identity == unit.identity {
+            if path_key(lock) == path_key(unit.path) || identity != "" && identity
+                == unit.identity {
                 project_fail(lock, "E226", "Lock must not overwrite dependency source.", json_mode);
             }
         }
     }
     for test in p.tests {
-        if path_key(lock) == path_key(test) || identity != ""&& identity == io_value(file_identity(test)) {
+        if path_key(lock) == path_key(test) || identity != "" && identity == io_value(file_identity(
+            test)) {
             project_fail(lock, "E226", "Lock must not overwrite test source.", json_mode);
         }
     }
-    if identity != ""&& identity == io_value(file_identity(p.manifest)) {
+    if identity != "" && identity == io_value(file_identity(p.manifest)) {
         project_fail(lock, "E226", "Lock must not overwrite manifest.", json_mode);
     }
     for native in p.natives {
-        if path_key(lock) == path_key(native.path) || identity != "" && identity == io_value(file_identity(native.path)) {
+        if path_key(lock) == path_key(native.path) || identity != "" && identity == io_value(
+            file_identity(native.path)) {
             project_fail(lock, "E226", "Lock must not overwrite native input.", json_mode);
         }
     }
     for asset in p.assets {
-        if path_key(lock) == path_key(asset.path) || identity != "" && identity == io_value(file_identity(asset.path)) {
+        if path_key(lock) == path_key(asset.path) || identity != "" && identity == io_value(
+            file_identity(asset.path)) {
             project_fail(lock, "E226", "Lock must not overwrite resource input.", json_mode);
         }
     }

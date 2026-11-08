@@ -1,0 +1,3 @@
+import "../../../std/option.vela" as option;
+fn invalid(value: Option<Int>) -> Option<Int> { return option::map(value, fn [](n: String) -> Int { return 1; }); }
+fn main() -> Unit {}

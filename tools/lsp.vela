@@ -1,5 +1,4 @@
 import "../std/json.vela" as json;
-
 struct Document {
     uri: String,
     path: String,
@@ -7,12 +6,12 @@ struct Document {
     version: Int
 }
 struct Session {
+    version: String,
     compiler: String,
     workspace: String,
     root: String,
     documents: List<Document>
 }
-
 fn string_result(result_value: StringResult) -> String {
     return match result_value {
         StringResult::Ok(value) => value,
@@ -20,7 +19,10 @@ fn string_result(result_value: StringResult) -> String {
     };
 }
 fn written(result_value: WriteResult) -> Bool {
-    return match result_value { WriteResult::Ok => true, WriteResult::Err(_) => false };
+    return match result_value {
+        WriteResult::Ok => true,
+        WriteResult::Err(_) => false
+    };
 }
 fn field(value: json::Value, name: String) -> json::Value effects { state } {
     return match json::field(json::root(value), name) {
@@ -29,28 +31,59 @@ fn field(value: json::Value, name: String) -> json::Value effects { state } {
     };
 }
 fn text(value: json::Value) -> String {
-    return match value { json::Value::StringValue(s) => s, json::Value::Null => "", json::Value::Boolean(_) => "", json::Value::Integer(_) => "", json::Value::Number(_) => "", json::Value::Array(_) => "", json::Value::Object(_) => "" };
+    return match value {
+        json::Value::StringValue(s) => s,
+        json::Value::Null => "",
+        json::Value::Boolean(_) => "",
+        json::Value::Integer(_) => "",
+        json::Value::Number(_) => "",
+        json::Value::Array(_) => "",
+        json::Value::Object(_) => ""
+    };
 }
 fn integer(value: json::Value) -> Int {
-    return match json::as_int(json::root(value)) { Result::Ok(n) => n, Result::Err(_) => -1 };
+    return match json::as_int(json::root(value)) {
+        Result::Ok(n) => n,
+        Result::Err(_) => -1
+    };
 }
 fn array(value: json::Value) -> List<json::Value> effects { state } {
-    return match json::as_array(json::root(value)) { Result::Ok(items) => items, Result::Err(_) => list_new<json::Value>() };
+    return match json::as_array(json::root(value)) {
+        Result::Ok(items) => items,
+        Result::Err(_) => list_new<json::Value>()
+    };
 }
 fn yes(value: json::Value) -> Bool {
-    return match value { json::Value::Boolean(b) => b, json::Value::Null => false, json::Value::StringValue(_) => false, json::Value::Integer(_) => false, json::Value::Number(_) => false, json::Value::Array(_) => false, json::Value::Object(_) => false };
+    return match value {
+        json::Value::Boolean(b) => b,
+        json::Value::Null => false,
+        json::Value::StringValue(_) => false,
+        json::Value::Integer(_) => false,
+        json::Value::Number(_) => false,
+        json::Value::Array(_) => false,
+        json::Value::Object(_) => false
+    };
 }
 fn encoded(value: json::Value) -> String effects { state } {
-    return match json::stringify(value) { Result::Ok(data) => data, Result::Err(_) => "null" };
+    return match json::stringify(value) {
+        Result::Ok(data) => data,
+        Result::Err(_) => "null"
+    };
 }
 fn quote(value: String) -> String effects { state } {
     return encoded(json::Value::StringValue(value));
 }
 fn parse(data: String) -> json::Value effects { state } {
-    return match json::parse(data) { Result::Ok(value) => value, Result::Err(_) => json::Value::Null };
+    return match json::parse(data) {
+        Result::Ok(value) => value,
+        Result::Err(_) => json::Value::Null
+    };
 }
 fn int_value(data: String) -> Int {
-    return match parse_int(data) { IntResult::Ok(value) => value, IntResult::Err(_) => -1 };
+    return match parse_int(data) {
+        IntResult::Ok(value) => value,
+        IntResult::Err(_) => -1
+    };
 }
 fn frame(data: String) -> Unit effects { io, state } {
     write_stdout(f"Content-Length: {str_len(data):d}\r\n\r\n{data:s}");
@@ -59,7 +92,8 @@ fn reply(id: String, value: String) -> Unit effects { io, state } {
     frame(f"{{\"jsonrpc\":\"2.0\",\"id\":{id:s},\"result\":{value:s}}}");
 }
 fn error(id: String, code: Int, message: String) -> Unit effects { io, state } {
-    frame(f"{{\"jsonrpc\":\"2.0\",\"id\":{id:s},\"error\":{{\"code\":{code:d},\"message\":{quote(message):s}}}}}");
+    frame(
+        f"{{\"jsonrpc\":\"2.0\",\"id\":{id:s},\"error\":{{\"code\":{code:d},\"message\":{quote(message):s}}}}}");
 }
 fn receive() -> String effects { io, state } {
     var length = -1;
@@ -67,26 +101,47 @@ fn receive() -> String effects { io, state } {
         match read_stdin(8192, true) {
             ReadResult::Ok(line) => {
                 if line == "\r\n" {
-                    if length <= 0 || length > 4194304 { return ""; }
-                    return match read_stdin(length, false) { ReadResult::Ok(data) => data, ReadResult::Limit => "", ReadResult::Err(_) => "" };
+                    if length <= 0 || length > 4194304 {
+                        return "";
+                    }
+                    return match read_stdin(length, false) {
+                        ReadResult::Ok(data) => data,
+                        ReadResult::Limit => "",
+                        ReadResult::Err(_) => ""
+                    };
                 }
                 let prefix = "Content-Length: ";
-                if str_len(line) > str_len(prefix) + 2 && str_slice(line, 0, str_len(prefix)) == prefix && str_slice(line, str_len(line) - 2, str_len(line)) == "\r\n" {
-                    if length >= 0 { return ""; }
+                if str_len(line) > str_len(prefix) + 2 && str_slice(line, 0, str_len(prefix))
+                    == prefix && str_slice(line, str_len(line) - 2, str_len(line)) == "\r\n" {
+                    if length >= 0 {
+                        return "";
+                    }
                     length = int_value(str_slice(line, str_len(prefix), str_len(line) - 2));
-                    if length <= 0 { return ""; }
+                    if length <= 0 {
+                        return "";
+                    }
                 }
             }
-            ReadResult::Limit => { return ""; }
-            ReadResult::Err(_) => { return ""; }
+            ReadResult::Limit => {
+                return "";
+            }
+            ReadResult::Err(_) => {
+                return "";
+            }
         }
     }
     return "";
 }
 fn hex_digit(b: Int) -> Int {
-    if b >= 48 && b <= 57 { return b - 48; }
-    if b >= 65 && b <= 70 { return b - 55; }
-    if b >= 97 && b <= 102 { return b - 87; }
+    if b >= 48 && b <= 57 {
+        return b - 48;
+    }
+    if b >= 65 && b <= 70 {
+        return b - 55;
+    }
+    if b >= 97 && b <= 102 {
+        return b - 87;
+    }
     return -1;
 }
 fn path_key(path: String) -> String effects { state } {
@@ -104,68 +159,102 @@ fn path_key(path: String) -> String effects { state } {
     return strings_join(parts, "");
 }
 fn uri_path(uri: String) -> String effects { state, io } {
-    if str_len(uri) < 9 || str_len(uri) > 4096 || str_slice(uri, 0, 8) != "file:///" { return ""; }
+    if str_len(uri) < 9 || str_len(uri) > 4096 || str_slice(uri, 0, 8) != "file:///" {
+        return "";
+    }
     let parts = strings_new();
     var i = 7;
-    if platform() == "windows" { i = 8; }
+    if platform() == "windows" {
+        i = 8;
+    }
     while i < str_len(uri) {
         let b = str_byte(uri, i);
         if b == 37 {
-            if i + 2 >= str_len(uri) { return ""; }
+            if i + 2 >= str_len(uri) {
+                return "";
+            }
             let a = hex_digit(str_byte(uri, i + 1));
             let z = hex_digit(str_byte(uri, i + 2));
-            if a < 0 || z < 0 || a * 16 + z < 32 || a * 16 + z == 127 { return ""; }
+            if a < 0 || z < 0 || a * 16 + z < 32 || a * 16 + z == 127 {
+                return "";
+            }
             strings_push(parts, str_from_byte(a * 16 + z));
             i = i + 3;
         } else {
-            if b < 32 || b == 127 || b == 35 || b == 63 { return ""; }
+            if b < 32 || b == 127 || b == 35 || b == 63 {
+                return "";
+            }
             strings_push(parts, str_slice(uri, i, i + 1));
             i = i + 1;
         }
     }
     let path = strings_join(parts, "");
-    if platform() == "windows" && (str_len(path) < 3 || str_byte(path, 1) != 58 || str_byte(path, 2) != 47) { return ""; }
+    if platform() == "windows" && (str_len(path) < 3 || str_byte(path, 1) != 58 || str_byte(path, 2)
+        != 47) {
+        return "";
+    }
     return string_result(absolute_path(path));
 }
 fn file_uri(path: String) -> String effects { state } {
     let parts = strings_new();
     strings_push(parts, "file://");
-    if platform() == "windows" { strings_push(parts, "/"); }
+    if platform() == "windows" {
+        strings_push(parts, "/");
+    }
     let hex = "0123456789ABCDEF";
     for i in 0 .. str_len(path) {
         let b = str_byte(path, i);
         if b == 92 && platform() == "windows" {
             strings_push(parts, "/");
-        } else if b >= 65 && b <= 90 || b >= 97 && b <= 122 || b >= 48 && b <= 57 || b == 58 || b == 47 || b == 45 || b == 46 || b == 95 || b == 126 {
+        } else if b >= 65 && b <= 90 || b >= 97 && b <= 122 || b >= 48 && b <= 57 || b == 58 || b
+            == 47 || b == 45 || b == 46 || b == 95 || b == 126 {
             strings_push(parts, str_slice(path, i, i + 1));
         } else {
-            strings_push(parts, "%" + str_slice(hex, b / 16, b / 16 + 1) + str_slice(hex, b % 16, b % 16 + 1));
+            strings_push(parts, "%" + str_slice(hex, b / 16, b / 16 + 1) + str_slice(hex, b % 16, b
+                % 16 + 1));
         }
     }
     return strings_join(parts, "");
 }
 fn within(workspace: String, path: String) -> Bool effects { state } {
     var prefix = path_key(workspace);
-    if str_len(prefix) == 0 { return false; }
-    if str_byte(prefix, str_len(prefix) - 1) != 47 { prefix = prefix + "/"; }
+    if str_len(prefix) == 0 {
+        return false;
+    }
+    if str_byte(prefix, str_len(prefix) - 1) != 47 {
+        prefix = prefix + "/";
+    }
     let key = path_key(path);
     return str_len(key) > str_len(prefix) && str_slice(key, 0, str_len(prefix)) == prefix;
 }
 fn doc_at(session: Session, path: String) -> Int effects { state } {
     let key = path_key(path);
     for i in 0 .. list_len(session.documents) {
-        if path_key(list_get(session.documents, i).path) == key { return i; }
+        if path_key(list_get(session.documents, i).path) == key {
+            return i;
+        }
     }
     return -1;
 }
 fn uri_for(session: Session, path: String) -> String effects { state } {
     let index = doc_at(session, path);
-    if index >= 0 { return list_get(session.documents, index).uri; }
+    if index >= 0 {
+        return list_get(session.documents, index).uri;
+    }
     return file_uri(path);
 }
-fn native(session: Session, path: String, command: String, options: List<String>) -> json::Value effects { state, io, process } {
-    let directory = string_result(temp_dir(env("VELA_LSP_TEMP")));
-    if directory == "" { return json::Value::Null; }
+fn native(session: Session, path: String, command: String,
+    options: List<String>) -> json::Value effects { state, io, process } {
+    var directory = "";
+    match temp_dir(env("VELA_LSP_TEMP")) {
+        StringResult::Ok(value) => {
+            directory = value;
+        }
+        StringResult::Err(cause) => {
+            eprint("Vela LSP worker staging: " + cause);
+            return json::Value::Null;
+        }
+    }
     scope {
         let owned = strings_new();
         defer {
@@ -178,15 +267,23 @@ fn native(session: Session, path: String, command: String, options: List<String>
         strings_push(args, session.compiler);
         strings_push(args, command);
         var root = session.root;
-        if root == "" { root = path; }
+        if root == "" {
+            root = path;
+        }
         strings_push(args, root);
-        for option in options { strings_push(args, option); }
+        for option in options {
+            strings_push(args, option);
+        }
         for i in 0 .. list_len(session.documents) {
             let doc = list_get(session.documents, i);
-            if doc.version < 0 { continue; }
+            if doc.version < 0 {
+                continue;
+            }
             let file = f"{directory:s}/overlay-{i:d}";
             strings_push(owned, file);
-            if !written(write_file(file, doc.text)) { return json::Value::Null; }
+            if !written(write_file(file, doc.text)) {
+                return json::Value::Null;
+            }
             strings_push(args, "--overlay");
             strings_push(args, doc.path);
             strings_push(args, file);
@@ -196,15 +293,30 @@ fn native(session: Session, path: String, command: String, options: List<String>
         strings_push(owned, output);
         strings_push(owned, err);
         let status = process_run_files(args, output, err, 15000);
-        if status < 0 || status > 2 { return json::Value::Null; }
-        return match read_file_bounded(output, 4194304) {
-            ReadResult::Ok(data) => parse(data),
-            ReadResult::Limit => json::Value::Null,
-            ReadResult::Err(_) => json::Value::Null
-        };
+        if status < 0 || status > 2 {
+            eprint("Vela LSP worker exit: " + to_string(status));
+            return json::Value::Null;
+        }
+        match read_file_bounded(output, 4194304) {
+            ReadResult::Ok(data) => {
+                let decoded = parse(data);
+                if encoded(decoded) == "null" {
+                    eprint("Vela LSP worker JSON rejected");
+                }
+                return decoded;
+            }
+            ReadResult::Limit => {
+                eprint("Vela LSP worker output limit");
+            }
+            ReadResult::Err(cause) => {
+                eprint("Vela LSP worker output: " + cause);
+            }
+        }
+        return json::Value::Null;
     }
 }
-fn focused(session: Session, path: String, line: Int, character: Int) -> json::Value effects { state, io, process } {
+fn focused(session: Session, path: String, line: Int,
+    character: Int) -> json::Value effects { state, io, process } {
     let options = list_new<String>();
     list_push(options, "--at");
     list_push(options, path);
@@ -221,7 +333,9 @@ fn range(value: json::Value) -> String effects { state } {
 fn location(session: Session, index: json::Value, value: json::Value) -> String effects { state } {
     let id = integer(field(value, "document"));
     let docs = array(field(index, "documents"));
-    if id < 0 || id >= list_len(docs) { return "null"; }
+    if id < 0 || id >= list_len(docs) {
+        return "null";
+    }
     let path = text(field(list_get(docs, id), "path"));
     return f"{{\"uri\":{quote(uri_for(session, path)):s},\"range\":{range(value):s}}}";
 }
@@ -230,7 +344,9 @@ fn diagnostics(session: Session, doc: Document) -> Unit effects { io, process, s
     let items = strings_new();
     for diagnostic in array(field(index, "diagnostics")) {
         let source = text(field(diagnostic, "source"));
-        if source != "" && path_key(source) != path_key(doc.path) { continue; }
+        if source != "" && path_key(source) != path_key(doc.path) {
+            continue;
+        }
         let span = field(diagnostic, "span");
         let start = integer(field(span, "line"));
         let end = integer(field(span, "end_line"));
@@ -238,59 +354,103 @@ fn diagnostics(session: Session, doc: Document) -> Unit effects { io, process, s
         let end_col = integer(field(span, "end_column"));
         var place = "{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}}";
         if start > 0 && end > 0 && col > 0 && end_col > 0 {
-            place = f"{{\"start\":{{\"line\":{start - 1:d},\"character\":{utf16_column(doc.text, start - 1, col - 1):d}}},\"end\":{{\"line\":{end - 1:d},\"character\":{utf16_column(doc.text, end - 1, end_col - 1):d}}}}}";
+            place =
+                f"{{\"start\":{{\"line\":{start - 1:d},\"character\":{utf16_column(doc.text, start - 1, col - 1):d}}},\"end\":{{\"line\":{end - 1:d},\"character\":{utf16_column(doc.text, end - 1, end_col - 1):d}}}}}";
         }
-        strings_push(items, f"{{\"range\":{place:s},\"severity\":1,\"source\":\"vela\",\"code\":{encoded(field(diagnostic, "code")):s},\"message\":{encoded(field(diagnostic, "message")):s}}}");
+        if encoded(field(diagnostic, "range")) != "null" {
+            place = range(field(diagnostic, "range"));
+        }
+        let related = strings_new();
+        for item in array(field(diagnostic, "related")) {
+            if encoded(field(item, "range")) != "null" {
+                strings_push(related,
+                    f"{{\"location\":{{\"uri\":{quote(uri_for(session,text(field(item,"source")))):s},\"range\":{range(field(item,"range")):s}}},\"message\":{encoded(field(item,"message")):s}}}");
+            }
+        }
+        strings_push(items,
+            f"{{\"range\":{place:s},\"severity\":1,\"source\":\"vela\",\"code\":{encoded(field(diagnostic, "code")):s},\"message\":{encoded(field(diagnostic, "message")):s},\"relatedInformation\":[{strings_join(related,","):s}],\"data\":{{\"revision\":{encoded(field(index,"revision")):s},\"details\":{encoded(field(diagnostic,"details")):s},\"explanation\":{encoded(field(diagnostic,"explanation")):s}}}}}");
     }
-    frame(f"{{\"jsonrpc\":\"2.0\",\"method\":\"textDocument/publishDiagnostics\",\"params\":{{\"uri\":{quote(doc.uri):s},\"version\":{doc.version:d},\"diagnostics\":[{strings_join(items, ","):s}]}}}}");
+    frame(
+        f"{{\"jsonrpc\":\"2.0\",\"method\":\"textDocument/publishDiagnostics\",\"params\":{{\"uri\":{quote(doc.uri):s},\"version\":{doc.version:d},\"diagnostics\":[{strings_join(items, ","):s}]}}}}");
 }
 fn utf16_column(data: String, line: Int, col: Int) -> Int {
     var current = 0;
     var i = 0;
     var column = 0;
     var units = 0;
-    if str_len(data) >= 3 && str_byte(data, 0) == 239 && str_byte(data, 1) == 187 && str_byte(data, 2) == 191 { i = 3; }
+    if str_len(data) >= 3 && str_byte(data, 0) == 239 && str_byte(data, 1) == 187 && str_byte(data,
+        2) == 191 {
+        i = 3;
+    }
     while i < str_len(data) && current <= line {
         let b = str_byte(data, i);
         if b == 13 || b == 10 {
-            if b == 13 && i + 1 < str_len(data) && str_byte(data, i + 1) == 10 { i = i + 1; }
+            if b == 13 && i + 1 < str_len(data) && str_byte(data, i + 1) == 10 {
+                i = i + 1;
+            }
             current = current + 1;
         } else if current == line && (b < 128 || b >= 192) {
-            if column == col { return units; }
+            if column == col {
+                return units;
+            }
             column = column + 1;
             units = units + 1;
-            if b >= 240 { units = units + 1; }
+            if b >= 240 {
+                units = units + 1;
+            }
         }
         i = i + 1;
     }
     return units;
 }
-fn request(session: Session, method: String, id: String, params: json::Value, path: String) -> Unit effects { state, io, process } {
+fn request(session: Session, method: String, id: String, params: json::Value,
+    path: String) -> Unit effects { state, io, process } {
     let position = field(params, "position");
     var line = integer(field(position, "line"));
     var character = integer(field(position, "character"));
-    if method == "textDocument/formatting" { line = 0; character = 0; }
-    if line < 0 || character < 0 { error(id, -32602, "Expected a UTF-16 position."); return; }
+    if method == "textDocument/formatting" || method == "textDocument/codeAction" {
+        line = 0;
+        character = 0;
+    }
+    if line < 0 || character < 0 {
+        error(id, -32602, "Expected a UTF-16 position.");
+        return;
+    }
     let index = focused(session, path, line, character);
+    if method == "textDocument/codeAction" {
+        diagnostic_actions(session, id, params, path, index);
+        return;
+    }
     if !yes(field(index, "ok")) {
         if method == "textDocument/rename" || method == "textDocument/formatting" {
             error(id, -32602, "Analysis was rejected; inspect diagnostics.");
-        } else { reply(id, "null"); }
+        } else {
+            reply(id, "null");
+        }
         return;
     }
     let definitions = array(field(index, "definitions"));
     let references = array(field(index, "references"));
-    if method == "vela/query" { reply(id, encoded(index)); return; }
+    if method == "vela/query" {
+        reply(id, encoded(index));
+        return;
+    }
     if method == "textDocument/definition" || method == "textDocument/references" {
         let results = strings_new();
         let seen = dict_new<String, Bool>();
-        if method == "textDocument/definition" || yes(field(field(params, "context"), "includeDeclaration")) {
-            for value in definitions { strings_push(results, location(session, index, field(value, "range"))); }
+        if method == "textDocument/definition" || yes(field(field(params, "context"),
+            "includeDeclaration")) {
+            for value in definitions {
+                strings_push(results, location(session, index, field(value, "range")));
+            }
         }
         if method == "textDocument/references" {
             for value in references {
                 let loc = location(session, index, field(value, "range"));
-                if !dict_has(seen, loc) { dict_set(seen, loc, true); strings_push(results, loc); }
+                if !dict_has(seen, loc) {
+                    dict_set(seen, loc, true);
+                    strings_push(results, loc);
+                }
             }
         }
         reply(id, "[" + strings_join(results, ",") + "]");
@@ -306,48 +466,149 @@ fn request(session: Session, method: String, id: String, params: json::Value, pa
             let typ = text(field(item, "type"));
             let row = f"{typ:s} effects {encoded(field(item, "effects")):s}";
             if typ != "" && !dict_has(seen, row) {
-                dict_set(seen, row, true); strings_push(lines, row);
+                dict_set(seen, row, true);
+                strings_push(lines, row);
             }
         }
-        if strings_len(lines) == 0 { reply(id, "null"); }
-        else { reply(id, f"{{\"contents\":{{\"kind\":\"plaintext\",\"value\":{quote(strings_join(lines, "\n")):s}}}}}"); }
+        if strings_len(lines) == 0 {
+            reply(id, "null");
+        } else {
+            reply(id,
+                f"{{\"contents\":{{\"kind\":\"plaintext\",\"value\":{quote(strings_join(lines, "\n")):s}}}}}");
+        }
     } else if method == "textDocument/rename" || method == "textDocument/formatting" {
         edit_request(session, method, id, params, path, index, line, character);
     } else {
         error(id, -32601, "Unsupported method.");
     }
 }
-fn edit_request(session: Session, method: String, id: String, params: json::Value, path: String, index: json::Value, line: Int, character: Int) -> Unit effects { state, io, process } {
+fn diagnostic_actions(session: Session, id: String, params: json::Value, path: String,
+    index: json::Value) -> Unit effects { state, io, process } {
+    let diagnostics = array(field(index, "diagnostics"));
+    if list_len(diagnostics) == 0 || text(field(index, "revision")) == "" {
+        reply(id, "[]");
+        return;
+    }
+    let diagnostic = list_get(diagnostics, 0);
+    if path_key(text(field(diagnostic, "source"))) != path_key(path) {
+        reply(id, "[]");
+        return;
+    }
+    let requested = field(params, "range");
+    let start = field(requested, "start");
+    let end = field(requested, "end");
+    if integer(field(start, "line")) < 0 || integer(field(end, "line")) < integer(field(start,
+        "line")) {
+        error(id, -32602, "Expected a code-action range.");
+        return;
+    }
+    let place = field(diagnostic, "range");
+    let first = field(place, "start");
+    let last = field(place, "end");
+    if integer(field(last, "line")) < integer(field(start, "line")) || integer(field(first, "line"))
+        > integer(field(end, "line")) {
+        reply(id, "[]");
+        return;
+    }
+    if integer(field(last, "line")) == integer(field(start, "line")) && integer(field(last,
+        "character")) < integer(field(start, "character")) || integer(field(first, "line"))
+        == integer(field(end, "line")) && integer(field(first, "character")) > integer(field(end,
+        "character")) {
+        reply(id, "[]");
+        return;
+    }
     var document = -1;
     for doc in array(field(index, "documents")) {
-        if path_key(text(field(doc, "path"))) == path_key(path) { document = integer(field(doc, "id")); }
+        if path_key(text(field(doc, "path"))) == path_key(path) {
+            document = integer(field(doc, "id"));
+        }
+    }
+    if document < 0 {
+        reply(id, "[]");
+        return;
+    }
+    let options = list_new<String>();
+    list_push(options, text(field(index, "revision")));
+    list_push(options, to_string(document));
+    list_push(options, "diagnose");
+    let plan = native(session, path, "plan", options);
+    if !yes(field(plan, "ok")) || !yes(field(plan, "validated")) {
+        reply(id, "[]");
+        return;
+    }
+    let changes = strings_new();
+    for change in array(field(plan, "changes")) {
+        let file = text(field(change, "path"));
+        let at = doc_at(session, file);
+        if at < 0 || list_get(session.documents, at).version < 0 {
+            reply(id, "[]");
+            return;
+        }
+        let doc = list_get(session.documents, at);
+        let edits = strings_new();
+        for edit in array(field(change, "edits")) {
+            strings_push(edits,
+                f"{{\"range\":{range(field(edit,"range")):s},\"newText\":{encoded(field(edit,"new_text")):s}}}");
+        }
+        strings_push(changes,
+            f"{{\"textDocument\":{{\"uri\":{quote(doc.uri):s},\"version\":{doc.version:d}}},\"edits\":[{strings_join(edits,","):s}]}}");
+    }
+    if strings_len(changes) == 0 {
+        reply(id, "[]");
+        return;
+    }
+    let title = "Vela: checked correction for " + text(field(diagnostic, "code"));
+    let edit = "{\"documentChanges\":[" + strings_join(changes, ",") + "]}";
+    let metadata = "{\"revision\":" + encoded(field(plan, "revision")) + ",\"explanations\":"
+        + encoded(field(plan, "explanations")) + "}";
+    reply(id, "[{\"title\":" + quote(title)
+        + ",\"kind\":\"quickfix\",\"isPreferred\":true,\"edit\":" + edit + ",\"data\":" + metadata
+        + "}]");
+}
+fn edit_request(session: Session, method: String, id: String, params: json::Value, path: String,
+    index: json::Value, line: Int, character: Int) -> Unit effects { state, io, process } {
+    var document = -1;
+    for doc in array(field(index, "documents")) {
+        if path_key(text(field(doc, "path"))) == path_key(path) {
+            document = integer(field(doc, "id"));
+        }
     }
     let options = list_new<String>();
     list_push(options, text(field(index, "revision")));
     list_push(options, to_string(document));
     let format = method == "textDocument/formatting";
-    if format { list_push(options, "fmt"); }
-    else {
+    if format {
+        list_push(options, "fmt");
+    } else {
         var offset = -1;
         for group in 0 .. 2 {
             var sites = array(field(index, "definitions"));
-            if group == 1 { sites = array(field(index, "references")); }
+            if group == 1 {
+                sites = array(field(index, "references"));
+            }
             for site in sites {
                 let place = field(site, "range");
                 let start = field(place, "start");
                 let end = field(place, "end");
-                if integer(field(place, "document")) == document && integer(field(start, "line")) == line && integer(field(end, "line")) == line &&
-                    integer(field(start, "character")) <= character && character < integer(field(end, "character")) {
+                if integer(field(place, "document")) == document && integer(field(start, "line"))
+                    == line && integer(field(end, "line")) == line && integer(field(start,
+                    "character")) <= character && character < integer(field(end, "character")) {
                     offset = integer(field(start, "byte"));
                 }
             }
         }
-        if offset < 0 { error(id, -32602, "No renameable symbol at this position."); return; }
+        if offset < 0 {
+            error(id, -32602, "No renameable symbol at this position.");
+            return;
+        }
         list_push(options, to_string(offset));
         list_push(options, text(field(params, "newName")));
     }
     let plan = native(session, path, "plan", options);
-    if !yes(field(plan, "ok")) { error(id, -32801, "Edit plan rejected by the compiler."); return; }
+    if !yes(field(plan, "ok")) {
+        error(id, -32801, "Edit plan rejected by the compiler.");
+        return;
+    }
     let changes = strings_new();
     for change in array(field(plan, "changes")) {
         let file = text(field(change, "path"));
@@ -359,94 +620,202 @@ fn edit_request(session: Session, method: String, id: String, params: json::Valu
         let doc = list_get(session.documents, at);
         let edits = strings_new();
         for edit in array(field(change, "edits")) {
-            strings_push(edits, f"{{\"range\":{range(field(edit, "range")):s},\"newText\":{encoded(field(edit, "new_text")):s}}}");
+            strings_push(edits,
+                f"{{\"range\":{range(field(edit, "range")):s},\"newText\":{encoded(field(edit, "new_text")):s}}}");
         }
-        if format { reply(id, "[" + strings_join(edits, ",") + "]"); return; }
-        strings_push(changes, f"{{\"textDocument\":{{\"uri\":{quote(doc.uri):s},\"version\":{doc.version:d}}},\"edits\":[{strings_join(edits, ","):s}]}}");
+        if format {
+            reply(id, "[" + strings_join(edits, ",") + "]");
+            return;
+        }
+        strings_push(changes,
+            f"{{\"textDocument\":{{\"uri\":{quote(doc.uri):s},\"version\":{doc.version:d}}},\"edits\":[{strings_join(edits, ","):s}]}}");
     }
-    if format { reply(id, "[]"); }
-    else {
+    if format {
+        reply(id, "[]");
+    } else {
         let excluded = integer(field(field(plan, "scope"), "excluded_test_roots"));
         if excluded > 0 {
-            let message = f"Vela rename covers the entry graph. Declared test roots omitted as entry points: {excluded:d}.";
-            frame(f"{{\"jsonrpc\":\"2.0\",\"method\":\"window/showMessage\",\"params\":{{\"type\":2,\"message\":{quote(message):s}}}}}");
+            let message =
+                f"Vela rename covers the entry graph. Declared test roots omitted as entry points: {excluded:d}.";
+            frame(
+                f"{{\"jsonrpc\":\"2.0\",\"method\":\"window/showMessage\",\"params\":{{\"type\":2,\"message\":{quote(message):s}}}}}");
         }
         reply(id, f"{{\"documentChanges\":[{strings_join(changes, ","):s}]}}");
     }
 }
-fn sync(session: Session, method: String, path: String, uri: String, document: json::Value, params: json::Value) -> Unit effects { state, io, process } {
+fn sync(session: Session, method: String, path: String, uri: String, document: json::Value,
+    params: json::Value) -> Unit effects { state, io, process } {
     var at = doc_at(session, path);
     if method == "textDocument/didClose" {
         if at >= 0 && list_get(session.documents, at).version >= 0 {
             list_set(session.documents, at, Document(uri: "", path: "", text: "", version: -1));
-            frame(f"{{\"jsonrpc\":\"2.0\",\"method\":\"textDocument/publishDiagnostics\",\"params\":{{\"uri\":{quote(uri):s},\"diagnostics\":[]}}}}");
+            frame(
+                f"{{\"jsonrpc\":\"2.0\",\"method\":\"textDocument/publishDiagnostics\",\"params\":{{\"uri\":{quote(uri):s},\"diagnostics\":[]}}}}");
         }
         return;
     }
     let version = integer(field(document, "version"));
-    if version < 0 || at >= 0 && version <= list_get(session.documents, at).version { return; }
+    if version < 0 || at >= 0 && version <= list_get(session.documents, at).version {
+        return;
+    }
     var data = text(field(document, "text"));
     if method == "textDocument/didChange" {
-        if at < 0 { return; }
+        if at < 0 {
+            return;
+        }
         let changes = array(field(params, "contentChanges"));
-        if list_len(changes) != 1 || encoded(field(list_get(changes, 0), "range")) != "null" { return; }
+        if list_len(changes) != 1 || encoded(field(list_get(changes, 0), "range")) != "null" {
+            return;
+        }
         data = text(field(list_get(changes, 0), "text"));
     }
-    if str_len(data) > 2097152 { return; }
+    if str_len(data) > 2097152 {
+        return;
+    }
     var total = str_len(data);
     for i in 0 .. list_len(session.documents) {
         let doc = list_get(session.documents, i);
-        if at < 0 && doc.version < 0 { at = i; }
-        if i != at { total = total + str_len(doc.text); }
+        if at < 0 && doc.version < 0 {
+            at = i;
+        }
+        if i != at {
+            total = total + str_len(doc.text);
+        }
     }
-    if total > 8388608 || at < 0 && list_len(session.documents) >= 32 { return; }
+    if total > 8388608 || at < 0 && list_len(session.documents) >= 32 {
+        return;
+    }
     let doc = Document(uri: uri, path: path, text: data, version: version);
-    if at >= 0 { list_set(session.documents, at, doc); } else { list_push(session.documents, doc); }
+    if at >= 0 {
+        list_set(session.documents, at, doc);
+    } else {
+        list_push(session.documents, doc);
+    }
     diagnostics(session, doc);
 }
+fn native_version(compiler: String) -> String effects { state, io, process } {
+    let directory = string_result(temp_dir(""));
+    if directory == "" {
+        return "";
+    }
+    let output = directory + "/stdout";
+    let errors = directory + "/stderr";
+    let args = strings_new();
+    strings_push(args, compiler);
+    strings_push(args, "--version");
+    let status = process_run_files(args, output, errors, 3000);
+    var data = "";
+    if status == 0 {
+        match read_file_bounded(output, 1024) {
+            ReadResult::Ok(value) => {
+                data = value;
+            }
+            ReadResult::Limit => {}
+            ReadResult::Err(_) => {}
+        }
+    }
+    let out_removed = written(remove_file(output));
+    let err_removed = written(remove_file(errors));
+    let dir_removed = written(remove_dir(directory));
+    if !out_removed || !err_removed || !dir_removed {
+        return "";
+    }
+    while str_len(data) > 0 && (str_byte(data, str_len(data) - 1) == 10 || str_byte(data, str_len(
+        data) - 1) == 13) {
+        data = str_slice(data, 0, str_len(data) - 1);
+    }
+    if str_len(data) >= 20 && str_slice(data, 0, 5) == "Vela " && str_slice(data, str_len(data)
+        - 14, str_len(data)) == " (self-hosted)" {
+        return str_slice(data, 5, str_len(data) - 14);
+    }
+    return "";
+}
 fn main() -> Int effects { args, state, io, process } {
-    if arg_count() < 2 || arg_count() > 3 { eprint("Usage: vela-lsp COMPILER WORKSPACE [SOURCE_OR_PROJECT]"); return 2; }
+    if arg_count() < 2 || arg_count() > 3 {
+        eprint("Usage: vela-lsp COMPILER WORKSPACE [SOURCE_OR_PROJECT]");
+        return 2;
+    }
     let compiler = string_result(absolute_path(string_result(arg(0))));
     let workspace = string_result(absolute_path(string_result(arg(1))));
     var root = "";
     if arg_count() == 3 {
         root = string_result(absolute_path(string_result(arg(2))));
-        if !within(workspace, root) { return 2; }
+        if !within(workspace, root) {
+            return 2;
+        }
     }
-    if compiler == "" || workspace == "" { return 2; }
+    if compiler == "" || workspace == "" {
+        return 2;
+    }
     var temp = env("TEMP");
-    if temp == "" { temp = env("TMPDIR"); }
-    if temp == "" { temp = "/tmp"; }
+    if temp == "" {
+        temp = env("TMPDIR");
+    }
+    if temp == "" {
+        temp = "/tmp";
+    }
     set_env("VELA_LSP_TEMP", temp);
     set_env("VELA_SOURCE_ROOT", workspace);
-    let session = Session(compiler: compiler, workspace: workspace, root: root, documents: list_new<Document>());
+    let version = native_version(compiler);
+    if version == "" {
+        eprint("Cannot determine native compiler version.");
+        return 2;
+    }
+    let session = Session(version: version, compiler: compiler, workspace: workspace, root: root,
+        documents: list_new<Document>());
     var initialized = false;
     var stopped = false;
     while true {
         let raw = receive();
-        if raw == "" { return 0; }
+        if raw == "" {
+            return 0;
+        }
         let message = parse(raw);
-        if encoded(message) == "null" { error("null", -32700, "Invalid JSON."); continue; }
+        if encoded(message) == "null" {
+            error("null", -32700, "Invalid JSON.");
+            continue;
+        }
         let id = encoded(field(message, "id"));
         let method = text(field(message, "method"));
         let params = field(message, "params");
-        if method == "exit" { if stopped { return 0; } return 1; }
+        if method == "exit" {
+            if stopped {
+                return 0;
+            }
+            return 1;
+        }
         if method == "initialize" && !initialized && !stopped {
             initialized = true;
-            reply(id, "{\"capabilities\":{\"positionEncoding\":\"utf-16\",\"textDocumentSync\":{\"openClose\":true,\"change\":1},\"definitionProvider\":true,\"referencesProvider\":true,\"hoverProvider\":true,\"renameProvider\":true,\"documentFormattingProvider\":true},\"serverInfo\":{\"name\":\"Vela\",\"version\":\"0.9.0\"}}");
+            reply(id,
+                "{\"capabilities\":{\"positionEncoding\":\"utf-16\",\"textDocumentSync\":{\"openClose\":true,\"change\":1},\"definitionProvider\":true,\"referencesProvider\":true,\"hoverProvider\":true,\"renameProvider\":true,\"documentFormattingProvider\":true,\"codeActionProvider\":true},\"serverInfo\":{\"name\":\"Vela\",\"version\":"
+                + quote(session.version) + "}}");
             continue;
         }
-        if method == "shutdown" && initialized && !stopped { stopped = true; reply(id, "null"); continue; }
-        if method == "$/cancelRequest" || method == "initialized" { continue; }
-        if !initialized || stopped { if id != "null" { error(id, -32002, "Analysis session is not active."); } continue; }
+        if method == "shutdown" && initialized && !stopped {
+            stopped = true;
+            reply(id, "null");
+            continue;
+        }
+        if method == "$/cancelRequest" || method == "initialized" {
+            continue;
+        }
+        if !initialized || stopped {
+            if id != "null" {
+                error(id, -32002, "Analysis session is not active.");
+            }
+            continue;
+        }
         let document = field(params, "textDocument");
         let uri = text(field(document, "uri"));
         let path = uri_path(uri);
         if !within(workspace, path) {
-            if id != "null" { error(id, -32602, "Expected a file URI within this workspace."); }
+            if id != "null" {
+                error(id, -32602, "Expected a file URI within this workspace.");
+            }
             continue;
         }
-        if method == "textDocument/didOpen" || method == "textDocument/didChange" || method == "textDocument/didClose" {
+        if method == "textDocument/didOpen" || method == "textDocument/didChange" || method
+            == "textDocument/didClose" {
             sync(session, method, path, uri, document, params);
         } else if id != "null" {
             request(session, method, id, params, path);
