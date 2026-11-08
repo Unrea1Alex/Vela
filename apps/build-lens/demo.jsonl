@@ -1,0 +1,15 @@
+{"id":"01","suite":"checkout","name":"Оплата банковской картой","status":"passed","duration_ms":1420}
+{"id":"02","suite":"checkout","name":"Возврат платежа","status":"failed","duration_ms":3850}
+{"id":"03","suite":"auth","name":"Вход через SSO","status":"failed","duration_ms":2100}
+{"id":"04","suite":"auth","name":"Вход через SSO","status":"passed","duration_ms":920}
+{"id":"05","suite":"api","name":"Экспорт большого каталога","status":"passed","duration_ms":6200}
+{"id":"06","suite":"api","name":"Поиск по каталогу","status":"passed","duration_ms":310}
+{"id":"07","suite":"checkout","name":"Промокод на первый заказ","status":"failed","duration_ms":870}
+{"id":"08","suite":"checkout","name":"Промокод на первый заказ","status":"passed","duration_ms":640}
+{"id":"09","suite":"checkout","name":"Промокод на первый заказ","status":"failed","duration_ms":940}
+{"id":"10","suite":"profile","name":"Загрузка аватара","status":"passed","duration_ms":720}
+{"id":"11","suite":"profile","name":"Удаление аккаунта","status":"skipped","duration_ms":0}
+{"id":"12","suite":"api","name":"Проверка прав доступа","status":"passed","duration_ms":120}
+{"id":"13","suite":"auth","name":"Восстановление пароля","status":"passed","duration_ms":680}
+{"id":"14","suite":"api","name":"Пустой ответ сервера","status":"passed","duration_ms":90}
+{"id":"14","suite":"api","name":"Пустой ответ сервера","status":"passed","duration_ms":90}

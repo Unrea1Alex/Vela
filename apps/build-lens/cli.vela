@@ -1,0 +1,17 @@
+import "../../std/cli_schema.vela" as cli;
+pub fn schema() -> Result<cli::Schema, cli::Error> effects { state } {
+    let args = list_new<cli::Parameter>();
+    list_push(args, cli::positional("input", "JSONL test events", Option<String>::None));
+    list_push(args, cli::text("output", "Report path; '-' writes stdout", Option<String>::Some(
+        "-")));
+    list_push(args, cli::text("format", "json or html", Option<String>::Some("json")));
+    list_push(args, cli::text("suite", "Exact suite name; empty selects all", Option<String>::Some(
+        "")));
+    list_push(args, cli::integer("top", "Maximum report rows", 1, 1000, Option<Int>::Some(20)));
+    list_push(args, cli::integer("max-events", "Maximum nonblank input events", 1, 100000,
+        Option<Int>::Some(100000)));
+    list_push(args, cli::flag("fail-on-problem",
+        "Exit 1 after publishing if failed/flaky tests exist", false));
+    return cli::create("buildlens", "Analyze test retries, failures and duration (Vela 1.2)", args,
+        list_new<cli::LessEqual>());
+}

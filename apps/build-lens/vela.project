@@ -1,0 +1,4 @@
+vela-project|1
+name|build_lens
+entry|main.vela
+test|unit.vela

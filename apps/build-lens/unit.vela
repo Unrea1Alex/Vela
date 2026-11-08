@@ -1,0 +1,89 @@
+import "model.vela" as model;
+import "report.vela" as report;
+import "../../std/io.vela" as io;
+import "../../std/testing.vela" as testing;
+import "../../std/result_ops.vela" as result_ops;
+import "../../std/json_decode.vela" as decode;
+fn event(id: String, status: String, duration: Int) -> String {
+    return "{\"id\":\"" + id + "\",\"suite\":\"core\",\"name\":\"login\",\"status\":\"" + status
+        + "\",\"duration_ms\":" + to_string(duration) + "}";
+}
+fn must<T, E>(value: Result<T, E>) -> T effects { process } {
+    match value {
+        Result::Ok(answer) => {
+            return answer;
+        }
+        Result::Err(_) => {
+            panic("expected Ok in BuildLens test");
+        }
+    }
+}
+fn analyze(data: String, suite: String, maximum: Int) -> model::Report effects { state, io,
+    process } {
+    let source = must(io::memory_reader(data, 3, 100000));
+    return must(model::read(source, suite, maximum));
+}
+test "retries identify flaky and keep latest status" effects { state, io, process } {
+    let analysis = analyze(event("1", "failed", 250) + "\n" + event("2", "passed", 100), "", 10);
+    testing::equal(analysis.summary.tests, 1, "one logical test");
+    testing::equal(analysis.summary.flaky, 1, "flaky");
+    testing::equal(analysis.summary.failed, 0, "latest passed");
+    testing::equal(analysis.summary.total_ms, 350, "sum");
+    testing::equal(list_get(analysis.tests, 0).max_ms, 250, "maximum");
+}
+test "first id wins without double counting" effects { state, io, process } {
+    let analysis = analyze(event("same", "failed", 250) + "\n" + event("same", "passed", 100), "",
+        10);
+    testing::equal(analysis.summary.duplicates, 1, "duplicate id");
+    testing::equal(analysis.summary.failed, 1, "first event wins");
+    testing::equal(analysis.summary.total_ms, 250, "duplicate duration omitted");
+}
+test "skipped alone does not imply flaky" effects { state, io, process } {
+    let analysis = analyze(event("1", "failed", 100) + "\n" + event("2", "skipped", 0), "", 10);
+    testing::equal(analysis.summary.flaky, 0, "no pass observed");
+    testing::equal(analysis.summary.skipped, 1, "latest skipped");
+}
+test "empty input and exact suite filter" effects { state, io, process } {
+    testing::equal(analyze(" \t\r\n", "", 10).summary.tests, 0, "blank input");
+    let analysis = analyze(event("1", "passed", 10), "Core", 10);
+    testing::equal(analysis.summary.events, 1, "input still counted");
+    testing::equal(analysis.summary.selected, 0, "case sensitive filter");
+}
+test "decoder rejects unknown fields and invalid status" effects { state, io, process } {
+    let schema = must(model::schema());
+    testing::is_err(model::parse(schema,
+        "{\"id\":\"a\",\"suite\":\"s\",\"name\":\"n\",\"status\":\"passed\",\"duration_ms\":0,\"typo\":1}"),
+        "unknown field");
+    testing::is_err(model::parse(schema, event("1", "unknown", 10)), "invalid status");
+    testing::is_err(model::parse(schema, event("1", "passed", -1)), "negative duration");
+    testing::is_err(model::parse(schema, event("", "passed", 0)), "empty id");
+}
+test "reader closes on success and on parse error" effects { state, io, process } {
+    let valid = must(io::memory_reader(event("1", "passed", 0), 1, 1000));
+    testing::is_ok(model::read(valid, "", 10), "valid input");
+    testing::is_err(io::read(valid, 1), "closed success source");
+    let invalid = must(io::memory_reader("{broken", 1, 1000));
+    testing::is_err(model::read(invalid, "", 10), "invalid input");
+    testing::is_err(io::read(invalid, 1), "closed error source");
+}
+test "duplicate event is still validated" effects { state, io, process } {
+    let source = must(io::memory_reader(event("1", "passed", 0) + "\n" + event("1", "invalid", 0),
+        7, 1000));
+    testing::is_err(model::read(source, "", 10), "invalid duplicate");
+}
+test "event budget rejects excess input" effects { state, io, process } {
+    let source = must(io::memory_reader(event("1", "passed", 0) + "\n" + event("2", "passed", 0), 7,
+        1000));
+    testing::is_err(model::read(source, "", 1), "event cap");
+}
+test "HTML escapes data including quotes" effects { state, io, process } {
+    testing::equal(report::escape("<script>\"&'"), "&lt;script&gt;&quot;&amp;&#39;",
+        "HTML escaping");
+}
+test "JSON output is stable and top preserves summary" effects { state, io, process } {
+    let analysis = analyze(event("1", "failed", 10), "", 10);
+    let actual = must(report::as_json(analysis, 1));
+    testing::equal(actual,
+        "{\"schema_version\":1,\"summary\":{\"events\":1,\"duplicates\":0,\"selected\":1,\"tests\":1,\"failed\":1,\"flaky\":0,\"skipped\":0,\"total_ms\":10},\"tests\":[{\"suite\":\"core\",\"name\":\"login\",\"latest\":\"failed\",\"flaky\":false,\"attempts\":1,\"passed\":0,\"failed\":1,\"skipped\":0,\"total_ms\":10,\"max_ms\":10}]}\n",
+        "literal JSON");
+}

@@ -1,0 +1,98 @@
+import "model.vela" as model;
+import "report.vela" as report;
+import "cli.vela" as options;
+import "../../std/cli_schema.vela" as cli;
+import "../../std/result.vela" as result;
+import "../../std/io.vela" as io;
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+import "../../std/text.vela" as text;
+fn writable(input: String, output: String) -> Result<Bool, String> effects { io } {
+    match file_identity(input) {
+        StringResult::Err(e) => {
+            return Result<Bool, String>::Err("input: " + e);
+        }
+        StringResult::Ok(identity) => {
+            match file_identity(output) {
+                StringResult::Err(_) => {}
+                StringResult::Ok(other) => {
+                    if identity == other {
+                        return Result<Bool, String>::Err("output must differ from input");
+                    }
+                }
+            }
+        }
+    }
+    return Result<Bool, String>::Ok(true);
+}
+fn write_error(error: fs::Error) -> String {
+    match error {
+        fs::Error::Io(file, cause) => {
+            return "write " + file + ": " + cause;
+        }
+        fs::Error::Cleanup(file, committed) => {
+            return "cleanup " + file + "; report already published=" + to_string(committed);
+        }
+        fs::Error::InvalidPath(_) => {
+            return "invalid output path";
+        }
+        fs::Error::Encoding(_) => {
+            return "invalid output encoding";
+        }
+        fs::Error::Limit(_) => {
+            return "output size limit";
+        }
+    }
+}
+fn run() -> Result<Int, String> effects { args, state, io } {
+    let schema = result::map_error(options::schema(), cli::describe)?;
+    let args = result::map_error(cli::current(schema), cli::describe)?;
+    if cli::is_help(args) {
+        print(cli::help(args));
+        return Result<Int, String>::Ok(0);
+    }
+    let input = result::map_error(cli::text_value(args, "input"), cli::describe)?;
+    let output = result::map_error(cli::text_value(args, "output"), cli::describe)?;
+    let format = result::map_error(cli::text_value(args, "format"), cli::describe)?;
+    let suite = result::map_error(cli::text_value(args, "suite"), cli::describe)?;
+    let top = result::map_error(cli::int_value(args, "top"), cli::describe)?;
+    let maximum = result::map_error(cli::int_value(args, "max-events"), cli::describe)?;
+    let fail = result::map_error(cli::flag_value(args, "fail-on-problem"), cli::describe)?;
+    if format != "json" && format != "html" {
+        return Result<Int, String>::Err("format must be json or html");
+    }
+    if output != "-" {
+        let checked = writable(input, output)?;
+    }
+    let source = result::map_error(io::open(input, 67108864), io::describe)?;
+    let analysis = model::read(source, suite, maximum)?;
+    var rendered = "";
+    if format == "json" {
+        rendered = report::as_json(analysis, top)?;
+    } else {
+        rendered = report::as_html(analysis, top);
+    }
+    if output == "-" {
+        print(rendered);
+    } else {
+        // Check again immediately before publication; concurrent path replacement remains outside this CLI contract.
+        let checked = writable(input, output)?;
+        let saved = result::map_error(fs::write_atomic(path::Path(value: output), text::Bytes(
+            data: rendered)), write_error)?;
+    }
+    if fail && (analysis.summary.failed > 0 || analysis.summary.flaky > 0) {
+        return Result<Int, String>::Ok(1);
+    }
+    return Result<Int, String>::Ok(0);
+}
+fn main() -> Int effects { args, state, io } {
+    match run() {
+        Result::Ok(code) => {
+            return code;
+        }
+        Result::Err(message) => {
+            eprint("BuildLens: " + message);
+            return 2;
+        }
+    }
+}

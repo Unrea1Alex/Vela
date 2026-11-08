@@ -1,0 +1,243 @@
+import "../../std/json_decode.vela" as decode;
+import "../../std/json_stream.vela" as stream;
+import "../../std/result.vela" as result;
+import "../../std/result_ops.vela" as result_ops;
+import "../../std/algorithms.vela" as algorithms;
+import "../../std/set.vela" as set;
+import "../../std/io.vela" as io;
+import "../../std/stream_lines.vela" as lines;
+pub struct Event {
+    id: String,
+    suite: String,
+    name: String,
+    status: String,
+    duration_ms: Int
+}
+pub struct TestRun {
+    suite: String,
+    name: String,
+    latest: String,
+    attempts: Int,
+    passed: Int,
+    failed: Int,
+    skipped: Int,
+    total_ms: Int,
+    max_ms: Int
+}
+pub struct Summary {
+    events: Int,
+    duplicates: Int,
+    selected: Int,
+    tests: Int,
+    failed: Int,
+    flaky: Int,
+    skipped: Int,
+    total_ms: Int
+}
+pub struct Report {
+    summary: Summary,
+    tests: List<TestRun>
+}
+struct Accumulator {
+    seen: set::Set<String>,
+    positions: Dict<String, Int>,
+    tests: List<TestRun>
+}
+pub fn schema() -> Result<decode::Decoder<Event>, decode::Error> effects { state } {
+    let names = list_new<String>();
+    list_push(names, "id");
+    list_push(names, "suite");
+    list_push(names, "name");
+    list_push(names, "status");
+    list_push(names, "duration_ms");
+    let duration = decode::integer(0, 86400000)?;
+    return decode::object(names, decode::Unknown::Reject, fn [ duration ](
+        fields: decode::Fields) -> Result<Event, decode::Error> effects { state } {
+        return Result<Event, decode::Error>::Ok(Event(id: decode::required(fields, "id",
+            decode::string())?, suite: decode::required(fields, "suite", decode::string())?,
+            name: decode::required(fields, "name", decode::string())?, status: decode::required(
+            fields, "status", decode::string())?, duration_ms: decode::required(fields,
+            "duration_ms", duration)?));
+    });
+}
+fn valid_event(value: Event) -> Result<Event, String> {
+    if str_len(value.id) < 1 || str_len(value.id) > 256 || str_len(value.suite) < 1 || str_len(
+        value.suite) > 256 || str_len(value.name) < 1 || str_len(value.name) > 256 {
+        return Result<Event, String>::Err("id, suite and name must contain 1..256 UTF-8 bytes");
+    }
+    if value.status != "passed" && value.status != "failed" && value.status != "skipped" {
+        return Result<Event, String>::Err("status must be passed, failed or skipped");
+    }
+    return Result<Event, String>::Ok(value);
+}
+pub fn parse(decoder: decode::Decoder<Event>, raw: String) -> Result<Event,
+    String> effects { state } {
+    let parsed = result::map_error(decode::decode(decoder, raw, stream::Limits(bytes: 65536,
+        depth: 16, nodes: 128)), decode::describe);
+    return result_ops::and_then(parsed, valid_event);
+}
+pub fn flaky(value: TestRun) -> Bool {
+    return value.passed > 0 && value.failed > 0;
+}
+fn priority(value: TestRun) -> Int {
+    if value.latest == "failed" {
+        return 0;
+    }
+    if flaky(value) {
+        return 1;
+    }
+    return 2;
+}
+fn compare_text(left: String, right: String) -> Int {
+    var size = str_len(left);
+    if str_len(right) < size {
+        size = str_len(right);
+    }
+    for i in 0 .. size {
+        let delta = str_byte(left, i) - str_byte(right, i);
+        if delta != 0 {
+            return delta;
+        }
+    }
+    return str_len(left) - str_len(right);
+}
+fn compare(left: TestRun, right: TestRun) -> Int {
+    let rank = priority(left) - priority(right);
+    if rank != 0 {
+        return rank;
+    }
+    if left.max_ms != right.max_ms {
+        return right.max_ms - left.max_ms;
+    }
+    let suite = compare_text(left.suite, right.suite);
+    if suite != 0 {
+        return suite;
+    }
+    return compare_text(left.name, right.name);
+}
+fn add(state: Accumulator, event: Event) -> Unit effects { state } {
+    let key = to_string(str_len(event.suite)) + ":" + event.suite + event.name;
+    var value = TestRun(suite: event.suite, name: event.name, latest: event.status, attempts: 0,
+        passed: 0, failed: 0, skipped: 0, total_ms: 0, max_ms: 0);
+    var position = list_len(state.tests);
+    if dict_has(state.positions, key) {
+        position = dict_get(state.positions, key);
+        value = list_get(state.tests, position);
+    } else {
+        dict_set(state.positions, key, position);
+        list_push(state.tests, value);
+    }
+    value.latest = event.status;
+    value.attempts = value.attempts + 1;
+    if event.status == "passed" {
+        value.passed = value.passed + 1;
+    }
+    if event.status == "failed" {
+        value.failed = value.failed + 1;
+    }
+    if event.status == "skipped" {
+        value.skipped = value.skipped + 1;
+    }
+    value.total_ms = value.total_ms + event.duration_ms;
+    if event.duration_ms > value.max_ms {
+        value.max_ms = event.duration_ms;
+    }
+    list_set(state.tests, position, value);
+}
+fn blank(raw: String) -> Bool {
+    for i in 0 .. str_len(raw) {
+        let b = str_byte(raw, i);
+        if b != 32 && b != 9 && b != 13 {
+            return false;
+        }
+    }
+    return true;
+}
+fn consume(reader: lines::Reader, suite: String, maximum: Int) -> Result<Report,
+    String> effects { state, io } {
+    let decoder = result::map_error(schema(), decode::describe)?;
+    let state = Accumulator(seen: set::create<String>(), positions: dict_new<String, Int>(),
+        tests: list_new<TestRun>());
+    var events = 0;
+    var duplicates = 0;
+    var selected = 0;
+    while true {
+        let next = result::map_error(lines::next(reader), lines::describe)?;
+        match next {
+            Option::None => {
+                break;
+            }
+            Option::Some(line) => {
+                if !blank(line.data) {
+                    if events == maximum {
+                        return Result<Report, String>::Err("line " + to_string(line.number)
+                            + ": event limit exceeded");
+                    }
+                    events = events + 1;
+                    let value = result::map_error(parse(decoder, line.data), fn [ line ](
+                        message: String) -> String {
+                        return "line " + to_string(line.number) + ": " + message;
+                    })?;
+                    if !set::insert(state.seen, value.id) {
+                        duplicates = duplicates + 1;
+                    } else {
+                        if suite == "" || value.suite == suite {
+                            selected = selected + 1;
+                            add(state, value);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    let initial = Summary(events: events, duplicates: duplicates, selected: selected, tests: 0,
+        failed: 0, flaky: 0, skipped: 0, total_ms: 0);
+    let summary = algorithms::fold(state.tests, initial, fn [ ](sum: Summary,
+        item: TestRun) -> Summary {
+        var next = sum;
+        next.tests = sum.tests + 1;
+        next.total_ms = sum.total_ms + item.total_ms;
+        if item.latest == "failed" {
+            next.failed = sum.failed + 1;
+        }
+        if item.latest == "skipped" {
+            next.skipped = sum.skipped + 1;
+        }
+        if flaky(item) {
+            next.flaky = sum.flaky + 1;
+        }
+        return next;
+    });
+    return Result<Report, String>::Ok(Report(summary: summary, tests: algorithms::sort(state.tests,
+        compare)));
+}
+// Takes ownership of source and closes it even when validation fails.
+pub fn read(source: io::Reader, suite: String, maximum: Int) -> Result<Report,
+    String> effects { state, io } {
+    let made = lines::reader(source, 16384, 65536);
+    match made {
+        Result::Err(error) => {
+            let closed = io::close_reader(source);
+            return Result<Report, String>::Err(lines::describe(error));
+        }
+        Result::Ok(reader) => {
+            let outcome = consume(reader, suite, maximum);
+            let closed = result::map_error(lines::close(reader), lines::describe);
+            match outcome {
+                Result::Err(error) => {
+                    match closed {
+                        Result::Err(cleanup) => {
+                            return Result<Report, String>::Err(error + "; close: " + cleanup);
+                        }
+                        Result::Ok(_) => {}
+                    }
+                    return Result<Report, String>::Err(error);
+                }
+                Result::Ok(report) => {
+                    closed?;
+                    return Result<Report, String>::Ok(report);
+                }
+            }
+        }
+    }
+}

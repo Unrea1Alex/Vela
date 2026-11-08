@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "source": "Provider cumulative token_count delta for this root session",
+  "request_started": "2026-11-08T07:05:16.492Z",
+  "baseline_timestamp": "2026-11-08T07:05:16.446Z",
+  "measured_through": "2026-11-08T07:20:40.005Z",
+  "scope": "BuildLens implementation, documentation, validation and usage accounting in this user turn; previous Vela release work excluded",
+  "excludes": "The measurement tool response and subsequent assistant work/final reply",
+  "reasoning_is_subset_of_output": true,
+  "baseline": {
+    "input_tokens": 208248153,
+    "cached_input_tokens": 207150336,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1151020,
+    "reasoning_output_tokens": 688054,
+    "total_tokens": 209399173
+  },
+  "endpoint": {
+    "input_tokens": 210211438,
+    "cached_input_tokens": 209046272,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1186036,
+    "reasoning_output_tokens": 694388,
+    "total_tokens": 211397474
+  },
+  "usage": {
+    "input_tokens": 1963285,
+    "cached_input_tokens": 1895936,
+    "output_tokens": 35016,
+    "reasoning_output_tokens": 6334,
+    "total_tokens": 1998301,
+    "uncached_input_tokens": 67349,
+    "uncached_input_plus_output": 102365
+  }
+}
