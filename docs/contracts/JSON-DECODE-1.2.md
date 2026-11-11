@@ -19,6 +19,9 @@ values, before invoking any schema callback. Existing 16 MiB/depth 4096/node
 1000000 ceilings apply; caller may choose smaller budgets. Syntax errors take
 priority over typed/unknown-field errors. Duplicate keys are Syntax errors with
 the unchanged typed json_stream cause, even for ignored members.
+In 1.3.4 the reader scans ordinary unescaped string bytes locally before
+committing its cursor. Decoded Strings still own a detached copy and preserve
+the previous escape and error behavior. [Profile contract](JSON-PROFILE-1.3.md).
 
 The schema layer locates byte spans ONLY in this validated immutable input.
 Its delimiter/string-boundary scanner neither accepts raw JSON independently
@@ -26,6 +29,9 @@ nor checks/decodes escapes or numeric grammar: json_stream remains the validator
 and supplies decoded keys/primitive tokens. Ignored values are never converted
 to numbers, so arbitrarily large valid numeric spellings remain skippable.
 Spans are immutable String views retaining their backing data under existing GC.
+In 1.3.4a, record access walks the validated spans and decodes their keys with
+the [common lexer](JSON-LEXICAL-1.3.md). Ignored subtrees are validated on the
+initial pass. Selected primitive values keep their local conversion causes.
 
 required(fields,name,decoder), optional(fields,name,decoder), and
 defaulted(fields,name,decoder,fallback) perform typed field access. names must be

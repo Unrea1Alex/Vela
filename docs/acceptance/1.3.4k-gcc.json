@@ -1,0 +1,1395 @@
+{
+  "schema_version": 1,
+  "stage": "1.3.4k",
+  "host": "gcc",
+  "work": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF",
+  "toolchain": "gcc (Alpine 14.2.0) 14.2.0",
+  "compiler": {
+    "sha256": "ad5d9f96d8fa4ea1b3b5dcce9c9d1110da5800c075b56f4eaf1dfad5e8b1db4f",
+    "bytes": 2998768
+  },
+  "training": {
+    "buildlens": {
+      "sha256": "d3f1bf5bb88b9e246b0b5bdab2475aa7ac5c279c322900aabe03390aef0f06ba",
+      "bytes": 3000656,
+      "expected": {
+        "events": 30000,
+        "duplicates": 0,
+        "selected": 30000,
+        "tests": 511,
+        "failed": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "total_ms": 359940
+      }
+    },
+    "fielddesk": {
+      "sha256": "de630fe1cfa7875217b613ff0472bd69495fdb8d292ddd325ab7495dc4b7037e",
+      "bytes": 11406
+    }
+  },
+  "evaluation": {
+    "buildlens": {
+      "bytes": 857890,
+      "sha256": "78935360046e36e57e9b137b485b8876252d546a7150e93eacfcfa37e546f38c",
+      "expected": {
+        "events": 10000,
+        "duplicates": 0,
+        "selected": 10000,
+        "tests": 100,
+        "failed": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "total_ms": 100000
+      }
+    },
+    "compiler": {
+      "artifacts.vela": "f6ea9d33508b1c9d7f649e5d37c47dd411670b387bb20dcf559c9b41e1b118d6",
+      "callables.vela": "2ec95c242e180bb76ae34cb4c13e24e273e23c05d881a1103fb060c124527096",
+      "compiler.vela": "c1690c7a14ad10c298e5520b870bb883d468f7e91565c7e2d5bc546c95a87ad3",
+      "control.vela": "7bd095b636fc576774ad4de487e8eb9d7f7f70603796cde74a080450d16604c0",
+      "core.vela": "3115450169d74468a7cf106c25029450bcd9ece9d754056a7ad55d42721b6988",
+      "driver.vela": "4d0c2603e6fc539e3a04f1a8b808bb026d62ce496c2b1197d54ce2237f735391",
+      "dynamic.vela": "c7c6261025e8138355e8b3dbf0ab605b2b641370a1b7af182fc1be086062dcc3",
+      "embedded.vela": "9a3639a34b9c42b9aba748d3977cf11c4cef24f9cc369caed44a906a51212848",
+      "emitter.vela": "b33b28b4383bbe569265c5b82ed9b9528550ef19b2e5a4d63083c9b6ef803661",
+      "errors.vela": "64e982313d5652cf929b4c9b725245e9353f1f7c803a021b2fda7995d7a5efc9",
+      "formatter.vela": "9d48b89f72b414265c3b2e3ae49769ebb7074828bd56f7c53de0a196a61c7f8c",
+      "generics.vela": "2eb4efcd609db1fe9da8343b6735cc0340cd9e20c43acad98a10d3f7dc725a0a",
+      "help.vela": "b2c19454051afddff15617fee04062a2e9414e841ced10707a34f2913a6c3bbf",
+      "incremental.vela": "461f6e09fec4660da57ab70da9d745882b5f50f7946a1fa3b3395e123774b6a7",
+      "interfaces.vela": "a46edd1bb9c7e664ca59079804b17871f57ac0faa5827a7fd1130c2a42e750cc",
+      "intrinsics.vela": "1d67c93e6ded331a72edb082694d17c5bcad2c7b66a1ba4f467475cc5316eb24",
+      "lexer.vela": "8e69d37ee7fcde774c7cf31368f8436dcd4229a05cc12471dd6585b969ddc60e",
+      "model.vela": "0cbe7409a07b30cc5c734c877109fedbd634ec492e9dfd1a0bd4d38b4e0e297b",
+      "modules.vela": "57ca31de84e656b9fafe65d252b8d0d6cf40e86e8361fd4daaf8ef9b258fd7e8",
+      "parser.vela": "703767193f56e6f44b520a0355f8d58708afcc2f6b8335219ad43df30ab618d7",
+      "projects.vela": "d8258606e2004c8669da39c4c8da8f1f3348f9bc3aa4b5060c512e7612a5f185",
+      "project_cli.vela": "143aa80404692b709e99389ded1da9aeeca0ce10adf2e5037c68470fe4556f76",
+      "query.vela": "749d2925efca055bb17cc25dc527069349659c5abe4a539632a9f3548d3d36cd",
+      "repairs.vela": "482f0d2c025e14fd3d3b6a3e9be7f5651a6c350c71229e4562572b31e15c3e8e",
+      "scaffold.vela": "6cc565c247784bb20fbe885488055d6c94836e2edec814a311b11d3d1a6aeef4",
+      "semantic.vela": "3086d000413263bd7134b6b11fb6930ad4f97c5f2c4919e442651d828ac6be6f",
+      "source.vela": "2274b38e20fed51d59ee2896331f0c28795d8c9549948547d34586c880a41745",
+      "suspension.vela": "1a4272f6828d157220008637cfc4b6cf889017d08ebc8adbdd05439868244eb2",
+      "types.vela": "2b5b1bc21a29f67a27af80144a2fee6f454a10a80d47009d70be52863ec956c1",
+      "vela.project": "11ef219470ce55523192f5fd67c8b10f4f9a4648c9aaa8ccd3775164ec6abcb6"
+    }
+  },
+  "workloads": {
+    "buildlens": {
+      "first": {
+        "o2": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-warm\\o2.exe",
+        "optimized": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-warm\\pgo.exe",
+        "profile": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-warm\\profile",
+        "metrics": {
+          "o2": {
+            "wall_ms": 5883.679,
+            "cpu_ms": 5438.215,
+            "peak_tree_bytes": 297136128,
+            "peak_process_bytes": 46981120
+          },
+          "instrument": {
+            "wall_ms": 5195.107,
+            "cpu_ms": 4653.61,
+            "peak_tree_bytes": 312389632,
+            "peak_process_bytes": 117817344
+          },
+          "train": {
+            "wall_ms": 2615.626,
+            "cpu_ms": 2402.56,
+            "peak_tree_bytes": 80871424,
+            "peak_process_bytes": 80785408
+          },
+          "use": {
+            "wall_ms": 5739.269,
+            "cpu_ms": 4968.674,
+            "peak_tree_bytes": 310116352,
+            "peak_process_bytes": 120147968
+          }
+        },
+        "artifacts": {
+          "o2": {
+            "sha256": "eabdf7afe12af17488d83b0b83fbb709abd9ebf48c5ad7f45b1f799bd9995ccb",
+            "bytes": 547640
+          },
+          "pgo": {
+            "sha256": "2d54d66ee0d7e1848b444372ba2a82b7dcc5ff1d88cd6fbc6a56fc2bc9e8a48b",
+            "bytes": 470472
+          },
+          "instrumented": {
+            "sha256": "c1bd4c5493c409f90f79607a69d7fb99508b0d07d2083658abec2463e6c00d18",
+            "bytes": 715800
+          },
+          "trained": {
+            "sha256": "bf33035db725a2bdcb4841fe12e015bcba65f157374b797313e2ede577c2fe11",
+            "bytes": 57368
+          },
+          "plan": {
+            "sha256": "c4e3dff510ace80dcb18b463b5a6fdba006396b9a9e0fc054c7c449bf4dcc1d2",
+            "bytes": 412
+          },
+          "receipt": {
+            "sha256": "1cafd5c7ae279c22c9d19a0b7f8b9a7853bc7230db1dc27911bba373a78355e0",
+            "bytes": 214
+          },
+          "use_log": {
+            "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+            "bytes": 2
+          }
+        }
+      },
+      "runtime": {
+        "noise": [
+          [
+            {
+              "wall_ms": 445.583,
+              "cpu_ms": 427.319,
+              "peak_tree_bytes": 7323648,
+              "peak_process_bytes": 7270400
+            },
+            {
+              "wall_ms": 411.455,
+              "cpu_ms": 394.497,
+              "peak_tree_bytes": 7237632,
+              "peak_process_bytes": 7036928
+            }
+          ],
+          [
+            {
+              "wall_ms": 435.768,
+              "cpu_ms": 416.497,
+              "peak_tree_bytes": 7360512,
+              "peak_process_bytes": 7360512
+            },
+            {
+              "wall_ms": 425.268,
+              "cpu_ms": 407.844,
+              "peak_tree_bytes": 7323648,
+              "peak_process_bytes": 6795264
+            }
+          ],
+          [
+            {
+              "wall_ms": 441.154,
+              "cpu_ms": 424.201,
+              "peak_tree_bytes": 7348224,
+              "peak_process_bytes": 6885376
+            },
+            {
+              "wall_ms": 441.825,
+              "cpu_ms": 423.925,
+              "peak_tree_bytes": 7323648,
+              "peak_process_bytes": 6676480
+            }
+          ],
+          [
+            {
+              "wall_ms": 435.237,
+              "cpu_ms": 418.06,
+              "peak_tree_bytes": 7335936,
+              "peak_process_bytes": 7004160
+            },
+            {
+              "wall_ms": 443.547,
+              "cpu_ms": 424.332,
+              "peak_tree_bytes": 7225344,
+              "peak_process_bytes": 6598656
+            }
+          ],
+          [
+            {
+              "wall_ms": 447.896,
+              "cpu_ms": 429.725,
+              "peak_tree_bytes": 7319552,
+              "peak_process_bytes": 6615040
+            },
+            {
+              "wall_ms": 442.204,
+              "cpu_ms": 423.61,
+              "peak_tree_bytes": 7299072,
+              "peak_process_bytes": 7122944
+            }
+          ]
+        ],
+        "pairs": [
+          {
+            "o2": {
+              "wall_ms": 437.182,
+              "cpu_ms": 419.058,
+              "peak_tree_bytes": 7266304,
+              "peak_process_bytes": 6856704
+            },
+            "optimized": {
+              "wall_ms": 406.77,
+              "cpu_ms": 388.906,
+              "peak_tree_bytes": 6983680,
+              "peak_process_bytes": 6778880
+            }
+          },
+          {
+            "optimized": {
+              "wall_ms": 415.529,
+              "cpu_ms": 398.447,
+              "peak_tree_bytes": 7032832,
+              "peak_process_bytes": 6946816
+            },
+            "o2": {
+              "wall_ms": 439.719,
+              "cpu_ms": 422.631,
+              "peak_tree_bytes": 7299072,
+              "peak_process_bytes": 7155712
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 441.491,
+              "cpu_ms": 423.28,
+              "peak_tree_bytes": 7299072,
+              "peak_process_bytes": 6914048
+            },
+            "optimized": {
+              "wall_ms": 427.883,
+              "cpu_ms": 410.49,
+              "peak_tree_bytes": 7262208,
+              "peak_process_bytes": 6770688
+            }
+          },
+          {
+            "optimized": {
+              "wall_ms": 429.807,
+              "cpu_ms": 411.696,
+              "peak_tree_bytes": 7188480,
+              "peak_process_bytes": 7188480
+            },
+            "o2": {
+              "wall_ms": 449.792,
+              "cpu_ms": 431.2,
+              "peak_tree_bytes": 7413760,
+              "peak_process_bytes": 7413760
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 455.1,
+              "cpu_ms": 437.582,
+              "peak_tree_bytes": 7385088,
+              "peak_process_bytes": 7385088
+            },
+            "optimized": {
+              "wall_ms": 427.102,
+              "cpu_ms": 409.177,
+              "peak_tree_bytes": 6979584,
+              "peak_process_bytes": 6787072
+            }
+          }
+        ],
+        "ranges": {
+          "o2": {
+            "wall_ms": {
+              "median": 441.491,
+              "min": 437.182,
+              "max": 455.1
+            },
+            "cpu_ms": {
+              "median": 423.28,
+              "min": 419.058,
+              "max": 437.582
+            },
+            "peak_tree_bytes": {
+              "median": 7299072,
+              "min": 7266304,
+              "max": 7413760
+            },
+            "peak_process_bytes": {
+              "median": 7155712,
+              "min": 6856704,
+              "max": 7413760
+            }
+          },
+          "optimized": {
+            "wall_ms": {
+              "median": 427.102,
+              "min": 406.77,
+              "max": 429.807
+            },
+            "cpu_ms": {
+              "median": 409.177,
+              "min": 388.906,
+              "max": 411.696
+            },
+            "peak_tree_bytes": {
+              "median": 7032832,
+              "min": 6979584,
+              "max": 7262208
+            },
+            "peak_process_bytes": {
+              "median": 6787072,
+              "min": 6770688,
+              "max": 7188480
+            }
+          }
+        },
+        "noise_percent": 1.8912497268953465,
+        "improvement_percent": 3.259183086404935,
+        "target": true
+      },
+      "build_pairs": [
+        {
+          "o2": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-0\\o2.exe",
+          "optimized": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-0\\pgo.exe",
+          "profile": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-0\\profile",
+          "metrics": {
+            "o2": {
+              "wall_ms": 5862.351,
+              "cpu_ms": 5452.9,
+              "peak_tree_bytes": 297177088,
+              "peak_process_bytes": 46972928
+            },
+            "instrument": {
+              "wall_ms": 5331.687,
+              "cpu_ms": 4786.653,
+              "peak_tree_bytes": 312197120,
+              "peak_process_bytes": 123961344
+            },
+            "train": {
+              "wall_ms": 2634.79,
+              "cpu_ms": 2427.822,
+              "peak_tree_bytes": 85790720,
+              "peak_process_bytes": 80084992
+            },
+            "use": {
+              "wall_ms": 5719.181,
+              "cpu_ms": 4942.556,
+              "peak_tree_bytes": 310050816,
+              "peak_process_bytes": 123559936
+            }
+          },
+          "artifacts": {
+            "o2": {
+              "sha256": "eabdf7afe12af17488d83b0b83fbb709abd9ebf48c5ad7f45b1f799bd9995ccb",
+              "bytes": 547640
+            },
+            "pgo": {
+              "sha256": "2d54d66ee0d7e1848b444372ba2a82b7dcc5ff1d88cd6fbc6a56fc2bc9e8a48b",
+              "bytes": 470472
+            },
+            "instrumented": {
+              "sha256": "19be606f481adc2ed4571e4eb6ffbd953600135f1dd9d5fcfc4cdffb7ebc07e8",
+              "bytes": 715800
+            },
+            "trained": {
+              "sha256": "54083dbf8bf00a786c9b91bd18e2a98704d7b8737766d40720cc02569acdf7ce",
+              "bytes": 57368
+            },
+            "plan": {
+              "sha256": "d27cc3953097c506f36bfe6294ab1c12420089ef00e051ad999fb8a3360eb50a",
+              "bytes": 412
+            },
+            "receipt": {
+              "sha256": "9ab33a3f3dd81e0007a9b6577ae05c6a54d2d33130d4795f6d9cfc5ec56e67ef",
+              "bytes": 214
+            },
+            "use_log": {
+              "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+              "bytes": 2
+            }
+          }
+        },
+        {
+          "o2": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-1\\o2.exe",
+          "optimized": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-1\\pgo.exe",
+          "profile": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-1\\profile",
+          "metrics": {
+            "o2": {
+              "wall_ms": 5690.396,
+              "cpu_ms": 5269.643,
+              "peak_tree_bytes": 297160704,
+              "peak_process_bytes": 46989312
+            },
+            "instrument": {
+              "wall_ms": 5149.32,
+              "cpu_ms": 4609.138,
+              "peak_tree_bytes": 312209408,
+              "peak_process_bytes": 119484416
+            },
+            "train": {
+              "wall_ms": 2521.327,
+              "cpu_ms": 2316.464,
+              "peak_tree_bytes": 80826368,
+              "peak_process_bytes": 77705216
+            },
+            "use": {
+              "wall_ms": 5697.91,
+              "cpu_ms": 4929.611,
+              "peak_tree_bytes": 310104064,
+              "peak_process_bytes": 123662336
+            }
+          },
+          "artifacts": {
+            "o2": {
+              "sha256": "eabdf7afe12af17488d83b0b83fbb709abd9ebf48c5ad7f45b1f799bd9995ccb",
+              "bytes": 547640
+            },
+            "pgo": {
+              "sha256": "2d54d66ee0d7e1848b444372ba2a82b7dcc5ff1d88cd6fbc6a56fc2bc9e8a48b",
+              "bytes": 470472
+            },
+            "instrumented": {
+              "sha256": "ea5b7034e89ebcc649d9c3e002c3d552eceff25e9cdbaa32ffee7caf2f43aadc",
+              "bytes": 715800
+            },
+            "trained": {
+              "sha256": "4bf8114c374e842473cd0ea4c6b633ddba9a61c8a2d2e62ee19042df0b6be680",
+              "bytes": 57368
+            },
+            "plan": {
+              "sha256": "a4a6d2d704f015fc180b9374c50616a6695107c9be6f3b91cd29d0c0668a7366",
+              "bytes": 412
+            },
+            "receipt": {
+              "sha256": "19ef14197498fbec7c8ff25e0d2a4368c0ab93f95af8ece70f69d32e47ffda88",
+              "bytes": 214
+            },
+            "use_log": {
+              "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+              "bytes": 2
+            }
+          }
+        },
+        {
+          "o2": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-2\\o2.exe",
+          "optimized": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-2\\pgo.exe",
+          "profile": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-2\\profile",
+          "metrics": {
+            "o2": {
+              "wall_ms": 5714.874,
+              "cpu_ms": 5288.463,
+              "peak_tree_bytes": 297103360,
+              "peak_process_bytes": 46940160
+            },
+            "instrument": {
+              "wall_ms": 5119.731,
+              "cpu_ms": 4582.14,
+              "peak_tree_bytes": 312365056,
+              "peak_process_bytes": 117702656
+            },
+            "train": {
+              "wall_ms": 2617.562,
+              "cpu_ms": 2406.235,
+              "peak_tree_bytes": 85770240,
+              "peak_process_bytes": 75964416
+            },
+            "use": {
+              "wall_ms": 5708.527,
+              "cpu_ms": 4936.075,
+              "peak_tree_bytes": 310054912,
+              "peak_process_bytes": 120709120
+            }
+          },
+          "artifacts": {
+            "o2": {
+              "sha256": "eabdf7afe12af17488d83b0b83fbb709abd9ebf48c5ad7f45b1f799bd9995ccb",
+              "bytes": 547640
+            },
+            "pgo": {
+              "sha256": "2d54d66ee0d7e1848b444372ba2a82b7dcc5ff1d88cd6fbc6a56fc2bc9e8a48b",
+              "bytes": 470472
+            },
+            "instrumented": {
+              "sha256": "5a63496d998d1e7c1ec7679679111720df2bbb3aafd1847403d2f98fb0364dfc",
+              "bytes": 715800
+            },
+            "trained": {
+              "sha256": "713ff21f16f85d3bce8b646cac2053a031f11d77fab113a93fcab8112a0a0204",
+              "bytes": 57368
+            },
+            "plan": {
+              "sha256": "f5c7e89a5565205c9516a4f8b9ba0def0171f55e71935e76a6394f9de95b0e49",
+              "bytes": 412
+            },
+            "receipt": {
+              "sha256": "6fc4a1947b3b85114aa7f6c6f89da33b201ba4546c27108940859dc50d4686d1",
+              "bytes": 214
+            },
+            "use_log": {
+              "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+              "bytes": 2
+            }
+          }
+        },
+        {
+          "o2": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-3\\o2.exe",
+          "optimized": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-3\\pgo.exe",
+          "profile": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-3\\profile",
+          "metrics": {
+            "o2": {
+              "wall_ms": 5739.031,
+              "cpu_ms": 5316.726,
+              "peak_tree_bytes": 297172992,
+              "peak_process_bytes": 46977024
+            },
+            "instrument": {
+              "wall_ms": 5097.126,
+              "cpu_ms": 4548.117,
+              "peak_tree_bytes": 312381440,
+              "peak_process_bytes": 118157312
+            },
+            "train": {
+              "wall_ms": 2505.078,
+              "cpu_ms": 2300.159,
+              "peak_tree_bytes": 80908288,
+              "peak_process_bytes": 80035840
+            },
+            "use": {
+              "wall_ms": 5724.627,
+              "cpu_ms": 4953.817,
+              "peak_tree_bytes": 310157312,
+              "peak_process_bytes": 122261504
+            }
+          },
+          "artifacts": {
+            "o2": {
+              "sha256": "eabdf7afe12af17488d83b0b83fbb709abd9ebf48c5ad7f45b1f799bd9995ccb",
+              "bytes": 547640
+            },
+            "pgo": {
+              "sha256": "2d54d66ee0d7e1848b444372ba2a82b7dcc5ff1d88cd6fbc6a56fc2bc9e8a48b",
+              "bytes": 470472
+            },
+            "instrumented": {
+              "sha256": "a71736a5d14f568d931a4bbade9b0d13959acb57902199a4f8f64c3a6d3a8731",
+              "bytes": 715800
+            },
+            "trained": {
+              "sha256": "83c407630205e460e011565bb0fad619f7615b5b272d826b984f1333192631dc",
+              "bytes": 57368
+            },
+            "plan": {
+              "sha256": "d00eef074b8e56bc85379ca32074228de1570c4fb996afc258125d118fb3546a",
+              "bytes": 412
+            },
+            "receipt": {
+              "sha256": "b302e6bf98070c9b9b970db08831fd38b727cbeb0facbe7b4a003f93e1f65618",
+              "bytes": 214
+            },
+            "use_log": {
+              "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+              "bytes": 2
+            }
+          }
+        },
+        {
+          "o2": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-4\\o2.exe",
+          "optimized": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-4\\pgo.exe",
+          "profile": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\buildlens-round-4\\profile",
+          "metrics": {
+            "o2": {
+              "wall_ms": 5690.199,
+              "cpu_ms": 5262.64,
+              "peak_tree_bytes": 296984576,
+              "peak_process_bytes": 46845952
+            },
+            "instrument": {
+              "wall_ms": 5125.062,
+              "cpu_ms": 4596.952,
+              "peak_tree_bytes": 312360960,
+              "peak_process_bytes": 120651776
+            },
+            "train": {
+              "wall_ms": 2470.054,
+              "cpu_ms": 2267.034,
+              "peak_tree_bytes": 80896000,
+              "peak_process_bytes": 72396800
+            },
+            "use": {
+              "wall_ms": 5659.127,
+              "cpu_ms": 4890.504,
+              "peak_tree_bytes": 309989376,
+              "peak_process_bytes": 119910400
+            }
+          },
+          "artifacts": {
+            "o2": {
+              "sha256": "eabdf7afe12af17488d83b0b83fbb709abd9ebf48c5ad7f45b1f799bd9995ccb",
+              "bytes": 547640
+            },
+            "pgo": {
+              "sha256": "2d54d66ee0d7e1848b444372ba2a82b7dcc5ff1d88cd6fbc6a56fc2bc9e8a48b",
+              "bytes": 470472
+            },
+            "instrumented": {
+              "sha256": "8f7c34c06bfeaebfd895d98c929588d0814f4253bd90e4d8137692ca8a3376ad",
+              "bytes": 715800
+            },
+            "trained": {
+              "sha256": "c8b7ab3a686f8b769de4c1fdcf328e8e59fbc8756b48f69de6b73a49b222a53f",
+              "bytes": 57368
+            },
+            "plan": {
+              "sha256": "419fe12aa9c26d2a0d3a36315786864d14864db3093695e383c973c5da9f1de3",
+              "bytes": 412
+            },
+            "receipt": {
+              "sha256": "16e20bf54ac80693bd45ccdabbbdf875c2fde8b043acddb0dee19f8f162e2958",
+              "bytes": 214
+            },
+            "use_log": {
+              "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+              "bytes": 2
+            }
+          }
+        }
+      ],
+      "build": {
+        "o2": {
+          "wall_ms": {
+            "median": 5714.874,
+            "min": 5690.199,
+            "max": 5862.351
+          },
+          "cpu_ms": {
+            "median": 5288.463,
+            "min": 5262.64,
+            "max": 5452.9
+          },
+          "peak_tree_bytes": {
+            "median": 297160704,
+            "min": 296984576,
+            "max": 297177088
+          },
+          "peak_process_bytes": {
+            "median": 46972928,
+            "min": 46845952,
+            "max": 46989312
+          }
+        },
+        "instrument": {
+          "wall_ms": {
+            "median": 5125.062,
+            "min": 5097.126,
+            "max": 5331.687
+          },
+          "cpu_ms": {
+            "median": 4596.952,
+            "min": 4548.117,
+            "max": 4786.653
+          },
+          "peak_tree_bytes": {
+            "median": 312360960,
+            "min": 312197120,
+            "max": 312381440
+          },
+          "peak_process_bytes": {
+            "median": 119484416,
+            "min": 117702656,
+            "max": 123961344
+          }
+        },
+        "train": {
+          "wall_ms": {
+            "median": 2521.327,
+            "min": 2470.054,
+            "max": 2634.79
+          },
+          "cpu_ms": {
+            "median": 2316.464,
+            "min": 2267.034,
+            "max": 2427.822
+          },
+          "peak_tree_bytes": {
+            "median": 80908288,
+            "min": 80826368,
+            "max": 85790720
+          },
+          "peak_process_bytes": {
+            "median": 77705216,
+            "min": 72396800,
+            "max": 80084992
+          }
+        },
+        "use": {
+          "wall_ms": {
+            "median": 5708.527,
+            "min": 5659.127,
+            "max": 5724.627
+          },
+          "cpu_ms": {
+            "median": 4936.075,
+            "min": 4890.504,
+            "max": 4953.817
+          },
+          "peak_tree_bytes": {
+            "median": 310054912,
+            "min": 309989376,
+            "max": 310157312
+          },
+          "peak_process_bytes": {
+            "median": 122261504,
+            "min": 119910400,
+            "max": 123662336
+          }
+        }
+      },
+      "break_even_runs": 531
+    },
+    "compiler": {
+      "first": {
+        "o2": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-warm\\o2.exe",
+        "optimized": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-warm\\pgo.exe",
+        "profile": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-warm\\profile",
+        "metrics": {
+          "o2": {
+            "wall_ms": 29731.88,
+            "cpu_ms": 28907.649,
+            "peak_tree_bytes": 565805056,
+            "peak_process_bytes": 161431552
+          },
+          "instrument": {
+            "wall_ms": 22601.729,
+            "cpu_ms": 21622.639,
+            "peak_tree_bytes": 592584704,
+            "peak_process_bytes": 228257792
+          },
+          "train": {
+            "wall_ms": 1425.947,
+            "cpu_ms": 952.522,
+            "peak_tree_bytes": 87703552,
+            "peak_process_bytes": 72847360
+          },
+          "use": {
+            "wall_ms": 21597.238,
+            "cpu_ms": 20288.225,
+            "peak_tree_bytes": 584929280,
+            "peak_process_bytes": 229154816
+          }
+        },
+        "artifacts": {
+          "o2": {
+            "sha256": "443323f78f26821fbe7560bb4288770897af218ead8e5296b2ae4d08fde25b6c",
+            "bytes": 3015552
+          },
+          "pgo": {
+            "sha256": "cc7a2f024d4e7d557191f350f030e6899b619d69ba665e9d4a64c628cec4cc7d",
+            "bytes": 2180000
+          },
+          "instrumented": {
+            "sha256": "1ab24f46baa388a186bacda767a4fa27697b2b7cb402c6df48197c6ddfbef3fd",
+            "bytes": 2892896
+          },
+          "trained": {
+            "sha256": "8fed6b13cc140053f58c48bd02b602dd47bc9515fcda97e1b8c5a08ddc53c7b2",
+            "bytes": 117708
+          },
+          "plan": {
+            "sha256": "781dee8d5ea215bc39629cee723b0aef1fe08b41814b1dfe98ba0ac425d73960",
+            "bytes": 412
+          },
+          "receipt": {
+            "sha256": "3f880ad115dcc355b4db78c989a9b4072fd2a82104e1cfc35f0fc523c54cf7ba",
+            "bytes": 214
+          },
+          "use_log": {
+            "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+            "bytes": 2
+          }
+        }
+      },
+      "runtime": {
+        "noise": [
+          [
+            {
+              "wall_ms": 2473.296,
+              "cpu_ms": 1919.446,
+              "peak_tree_bytes": 91291648,
+              "peak_process_bytes": 91291648
+            },
+            {
+              "wall_ms": 2475.198,
+              "cpu_ms": 1931.467,
+              "peak_tree_bytes": 91328512,
+              "peak_process_bytes": 91328512
+            }
+          ],
+          [
+            {
+              "wall_ms": 2474.871,
+              "cpu_ms": 1936.493,
+              "peak_tree_bytes": 91381760,
+              "peak_process_bytes": 91381760
+            },
+            {
+              "wall_ms": 2496.855,
+              "cpu_ms": 1956.355,
+              "peak_tree_bytes": 91402240,
+              "peak_process_bytes": 91402240
+            }
+          ],
+          [
+            {
+              "wall_ms": 2497.768,
+              "cpu_ms": 1947.651,
+              "peak_tree_bytes": 91394048,
+              "peak_process_bytes": 91394048
+            },
+            {
+              "wall_ms": 2458.237,
+              "cpu_ms": 1911.582,
+              "peak_tree_bytes": 91402240,
+              "peak_process_bytes": 91402240
+            }
+          ],
+          [
+            {
+              "wall_ms": 2528.241,
+              "cpu_ms": 1956.22,
+              "peak_tree_bytes": 91369472,
+              "peak_process_bytes": 91369472
+            },
+            {
+              "wall_ms": 2484.713,
+              "cpu_ms": 1932.942,
+              "peak_tree_bytes": 91430912,
+              "peak_process_bytes": 91430912
+            }
+          ],
+          [
+            {
+              "wall_ms": 2443.604,
+              "cpu_ms": 1900.752,
+              "peak_tree_bytes": 91394048,
+              "peak_process_bytes": 91394048
+            },
+            {
+              "wall_ms": 2470.125,
+              "cpu_ms": 1923.368,
+              "peak_tree_bytes": 91299840,
+              "peak_process_bytes": 91299840
+            }
+          ]
+        ],
+        "pairs": [
+          {
+            "o2": {
+              "wall_ms": 2530.698,
+              "cpu_ms": 1985.168,
+              "peak_tree_bytes": 91402240,
+              "peak_process_bytes": 91402240
+            },
+            "optimized": {
+              "wall_ms": 2446.502,
+              "cpu_ms": 1900.458,
+              "peak_tree_bytes": 90497024,
+              "peak_process_bytes": 90497024
+            }
+          },
+          {
+            "optimized": {
+              "wall_ms": 2517.655,
+              "cpu_ms": 1927.62,
+              "peak_tree_bytes": 90447872,
+              "peak_process_bytes": 90447872
+            },
+            "o2": {
+              "wall_ms": 2485.768,
+              "cpu_ms": 1945.354,
+              "peak_tree_bytes": 91283456,
+              "peak_process_bytes": 91283456
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 2480.48,
+              "cpu_ms": 1939.652,
+              "peak_tree_bytes": 91328512,
+              "peak_process_bytes": 91328512
+            },
+            "optimized": {
+              "wall_ms": 2462.851,
+              "cpu_ms": 1929.014,
+              "peak_tree_bytes": 90480640,
+              "peak_process_bytes": 90480640
+            }
+          },
+          {
+            "optimized": {
+              "wall_ms": 2533.131,
+              "cpu_ms": 1977.251,
+              "peak_tree_bytes": 90501120,
+              "peak_process_bytes": 90501120
+            },
+            "o2": {
+              "wall_ms": 2476.725,
+              "cpu_ms": 1930.939,
+              "peak_tree_bytes": 91336704,
+              "peak_process_bytes": 91336704
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 2472.352,
+              "cpu_ms": 1925.691,
+              "peak_tree_bytes": 91381760,
+              "peak_process_bytes": 91381760
+            },
+            "optimized": {
+              "wall_ms": 2467.288,
+              "cpu_ms": 1927.094,
+              "peak_tree_bytes": 90451968,
+              "peak_process_bytes": 90451968
+            }
+          }
+        ],
+        "ranges": {
+          "o2": {
+            "wall_ms": {
+              "median": 2480.48,
+              "min": 2472.352,
+              "max": 2530.698
+            },
+            "cpu_ms": {
+              "median": 1939.652,
+              "min": 1925.691,
+              "max": 1985.168
+            },
+            "peak_tree_bytes": {
+              "median": 91336704,
+              "min": 91283456,
+              "max": 91402240
+            },
+            "peak_process_bytes": {
+              "median": 91336704,
+              "min": 91283456,
+              "max": 91402240
+            }
+          },
+          "optimized": {
+            "wall_ms": {
+              "median": 2467.288,
+              "min": 2446.502,
+              "max": 2533.131
+            },
+            "cpu_ms": {
+              "median": 1927.62,
+              "min": 1900.458,
+              "max": 1977.251
+            },
+            "peak_tree_bytes": {
+              "median": 90480640,
+              "min": 90447872,
+              "max": 90501120
+            },
+            "peak_process_bytes": {
+              "median": 90480640,
+              "min": 90447872,
+              "max": 90501120
+            }
+          }
+        },
+        "noise_percent": 1.0794653103579863,
+        "improvement_percent": 0.5318325485389928,
+        "target": false
+      },
+      "build_pairs": [
+        {
+          "o2": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-0\\o2.exe",
+          "optimized": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-0\\pgo.exe",
+          "profile": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-0\\profile",
+          "metrics": {
+            "o2": {
+              "wall_ms": 29356.545,
+              "cpu_ms": 28537.398,
+              "peak_tree_bytes": 565751808,
+              "peak_process_bytes": 161419264
+            },
+            "instrument": {
+              "wall_ms": 22143.759,
+              "cpu_ms": 21206.125,
+              "peak_tree_bytes": 592752640,
+              "peak_process_bytes": 231870464
+            },
+            "train": {
+              "wall_ms": 1429.137,
+              "cpu_ms": 965.868,
+              "peak_tree_bytes": 87638016,
+              "peak_process_bytes": 76480512
+            },
+            "use": {
+              "wall_ms": 21615.745,
+              "cpu_ms": 20301.193,
+              "peak_tree_bytes": 584966144,
+              "peak_process_bytes": 227549184
+            }
+          },
+          "artifacts": {
+            "o2": {
+              "sha256": "443323f78f26821fbe7560bb4288770897af218ead8e5296b2ae4d08fde25b6c",
+              "bytes": 3015552
+            },
+            "pgo": {
+              "sha256": "cc7a2f024d4e7d557191f350f030e6899b619d69ba665e9d4a64c628cec4cc7d",
+              "bytes": 2180000
+            },
+            "instrumented": {
+              "sha256": "d692216a0d60ca3fd38cb9cc6f85f9ff68dddcd0d916f0902a59656ccb975f74",
+              "bytes": 2892896
+            },
+            "trained": {
+              "sha256": "cdbe3c72ce9c7b57914ffa9bc52d40bb8ddbe16a2cfe700d4f665ff7035897e1",
+              "bytes": 117708
+            },
+            "plan": {
+              "sha256": "3c9ee2ed4647230b4177ad58c61f38b2281acc259ae4f15efb339dbfe98dc1e3",
+              "bytes": 412
+            },
+            "receipt": {
+              "sha256": "4d7c0687013bd6866ee3e0828164c684344285132d00a61efdb979e5f1c93322",
+              "bytes": 214
+            },
+            "use_log": {
+              "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+              "bytes": 2
+            }
+          }
+        },
+        {
+          "o2": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-1\\o2.exe",
+          "optimized": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-1\\pgo.exe",
+          "profile": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-1\\profile",
+          "metrics": {
+            "o2": {
+              "wall_ms": 29746.003,
+              "cpu_ms": 28918.36,
+              "peak_tree_bytes": 565878784,
+              "peak_process_bytes": 161419264
+            },
+            "instrument": {
+              "wall_ms": 22151.202,
+              "cpu_ms": 21195.264,
+              "peak_tree_bytes": 592556032,
+              "peak_process_bytes": 235732992
+            },
+            "train": {
+              "wall_ms": 1415.746,
+              "cpu_ms": 951.92,
+              "peak_tree_bytes": 90214400,
+              "peak_process_bytes": 73318400
+            },
+            "use": {
+              "wall_ms": 22112.82,
+              "cpu_ms": 20826.892,
+              "peak_tree_bytes": 584876032,
+              "peak_process_bytes": 237309952
+            }
+          },
+          "artifacts": {
+            "o2": {
+              "sha256": "443323f78f26821fbe7560bb4288770897af218ead8e5296b2ae4d08fde25b6c",
+              "bytes": 3015552
+            },
+            "pgo": {
+              "sha256": "cc7a2f024d4e7d557191f350f030e6899b619d69ba665e9d4a64c628cec4cc7d",
+              "bytes": 2180000
+            },
+            "instrumented": {
+              "sha256": "5181de08593a3b485bad7252a76d5ec38ea646f9e86cc5a54b796ef327726888",
+              "bytes": 2892896
+            },
+            "trained": {
+              "sha256": "fe695d01b4a90a8440b2f2d02acf2367e640937abf1e9043fd449dd71efe81c4",
+              "bytes": 117708
+            },
+            "plan": {
+              "sha256": "62c5d9d83949a081e02aa094ceb1695b3b3c026bc1d64f63a105a0c3dbf74f95",
+              "bytes": 412
+            },
+            "receipt": {
+              "sha256": "be2dc162587d8866d4cec0b246041911bce67785c45a37a23d34741de078b4f8",
+              "bytes": 214
+            },
+            "use_log": {
+              "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+              "bytes": 2
+            }
+          }
+        },
+        {
+          "o2": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-2\\o2.exe",
+          "optimized": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-2\\pgo.exe",
+          "profile": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-2\\profile",
+          "metrics": {
+            "o2": {
+              "wall_ms": 29516.814,
+              "cpu_ms": 28684.71,
+              "peak_tree_bytes": 565706752,
+              "peak_process_bytes": 161390592
+            },
+            "instrument": {
+              "wall_ms": 22347.422,
+              "cpu_ms": 21394.95,
+              "peak_tree_bytes": 592490496,
+              "peak_process_bytes": 231452672
+            },
+            "train": {
+              "wall_ms": 1424.892,
+              "cpu_ms": 952.39,
+              "peak_tree_bytes": 87584768,
+              "peak_process_bytes": 71237632
+            },
+            "use": {
+              "wall_ms": 22718.104,
+              "cpu_ms": 21389.149,
+              "peak_tree_bytes": 584650752,
+              "peak_process_bytes": 236171264
+            }
+          },
+          "artifacts": {
+            "o2": {
+              "sha256": "443323f78f26821fbe7560bb4288770897af218ead8e5296b2ae4d08fde25b6c",
+              "bytes": 3015552
+            },
+            "pgo": {
+              "sha256": "cc7a2f024d4e7d557191f350f030e6899b619d69ba665e9d4a64c628cec4cc7d",
+              "bytes": 2180000
+            },
+            "instrumented": {
+              "sha256": "de7d7f0534a4682ba5384613eebb9dbdac675245856fc64026f73c207e18a757",
+              "bytes": 2892896
+            },
+            "trained": {
+              "sha256": "f4075604f4812a541607bb8d05f5ca2d99e55a85053e20335b4d77792c742835",
+              "bytes": 117708
+            },
+            "plan": {
+              "sha256": "82f2d1c14392fb7f418d5d3ed46e754a33d7e20e44708ad9c484a72f99ee0207",
+              "bytes": 412
+            },
+            "receipt": {
+              "sha256": "8e692cc219eacd6ec9c16738c26e1431c344c28f916ba93b48bf3b8859e6e9c1",
+              "bytes": 214
+            },
+            "use_log": {
+              "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+              "bytes": 2
+            }
+          }
+        },
+        {
+          "o2": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-3\\o2.exe",
+          "optimized": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-3\\pgo.exe",
+          "profile": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-3\\profile",
+          "metrics": {
+            "o2": {
+              "wall_ms": 31552.558,
+              "cpu_ms": 30704.868,
+              "peak_tree_bytes": 565833728,
+              "peak_process_bytes": 161411072
+            },
+            "instrument": {
+              "wall_ms": 22873.434,
+              "cpu_ms": 21911.721,
+              "peak_tree_bytes": 592654336,
+              "peak_process_bytes": 234102784
+            },
+            "train": {
+              "wall_ms": 1442.435,
+              "cpu_ms": 971.491,
+              "peak_tree_bytes": 87609344,
+              "peak_process_bytes": 79650816
+            },
+            "use": {
+              "wall_ms": 22135.153,
+              "cpu_ms": 20778.44,
+              "peak_tree_bytes": 584884224,
+              "peak_process_bytes": 237228032
+            }
+          },
+          "artifacts": {
+            "o2": {
+              "sha256": "443323f78f26821fbe7560bb4288770897af218ead8e5296b2ae4d08fde25b6c",
+              "bytes": 3015552
+            },
+            "pgo": {
+              "sha256": "cc7a2f024d4e7d557191f350f030e6899b619d69ba665e9d4a64c628cec4cc7d",
+              "bytes": 2180000
+            },
+            "instrumented": {
+              "sha256": "0945aeb5d272c151a124c54533e4e4e2da87d4f28347d778fb57418bb161c403",
+              "bytes": 2892896
+            },
+            "trained": {
+              "sha256": "18f044110030c186f3ad2ada210a2aa55d16286e52a4ca52e0cf66a1513b9bad",
+              "bytes": 117708
+            },
+            "plan": {
+              "sha256": "50ae6f42985d30c1ab3a22d71f7f03e0b81fbaebcc4182cdaadb481cdadc392a",
+              "bytes": 412
+            },
+            "receipt": {
+              "sha256": "93f0c754b88ccd893dd3c8a53d9eb03d73494a155b3ddadd4a5f12f32deb34cc",
+              "bytes": 214
+            },
+            "use_log": {
+              "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+              "bytes": 2
+            }
+          }
+        },
+        {
+          "o2": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-4\\o2.exe",
+          "optimized": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-4\\pgo.exe",
+          "profile": "G:\\Vela\\build\\stage13\\pgo-gcc-BRnSTF\\compiler-round-4\\profile",
+          "metrics": {
+            "o2": {
+              "wall_ms": 30472.086,
+              "cpu_ms": 29641.734,
+              "peak_tree_bytes": 565825536,
+              "peak_process_bytes": 161423360
+            },
+            "instrument": {
+              "wall_ms": 23924.01,
+              "cpu_ms": 22947.335,
+              "peak_tree_bytes": 592666624,
+              "peak_process_bytes": 235241472
+            },
+            "train": {
+              "wall_ms": 1436.939,
+              "cpu_ms": 967.087,
+              "peak_tree_bytes": 87642112,
+              "peak_process_bytes": 71684096
+            },
+            "use": {
+              "wall_ms": 22912.326,
+              "cpu_ms": 21575.086,
+              "peak_tree_bytes": 584892416,
+              "peak_process_bytes": 233799680
+            }
+          },
+          "artifacts": {
+            "o2": {
+              "sha256": "443323f78f26821fbe7560bb4288770897af218ead8e5296b2ae4d08fde25b6c",
+              "bytes": 3015552
+            },
+            "pgo": {
+              "sha256": "cc7a2f024d4e7d557191f350f030e6899b619d69ba665e9d4a64c628cec4cc7d",
+              "bytes": 2180000
+            },
+            "instrumented": {
+              "sha256": "588a56071dfb48dcdec10cfb49c69374825e9d855c92b724272a1523f9d94978",
+              "bytes": 2892896
+            },
+            "trained": {
+              "sha256": "697237910197686fd029e9483a25634cfd3820057ec994f3c77798b10de8b662",
+              "bytes": 117708
+            },
+            "plan": {
+              "sha256": "502880caecd9d58645d82c670e985e52ab92f4c2e9b41e6c348ec9d75061e55a",
+              "bytes": 412
+            },
+            "receipt": {
+              "sha256": "09a700b7fcb2957933607281f5fb18fd3932e69d25116e6e305553d52fc3912c",
+              "bytes": 214
+            },
+            "use_log": {
+              "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+              "bytes": 2
+            }
+          }
+        }
+      ],
+      "build": {
+        "o2": {
+          "wall_ms": {
+            "median": 29746.003,
+            "min": 29356.545,
+            "max": 31552.558
+          },
+          "cpu_ms": {
+            "median": 28918.36,
+            "min": 28537.398,
+            "max": 30704.868
+          },
+          "peak_tree_bytes": {
+            "median": 565825536,
+            "min": 565706752,
+            "max": 565878784
+          },
+          "peak_process_bytes": {
+            "median": 161419264,
+            "min": 161390592,
+            "max": 161423360
+          }
+        },
+        "instrument": {
+          "wall_ms": {
+            "median": 22347.422,
+            "min": 22143.759,
+            "max": 23924.01
+          },
+          "cpu_ms": {
+            "median": 21394.95,
+            "min": 21195.264,
+            "max": 22947.335
+          },
+          "peak_tree_bytes": {
+            "median": 592654336,
+            "min": 592490496,
+            "max": 592752640
+          },
+          "peak_process_bytes": {
+            "median": 234102784,
+            "min": 231452672,
+            "max": 235732992
+          }
+        },
+        "train": {
+          "wall_ms": {
+            "median": 1429.137,
+            "min": 1415.746,
+            "max": 1442.435
+          },
+          "cpu_ms": {
+            "median": 965.868,
+            "min": 951.92,
+            "max": 971.491
+          },
+          "peak_tree_bytes": {
+            "median": 87638016,
+            "min": 87584768,
+            "max": 90214400
+          },
+          "peak_process_bytes": {
+            "median": 73318400,
+            "min": 71237632,
+            "max": 79650816
+          }
+        },
+        "use": {
+          "wall_ms": {
+            "median": 22135.153,
+            "min": 21615.745,
+            "max": 22912.326
+          },
+          "cpu_ms": {
+            "median": 20826.892,
+            "min": 20301.193,
+            "max": 21575.086
+          },
+          "peak_tree_bytes": {
+            "median": 584884224,
+            "min": 584650752,
+            "max": 584966144
+          },
+          "peak_process_bytes": {
+            "median": 236171264,
+            "min": 227549184,
+            "max": 237309952
+          }
+        }
+      },
+      "break_even_runs": 1226
+    }
+  },
+  "primary_target": true,
+  "complete": true
+}

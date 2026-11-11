@@ -3,7 +3,8 @@
 Status: included in Vela 0.7.0, verified on Windows x64/MSVC.
 Original stage 0.7.1 verify: 905/905, both fixed points; `tools/float-platform.vela` separately
 verified parsing/formatting inside a comma-decimal UCRT locale without changing it.
-POSIX implementation is present but not execution-verified on this host.
+The original 0.7.1 gate exercised Windows. The 1.3 lowering audit separately
+checks the numeric boundaries on Linux/GCC and Windows/MSVC.
 Final release gate: [Vela 0.7.0](../VALIDATION-0.7.md), 974/974 in two native trees.
 
 Int remains checked signed 64-bit. Float64 is IEEE 754 binary64, a separate

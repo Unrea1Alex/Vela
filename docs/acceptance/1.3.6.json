@@ -1,0 +1,960 @@
+{
+  "schema_version": 1,
+  "stage": "1.3.6",
+  "version": "1.3.0",
+  "status": "verified",
+  "stage_order": {
+    "1.3.1": {
+      "native_passed": 1401,
+      "receipt": "1.3.1.json",
+      "verify_log_sha256": "9876e3b8016ceedc40db34c107f4abbbaa9973582b1ee15b88e9842c7da440ca"
+    },
+    "1.3.1a": {
+      "native_passed": 1411,
+      "receipt": "1.3.1a.json",
+      "verify_log_sha256": "0516986a69101b58dab3f54cc2a95620777c0feb3d367457538aeb2ed234e084"
+    },
+    "1.3.1b": {
+      "native_passed": 1417,
+      "receipt": "1.3.1b.json",
+      "verify_log_sha256": "406837262624cb10a82b147e65a9e237fc772bc130bfc789bda2e43981181403"
+    },
+    "1.3.2": {
+      "native_passed": 1417,
+      "receipt": "1.3.2.json",
+      "verify_log_sha256": "406837262624cb10a82b147e65a9e237fc772bc130bfc789bda2e43981181403"
+    },
+    "1.3.3": {
+      "native_passed": 1423,
+      "receipt": "1.3.3.json",
+      "verify_log_sha256": "bde2d2d2ff7977a1cb6fe6a5f2a1f17f3a415a9b466952e3728e8aa3718b9588"
+    },
+    "1.3.4": {
+      "native_passed": 1423,
+      "receipt": "1.3.4.json",
+      "verify_log_sha256": "bde2d2d2ff7977a1cb6fe6a5f2a1f17f3a415a9b466952e3728e8aa3718b9588"
+    },
+    "1.3.4a": {
+      "native_passed": 1425,
+      "receipt": "1.3.4a.json",
+      "verify_log_sha256": "6b519f30c71b39165ab1cd7f3edf3d01d0cb5cbfc9afd8ac2fdcd6f9602c09c7"
+    },
+    "1.3.4b": {
+      "native_passed": 1427,
+      "receipt": "1.3.4b.json",
+      "verify_log_sha256": "9a2b3c73abe9fd111235d1a9cca3c2cfe0e0a1588394f1b4669d7432f56dbb1b"
+    },
+    "1.3.4c": {
+      "native_passed": 1428,
+      "receipt": "1.3.4c.json",
+      "verify_log_sha256": "c92a66816f231adc7bff672574cadc948b669e0c93aa1628380c6098a18a0c79"
+    },
+    "1.3.4d": {
+      "native_passed": 1430,
+      "receipt": "1.3.4d.json",
+      "verify_log_sha256": "2d9824f202cc900c575151c5f9f067b81d6478606923253962a7bc7863f3e9dd"
+    },
+    "1.3.4e": {
+      "native_passed": 1430,
+      "receipt": "1.3.4e.json",
+      "verify_log_sha256": "2d9824f202cc900c575151c5f9f067b81d6478606923253962a7bc7863f3e9dd"
+    },
+    "1.3.4f": {
+      "native_passed": 1432,
+      "receipt": "1.3.4f.json",
+      "verify_log_sha256": "9a846b869ddc7b143a252e801bba1eab81a8aba893e2ef6e04c1eb684385831c"
+    },
+    "1.3.4g": {
+      "native_passed": 1434,
+      "receipt": "1.3.4g.json",
+      "verify_log_sha256": "fc912eca238863b3d4292e367d8dc65c452a7a647c60f9f28add6b4847641875"
+    },
+    "1.3.4h": {
+      "native_passed": 1439,
+      "receipt": "1.3.4h.json",
+      "verify_log_sha256": "1af04d058f92dd5484d2af9df78b8926f3ce47c51bdcf9435d030b8b72670e79"
+    },
+    "1.3.4i": {
+      "native_passed": 1444,
+      "receipt": "1.3.4i.json",
+      "verify_log_sha256": "f90a51c36121114b76164f6be7779d978d80567868aa1ac7b6fd920534ed91ea"
+    },
+    "1.3.4j": {
+      "native_passed": 1449,
+      "receipt": "1.3.4j.json",
+      "verify_log_sha256": "49e212617841cd87f0072e448c90d011e0ae674ce9715498bd1fce0bfb303233"
+    },
+    "1.3.4k": {
+      "native_passed": 1450,
+      "receipt": "1.3.4k.json",
+      "verify_log_sha256": "89b5b9c6ca8218322abb95e3589d9e5848974ba5e3cd0e9bb28118f3f756a285"
+    },
+    "1.3.4l": {
+      "native_passed": 1450,
+      "receipt": "1.3.4l.json",
+      "verify_log_sha256": "89b5b9c6ca8218322abb95e3589d9e5848974ba5e3cd0e9bb28118f3f756a285"
+    },
+    "1.3.5": {
+      "native_passed": 1451,
+      "receipt": "1.3.5.json",
+      "verify_log_sha256": "2cfca6ef88d73aa9df89542e355967f052dc7d1c49247eb63a0b10367fb56ea0"
+    },
+    "1.3.5a": {
+      "native_passed": 1451,
+      "receipt": "1.3.5a.json",
+      "verify_log_sha256": "2cfca6ef88d73aa9df89542e355967f052dc7d1c49247eb63a0b10367fb56ea0"
+    }
+  },
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1451,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.3.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 583117,
+    "tests_run": true
+  },
+  "canonical_c": {
+    "bytes": 5982829,
+    "sha256": "31b4949d4a633ab78147ccb1aa4fb164da8042190b77c2dbf48944a35e019d21"
+  },
+  "verify_log_sha256": "7c94a78ece8b77d5be702803ab2c6e9d51bd5faaaeb5659b71c3d14989b2ec55",
+  "windows_recovery": {
+    "version": "1.3.0",
+    "recovered_from_c": true,
+    "canonical_c_sha256": "31b4949d4a633ab78147ccb1aa4fb164da8042190b77c2dbf48944a35e019d21",
+    "bootstrap": {
+      "schema_version": 1,
+      "version": "1.3.0",
+      "orchestrator": "Vela",
+      "fixed_point": true,
+      "bundler_fixed_point": true,
+      "source_bytes": 583117,
+      "tests_run": true
+    },
+    "native": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 1451,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "windows_compiler": {
+    "bytes": 3419648,
+    "sha256": "56e30f5a787560ba30117b72587ec125297963d7057e4b4c7c27bc103a6d3a49"
+  },
+  "linux_compiler": {
+    "bytes": 3505016,
+    "sha256": "a13d1e65e77a8e562e321fb80519febda6105d12c34658352970e020fa3395d5"
+  },
+  "bundler_fixed_source": {
+    "bytes": 583117,
+    "sha256": "73b3f7a848453ddba5b5f3ff49ce7fca7710d0ee727eb756b12a9ac75d9db782"
+  },
+  "release_performance": {
+    "ordinary": "1.3.6-ordinary.json",
+    "paired": [
+      "1.3.6-text-path.json",
+      "1.3.6-config.json",
+      "1.3.6-json.json",
+      "1.3.6-http.json",
+      "1.3.6-cache.json"
+    ],
+    "fixed_1_3_4d": {
+      "msvc": {
+        "series": "1.3.6-fixed-msvc.json",
+        "comparison": "1.3.6-compare-msvc.json",
+        "workload_groups": 30,
+        "compiler": {
+          "phases": {
+            "frontend": {
+              "timing": {
+                "wall_ms": {
+                  "fixed": 1295.1257,
+                  "previous": 1391.933,
+                  "candidate": 538.8,
+                  "previous_percent": -61.29124031113567,
+                  "fixed_percent": -58.39786053199315
+                },
+                "cpu_ms": {
+                  "fixed": 1281.25,
+                  "previous": 1390.625,
+                  "candidate": 531.25,
+                  "previous_percent": -61.79775280898876,
+                  "fixed_percent": -58.53658536585366
+                },
+                "peak_process_working_set_bytes": {
+                  "fixed": 92622848,
+                  "previous": 93024256,
+                  "candidate": 93413376,
+                  "previous_percent": 0.41829950244374975,
+                  "fixed_percent": 0.8534913545305798
+                },
+                "peak_tree_commit_bytes": {
+                  "fixed": 96395264,
+                  "previous": 97009664,
+                  "candidate": 97669120,
+                  "previous_percent": 0.6797838203006249,
+                  "fixed_percent": 1.321492308999745
+                }
+              },
+              "fixed_wall_noise_percent": 0.6123829283201944
+            },
+            "emit_c_total": {
+              "timing": {
+                "wall_ms": {
+                  "fixed": 1762.2903,
+                  "previous": 2088.4603,
+                  "candidate": 1154.0832,
+                  "previous_percent": -44.739998169943675,
+                  "fixed_percent": -34.512310485962495
+                },
+                "cpu_ms": {
+                  "fixed": 1750,
+                  "previous": 2078.125,
+                  "candidate": 1140.625,
+                  "previous_percent": -45.11278195488722,
+                  "fixed_percent": -34.82142857142857
+                },
+                "peak_process_working_set_bytes": {
+                  "fixed": 149168128,
+                  "previous": 156418048,
+                  "candidate": 152993792,
+                  "previous_percent": -2.189169372577773,
+                  "fixed_percent": 2.5646658245922347
+                },
+                "peak_tree_commit_bytes": {
+                  "fixed": 154165248,
+                  "previous": 163622912,
+                  "candidate": 157437952,
+                  "previous_percent": -3.7800085112774426,
+                  "fixed_percent": 2.122854561878952
+                }
+              },
+              "fixed_wall_noise_percent": 1.0255283613290553
+            },
+            "c_compile_link": {
+              "timing": {
+                "wall_ms": {
+                  "fixed": 38163.974,
+                  "previous": 38754.648,
+                  "candidate": 23629.5632,
+                  "previous_percent": -39.02779558209379,
+                  "fixed_percent": -38.08411251930944
+                },
+                "cpu_ms": {
+                  "fixed": 142046.875,
+                  "previous": 136921.875,
+                  "candidate": 80750,
+                  "previous_percent": -41.02476320894671,
+                  "fixed_percent": -43.15256847431526
+                },
+                "peak_process_working_set_bytes": {
+                  "fixed": 652800000,
+                  "previous": 636637184,
+                  "candidate": 405524480,
+                  "previous_percent": -36.30210578463478,
+                  "fixed_percent": -37.87921568627451
+                },
+                "peak_tree_commit_bytes": {
+                  "fixed": 659189760,
+                  "previous": 644562944,
+                  "candidate": 418807808,
+                  "previous_percent": -35.024529117205965,
+                  "fixed_percent": -36.46627520427502
+                }
+              },
+              "fixed_wall_noise_percent": 0.3449174853185191
+            },
+            "build_total": {
+              "timing": {
+                "wall_ms": {
+                  "fixed": 40441.4847,
+                  "previous": 38135.1468,
+                  "candidate": 23363.7688,
+                  "previous_percent": -38.734289073196905,
+                  "fixed_percent": -42.22821201220636
+                },
+                "cpu_ms": {
+                  "fixed": 144046.875,
+                  "previous": 133109.375,
+                  "candidate": 77843.75,
+                  "previous_percent": -41.51895762413429,
+                  "fixed_percent": -45.95943160863434
+                },
+                "peak_process_working_set_bytes": {
+                  "fixed": 149155840,
+                  "previous": 156381184,
+                  "candidate": 153169920,
+                  "previous_percent": -2.053484900075958,
+                  "fixed_percent": 2.69119868186187
+                },
+                "peak_tree_commit_bytes": {
+                  "fixed": 786239488,
+                  "previous": 815902720,
+                  "candidate": 577937408,
+                  "previous_percent": -29.16589271819072,
+                  "fixed_percent": -26.49346454600866
+                }
+              },
+              "fixed_wall_noise_percent": 1.0319318983530714
+            }
+          },
+          "emitted": {
+            "roots": {
+              "fixed": 21920,
+              "previous": 21920,
+              "candidate": 19051,
+              "previous_percent": -13.088503649635037,
+              "fixed_percent": -13.088503649635037
+            },
+            "polls": {
+              "fixed": 29961,
+              "previous": 29961,
+              "candidate": 7370,
+              "previous_percent": -75.40135509495677,
+              "fixed_percent": -75.40135509495677
+            },
+            "arithmetic_guards": {
+              "fixed": 716,
+              "previous": 716,
+              "candidate": 472,
+              "previous_percent": -34.07821229050279,
+              "fixed_percent": -34.07821229050279
+            },
+            "temporaries": {
+              "fixed": 39698,
+              "previous": 39698,
+              "candidate": 39669,
+              "previous_percent": -0.07305153912035871,
+              "fixed_percent": -0.07305153912035871
+            },
+            "branches": {
+              "fixed": null,
+              "previous": 2222,
+              "candidate": 2222,
+              "previous_percent": 0,
+              "fixed_percent": null
+            },
+            "functions": {
+              "fixed": 517,
+              "previous": 517,
+              "candidate": 504,
+              "previous_percent": -2.514506769825919,
+              "fixed_percent": -2.514506769825919
+            },
+            "types": {
+              "fixed": 68,
+              "previous": 68,
+              "candidate": 68,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            },
+            "traces": {
+              "fixed": 63,
+              "previous": 63,
+              "candidate": 55,
+              "previous_percent": -12.698412698412698,
+              "fixed_percent": -12.698412698412698
+            }
+          },
+          "sizes": {
+            "package": {
+              "fixed": 2649314,
+              "previous": 2654785,
+              "candidate": 2087394,
+              "previous_percent": -21.37238985454566,
+              "fixed_percent": -21.210018895457466
+            },
+            "c": {
+              "fixed": 6067085,
+              "previous": 6624365,
+              "candidate": 6039352,
+              "previous_percent": -8.831231370855923,
+              "fixed_percent": -0.4571058424267997
+            },
+            "exe": {
+              "fixed": 4188160,
+              "previous": 4188672,
+              "candidate": 3038720,
+              "previous_percent": -27.453856496760785,
+              "fixed_percent": -27.444987775061126
+            }
+          }
+        }
+      },
+      "gcc": {
+        "series": "1.3.6-fixed-gcc.json",
+        "comparison": "1.3.6-compare-gcc.json",
+        "workload_groups": 28,
+        "compiler": {
+          "phases": {
+            "frontend": {
+              "timing": {
+                "wall_ms": {
+                  "fixed": 1989.154,
+                  "previous": 2010.68,
+                  "candidate": 1257.733,
+                  "previous_percent": -37.44738098553724,
+                  "fixed_percent": -36.770456183885216
+                },
+                "cpu_ms": {
+                  "fixed": 1540.436,
+                  "previous": 1563.669,
+                  "candidate": 704.743,
+                  "previous_percent": -54.93016744592366,
+                  "fixed_percent": -54.25042001095793
+                },
+                "peak_process_rss_bytes": {
+                  "fixed": 92602368,
+                  "previous": 92667904,
+                  "candidate": 91226112,
+                  "previous_percent": -1.5558698727015559,
+                  "fixed_percent": -1.4861995753715498
+                },
+                "peak_tree_rss_bytes": {
+                  "fixed": 92602368,
+                  "previous": 92667904,
+                  "candidate": 91226112,
+                  "previous_percent": -1.5558698727015559,
+                  "fixed_percent": -1.4861995753715498
+                },
+                "peak_single_rss_wait4_bytes": {
+                  "fixed": 92061696,
+                  "previous": 92291072,
+                  "candidate": 90984448,
+                  "previous_percent": -1.4157642464051128,
+                  "fixed_percent": -1.1701370350596192
+                },
+                "observed_processes": {
+                  "fixed": 1,
+                  "previous": 1,
+                  "candidate": 1,
+                  "previous_percent": 0,
+                  "fixed_percent": 0
+                }
+              },
+              "fixed_wall_noise_percent": 0.24227159876409077
+            },
+            "emit_c_total": {
+              "timing": {
+                "wall_ms": {
+                  "fixed": 2514.794,
+                  "previous": 2679.62,
+                  "candidate": 1922.227,
+                  "previous_percent": -28.264940551272186,
+                  "fixed_percent": -23.5632421582046
+                },
+                "cpu_ms": {
+                  "fixed": 2031.917,
+                  "previous": 2206.156,
+                  "candidate": 1331.956,
+                  "previous_percent": -39.62548432658434,
+                  "fixed_percent": -34.448306697566885
+                },
+                "peak_process_rss_bytes": {
+                  "fixed": 155111424,
+                  "previous": 144773120,
+                  "candidate": 139259904,
+                  "previous_percent": -3.808176545480266,
+                  "fixed_percent": -10.219440703477778
+                },
+                "peak_tree_rss_bytes": {
+                  "fixed": 155111424,
+                  "previous": 144773120,
+                  "candidate": 139259904,
+                  "previous_percent": -3.808176545480266,
+                  "fixed_percent": -10.219440703477778
+                },
+                "peak_single_rss_wait4_bytes": {
+                  "fixed": 154877952,
+                  "previous": 144506880,
+                  "candidate": 138956800,
+                  "previous_percent": -3.840702947845805,
+                  "fixed_percent": -10.279805352798054
+                },
+                "observed_processes": {
+                  "fixed": 1,
+                  "previous": 1,
+                  "candidate": 1,
+                  "previous_percent": 0,
+                  "fixed_percent": 0
+                }
+              },
+              "fixed_wall_noise_percent": 0.9478901815143812
+            },
+            "c_compile_link": {
+              "timing": {
+                "wall_ms": {
+                  "fixed": 52537.549,
+                  "previous": 56073.54,
+                  "candidate": 24511.258,
+                  "previous_percent": -56.287300569930125,
+                  "fixed_percent": -53.34525788403261
+                },
+                "cpu_ms": {
+                  "fixed": 52126.31,
+                  "previous": 55921.715,
+                  "candidate": 24392.29,
+                  "previous_percent": -56.381362767576064,
+                  "fixed_percent": -53.2054158447049
+                },
+                "peak_process_rss_bytes": {
+                  "fixed": 1998848,
+                  "previous": 2027520,
+                  "candidate": 1998848,
+                  "previous_percent": -1.4141414141414141,
+                  "fixed_percent": 0
+                },
+                "peak_tree_rss_bytes": {
+                  "fixed": 482963456,
+                  "previous": 483942400,
+                  "candidate": 387321856,
+                  "previous_percent": -19.96529834955565,
+                  "fixed_percent": -19.80307180839786
+                },
+                "peak_single_rss_wait4_bytes": {
+                  "fixed": 480854016,
+                  "previous": 481959936,
+                  "candidate": 385273856,
+                  "previous_percent": -20.061020175751704,
+                  "fixed_percent": -19.877167876247913
+                },
+                "observed_processes": {
+                  "fixed": 3,
+                  "previous": 3,
+                  "candidate": 3,
+                  "previous_percent": 0,
+                  "fixed_percent": 0
+                }
+              },
+              "fixed_wall_noise_percent": 0.3570821054054097
+            },
+            "build_total": {
+              "timing": {
+                "wall_ms": {
+                  "fixed": 55118.133,
+                  "previous": 58808.331,
+                  "candidate": 26842.503,
+                  "previous_percent": -54.355951710311246,
+                  "fixed_percent": -51.30005038450776
+                },
+                "cpu_ms": {
+                  "fixed": 54200.313,
+                  "previous": 58144.664,
+                  "candidate": 26115.728,
+                  "previous_percent": -55.08491028514671,
+                  "fixed_percent": -51.81627825654808
+                },
+                "peak_process_rss_bytes": {
+                  "fixed": 155189248,
+                  "previous": 144715776,
+                  "candidate": 139259904,
+                  "previous_percent": -3.770060287000085,
+                  "fixed_percent": -10.264463682432432
+                },
+                "peak_tree_rss_bytes": {
+                  "fixed": 631148544,
+                  "previous": 625954816,
+                  "candidate": 519315456,
+                  "previous_percent": -17.03627119309519,
+                  "fixed_percent": -17.718980589140042
+                },
+                "peak_single_rss_wait4_bytes": {
+                  "fixed": 480772096,
+                  "previous": 481738752,
+                  "candidate": 385269760,
+                  "previous_percent": -20.025167499914975,
+                  "fixed_percent": -19.86436750272628
+                },
+                "observed_processes": {
+                  "fixed": 4,
+                  "previous": 4,
+                  "candidate": 4,
+                  "previous_percent": 0,
+                  "fixed_percent": 0
+                }
+              },
+              "fixed_wall_noise_percent": 0.3786820034744291
+            }
+          },
+          "emitted": {
+            "roots": {
+              "fixed": 21920,
+              "previous": 21920,
+              "candidate": 19051,
+              "previous_percent": -13.088503649635037,
+              "fixed_percent": -13.088503649635037
+            },
+            "polls": {
+              "fixed": 29961,
+              "previous": 29961,
+              "candidate": 7370,
+              "previous_percent": -75.40135509495677,
+              "fixed_percent": -75.40135509495677
+            },
+            "arithmetic_guards": {
+              "fixed": 716,
+              "previous": 716,
+              "candidate": 472,
+              "previous_percent": -34.07821229050279,
+              "fixed_percent": -34.07821229050279
+            },
+            "temporaries": {
+              "fixed": 39698,
+              "previous": 39698,
+              "candidate": 39669,
+              "previous_percent": -0.07305153912035871,
+              "fixed_percent": -0.07305153912035871
+            },
+            "branches": {
+              "fixed": null,
+              "previous": 2222,
+              "candidate": 2222,
+              "previous_percent": 0,
+              "fixed_percent": null
+            },
+            "functions": {
+              "fixed": 517,
+              "previous": 517,
+              "candidate": 504,
+              "previous_percent": -2.514506769825919,
+              "fixed_percent": -2.514506769825919
+            },
+            "types": {
+              "fixed": 68,
+              "previous": 68,
+              "candidate": 68,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            },
+            "traces": {
+              "fixed": 63,
+              "previous": 63,
+              "candidate": 55,
+              "previous_percent": -12.698412698412698,
+              "fixed_percent": -12.698412698412698
+            }
+          },
+          "sizes": {
+            "package": {
+              "fixed": 3289360,
+              "previous": 3298771,
+              "candidate": 2053384,
+              "previous_percent": -37.75306015482736,
+              "fixed_percent": -37.574968990928326
+            },
+            "c": {
+              "fixed": 6301785,
+              "previous": 6859065,
+              "candidate": 6262232,
+              "previous_percent": -8.70137547901937,
+              "fixed_percent": -0.6276475633491145
+            },
+            "exe": {
+              "fixed": 5869864,
+              "previous": 5869864,
+              "candidate": 2767096,
+              "previous_percent": -52.85928260007387,
+              "fixed_percent": -52.85928260007387
+            }
+          }
+        }
+      }
+    },
+    "runtime_repeats": {
+      "recheck-msvc-previous": {
+        "report": "1.3.6-recheck-msvc-previous.json",
+        "cases": 2
+      },
+      "recheck-msvc-fixed": {
+        "report": "1.3.6-recheck-msvc-fixed.json",
+        "cases": 18
+      },
+      "recheck-gcc-previous": {
+        "report": "1.3.6-recheck-gcc-previous.json",
+        "cases": 0
+      },
+      "recheck-gcc-fixed": {
+        "report": "1.3.6-recheck-gcc-fixed.json",
+        "cases": 2
+      }
+    },
+    "soak": {
+      "report": "1.3.6-soak.json",
+      "sha256": "58ad2baf997b5794e2363419d09ce29709e6d72add3214561ef656dec0d65a21",
+      "samples": 1783,
+      "initial": {
+        "count": 297,
+        "min": 4362240,
+        "median": 4837376,
+        "max": 5419008
+      },
+      "final": {
+        "count": 297,
+        "min": 4423680,
+        "median": 4800512,
+        "max": 5300224
+      },
+      "max_sockets": 1,
+      "remaining_sockets": 0,
+      "wall_ms": 1800189.9782,
+      "cpu_ms": 31500,
+      "peak_tree_commit_bytes": 5419008
+    },
+    "budgets": {
+      "minimum_selected_wall_reduction": 0.2,
+      "maximum_peak_commit_increase": 0.1,
+      "maximum_package_increase": 0.1,
+      "package_sizes": {
+        "baseline": {
+          "windows": 8432006,
+          "linux": 5071098,
+          "mcp": 175374
+        },
+        "candidate": {
+          "windows": 14685069,
+          "linux": 4868425,
+          "mcp": 189242
+        },
+        "http_dll": {
+          "copies": 3,
+          "bytes": 4363776,
+          "total_zip_payload_bytes": 5993304
+        }
+      },
+      "windows_growth_decision": "Three sibling copies of the pinned HTTP/TLS/resolver adapter preserve self-contained application delivery. The remaining Windows ZIP payload meets the 10% budget."
+    }
+  },
+  "native_modes": {
+    "msvc": {
+      "workloads": "1.3.6-modes-msvc.json",
+      "fixed_points": "1.3.6-compiler-msvc.json"
+    },
+    "gcc": {
+      "workloads": "1.3.6-modes-gcc.json",
+      "fixed_points": "1.3.6-compiler-gcc.json"
+    }
+  },
+  "checked_ir_cases": 88,
+  "stable": {
+    "schema_version": 1,
+    "status": "passed",
+    "files": 130,
+    "negative_checks": 2
+  },
+  "frozen_api": {
+    "schema_version": 1,
+    "old_surface_entries": 372,
+    "frozen_fixture_files": 4,
+    "archive": "unchanged",
+    "status": "passed"
+  },
+  "native_api": {
+    "schema_version": 1,
+    "passed": 25,
+    "checks": [
+      "exact ID",
+      "checked signature",
+      "metadata fields",
+      "independent fingerprint",
+      "JSON lookup",
+      "HTTP lookup",
+      "Unicode purpose",
+      "ASCII folded purpose",
+      "unknown name",
+      "no matches",
+      "empty query",
+      "ambiguous exact name",
+      "case sensitive exact name",
+      "stale version",
+      "stale fingerprint",
+      "pages cover exactly once",
+      "byte order",
+      "out of range page",
+      "payload limit",
+      "invalid argument",
+      "duplicate IDs fail even empty search",
+      "malformed JSON",
+      "malformed field",
+      "catalog byte bound",
+      "UTF8 rather than UTF16 order"
+    ]
+  },
+  "mcp": {
+    "packaged": {
+      "schema_version": 1,
+      "status": "passed",
+      "version": "1.3.0",
+      "checks": [
+        "new Unicode/space installation with execution manifest",
+        "setup is idempotent",
+        "matching version/capabilities and isolated execution available",
+        "installed native API discovery",
+        "check installed sort/fold overlay",
+        "build issues isolated artifact",
+        "named test through allowed execution path",
+        "run issued artifact produces independent literal output",
+        "overlay did not write source"
+      ],
+      "scope": "fresh packaged setup and real stdio SDK client, isolated native check/build/test/run; desktop IDE discovery not exercised"
+    },
+    "execution": [
+      "eleven native MCP tools",
+      "execution enabled after OS startup probe",
+      "isolated compiler accepts opaque structs and methods",
+      "isolated method call prints the expected value",
+      "disk check accepts the current import graph",
+      "unsaved dependency check reports current type and span",
+      "unsaved dependency leaves disk and its snapshot unchanged",
+      "isolated MSVC build issues artifact",
+      "local optimization mode rejected pgo-instrument",
+      "local optimization mode rejected pgo-use",
+      "local optimization mode rejected lto",
+      "local optimization mode rejected pgo-lto",
+      "Unicode output and no inherited secret",
+      "source unchanged",
+      "forged artifact rejected",
+      "invalid argv 15",
+      "invalid argv 16",
+      "invalid argv 17",
+      "invalid code rejected with native diagnostic",
+      "path escape rejected",
+      "native tests continue after failure",
+      "unsaved source build",
+      "application nonzero exit is run result",
+      "overlay is private",
+      "stale snapshot rejected",
+      "native bytes require host allowlist",
+      "isolated directory and JSON build",
+      "new directory handles preserve LPAC boundary and JSON skip",
+      "outside directory bytes unchanged",
+      "hardlinked snapshot rejected",
+      "loop build",
+      "execution concurrency limit",
+      "wall time limit",
+      "server recovers after cancellation",
+      "transport stdout contains only MCP",
+      "MCP disconnect releases execution cache"
+    ],
+    "isolation": [
+      "startup access, socket, build/run/test probes",
+      "--memory",
+      "--memory bounded capture",
+      "--process-limit",
+      "--process-limit bounded capture",
+      "--breakaway",
+      "--breakaway bounded capture",
+      "--flood",
+      "--flood bounded capture",
+      "--disk",
+      "--disk bounded capture",
+      "--files",
+      "--files bounded capture",
+      "--tree",
+      "--tree bounded capture",
+      "child preserves LPAC/job",
+      "timeout kills descendant",
+      "explicit cancellation",
+      "cancel kills descendant",
+      "disconnect cancels job",
+      "disconnect kills descendant",
+      "supervisor death fails closed and recovers profile",
+      "supervisor death kills descendant",
+      "toolchain bytes unchanged",
+      "forced Node death kills descendants",
+      "forced Node death removes snapshot and lease"
+    ],
+    "faults": [
+      "changed artifact bytes rejected",
+      "expired artifact rejected",
+      "artifact count bound",
+      "invalid UTF8 stdout uses hex",
+      "isolated canonical roundtrip builds",
+      "restricted canonical paths reopen the same objects",
+      "snapshot race rejected",
+      "cancelled build publishes nothing",
+      "authorized native DLL is pinned and staged",
+      "toolchain mutation disables execution",
+      "failed backend keeps analysis only"
+    ],
+    "outputs": [
+      "fresh SDK session discovers output tool",
+      "provenance",
+      "chunked bytes and SHA-256",
+      "no implicit write",
+      "executable ID cannot read a generated file",
+      "forged output ID",
+      "output ID cannot execute",
+      "out of range",
+      "unsafe name ../result.html",
+      "unsafe name a.html:stream",
+      "unsafe name NUL.html",
+      "unsafe name a.exe",
+      "reject missing",
+      "reject extra",
+      "reject directory",
+      "byte bound",
+      "nonzero does not export",
+      "timeout does not export",
+      "cancelled run releases job and export slot",
+      "hardlink rejection",
+      "junction rejection",
+      "expiry removes bytes"
+    ],
+    "sdk_log_sha256": "65eb6cc6a83eba9b09b8eb905cadda806a8fba86e853f82dad3f4f535a47c39b",
+    "sdk_groups": 8
+  },
+  "applications": {
+    "index": 26,
+    "log_summary": 46,
+    "http_collector": 44,
+    "http_collector_1_2_source_legacy": 44,
+    "fielddesk_named": 17,
+    "fielddesk_cli": 19,
+    "fielddesk_network": 8,
+    "pulse_deck_named": 11,
+    "pulse_deck_native_tls": 21,
+    "pulse_deck_legacy_tls": 21,
+    "buildlens_named": 10,
+    "gui": {
+      "field": {
+        "controls": "FieldDesk window: load, concurrent edit, cancel, close",
+        "output": ""
+      },
+      "deck": {
+        "controls": "PulseDeck window: cancel, save, run again, close",
+        "output": "1/1 completed | 0 healthy\r\nREPORT=G:\\Vela\\build\\stage13\\release-136\\http-gui-8SVBfV\\vla1EA7.tmp/report.json\r\n1/1 completed | 0 healthy\r\nREPORT=G:\\Vela\\build\\stage13\\release-136\\http-gui-8SVBfV\\vla1EA7.tmp/report.json"
+      },
+      "seen": {
+        "field": [
+          1,
+          1,
+          1,
+          2
+        ],
+        "pulse": [
+          3,
+          4
+        ]
+      },
+      "openSocketsAfter": 0
+    },
+    "legacy_1_0_project_lock_and_ffi": true
+  },
+  "scope": {
+    "windows": "x64 MSVC 19.44.35222 with Win32 GUI, HTTP/TLS, fibers and ABI 1 DLLs",
+    "linux": "x86-64 GCC 14.2 and musl console. Static compiler and tools. C recovery, API, project resources, TreeIndex, LogSummary and BuildLens.",
+    "mcp": "Node 24 official stdio SDK, matching Windows SDK and LPAC execution. Desktop IDE discovery outside gate.",
+    "benchmark": "Uses the existing ProcessMeter. Independent VelaBench rerun remains 1.4.6."
+  },
+  "next": "1.4.1"
+}

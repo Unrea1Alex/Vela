@@ -1,6 +1,6 @@
 # Интерфейс для инструментов
 
-Рабочая версия 1.2 добавляет `vela api SOURCE_OR_PROJECT --json`: проверенный
+Команда `vela api SOURCE_OR_PROJECT --json` возвращает проверенный
 public-интерфейс entry-модуля без требования main. `vela api --builtins` читает
 embedded-каталог. Generic/effect signatures, методы и скрытые opaque-поля
 обрабатывает frontend; C compiler не участвует. `tools/help.vela` генерирует
@@ -159,11 +159,15 @@ E201 сообщает `expected_type`/`actual_type`; E209 — `callee`, `require
 `vela check ROOT --cache DIR`, `vela emit-c ROOT --cache DIR` и
 `vela build ROOT -o OUTPUT --cache DIR` используют локальный каталог доверенного
 кэша. С 1.0.0-dev.2 последний компонент каталога создаётся автоматически, если
-родитель существует. `--cache-report` выводит JSON Lines в stderr: готовность
-каталога, hit/miss по imports и check/C, результат записи. stdout не меняется.
-Ошибки каталога и записи видны также без флага; компиляция продолжает работать
-без кэша. Наличие `status:"hit"` для `layer:"check-v1"` подтверждает повторное
-использование полной проверки; время само по себе этого не доказывает.
+родитель существует. `--cache-report` выводит JSON Lines в stderr с готовностью
+каталога, попаданиями по imports и check/C, результатами записи и счётчиками
+семантической проверки. stdout не меняется. Ошибки каталога и записи видны
+также без флага. При этих ошибках компиляция продолжает работать.
+Для проверки смотрите `semantic-modules-v1` и поля `declarations_checked`,
+`bodies_checked`, `reused_modules`. После правки комментария совпавшие токены
+позволяют переиспользовать проверку. В поддержанных графах правка тела или
+публичной сигнатуры проверяет затронутые модули.
+[Границы переиспользования](contracts/SEMANTIC-CACHE-1.3.md).
 Windows-инструмент независимых сборок принимает
 1–8 одновременно запущенных корней и сохраняет журналы в каталоге каждого.
 
@@ -176,6 +180,45 @@ New-Item -ItemType Directory -Force build/cache | Out-Null
 [контракте инкрементальной сборки](contracts/INCREMENTAL-BUILD.md).
 
 ## Отладка и профиль
+
+`vela emit-c ROOT --no-ir-simplify` и `vela build ROOT -o OUTPUT --no-ir-simplify`
+отключают проход упрощения checked IR для сравнения выдаваемого C. Обе команды
+выполняют полную проверку исходников. Для `emit-c` режим совместим с `--debug`.
+Анализ диапазонов и отбор функций и типов от точки входа применяются в обоих
+режимах. Кэш C хранит результаты упрощения и обхода под разными ключами.
+[Упрощение](contracts/IR-SIMPLIFICATION-1.3.md),
+[достижимость](contracts/C-REACHABILITY-1.3.md).
+
+### Сборка по профилю
+
+```powershell
+New-Item -ItemType Directory -Force build | Out-Null
+.\vela.cmd pgo-instrument apps/build-lens/vela.project --profile build/buildlens-pgo
+.\vela.cmd pgo-train build/buildlens-pgo -- apps/build-lens/demo.jsonl --top 1
+.\vela.cmd build apps/build-lens/vela.project -o build/buildlens-pgo.exe --pgo-profile build/buildlens-pgo
+```
+
+Родительский каталог профиля должен существовать. Создавайте новый профиль
+для каждого обучения. Устаревший, повреждённый или отсутствующий профиль
+даёт E243. Профили поддерживают MSVC 19.44.35222 x64 и GCC 14.2.0
+на x86-64 Alpine musl. MCP выполняет изолированную сборку O2.
+[Флаги, ограничения и состав профиля](contracts/NATIVE-PGO-1.3.md).
+
+### Оптимизация при линковке
+
+```powershell
+.\vela.cmd build apps/build-lens/vela.project -o build/buildlens-lto.exe --lto
+```
+
+Чтобы совместить PGO и LTO, добавьте `--lto` к `pgo-instrument` и к итоговому
+`build --pgo-profile`. GCC требует профиль, подготовленный в этом режиме.
+На MSVC PGO уже включает LTCG и профиль подходит для обоих вариантов.
+Чистый LTO на MSVC предпочитает меньший код для коротких функций без
+циклов. Такой EXE может выполнять ту же нагрузку дольше обычной сборки.
+При неподдерживаемом toolchain обычная сборка остаётся доступна без
+`--lto`. [Контракт LTO](contracts/NATIVE-LTO-1.3.md).
+
+### Отладочная сборка
 
 Экспортируйте C с позициями Vela и инструментированием функций.
 Команда ниже предполагает консоль разработчика MSVC.
@@ -213,6 +256,12 @@ check/build/run/symbols/emit-c загружают граф импортов; fmt
 импорт/предел графа; E222 — неоднозначность/alias; E223 — private доступ;
 E224 — private тип в public API. Выходной файл не может совпадать с любым
 исходником графа по пути или файловой идентичности.
+
+Для проекта с Windows HTTP multi укажите
+`native|vela-http.dll|bin/vela-http.dll|windows-x64|1|shared` и обновите lock
+после установки DLL. DLL нужна рядом с executable, а для передачи
+пакета нужны manifest версий и лицензии. Само приложение открывает адаптер
+через `http::curl_multi`. [Сборка и размещение адаптера](contracts/HTTP-MULTI-1.3.md).
 
 # Семантические запросы и правки
 

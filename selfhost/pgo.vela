@@ -1,0 +1,570 @@
+import "model.vela";
+import "types.vela";
+import "core.vela";
+import "projects.vela";
+import "artifacts.vela";
+import "incremental.vela";
+import "driver.vela";
+import "errors.vela";
+import "parser.vela";
+import "embedded.vela";
+pub struct PgoUse {
+    directory: String,
+    source: String,
+    json_mode: Bool,
+    lto: Bool
+}
+struct PgoTools {
+    kind: String,
+    compiler: String,
+    directory: String,
+    identity: String,
+    lto: Bool
+}
+struct PgoPlan {
+    hash: String,
+    kind: String,
+    source: String,
+    c_hash: String,
+    toolchain: String,
+    flags: String,
+    program: String,
+    database: String,
+    companions: List<String>
+}
+struct PgoProcess {
+    code: Int,
+    output: String,
+    error: String
+}
+fn pgo_read(path: String, limit: Int) -> Result<String, String> effects { io } {
+    match read_file_bounded(path, limit) {
+        ReadResult::Ok(data) => {
+            if data == "" {
+                return Result<String, String>::Err("Empty PGO file: " + path);
+            }
+            return Result<String, String>::Ok(data);
+        }
+        ReadResult::Limit => {
+            return Result<String, String>::Err("PGO file exceeds its byte limit: " + path);
+        }
+        ReadResult::Err(message) => {
+            return Result<String, String>::Err("Cannot read PGO file: " + path + " (" + message
+                + ")");
+        }
+    }
+}
+fn pgo_tool_output(path: String) -> String effects { io } {
+    return match read_file_bounded(path, 4194304) {
+        ReadResult::Ok(data) => data,
+        ReadResult::Limit => "PGO tool output exceeds 4 MiB.",
+        ReadResult::Err(_) => ""
+    };
+}
+fn pgo_process(args: StringList, dir: String) -> Result<PgoProcess, String> effects { state, io,
+    process } {
+    let stdout = artifact_join(dir, "tool.stdout");
+    let stderr = artifact_join(dir, "tool.stderr");
+    let outcome = process_run_at(args, dir, stdout, stderr, 600000);
+    let output = pgo_tool_output(stdout);
+    let error = pgo_tool_output(stderr);
+    ignored_write(remove_file(stdout));
+    ignored_write(remove_file(stderr));
+    return match outcome {
+        ProcessResult::Exited(code) => Result<PgoProcess, String>::Ok(PgoProcess(code: code,
+            output: output, error: error)),
+        ProcessResult::TimedOut => Result<PgoProcess, String>::Err(
+            "PGO tool exceeded its time limit."),
+        ProcessResult::Err(message) => Result<PgoProcess, String>::Err("Cannot run PGO tool: "
+            + message)
+    };
+}
+fn pgo_tool(args: StringList, dir: String) -> Result<Bool, String> effects { state, io, process } {
+    let outcome = pgo_process(args, dir)?;
+    if outcome.output != "" {
+        eprint(outcome.output);
+    }
+    if outcome.error != "" {
+        eprint(outcome.error);
+    }
+    if outcome.code != 0 {
+        return Result<Bool, String>::Err("PGO tool failed with exit " + to_string(outcome.code)
+            + ".");
+    }
+    return Result<Bool, String>::Ok(true);
+}
+fn pgo_probe(compiler: String, flag: String, dir: String) -> Result<PgoProcess,
+    String> effects { state, io, process } {
+    let args = strings_new();
+    strings_push(args, compiler);
+    strings_push(args, flag);
+    return pgo_process(args, dir);
+}
+fn pgo_contains(text: String, expected: String) -> Bool {
+    let count = str_len(expected);
+    for i in 0 ..= str_len(text) - count {
+        if str_slice(text, i, i + count) == expected {
+            return true;
+        }
+    }
+    return false;
+}
+fn pgo_probe_line(compiler: String, flag: String, dir: String) -> Result<String,
+    String> effects { state, io, process } {
+    let outcome = pgo_probe(compiler, flag, dir)?;
+    if outcome.code != 0 {
+        return Result<String, String>::Err("Cannot query PGO toolchain: " + flag);
+    }
+    var end = str_len(outcome.output);
+    while end > 0 && (str_byte(outcome.output, end - 1) == 10 || str_byte(outcome.output, end - 1)
+        == 13) {
+        end = end - 1;
+    }
+    return Result<String, String>::Ok(str_slice(outcome.output, 0, end));
+}
+fn pgo_tools(dir: String, profiling: Bool, lto: Bool) -> Result<PgoTools, String> effects { state,
+    io, process } {
+    let cc = env("VELA_CC");
+    let kind = env("VELA_CC_KIND");
+    let hashes = strings_new();
+    var mode = "LTO";
+    if profiling {
+        mode = "PGO";
+    }
+    if platform() == "windows" {
+        if (kind != "" && kind != "msvc") || (cc != "" && cc != "cl.exe") || env("VCToolsVersion")
+            != "14.44.35207" || env("VCToolsInstallDir") == "" {
+            return Result<PgoTools, String>::Err(mode
+                + " requires the MSVC 19.44.35222 x64 developer environment.");
+        }
+        if env("CL") != "" || env("_CL_") != "" || env("LINK") != "" || env("_LINK_") != "" {
+            return Result<PgoTools, String>::Err(mode
+                + " requires the fixed MSVC flags without CL or LINK overrides.");
+        }
+        let tools = artifact_join(env("VCToolsInstallDir"), "bin/Hostx64/x64");
+        let compiler = artifact_join(tools, "cl.exe");
+        set_env("PATH", tools + ";" + env("PATH"));
+        let version = pgo_probe(compiler, "/Bv", dir)?;
+        if !pgo_contains(version.output + version.error, "19.44.35222") {
+            return Result<PgoTools, String>::Err(mode + " requires MSVC 19.44.35222 x64.");
+        }
+        var binaries = "cl.exe;c1.dll;c2.dll;link.exe";
+        if profiling {
+            binaries = binaries + ";pgomgr.exe;pgort140.dll";
+        }
+        for name in split_text(binaries, 59) {
+            let bytes = pgo_read(artifact_join(tools, name), 67108864)?;
+            strings_push(hashes, sha256(bytes));
+        }
+        for name in split_text("INCLUDE;LIB;LIBPATH", 59) {
+            strings_push(hashes, sha256(env(name)));
+        }
+        return Result<PgoTools, String>::Ok(PgoTools(kind: "msvc", compiler: compiler,
+            directory: tools, identity: sha256(strings_join(hashes, "\n")), lto: lto));
+    }
+    if platform() != "posix" || (kind != "" && kind != "cc" && kind != "gcc") || (cc != "" && cc
+        != "gcc" && cc != "cc" && cc != "/usr/bin/gcc" && cc != "/usr/bin/cc") {
+        return Result<PgoTools, String>::Err(mode
+            + " requires GCC 14.2.0 for x86_64-alpine-linux-musl.");
+    }
+    for name in split_text("GCC_EXEC_PREFIX;COMPILER_PATH;LIBRARY_PATH;C_INCLUDE_PATH;CPATH", 59) {
+        if env(name) != "" {
+            return Result<PgoTools, String>::Err(mode
+                + " requires the fixed GCC environment without " + name + ".");
+        }
+    }
+    let compiler = "/usr/bin/gcc";
+    let version = pgo_probe_line(compiler, "-dumpfullversion", dir)?;
+    let target = pgo_probe_line(compiler, "-dumpmachine", dir)?;
+    if version != "14.2.0" || target != "x86_64-alpine-linux-musl" {
+        return Result<PgoTools, String>::Err(mode
+            + " requires GCC 14.2.0 for x86_64-alpine-linux-musl.");
+    }
+    let frontend = pgo_probe_line(compiler, "-print-prog-name=cc1", dir)?;
+    let linker = pgo_probe_line(compiler, "-print-prog-name=ld", dir)?;
+    let assembler = pgo_probe_line(compiler, "-print-prog-name=as", dir)?;
+    var binaries = compiler + "\n" + frontend + "\n" + linker + "\n" + assembler;
+    if lto {
+        let lto_compiler = pgo_probe_line(compiler, "-print-prog-name=lto1", dir)?;
+        let lto_wrapper = pgo_probe_line(compiler, "-print-prog-name=lto-wrapper", dir)?;
+        let collector = pgo_probe_line(compiler, "-print-prog-name=collect2", dir)?;
+        binaries = binaries + "\n" + lto_compiler + "\n" + lto_wrapper + "\n" + collector + "\n"
+            + artifact_join(parent_path(lto_compiler), "liblto_plugin.so");
+    }
+    for path in split_text(binaries, 10) {
+        let bytes = pgo_read(path, 67108864)?;
+        strings_push(hashes, sha256(bytes));
+    }
+    return Result<PgoTools, String>::Ok(PgoTools(kind: "gcc", compiler: compiler, directory: "",
+        identity: sha256(strings_join(hashes, "\n")), lto: lto));
+}
+fn pgo_profile_kind(tools: PgoTools) -> String {
+    if tools.kind == "gcc" && tools.lto {
+        return "gcc-lto";
+    }
+    return tools.kind;
+}
+fn pgo_args(tools: PgoTools, dir: String, instrument: Bool) -> StringList effects { state } {
+    let windows = tools.kind == "msvc";
+    var optimization = "o2";
+    if windows || tools.lto {
+        optimization = "pgo-lto";
+    }
+    let args = native_arguments(tools.compiler, tools.kind, "program.c", "program.exe",
+        "program.obj", optimization);
+    if windows {
+        if instrument {
+            strings_push(args, "/GENPROFILE:EXACT,PGD=program.pgd");
+        } else {
+            strings_push(args, "/USEPROFILE:AGGRESSIVE");
+            strings_push(args, "/WX");
+        }
+    } else {
+        strings_push(args, "-fprofile-prefix-path=" + dir);
+        if instrument {
+            strings_push(args, "-fprofile-generate=%q{VELA_PGO_COUNTER_DIR}");
+            strings_push(args, "-fprofile-update=atomic");
+        } else {
+            strings_push(args, "-fprofile-use=" + dir);
+            strings_push(args, "-Werror=missing-profile");
+            strings_push(args, "-Werror=coverage-mismatch");
+        }
+    }
+    return args;
+}
+fn pgo_flags(tools: PgoTools) -> String effects { state } {
+    return sha256(strings_join(pgo_args(tools, "<work-directory>", true), "\n") + "\n"
+        + strings_join(pgo_args(tools, "<work-directory>", false), "\n"));
+}
+fn pgo_companions(p: Project) -> Result<String, String> effects { state } {
+    let entries = strings_new();
+    for native in p.natives {
+        if native.target == "" {
+            return Result<String, String>::Err(
+                "PGO requires locked native dependencies with explicit target and ABI.");
+        }
+        if artifact_key(native.name) == "pgort140.dll" {
+            return Result<String, String>::Err(
+                "pgort140.dll is reserved by MSVC profile training.");
+        }
+        strings_push(entries, native.name + "|" + sha256(native.data) + "\n");
+    }
+    for asset in p.assets {
+        strings_push(entries, asset.name + "|" + sha256(asset.data) + "\n");
+    }
+    return Result<String, String>::Ok(strings_join(entries, ""));
+}
+fn pgo_source_key(c: Context, p: Project, companions: String) -> String effects { state } {
+    return sha256(analysis_cache_key(c, p, "pgo-source-v1") + "\n" + companions);
+}
+fn pgo_inside(parent: String, path: String) -> Bool effects { state } {
+    let root = path_key(artifact_join(parent, ""));
+    let target = path_key(artifact_join(path, ""));
+    return str_len(target) >= str_len(root) && str_slice(target, 0, str_len(root)) == root;
+}
+pub fn pgo_build_request(c: Context, p: Project, profile: String, output: String,
+    lto: Bool) -> PgoUse effects { state, io, process } {
+    if profile == "" {
+        return PgoUse(directory: "", source: "", json_mode: c.json_mode, lto: lto);
+    }
+    match pgo_build_options(c, p, profile, output, lto) {
+        Result::Ok(options) => {
+            return options;
+        }
+        Result::Err(message) => {
+            project_fail(profile, "E243", message, c.json_mode);
+        }
+    }
+    return PgoUse(directory: "", source: "", json_mode: c.json_mode, lto: lto);
+}
+fn pgo_build_options(c: Context, p: Project, profile: String, output: String,
+    lto: Bool) -> Result<PgoUse, String> effects { state, io } {
+    let root = from_string(canonical_path(profile, false))?;
+    let parent = from_string(canonical_path(parent_path(output), false))?;
+    if pgo_inside(root, parent) {
+        return Result<PgoUse, String>::Err("PGO output must be outside the profile directory.");
+    }
+    let companions = pgo_companions(p)?;
+    return Result<PgoUse, String>::Ok(PgoUse(directory: profile, source: pgo_source_key(c, p,
+        companions), json_mode: c.json_mode, lto: lto));
+}
+fn pgo_plan(path: String) -> Result<PgoPlan, String> effects { state, io, process } {
+    let data = pgo_read(artifact_join(path, "plan"), 65536)?;
+    let rows = split_text(data, 10);
+    let count = list_len(rows);
+    if count < 10 || list_get(rows, 0) != "vela-pgo-plan|1" || list_get(rows, count - 1) != "" {
+        return Result<PgoPlan, String>::Err("Malformed PGO plan.");
+    }
+    if list_get(rows, 2) != compiler_fingerprint() {
+        return Result<PgoPlan, String>::Err("PGO plan belongs to another compiler revision.");
+    }
+    let companions = list_new<String>();
+    for i in 9 .. count - 1 {
+        list_push(companions, list_get(rows, i));
+    }
+    return Result<PgoPlan, String>::Ok(PgoPlan(hash: sha256(data), kind: list_get(rows, 1),
+        source: list_get(rows, 3), c_hash: list_get(rows, 4), toolchain: list_get(rows, 5),
+        flags: list_get(rows, 6), program: list_get(rows, 7), database: list_get(rows, 8),
+        companions: companions));
+}
+fn pgo_validate_tools(plan: PgoPlan, tools: PgoTools) -> Result<Bool, String> effects { state } {
+    if plan.kind != pgo_profile_kind(tools) || plan.toolchain != tools.identity || plan.flags
+        != pgo_flags(tools) {
+        return Result<Bool, String>::Err("PGO toolchain or flag fingerprint differs.");
+    }
+    return Result<Bool, String>::Ok(true);
+}
+fn pgo_write(path: String, data: String) -> Result<Bool, String> effects { io } {
+    return from_write(write_file(path, data));
+}
+fn pgo_claim(dir: String, lock: String) -> Result<Bool, String> effects { state, io } {
+    let path = artifact_join(dir, "claim");
+    let saved = pgo_write(path, "vela-pgo-claim|1\n");
+    match saved {
+        Result::Err(message) => {
+            return Result<Bool, String>::Err(message);
+        }
+        Result::Ok(_) => {}
+    }
+    let installed = from_write(install_file(path, lock));
+    ignored_write(remove_file(path));
+    return installed;
+}
+fn pgo_publish_plan(p: Project, dir: String, profile: String, database: Bool) -> Result<Bool,
+    String> effects { state, io } {
+    let executable = from_write(install_file(artifact_join(dir, "program.exe"), artifact_join(
+        profile, "program.exe")))?;
+    if database {
+        let published = from_write(install_file(artifact_join(dir, "program.pgd"), artifact_join(
+            profile, "program.pgd")))?;
+    }
+    let companions = stage_artifacts(p.natives, p.assets, profile)?;
+    return from_write(install_file(artifact_join(dir, "plan"), artifact_join(profile, "plan")));
+}
+fn pgo_work_path(dir: String) -> Result<String, String> effects { io } {
+    if platform() == "windows" {
+        return Result<String, String>::Ok(dir);
+    }
+    return from_string(canonical_path(dir, false));
+}
+fn pgo_instrument_into(c: Context, p: Project, code: String, profile: String, dir: String,
+    lto: Bool) -> Result<Bool, String> effects { state, io, process } {
+    let work = pgo_work_path(dir)?;
+    let companions = pgo_companions(p)?;
+    let tools = pgo_tools(work, true, lto)?;
+    let saved = pgo_write(artifact_join(dir, "program.c"), code)?;
+    let compiled = pgo_tool(pgo_args(tools, work, true), work)?;
+    let executable = pgo_read(artifact_join(dir, "program.exe"), 67108864)?;
+    var database = "-";
+    if tools.kind == "msvc" {
+        let data = pgo_read(artifact_join(dir, "program.pgd"), 67108864)?;
+        database = sha256(data);
+    }
+    let plan = "vela-pgo-plan|1\n" + pgo_profile_kind(tools) + "\n" + compiler_fingerprint() + "\n"
+        + pgo_source_key(c, p, companions) + "\n" + sha256(code) + "\n" + tools.identity + "\n"
+        + pgo_flags(tools) + "\n" + sha256(executable) + "\n" + database + "\n" + companions;
+    let receipt = pgo_write(artifact_join(dir, "plan"), plan)?;
+    if from_string(file_identity(profile))? != "" {
+        return Result<Bool, String>::Err("PGO instrument requires a new directory.");
+    }
+    let created = from_write(make_dir(profile))?;
+    let lock = artifact_join(profile, "initializing");
+    let claimed = pgo_claim(dir, lock)?;
+    let published = pgo_publish_plan(p, dir, profile, tools.kind == "msvc");
+    ignored_write(remove_file(lock));
+    return published;
+}
+fn pgo_clean(dir: String, names: String) -> Unit effects { state, io } {
+    for name in split_text(names, 59) {
+        ignored_write(remove_file(artifact_join(dir, name)));
+    }
+    ignored_write(remove_dir(dir));
+}
+pub fn pgo_instrument(c: Context, p: Project, code: String, profile: String,
+    lto: Bool) -> Int effects { state, io, process } {
+    if io_value(file_identity(profile)) != "" {
+        project_fail(profile, "E243", "PGO instrument requires a new directory.", c.json_mode);
+    }
+    let dir = io_value(temp_dir(parent_path(profile)));
+    let outcome = pgo_instrument_into(c, p, code, profile, dir, lto);
+    pgo_clean(dir, "program.c;program.obj;program.exe;program.pgd;plan;claim");
+    match outcome {
+        Result::Ok(_) => {
+            if c.json_mode {
+                print("{\"schema_version\":1,\"ok\":true,\"profile\":" + json_string(profile)
+                    + "}");
+            } else {
+                print(profile);
+            }
+        }
+        Result::Err(message) => {
+            project_fail(profile, "E243", message, c.json_mode);
+        }
+    }
+    return 0;
+}
+fn pgo_check_companions(profile: String, names: List<String>) -> Result<Bool,
+    String> effects { state, io } {
+    for row in names {
+        let pair = split_text(row, 124);
+        if list_len(pair) != 2 {
+            return Result<Bool, String>::Err("Malformed PGO companion entry.");
+        }
+        let name = list_get(pair, 0);
+        if !asset_name(name) && !foreign_library_name(name) {
+            return Result<Bool, String>::Err("Unsafe PGO companion name.");
+        }
+        let data = artifact_bytes(artifact_join(profile, name))?;
+        if sha256(data) != list_get(pair, 1) {
+            return Result<Bool, String>::Err("Changed PGO companion: " + name);
+        }
+    }
+    return Result<Bool, String>::Ok(true);
+}
+fn pgo_train_into(profile: String, arguments: StringList, dir: String) -> Result<Bool,
+    String> effects { state, io, process } {
+    let work = pgo_work_path(dir)?;
+    let plan = pgo_plan(profile)?;
+    let tools = pgo_tools(work, true, plan.kind == "gcc-lto")?;
+    let compatible = pgo_validate_tools(plan, tools)?;
+    let executable = artifact_join(profile, "program.exe");
+    let code = pgo_read(executable, 67108864)?;
+    if sha256(code) != plan.program {
+        return Result<Bool, String>::Err("Changed PGO training executable.");
+    }
+    let companions = pgo_check_companions(profile, plan.companions)?;
+    var payload = "program.gcda";
+    if tools.kind == "msvc" {
+        let database = pgo_read(artifact_join(profile, "program.pgd"), 67108864)?;
+        if sha256(database) != plan.database {
+            return Result<Bool, String>::Err("Changed initial PGO database.");
+        }
+        let saved = pgo_write(artifact_join(dir, "program.pgd"), database)?;
+        set_env("VCPROFILE_PATH", work);
+        payload = "program.pgd";
+    } else {
+        set_env("VELA_PGO_COUNTER_DIR", work);
+        set_env("GCOV_PREFIX", "");
+        set_env("GCOV_PREFIX_STRIP", "0");
+    }
+    let run = strings_new();
+    strings_push(run, executable);
+    for i in 0 .. strings_len(arguments) {
+        strings_push(run, strings_get(arguments, i));
+    }
+    let status = process_run(run);
+    if status != 0 {
+        return Result<Bool, String>::Err("PGO training failed with exit " + to_string(status)
+            + ".");
+    }
+    if tools.kind == "msvc" {
+        let counters = pgo_read(artifact_join(dir, "program!1.pgc"), 67108864)?;
+        let merge = strings_new();
+        strings_push(merge, artifact_join(tools.directory, "pgomgr.exe"));
+        strings_push(merge, "/merge");
+        strings_push(merge, "program!1.pgc");
+        strings_push(merge, "program.pgd");
+        let merged = pgo_tool(merge, work)?;
+        ignored_write(remove_file(artifact_join(dir, "program!1.pgc")));
+    }
+    let bytes = pgo_read(artifact_join(dir, payload), 67108864)?;
+    let args_hashes = strings_new();
+    for i in 0 .. strings_len(arguments) {
+        strings_push(args_hashes, sha256(strings_get(arguments, i)));
+    }
+    let receipt = "vela-pgo-trained|1\n" + plan.hash + "\n" + sha256(bytes) + "\n" + sha256(
+        strings_join(args_hashes, "\n")) + "\n";
+    let saved = pgo_write(artifact_join(dir, "receipt"), receipt)?;
+    let trained = artifact_join(profile, "trained");
+    let created = from_write(make_dir(trained))?;
+    let installed = from_write(install_file(artifact_join(dir, payload), artifact_join(trained,
+        payload)))?;
+    return from_write(install_file(artifact_join(dir, "receipt"), artifact_join(trained,
+        "receipt")));
+}
+pub fn pgo_train(input: String, arguments: StringList) -> Int effects { state, io, process } {
+    let profile = io_value(absolute_path(input));
+    if io_value(file_identity(artifact_join(profile, "trained"))) != "" {
+        project_fail(profile, "E243", "This PGO directory already has an accepted training run.",
+            false);
+    }
+    var dir = "";
+    match temp_dir(profile) {
+        StringResult::Ok(path) => {
+            dir = path;
+        }
+        StringResult::Err(message) => {
+            project_fail(profile, "E243", "Cannot open PGO training directory: " + message, false);
+            return 1;
+        }
+    }
+    let lock = artifact_join(profile, "training");
+    match pgo_claim(dir, lock) {
+        Result::Ok(_) => {}
+        Result::Err(_) => {
+            pgo_clean(dir, "claim");
+            project_fail(profile, "E243",
+                "PGO training is active or was interrupted. An interrupted profile requires a new directory.",
+                false);
+        }
+    }
+    // A previous trainer can complete between our initial check and lock acquisition.
+    if io_value(file_identity(artifact_join(profile, "trained"))) != "" {
+        pgo_clean(dir, "claim");
+        ignored_write(remove_file(lock));
+        project_fail(profile, "E243", "This PGO directory already has an accepted training run.",
+            false);
+    }
+    let outcome = pgo_train_into(profile, arguments, dir);
+    pgo_clean(dir, "program.pgd;program!1.pgc;program.gcda;receipt;claim");
+    ignored_write(remove_file(lock));
+    match outcome {
+        Result::Ok(_) => {}
+        Result::Err(message) => {
+            project_fail(profile, "E243", message, false);
+        }
+    }
+    return 0;
+}
+fn pgo_use(request: PgoUse, code: String, dir: String) -> Result<Bool, String> effects { state, io,
+    process } {
+    let work = pgo_work_path(dir)?;
+    let plan = pgo_plan(request.directory)?;
+    if plan.source != request.source || plan.c_hash != sha256(code) {
+        return Result<Bool, String>::Err(
+            "PGO profile is stale for this source graph or generated C.");
+    }
+    let trained = artifact_join(request.directory, "trained");
+    let receipt = pgo_read(artifact_join(trained, "receipt"), 512)?;
+    let rows = split_text(receipt, 10);
+    if list_len(rows) != 5 || list_get(rows, 0) != "vela-pgo-trained|1" || list_get(rows, 1)
+        != plan.hash || str_len(list_get(rows, 3)) != 64 || list_get(rows, 4) != "" {
+        return Result<Bool, String>::Err("PGO training receipt does not match the plan.");
+    }
+    let tools = pgo_tools(work, true, request.lto)?;
+    let compatible = pgo_validate_tools(plan, tools)?;
+    var payload = "program.gcda";
+    if tools.kind == "msvc" {
+        payload = "program.pgd";
+    }
+    let bytes = pgo_read(artifact_join(trained, payload), 67108864)?;
+    if sha256(bytes) != list_get(rows, 2) {
+        return Result<Bool, String>::Err("PGO trained payload digest differs.");
+    }
+    let copy = artifact_join(dir, payload);
+    let written = pgo_write(copy, bytes)?;
+    let compiled = pgo_tool(pgo_args(tools, work, false), work);
+    ignored_write(remove_file(copy));
+    return compiled;
+}
+pub fn compile_optimized(request: PgoUse, code: String, dir: String) -> Result<Bool,
+    String> effects { state, io, process } {
+    if request.directory != "" {
+        return pgo_use(request, code, dir);
+    }
+    let work = pgo_work_path(dir)?;
+    let tools = pgo_tools(work, false, true)?;
+    let args = native_arguments(tools.compiler, tools.kind, "program.c", "program.exe",
+        "program.obj", "lto");
+    return pgo_tool(args, work);
+}

@@ -2,6 +2,7 @@ import "event_loop.vela" as loop;
 import "path.vela" as path;
 import "process.vela" as process;
 import "text.vela" as text;
+import "cell.vela" as cell;
 pub enum Scheme {
     Http,
     Https
@@ -41,7 +42,8 @@ pub opaque struct Request {
     body_limit: Int,
     method: Method,
     headers: String,
-    upload: String
+    upload: String,
+    remaining: Option<Int>
 }
 pub struct Response {
     status: Int,
@@ -64,7 +66,8 @@ struct Work {
 }
 enum Source {
     Process(Work),
-    Scripted(Result<Response, Error>)
+    Scripted(Result<Response, Error>),
+    Multi(MultiExchange)
 }
 pub opaque struct Exchange {
     source: Source,
@@ -77,6 +80,57 @@ pub opaque struct Curl {
 }
 pub opaque struct Scripted {
     result_value: Result<Response, Error>
+}
+pub struct MultiLimits {
+    connections: Int,
+    per_origin: Int,
+    queue: Int,
+    idle_seconds: Int,
+    connect_ms: Int
+}
+pub enum MultiOpenError {
+    Unsupported,
+    Limits,
+    Trust(Error),
+    Dependency(String)
+}
+pub fn describe_multi_open(error: MultiOpenError) -> String {
+    return match error {
+        MultiOpenError::Unsupported => "HTTP multi requires Windows x64",
+        MultiOpenError::Limits => "Invalid HTTP multi limits",
+        MultiOpenError::Trust(_) => "Invalid HTTP multi CA file",
+        MultiOpenError::Dependency(message) => "HTTP multi dependency: " + message
+    };
+}
+enum MultiPhase {
+    Queued,
+    Active(ForeignHandle),
+    Done(Result<Response, Error>),
+    Released
+}
+struct MultiItem {
+    request: Request,
+    origin: String,
+    deadline: Int,
+    phase: cell::Cell<MultiPhase>,
+    cancelled: cell::Cell<Bool>
+}
+pub opaque struct CurlMulti {
+    owner: ForeignHandle,
+    limits: MultiLimits,
+    items: List<MultiItem>,
+    closing: cell::Cell<Bool>,
+    closed: cell::Cell<Bool>
+}
+struct MultiExchange {
+    pool: CurlMulti,
+    item: MultiItem
+}
+pub struct MultiStats {
+    active: Int,
+    queued: Int,
+    slots: Int,
+    reserved_body: Int
 }
 pub interface Transport {
     fn start(self: Self, scheduler: loop::Loop<process::Completed>, request: Request,
@@ -151,10 +205,15 @@ pub fn get(scheme: Scheme, host: String, port: Int, target: String, timeout_ms: 
     };
     let url = protocol + "://" + host + ":" + to_string(port) + target;
     return Result<Request, Error>::Ok(Request(url: url, timeout_ms: timeout_ms,
-        body_limit: body_limit, method: Method::Get, headers: "", upload: ""));
+        body_limit: body_limit, method: Method::Get, headers: "", upload: "", remaining: Option<Int>::None));
 }
 pub fn url(request: Request) -> String {
     return request.url;
+}
+pub fn with_remaining_budget(request: Request, remaining: Int) -> Request {
+    var changed = request;
+    changed.remaining = Option<Int>::Some(remaining);
+    return changed;
 }
 pub fn from_url(value: String, timeout_ms: Int, body_limit: Int) -> Result<Request, Error> {
     let size = str_len(value);
@@ -485,12 +544,14 @@ pub fn cancel(request: Exchange) -> Bool effects { state } {
     }
     return match request.source {
         Source::Process(work) => loop::cancel(work.task),
-        Source::Scripted(_) => false
+        Source::Scripted(_) => false,
+        Source::Multi(work) => multi_cancel(work.item)
     };
 }
 pub fn pending(request: Exchange) -> Bool effects { state } {
     return match request.source {
         Source::Scripted(_) => false,
+        Source::Multi(work) => multi_pending(work.item),
         Source::Process(work) => match loop::outcome(work.task) {
             Option::None => true,
             Option::Some(_) => false
@@ -560,6 +621,7 @@ pub fn poll(request: Exchange) -> Result<Option<Response>, Error> effects { stat
         Source::Scripted(value) => {
             return ready(value);
         }
+        Source::Multi(work) => { return multi_poll(work); }
         Source::Process(work) => {
             match loop::outcome(work.task) {
                 Option::None => {
@@ -602,6 +664,7 @@ pub fn release(request: Exchange) -> Result<Bool, Error> effects { state, io } {
     }
     match request.source {
         Source::Scripted(_) => {}
+        Source::Multi(work) => { let released = multi_release(work)?; }
         Source::Process(work) => {
             match loop::outcome(work.task) {
                 Option::None => {
@@ -624,4 +687,287 @@ pub fn release(request: Exchange) -> Result<Bool, Error> effects { state, io } {
     }
     list_set(request.closed, 0, true);
     return Result<Bool, Error>::Ok(true);
+}
+
+pub fn multi_limits() -> MultiLimits {
+    return MultiLimits(connections: 8, per_origin: 4, queue: 32, idle_seconds: 30, connect_ms: 5000);
+}
+pub fn curl_multi(limits: MultiLimits, ca_file: Option<path::Path>) -> Result<CurlMulti, MultiOpenError> effects { state, io } {
+    if platform() != "windows" {
+        return Result<CurlMulti, MultiOpenError>::Err(MultiOpenError::Unsupported);
+    }
+    if limits.connections < 1 || limits.connections > 16 || limits.per_origin < 1
+        || limits.per_origin > limits.connections || limits.queue < 0 || limits.queue > 112
+        || limits.idle_seconds < 1 || limits.idle_seconds > 3600 || limits.connect_ms < 1 || limits.connect_ms > 120000 {
+        return Result<CurlMulti, MultiOpenError>::Err(MultiOpenError::Limits);
+    }
+    var ca = "";
+    match ca_file {
+        Option::None => {}
+        Option::Some(file) => {
+            if !absolute(file) {
+                return Result<CurlMulti, MultiOpenError>::Err(MultiOpenError::Trust(Error::InvalidTransport));
+            }
+            match read(file.value, 1048576) {
+                Result::Err(error) => { return Result<CurlMulti, MultiOpenError>::Err(MultiOpenError::Trust(error)); }
+                Result::Ok(bytes) => {
+                    if bytes == "" {
+                        return Result<CurlMulti, MultiOpenError>::Err(MultiOpenError::Trust(Error::InvalidTransport));
+                    }
+                    ca = bytes;
+                }
+            }
+        }
+    }
+    match http_native_open(limits.connections, limits.per_origin, limits.idle_seconds, ca) {
+        SpawnResult::Err(reason) => {
+            return Result<CurlMulti, MultiOpenError>::Err(MultiOpenError::Dependency(reason));
+        }
+        SpawnResult::Ok(owner) => {
+            return Result<CurlMulti, MultiOpenError>::Ok(CurlMulti(owner: owner, limits: limits,
+                items: list_new<MultiItem>(), closing: cell::create(false), closed: cell::create(false)));
+        }
+    }
+}
+fn multi_pending(item: MultiItem) -> Bool effects { state } {
+    return match cell::get(item.phase) {
+        MultiPhase::Queued => true,
+        MultiPhase::Active(_) => true,
+        MultiPhase::Done(_) => false,
+        MultiPhase::Released => false
+    };
+}
+fn multi_cancel(item: MultiItem) -> Bool effects { state } {
+    if !multi_pending(item) || cell::get(item.cancelled) { return false; }
+    cell::set(item.cancelled, true);
+    return true;
+}
+pub fn multi_stats(pool: CurlMulti) -> MultiStats effects { state } {
+    var out = MultiStats(active: 0, queued: 0, slots: 0, reserved_body: 0);
+    for item in pool.items {
+        match cell::get(item.phase) {
+            MultiPhase::Queued => { out.queued = out.queued + 1; }
+            MultiPhase::Active(_) => { out.active = out.active + 1; }
+            MultiPhase::Done(_) => {}
+            MultiPhase::Released => { continue; }
+        }
+        out.slots = out.slots + 1;
+        out.reserved_body = out.reserved_body + item.request.body_limit;
+    }
+    return out;
+}
+fn multi_available(pool: CurlMulti, origin: String) -> Bool effects { state } {
+    var active = 0;
+    var host = 0;
+    for item in pool.items {
+        match cell::get(item.phase) {
+            MultiPhase::Active(_) => {
+                active = active + 1;
+                if item.origin == origin { host = host + 1; }
+            }
+            MultiPhase::Queued => {}
+            MultiPhase::Done(_) => {}
+            MultiPhase::Released => {}
+        }
+    }
+    return active < pool.limits.connections && host < pool.limits.per_origin;
+}
+fn multi_origin(url_value: String) -> String effects { state } {
+    var end = 7;
+    if str_slice(url_value, 0, 5) == "https" { end = 8; }
+    while str_byte(url_value, end) != 47 { end = end + 1; }
+    let parts = strings_new();
+    for i in 0 .. end {
+        var byte = str_byte(url_value, i);
+        if byte >= 65 && byte <= 90 { byte = byte + 32; }
+        strings_push(parts, str_from_byte(byte));
+    }
+    return strings_join(parts, "");
+}
+fn multi_clock() -> Result<Int, Error> effects { io } {
+    return match monotonic_millis() {
+        IntResult::Ok(now) => Result<Int, Error>::Ok(now),
+        IntResult::Err(message) => Result<Int, Error>::Err(Error::Storage(message))
+    };
+}
+fn multi_finish(item: MultiItem, result_value: Result<Response, Error>) -> Unit effects { state } {
+    cell::set(item.phase, MultiPhase::Done(result_value));
+}
+fn multi_failure(item: MultiItem, error: Error) -> Unit effects { state } {
+    multi_finish(item, Result<Response, Error>::Err(error));
+}
+fn multi_admit(pool: CurlMulti, item: MultiItem) -> Unit effects { state, io } {
+    let method = match item.request.method {
+        Method::Get => 0, Method::Head => 1, Method::Post => 2, Method::Put => 3, Method::Delete => 4
+    };
+    match http_native_start(pool.owner, item.request.url, item.request.headers, item.request.upload,
+        method, item.request.body_limit, item.deadline, pool.limits.connect_ms) {
+        SpawnResult::Ok(request) => { cell::set(item.phase, MultiPhase::Active(request)); }
+        SpawnResult::Err(reason) => {
+            if reason == "timeout" { multi_failure(item, Error::TimedOut); }
+            else if reason == "limit" { multi_failure(item, Error::Limit); }
+            else { multi_failure(item, Error::Storage(reason)); }
+        }
+    }
+}
+fn native_bytes(request: ForeignHandle, part: Int) -> Result<String, Error> effects { state, io } {
+    return match http_native_read(request, part) {
+        StringResult::Ok(data) => Result<String, Error>::Ok(data),
+        StringResult::Err(message) => Result<String, Error>::Err(Error::Storage(message))
+    };
+}
+fn multi_result(request: ForeignHandle, outcome: Int) -> Result<Response, Error> effects { state, io } {
+    if outcome == 1 {
+        let status = http_native_call(request, 5);
+        if status < 100 || status > 599 { return Result<Response, Error>::Err(Error::Protocol); }
+        return Result<Response, Error>::Ok(Response(status: status, headers: text::Bytes(data: native_bytes(request, 0)?),
+            body: text::Bytes(data: native_bytes(request, 1)?)));
+    }
+    if outcome == 2 { return Result<Response, Error>::Err(Error::Cancelled); }
+    if outcome == 3 { return Result<Response, Error>::Err(Error::TimedOut); }
+    if outcome == 4 { return Result<Response, Error>::Err(Error::Connect(28)); }
+    if outcome == 5 { return Result<Response, Error>::Err(Error::Limit); }
+    if outcome == 6 { return Result<Response, Error>::Err(exit_error(http_native_call(request, 6))); }
+    let reason = native_bytes(request, 2)?;
+    return Result<Response, Error>::Err(Error::Storage(reason));
+}
+pub fn multi_tick(pool: CurlMulti) -> Result<Bool, Error> effects { state, io } {
+    if cell::get(pool.closed) { return Result<Bool, Error>::Ok(false); }
+    let now = multi_clock()?;
+    for item in pool.items {
+        let cancelled = cell::get(item.cancelled);
+        match cell::get(item.phase) {
+            MultiPhase::Queued => {
+                if cancelled { multi_failure(item, Error::Cancelled); }
+                else if now >= item.deadline { multi_failure(item, Error::TimedOut); }
+            }
+            MultiPhase::Active(request) => {
+                if cancelled { let accepted = http_native_call(request, 2); }
+            }
+            MultiPhase::Done(_) => {}
+            MultiPhase::Released => {}
+        }
+    }
+    let driven = http_native_call(pool.owner, 0);
+    for item in pool.items {
+        match cell::get(item.phase) {
+            MultiPhase::Active(request) => {
+                let outcome = http_native_call(request, 4);
+                if outcome != 0 {
+                    let result_value = multi_result(request, outcome);
+                    if http_native_call(request, 3) != 1 {
+                        return Result<Bool, Error>::Err(Error::Storage("cannot release native HTTP request"));
+                    }
+                    multi_finish(item, result_value);
+                }
+            }
+            MultiPhase::Queued => {}
+            MultiPhase::Done(_) => {}
+            MultiPhase::Released => {}
+        }
+    }
+    if driven != 1 {
+        return Result<Bool, Error>::Err(Error::Storage("native HTTP driver failed"));
+    }
+    for item in pool.items {
+        match cell::get(item.phase) {
+            MultiPhase::Queued => {
+                if multi_available(pool, item.origin) { multi_admit(pool, item); }
+            }
+            MultiPhase::Active(_) => {}
+            MultiPhase::Done(_) => {}
+            MultiPhase::Released => {}
+        }
+    }
+    return Result<Bool, Error>::Ok(true);
+}
+pub fn multi_wait(pool: CurlMulti, milliseconds: Int) -> Result<Bool, Error> effects { state, io, process } {
+    if milliseconds < 1 || milliseconds > 10 { return Result<Bool, Error>::Err(Error::InvalidLimit); }
+    if cell::get(pool.closed) { return Result<Bool, Error>::Err(Error::Closed); }
+    if http_native_wait(pool.owner, milliseconds) != 1 {
+        return Result<Bool, Error>::Err(Error::Storage("native HTTP wait failed"));
+    }
+    return Result<Bool, Error>::Ok(true);
+}
+fn multi_poll(work: MultiExchange) -> Result<Option<Response>, Error> effects { state, io } {
+    let progress = multi_tick(work.pool);
+    match cell::get(work.item.phase) {
+        MultiPhase::Done(value) => { return ready(value); }
+        MultiPhase::Released => { return Result<Option<Response>, Error>::Err(Error::Closed); }
+        MultiPhase::Queued => {}
+        MultiPhase::Active(_) => {}
+    }
+    let driven = progress?;
+    return Result<Option<Response>, Error>::Ok(Option<Response>::None);
+}
+fn multi_compact(pool: CurlMulti) -> Unit effects { state } {
+    var next = 0;
+    for i in 0 .. list_len(pool.items) {
+        let item = list_get(pool.items, i);
+        match cell::get(item.phase) {
+            MultiPhase::Released => { continue; }
+            MultiPhase::Queued => {}
+            MultiPhase::Active(_) => {}
+            MultiPhase::Done(_) => {}
+        }
+        if next != i { list_set(pool.items, next, item); }
+        next = next + 1;
+    }
+    list_truncate(pool.items, next);
+}
+fn multi_release(work: MultiExchange) -> Result<Bool, Error> effects { state, io } {
+    if multi_pending(work.item) && cell::get(work.item.cancelled) {
+        let driven = multi_tick(work.pool)?;
+    }
+    if multi_pending(work.item) { return Result<Bool, Error>::Err(Error::Pending); }
+    cell::set(work.item.phase, MultiPhase::Released);
+    multi_compact(work.pool);
+    return Result<Bool, Error>::Ok(true);
+}
+pub fn close_multi(pool: CurlMulti) -> Result<Bool, Error> effects { state, io } {
+    if cell::get(pool.closed) { return Result<Bool, Error>::Ok(true); }
+    cell::set(pool.closing, true);
+    for item in pool.items { let cancelled = multi_cancel(item); }
+    let progress = multi_tick(pool);
+    let current = multi_stats(pool);
+    if current.active > 0 || current.queued > 0 {
+        let driven = progress?;
+        return Result<Bool, Error>::Err(Error::Pending);
+    }
+    if http_native_call(pool.owner, 1) != 1 {
+        return Result<Bool, Error>::Err(Error::Storage("cannot close native HTTP pool"));
+    }
+    for item in pool.items { cell::set(item.phase, MultiPhase::Released); }
+    list_truncate(pool.items, 0);
+    cell::set(pool.closed, true);
+    return Result<Bool, Error>::Ok(true);
+}
+impl Transport for CurlMulti {
+    fn start(self: CurlMulti, scheduler: loop::Loop<process::Completed>, request: Request,
+        directory: path::Path) -> Result<Exchange, Error> effects { state, io } {
+        if cell::get(self.closing) { return Result<Exchange, Error>::Err(Error::Closed); }
+        var timeout = request.timeout_ms;
+        match request.remaining {
+            Option::Some(limit) => { if limit < timeout { timeout = limit; } }
+            Option::None => {}
+        }
+        if timeout < 1 { return Result<Exchange, Error>::Err(Error::TimedOut); }
+        let now = multi_clock()?;
+        if now > 9223372036854775807 - timeout {
+            return Result<Exchange, Error>::Err(Error::InvalidLimit);
+        }
+        let origin = multi_origin(request.url);
+        let driven = multi_tick(self)?;
+        let stats = multi_stats(self);
+        let available = multi_available(self, origin);
+        if stats.slots >= 128 || request.body_limit > 67108864 - stats.reserved_body
+            || (!available && stats.queued >= self.limits.queue) {
+            return Result<Exchange, Error>::Err(Error::Limit);
+        }
+        let item = MultiItem(request: request, origin: origin, deadline: now + timeout,
+            phase: cell::create(MultiPhase::Queued), cancelled: cell::create(false));
+        list_push(self.items, item);
+        if available { multi_admit(self, item); }
+        return Result<Exchange, Error>::Ok(exchange(Source::Multi(MultiExchange(pool: self, item: item))));
+    }
 }

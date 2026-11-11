@@ -9,16 +9,15 @@ build driver and test runner are written in Vela. The language makes types,
 side effects and error paths visible so that people and agents can reason about
 a small piece of code from its local context.
 
-**Vela 1.2.0** adds compact agent entry, native API discovery/project scaffolding,
-checked diagnostic previews, typed CLI/JSON schemas, stable generic sorting and
-traversals, Set/Cell, bounded streams and ordered parallel jobs. The three
-acceptance applications use these libraries while retaining their original
-functional oracles. The 1.0/1.1 API and source baseline remains in force.
-See [current acceptance](docs/VALIDATION-1.2.md), [agent entry](docs/AGENT-START.md)
-and [library map](docs/STDLIB-MAP-1.2.md) for measured results and platform scope.
-Package names under `dist/`: `vela-1.2.0-windows-x64.zip`,
-`vela-1.2.0-linux-x64-musl.tar.gz`, `vela-mcp-1.2.0.zip`,
-with `SHA256SUMS-1.2.0.txt`. [Historical 1.1 acceptance](docs/VALIDATION-1.1.md).
+**Vela 1.3.0** adds checked text and paths, typed configuration snapshots,
+JSON lexical traversal, atomic file publication, and a reusable native HTTP
+transport on Windows. The compiler uses a semantic check cache and optimized
+C lowering. PGO and LTO are opt-in build modes.
+See [1.3 acceptance](docs/VALIDATION-1.3.md), [agent entry](docs/AGENT-START.md)
+and [historical 1.2 acceptance](docs/VALIDATION-1.2.md).
+The release files in `dist/` are `vela-1.3.0-windows-x64.zip`,
+`vela-1.3.0-linux-x64-musl.tar.gz`, `vela-mcp-1.3.0.zip`
+and `SHA256SUMS-1.3.0.txt`.
 
 The [stable 1.0 API contract](docs/contracts/STABLE-1.0.md),
 [compatibility policy](docs/COMPATIBILITY.md) and

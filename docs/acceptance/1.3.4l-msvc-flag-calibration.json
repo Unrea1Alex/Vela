@@ -1,0 +1,799 @@
+{
+  "reason": "Independent MSVC compiler and FieldDesk calibration for pure LTO flag variants.",
+  "flags": {
+    "o2": [],
+    "lto": [
+      "/GL",
+      "/LTCG"
+    ],
+    "inline-explicit": [
+      "/Ob1",
+      "/GL",
+      "/LTCG"
+    ],
+    "inline-aggressive": [
+      "/Ob3",
+      "/GL",
+      "/LTCG"
+    ],
+    "size-aggressive": [
+      "/Os",
+      "/Ob3",
+      "/GL",
+      "/LTCG"
+    ],
+    "link-fold": [
+      "/GL",
+      "/LTCG",
+      "/OPT:REF,ICF=10"
+    ],
+    "data-fold": [
+      "/Gw",
+      "/GL",
+      "/LTCG",
+      "/OPT:REF,ICF=10"
+    ]
+  },
+  "workloads": {
+    "fielddesk": {
+      "c": {
+        "bytes": 2068571,
+        "sha256": "f7c40eea6784e3a917e72704e4a06c8d6a559d719834c8e9c3829637fdffc58a"
+      },
+      "binaries": {
+        "o2": {
+          "bytes": 870912,
+          "sha256": "920a0d38efc6f3f0c43ed0bf4bb2f28471c867d4d80330e9615de6435a958e32"
+        },
+        "lto": {
+          "bytes": 881152,
+          "sha256": "d8b842821f84dfedbaa79a393fc520c29b7846d007945b68047d856fe744e31d"
+        },
+        "inline-explicit": {
+          "bytes": 871424,
+          "sha256": "0f36017a5c9e0abc14360f2625039d0a1c9c59119728e2f21e368ae3d1f2c4b9"
+        },
+        "inline-aggressive": {
+          "bytes": 934912,
+          "sha256": "554f357eed87c9b500c0f866e19d74a3acc5302899b97b5e5600c2bc3edd2d0a"
+        },
+        "size-aggressive": {
+          "bytes": 738816,
+          "sha256": "33c38deeaa969b276d01ab8e04e969d6ba572d8de672b6d661d644cc429f3103"
+        },
+        "link-fold": {
+          "bytes": 881152,
+          "sha256": "95b1ec7a9fead1a8a2bdd5ff2e41efd3ba0b1a4cc27b033cab24c6cb96b9ec6a"
+        },
+        "data-fold": {
+          "bytes": 881152,
+          "sha256": "fb6d964fb00dbfa8acff98471f0d6e309916b5439e332b38de2f851deb924d4b"
+        }
+      },
+      "wall_medians": {
+        "o2": 48.2237,
+        "lto": 40.4341,
+        "inline-explicit": 41.5242,
+        "inline-aggressive": 40.0898,
+        "size-aggressive": 40.5782,
+        "link-fold": 41.3313,
+        "data-fold": 41.4577
+      },
+      "raw": [
+        {
+          "o2": {
+            "wall_ms": 45.3668,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4792320
+          },
+          "lto": {
+            "wall_ms": 42.2572,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4104192
+          },
+          "inline-explicit": {
+            "wall_ms": 45.0887,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4116480
+          },
+          "inline-aggressive": {
+            "wall_ms": 40.5558,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4186112
+          },
+          "size-aggressive": {
+            "wall_ms": 40.5333,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4096000
+          },
+          "link-fold": {
+            "wall_ms": 41.4513,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4100096
+          },
+          "data-fold": {
+            "wall_ms": 41.7934,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4132864
+          }
+        },
+        {
+          "data-fold": {
+            "wall_ms": 39.9266,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4124672
+          },
+          "link-fold": {
+            "wall_ms": 41.3313,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4104192
+          },
+          "size-aggressive": {
+            "wall_ms": 39.3548,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4104192
+          },
+          "inline-aggressive": {
+            "wall_ms": 39.672,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4177920
+          },
+          "inline-explicit": {
+            "wall_ms": 43.0936,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4132864
+          },
+          "lto": {
+            "wall_ms": 40.7954,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4083712
+          },
+          "o2": {
+            "wall_ms": 47.5028,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4792320
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 49.8253,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4792320
+          },
+          "lto": {
+            "wall_ms": 42.0413,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4087808
+          },
+          "inline-explicit": {
+            "wall_ms": 40.3804,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4116480
+          },
+          "inline-aggressive": {
+            "wall_ms": 40.9132,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4169728
+          },
+          "size-aggressive": {
+            "wall_ms": 44.1165,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4128768
+          },
+          "link-fold": {
+            "wall_ms": 40.6343,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4091904
+          },
+          "data-fold": {
+            "wall_ms": 42.9676,
+            "cpu_ms": 62.5,
+            "peak_tree_bytes": 4116480
+          }
+        },
+        {
+          "data-fold": {
+            "wall_ms": 40.8842,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4120576
+          },
+          "link-fold": {
+            "wall_ms": 40.6905,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4104192
+          },
+          "size-aggressive": {
+            "wall_ms": 42.3435,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4112384
+          },
+          "inline-aggressive": {
+            "wall_ms": 39.8098,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4173824
+          },
+          "inline-explicit": {
+            "wall_ms": 41.5242,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4120576
+          },
+          "lto": {
+            "wall_ms": 39.6758,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4096000
+          },
+          "o2": {
+            "wall_ms": 45.7975,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4775936
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 48.2237,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4780032
+          },
+          "lto": {
+            "wall_ms": 38.3485,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4112384
+          },
+          "inline-explicit": {
+            "wall_ms": 39.5687,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4128768
+          },
+          "inline-aggressive": {
+            "wall_ms": 40.0898,
+            "cpu_ms": 62.5,
+            "peak_tree_bytes": 4173824
+          },
+          "size-aggressive": {
+            "wall_ms": 40.4453,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4104192
+          },
+          "link-fold": {
+            "wall_ms": 42.2936,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4112384
+          },
+          "data-fold": {
+            "wall_ms": 39.1883,
+            "cpu_ms": 0,
+            "peak_tree_bytes": 4128768
+          }
+        },
+        {
+          "data-fold": {
+            "wall_ms": 42.4732,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4108288
+          },
+          "link-fold": {
+            "wall_ms": 39.7344,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4116480
+          },
+          "size-aggressive": {
+            "wall_ms": 40.5782,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4104192
+          },
+          "inline-aggressive": {
+            "wall_ms": 39.8864,
+            "cpu_ms": 0,
+            "peak_tree_bytes": 4169728
+          },
+          "inline-explicit": {
+            "wall_ms": 38.9463,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4108288
+          },
+          "lto": {
+            "wall_ms": 39.9843,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4116480
+          },
+          "o2": {
+            "wall_ms": 48.5203,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4792320
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 50.1271,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4796416
+          },
+          "lto": {
+            "wall_ms": 45.914,
+            "cpu_ms": 0,
+            "peak_tree_bytes": 4108288
+          },
+          "inline-explicit": {
+            "wall_ms": 42.9651,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4128768
+          },
+          "inline-aggressive": {
+            "wall_ms": 48.4526,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4182016
+          },
+          "size-aggressive": {
+            "wall_ms": 45.4076,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4120576
+          },
+          "link-fold": {
+            "wall_ms": 42.4679,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4108288
+          },
+          "data-fold": {
+            "wall_ms": 41.4577,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4108288
+          }
+        },
+        {
+          "data-fold": {
+            "wall_ms": 42.0376,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4108288
+          },
+          "link-fold": {
+            "wall_ms": 41.4982,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4104192
+          },
+          "size-aggressive": {
+            "wall_ms": 41.9107,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4116480
+          },
+          "inline-aggressive": {
+            "wall_ms": 41.6459,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4169728
+          },
+          "inline-explicit": {
+            "wall_ms": 42.3617,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4112384
+          },
+          "lto": {
+            "wall_ms": 40.4341,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4087808
+          },
+          "o2": {
+            "wall_ms": 48.1289,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4796416
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 52.729,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4796416
+          },
+          "lto": {
+            "wall_ms": 39.7955,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4091904
+          },
+          "inline-explicit": {
+            "wall_ms": 40.2344,
+            "cpu_ms": 0,
+            "peak_tree_bytes": 4112384
+          },
+          "inline-aggressive": {
+            "wall_ms": 39.895,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4165632
+          },
+          "size-aggressive": {
+            "wall_ms": 40.2701,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4128768
+          },
+          "link-fold": {
+            "wall_ms": 39.5934,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4100096
+          },
+          "data-fold": {
+            "wall_ms": 39.9907,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4132864
+          }
+        }
+      ]
+    },
+    "compiler": {
+      "c": {
+        "bytes": 6029257,
+        "sha256": "475349363d0b62ea9a112f16087c326c9b2d936b96652ac2f0fc19d29e0398f7"
+      },
+      "binaries": {
+        "o2": {
+          "bytes": 3038720,
+          "sha256": "6658ffe05b922f8526275bd0271f953ace2c85339a115c2ed16298b58af127d9"
+        },
+        "lto": {
+          "bytes": 3019776,
+          "sha256": "3519dfc05397916e6714f5cf2ec05cca834cb54b45ecdc82ee4cabeea868c395"
+        },
+        "inline-explicit": {
+          "bytes": 2742272,
+          "sha256": "d8a4e5db138d5fe99995ec21545ffcecfbd2cb776d821d6a960dd3703ffde66f"
+        },
+        "inline-aggressive": {
+          "bytes": 3321856,
+          "sha256": "547efa3b654ae0fd8d40c4c920db5cefe6422edf2e17a66dc318fe5e8d9a97f5"
+        },
+        "size-aggressive": {
+          "bytes": 2529280,
+          "sha256": "d63caf3a94048f1a7fd5c548d1ad035f5be81fb31aaf78eb0b912fdb1e87f779"
+        },
+        "link-fold": {
+          "bytes": 3019776,
+          "sha256": "7e7add803857abd52f912a5409c9e541211cad7c1c09a8d4ad3399afe6dce1ea"
+        },
+        "data-fold": {
+          "bytes": 3019776,
+          "sha256": "4693a5ef9e8f86298c11b81c20468a1da9a2e14a1da644a3a16dc511d2c7d539"
+        }
+      },
+      "wall_medians": {
+        "o2": 242.1644,
+        "lto": 236.5318,
+        "inline-explicit": 353.2885,
+        "inline-aggressive": 234.3061,
+        "size-aggressive": 318.6202,
+        "link-fold": 227.8418,
+        "data-fold": 233.7007
+      },
+      "raw": [
+        {
+          "o2": {
+            "wall_ms": 254.9403,
+            "cpu_ms": 250,
+            "peak_tree_bytes": 39321600
+          },
+          "lto": {
+            "wall_ms": 236.5318,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 39436288
+          },
+          "inline-explicit": {
+            "wall_ms": 361.9476,
+            "cpu_ms": 359.375,
+            "peak_tree_bytes": 38801408
+          },
+          "inline-aggressive": {
+            "wall_ms": 254.494,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38662144
+          },
+          "size-aggressive": {
+            "wall_ms": 317.9852,
+            "cpu_ms": 312.5,
+            "peak_tree_bytes": 38797312
+          },
+          "link-fold": {
+            "wall_ms": 261.9958,
+            "cpu_ms": 265.625,
+            "peak_tree_bytes": 38731776
+          },
+          "data-fold": {
+            "wall_ms": 250.3376,
+            "cpu_ms": 250,
+            "peak_tree_bytes": 38727680
+          }
+        },
+        {
+          "data-fold": {
+            "wall_ms": 237.7519,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 38727680
+          },
+          "link-fold": {
+            "wall_ms": 233.1105,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38727680
+          },
+          "size-aggressive": {
+            "wall_ms": 329.3803,
+            "cpu_ms": 312.5,
+            "peak_tree_bytes": 38785024
+          },
+          "inline-aggressive": {
+            "wall_ms": 242.0302,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38649856
+          },
+          "inline-explicit": {
+            "wall_ms": 353.2885,
+            "cpu_ms": 343.75,
+            "peak_tree_bytes": 38809600
+          },
+          "lto": {
+            "wall_ms": 236.6298,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 39444480
+          },
+          "o2": {
+            "wall_ms": 241.4187,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 39337984
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 246.8418,
+            "cpu_ms": 250,
+            "peak_tree_bytes": 39329792
+          },
+          "lto": {
+            "wall_ms": 236.4357,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 39444480
+          },
+          "inline-explicit": {
+            "wall_ms": 348.5099,
+            "cpu_ms": 343.75,
+            "peak_tree_bytes": 38805504
+          },
+          "inline-aggressive": {
+            "wall_ms": 229.9915,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 38670336
+          },
+          "size-aggressive": {
+            "wall_ms": 318.5693,
+            "cpu_ms": 312.5,
+            "peak_tree_bytes": 38797312
+          },
+          "link-fold": {
+            "wall_ms": 229.9713,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38723584
+          },
+          "data-fold": {
+            "wall_ms": 233.3877,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 38719488
+          }
+        },
+        {
+          "data-fold": {
+            "wall_ms": 222.3733,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 38719488
+          },
+          "link-fold": {
+            "wall_ms": 227.8418,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 38699008
+          },
+          "size-aggressive": {
+            "wall_ms": 318.709,
+            "cpu_ms": 312.5,
+            "peak_tree_bytes": 38797312
+          },
+          "inline-aggressive": {
+            "wall_ms": 234.3061,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 38666240
+          },
+          "inline-explicit": {
+            "wall_ms": 366.7639,
+            "cpu_ms": 359.375,
+            "peak_tree_bytes": 38813696
+          },
+          "lto": {
+            "wall_ms": 276.3543,
+            "cpu_ms": 265.625,
+            "peak_tree_bytes": 39452672
+          },
+          "o2": {
+            "wall_ms": 243.8317,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 39325696
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 299.157,
+            "cpu_ms": 296.875,
+            "peak_tree_bytes": 39333888
+          },
+          "lto": {
+            "wall_ms": 238.5995,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 39448576
+          },
+          "inline-explicit": {
+            "wall_ms": 357.577,
+            "cpu_ms": 359.375,
+            "peak_tree_bytes": 38801408
+          },
+          "inline-aggressive": {
+            "wall_ms": 233.1507,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38658048
+          },
+          "size-aggressive": {
+            "wall_ms": 332.0698,
+            "cpu_ms": 328.125,
+            "peak_tree_bytes": 38789120
+          },
+          "link-fold": {
+            "wall_ms": 225.0718,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38731776
+          },
+          "data-fold": {
+            "wall_ms": 233.3469,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38731776
+          }
+        },
+        {
+          "data-fold": {
+            "wall_ms": 236.3641,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38731776
+          },
+          "link-fold": {
+            "wall_ms": 227.6779,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 38735872
+          },
+          "size-aggressive": {
+            "wall_ms": 319.1869,
+            "cpu_ms": 312.5,
+            "peak_tree_bytes": 38789120
+          },
+          "inline-aggressive": {
+            "wall_ms": 227.368,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38662144
+          },
+          "inline-explicit": {
+            "wall_ms": 352.9561,
+            "cpu_ms": 343.75,
+            "peak_tree_bytes": 38813696
+          },
+          "lto": {
+            "wall_ms": 232.0295,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 39440384
+          },
+          "o2": {
+            "wall_ms": 242.1644,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 39321600
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 241.5204,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 39333888
+          },
+          "lto": {
+            "wall_ms": 236.7172,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 39448576
+          },
+          "inline-explicit": {
+            "wall_ms": 346.0121,
+            "cpu_ms": 359.375,
+            "peak_tree_bytes": 38805504
+          },
+          "inline-aggressive": {
+            "wall_ms": 230.6854,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38658048
+          },
+          "size-aggressive": {
+            "wall_ms": 318.6202,
+            "cpu_ms": 312.5,
+            "peak_tree_bytes": 38809600
+          },
+          "link-fold": {
+            "wall_ms": 227.2098,
+            "cpu_ms": 203.125,
+            "peak_tree_bytes": 38723584
+          },
+          "data-fold": {
+            "wall_ms": 235.8515,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38727680
+          }
+        },
+        {
+          "data-fold": {
+            "wall_ms": 233.7007,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 38715392
+          },
+          "link-fold": {
+            "wall_ms": 226.9728,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 38723584
+          },
+          "size-aggressive": {
+            "wall_ms": 316.25,
+            "cpu_ms": 312.5,
+            "peak_tree_bytes": 38793216
+          },
+          "inline-aggressive": {
+            "wall_ms": 238.6126,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 38645760
+          },
+          "inline-explicit": {
+            "wall_ms": 356.7954,
+            "cpu_ms": 375,
+            "peak_tree_bytes": 38801408
+          },
+          "lto": {
+            "wall_ms": 230.0468,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 39436288
+          },
+          "o2": {
+            "wall_ms": 240.845,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 39329792
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 238.3598,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 39333888
+          },
+          "lto": {
+            "wall_ms": 235.5288,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 39440384
+          },
+          "inline-explicit": {
+            "wall_ms": 342.7781,
+            "cpu_ms": 343.75,
+            "peak_tree_bytes": 38793216
+          },
+          "inline-aggressive": {
+            "wall_ms": 235.8772,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38662144
+          },
+          "size-aggressive": {
+            "wall_ms": 313.2722,
+            "cpu_ms": 328.125,
+            "peak_tree_bytes": 38797312
+          },
+          "link-fold": {
+            "wall_ms": 236.0069,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 38711296
+          },
+          "data-fold": {
+            "wall_ms": 226.7242,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 38719488
+          }
+        }
+      ]
+    }
+  }
+}

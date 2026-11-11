@@ -1,5 +1,5 @@
+import "json_tokens.vela" as tokens;
 import "json_stream.vela" as stream;
-import "json.vela" as json;
 import "text.vela" as text;
 import "result.vela" as result;
 pub enum ErrorKind {
@@ -239,18 +239,8 @@ pub fn nullable<T>(inner: Decoder<T>) -> Decoder<Option<T>> {
         return Result<Option<T>, Error>::Ok(Option<T>::Some(execute(inner, input)?));
     });
 }
+
 // Boundary helpers ONLY receive a value already validated by json_stream.
-fn whitespace_at(data: String, start: Int) -> Int {
-    var at = start;
-    while at < str_len(data) {
-        let b = str_byte(data, at);
-        if b != 32 && b != 9 && b != 10 && b != 13 {
-            return at;
-        }
-        at = at + 1;
-    }
-    return at;
-}
 fn string_end(data: String, start: Int) -> Int {
     var at = start + 1;
     while at < str_len(data) {
@@ -298,7 +288,7 @@ fn value_end(data: String, start: Int) -> Int {
     var at = start;
     while at < str_len(data) {
         let b = str_byte(data, at);
-        if b == 32 || b == 9 || b == 10 || b == 13 || b == 44 || b == 93 || b == 125 {
+        if tokens::is_whitespace(b) || b == 44 || b == 93 || b == 125 {
             return at;
         }
         at = at + 1;
@@ -323,7 +313,7 @@ pub fn array<T>(inner: Decoder<T>, minimum: Int, maximum: Int) -> Result<Decoder
     }
     return Result<Decoder<List<T>>, Error>::Ok(Decoder<List<T>>(action: fn [ inner, minimum,
         maximum ](input: Input) -> Result<List<T>, Error> effects { state } {
-        let start = whitespace_at(input.data, 0);
+        let start = tokens::whitespace_at(input.data, 0);
         if start >= str_len(input.data) || str_byte(input.data, start) != 91 {
             return Result<List<T>, Error>::Err(failure(input, ErrorKind::Type, start,
                 "expected array"));
@@ -331,7 +321,7 @@ pub fn array<T>(inner: Decoder<T>, minimum: Int, maximum: Int) -> Result<Decoder
         let output = list_new<T>();
         var at = start + 1;
         while at < str_len(input.data) {
-            at = whitespace_at(input.data, at);
+            at = tokens::whitespace_at(input.data, at);
             if str_byte(input.data, at) == 93 {
                 break;
             }
@@ -345,7 +335,7 @@ pub fn array<T>(inner: Decoder<T>, minimum: Int, maximum: Int) -> Result<Decoder
             let end = value_end(input.data, at);
             let item = child(input, at, end, path)?;
             list_push(output, execute(inner, item)?);
-            at = whitespace_at(input.data, end);
+            at = tokens::whitespace_at(input.data, end);
             if str_byte(input.data, at) == 44 {
                 at = at + 1;
             }
@@ -357,100 +347,52 @@ pub fn array<T>(inner: Decoder<T>, minimum: Int, maximum: Int) -> Result<Decoder
         return Result<List<T>, Error>::Ok(output);
     }));
 }
+fn key_path(input: Input, name: String, at: Int) -> Result<String, Error> effects { state } {
+    return bounded_path(input, "$[" + tokens::quote(name) + "]", at);
+}
 fn read_object(input: Input, allowed: Dict<String, Bool>, policy: Unknown) -> Result<Fields,
     Error> effects { state } {
-    let reader = checked(stream::create(input.data, input.limits), input)?;
-    let first_token = next_token(reader, input)?;
-    match first_token.event {
-        stream::Event::ObjectStart => {}
-        stream::Event::ObjectEnd => {
-            return Result<Fields, Error>::Err(failure(input, ErrorKind::Type, first_token.offset,
-                "expected object"));
-        }
-        stream::Event::ArrayStart => {
-            return Result<Fields, Error>::Err(failure(input, ErrorKind::Type, first_token.offset,
-                "expected object"));
-        }
-        stream::Event::ArrayEnd => {
-            return Result<Fields, Error>::Err(failure(input, ErrorKind::Type, first_token.offset,
-                "expected object"));
-        }
-        stream::Event::Key(_) => {
-            return Result<Fields, Error>::Err(failure(input, ErrorKind::Type, first_token.offset,
-                "expected object"));
-        }
-        stream::Event::StringValue(_) => {
-            return Result<Fields, Error>::Err(failure(input, ErrorKind::Type, first_token.offset,
-                "expected object"));
-        }
-        stream::Event::NumberLiteral(_) => {
-            return Result<Fields, Error>::Err(failure(input, ErrorKind::Type, first_token.offset,
-                "expected object"));
-        }
-        stream::Event::Boolean(_) => {
-            return Result<Fields, Error>::Err(failure(input, ErrorKind::Type, first_token.offset,
-                "expected object"));
-        }
-        stream::Event::Null => {
-            return Result<Fields, Error>::Err(failure(input, ErrorKind::Type, first_token.offset,
-                "expected object"));
-        }
+    let start = tokens::whitespace_at(input.data, 0);
+    if start >= str_len(input.data) || str_byte(input.data, start) != 123 {
+        return Result<Fields, Error>::Err(failure(input, ErrorKind::Type, start, "expected object"));
     }
-    let fields = Fields(input: input, start: first_token.offset, allowed: allowed,
-        members: dict_new<String, Input>());
+    let fields = Fields(input: input, start: start, allowed: allowed, members: dict_new<String, Input>());
     var unknown = Option<Error>::None;
-    var ended = false;
-    while !ended {
-        match checked(stream::next(reader), input)? {
-            Option::None => {
-                return Result<Fields, Error>::Err(failure(input, ErrorKind::Schema, 0,
-                    "validated object invariant"));
+    var at = tokens::whitespace_at(input.data, start + 1);
+    // decode has already checked the full grammar and budget before invoking any schema.
+    while str_byte(input.data, at) != 125 {
+        let key_at = at;
+        match tokens::string(input.data, key_at) {
+            Result::Err(_) => {
+                return Result<Fields, Error>::Err(failure(input, ErrorKind::Schema, key_at,
+                    "validated object key invariant"));
             }
-            Option::Some(token) => {
-                match token.event {
-                    stream::Event::Key(name) => {
-                        let colon = whitespace_at(input.data, string_end(input.data, token.offset));
-                        let start = whitespace_at(input.data, colon + 1);
-                        let skipped = checked(stream::skip_value(reader), input)?;
-                        if dict_has(allowed, name) {
-                            let path = bounded_path(input, token.path, token.offset)?;
-                            dict_set(fields.members, name, child(input, start, value_end(input.data,
-                                start), path)?);
-                        } else if policy == Unknown::Reject {
-                            match unknown {
-                                Option::None => {
-                                    unknown = Option<Error>::Some(Error(kind: ErrorKind::Unknown,
-                                        path: bounded_path(input, token.path, token.offset)?,
-                                        offset: input.offset + token.offset,
-                                        message: "unknown member",
-                                        cause: Option<stream::Error>::None));
-                                }
-                                Option::Some(_) => {}
-                            }
+            Result::Ok(key) => {
+                let colon = tokens::whitespace_at(input.data, key.end);
+                let value_at = tokens::whitespace_at(input.data, colon + 1);
+                let end = value_end(input.data, value_at);
+                if dict_has(allowed, key.value) {
+                    let path = key_path(input, key.value, key_at)?;
+                    dict_set(fields.members, key.value, child(input, value_at, end, path)?);
+                } else if policy == Unknown::Reject {
+                    match unknown {
+                        Option::None => {
+                            unknown = Option<Error>::Some(Error(kind: ErrorKind::Unknown,
+                                path: key_path(input, key.value, key_at)?, offset: input.offset + key_at,
+                                message: "unknown member", cause: Option<stream::Error>::None));
                         }
+                        Option::Some(_) => {}
                     }
-                    stream::Event::ObjectEnd => {
-                        ended = true;
-                    }
-                    stream::Event::ObjectStart => {}
-                    stream::Event::ArrayStart => {}
-                    stream::Event::ArrayEnd => {}
-                    stream::Event::StringValue(_) => {}
-                    stream::Event::NumberLiteral(_) => {}
-                    stream::Event::Boolean(_) => {}
-                    stream::Event::Null => {}
                 }
+                at = tokens::whitespace_at(input.data, end);
+                if str_byte(input.data, at) == 44 { at = tokens::whitespace_at(input.data, at + 1); }
             }
         }
     }
-    let complete = checked(stream::finish(reader), input)?;
-    match unknown {
-        Option::Some(error) => {
-            return Result<Fields, Error>::Err(error);
-        }
-        Option::None => {}
-    }
-    return Result<Fields, Error>::Ok(fields);
+    return match unknown {
+        Option::Some(error) => Result<Fields, Error>::Err(error),
+        Option::None => Result<Fields, Error>::Ok(fields)
+    };
 }
 pub fn object<T>(names: List<String>, policy: Unknown, build: fn(Fields) -> Result<T,
     Error> effects { state }) -> Result<Decoder<T>, Error> effects { state } {
@@ -473,15 +415,7 @@ pub fn object<T>(names: List<String>, policy: Unknown, build: fn(Fields) -> Resu
     }));
 }
 fn member_path(fields: Fields, name: String) -> Result<String, Error> effects { state } {
-    match json::stringify(json::Value::StringValue(name)) {
-        Result::Ok(quoted) => {
-            return bounded_path(fields.input, "$[" + quoted + "]", fields.start);
-        }
-        Result::Err(_) => {
-            return Result<String, Error>::Err(failure(fields.input, ErrorKind::Schema, fields.start,
-                "invalid field declaration"));
-        }
-    }
+    return key_path(fields.input, name, fields.start);
 }
 fn declared(fields: Fields, name: String) -> Result<Bool, Error> effects { state } {
     if !dict_has(fields.allowed, name) {

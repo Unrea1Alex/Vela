@@ -8,8 +8,12 @@ import "projects.vela";
 import "project_cli.vela";
 import "types.vela";
 import "semantic.vela";
+import "semantic_cache.vela";
 import "errors.vela";
 import "emitter.vela";
+import "simplify.vela";
+import "ranges.vela";
+import "pgo.vela";
 import "formatter.vela";
 import "query.vela";
 import "incremental.vela";
@@ -184,24 +188,9 @@ pub fn path_key(path: String) -> String effects { state } {
     }
     return strings_join(chars, "");
 }
-pub fn compile_native(cfile: String, executable: String,
-    object_file: String) -> Int effects { state, process } {
-    var cc = env("VELA_CC");
-    var kind = env("VELA_CC_KIND");
-    if cc == "" {
-        if platform() == "windows" {
-            cc = "cl.exe";
-        } else {
-            cc = "cc";
-        }
-    }
-    if kind == "" {
-        if platform() == "windows" {
-            kind = "msvc";
-        } else {
-            kind = "cc";
-        }
-    }
+pub fn native_arguments(cc: String, kind: String, cfile: String, executable: String,
+    object_file: String, optimization: String) -> StringList effects { state } {
+    let whole_program = optimization == "lto" || optimization == "pgo-lto";
     let args = strings_new();
     strings_push(args, cc);
     if kind == "msvc" {
@@ -214,21 +203,48 @@ pub fn compile_native(cfile: String, executable: String,
         strings_push(args, "/W3");
         strings_push(args, "/wd4102");
         strings_push(args, "/MT");
+        if whole_program {
+            strings_push(args, "/GL");
+        }
+        if optimization == "lto" {
+            strings_push(args, "/DVELA_LTO_COMPACT");
+        }
         strings_push(args, cat("/Fo", object_file));
         strings_push(args, cat("/Fe", executable));
         strings_push(args, cfile);
         strings_push(args, "/link");
         strings_push(args, "/INCREMENTAL:NO");
+        if whole_program {
+            strings_push(args, "/LTCG");
+        }
     } else {
         strings_push(args, "-std=c11");
         strings_push(args, "-O2");
         strings_push(args, "-ffp-contract=off");
+        if whole_program {
+            strings_push(args, "-flto");
+            strings_push(args, "-fuse-linker-plugin");
+        }
         strings_push(args, cfile);
         strings_push(args, "-o");
         strings_push(args, executable);
         strings_push(args, "-lm");
     }
-    return process_run_to_stderr(args);
+    return args;
+}
+pub fn compile_native(cfile: String, executable: String,
+    object_file: String) -> Int effects { state, process } {
+    var cc = env("VELA_CC");
+    var kind = env("VELA_CC_KIND");
+    if cc == "" {
+        if platform() == "windows" { cc = "cl.exe"; }
+        else { cc = "cc"; }
+    }
+    if kind == "" {
+        if platform() == "windows" { kind = "msvc"; }
+        else { kind = "cc"; }
+    }
+    return process_run_to_stderr(native_arguments(cc, kind, cfile, executable, object_file, "o2"));
 }
 pub fn write_atomic_result(path: String, code: String) -> Result<Bool, String> effects { state,
     io } {
@@ -256,6 +272,12 @@ pub fn build_or_run(code: String, output_path: String, arguments: StringList,
 }
 pub fn build_or_run_native(code: String, output_path: String, arguments: StringList, running: Bool,
     natives: List<NativeDependency>, assets: List<Resource>) -> Int effects { state, io, process } {
+    return build_or_run_configured(code, output_path, arguments, running, natives, assets, PgoUse(
+        directory: "", source: "", json_mode: false, lto: false));
+}
+fn build_or_run_configured(code: String, output_path: String, arguments: StringList, running: Bool,
+    natives: List<NativeDependency>, assets: List<Resource>, pgo: PgoUse) -> Int effects { state,
+    io, process } {
     var parent = "";
     if !running {
         parent = parent_path(output_path);
@@ -265,9 +287,20 @@ pub fn build_or_run_native(code: String, output_path: String, arguments: StringL
     let exe = cat(dir, "/program.exe");
     let obj = cat(dir, "/program.obj");
     io_done(write_file(cfile, code));
-    var status = compile_native(cfile, exe, obj);
-    if status != 0 {
-        status = 2;
+    var status = 0;
+    var optimization_error = "";
+    if pgo.directory == "" && !pgo.lto {
+        if compile_native(cfile, exe, obj) != 0 {
+            status = 2;
+        }
+    } else {
+        match compile_optimized(pgo, code, dir) {
+            Result::Ok(_) => {}
+            Result::Err(message) => {
+                optimization_error = message;
+                status = 2;
+            }
+        }
     }
     if status == 0 {
         var destination = parent_path(output_path);
@@ -312,6 +345,13 @@ pub fn build_or_run_native(code: String, output_path: String, arguments: StringL
         unstage_assets(assets, dir);
     }
     ignored_write(remove_dir(dir));
+    if optimization_error != "" {
+        if pgo.directory == "" {
+            project_fail(output_path, "E244", optimization_error, pgo.json_mode);
+        } else {
+            project_fail(pgo.directory, "E243", optimization_error, pgo.json_mode);
+        }
+    }
     if status < 0 || status > 255 {
         eprint("velac: cannot run compiler or program; configure VELA_CC and its environment");
         return 2;
@@ -328,8 +368,8 @@ pub fn checked_output(input: String, source_name: String, json_mode: Bool) -> In
     }
     return 0;
 }
-pub fn generated_output(command: String, generated: String, output_path: String,
-    arguments: StringList, p: Project) -> Int effects { io, state, process } {
+fn generated_output(command: String, generated: String, output_path: String, arguments: StringList,
+    p: Project, c: Context, profile: String, lto: Bool) -> Int effects { io, state, process } {
     if command == "emit-c" {
         if output_path == "" {
             print(generated);
@@ -337,6 +377,14 @@ pub fn generated_output(command: String, generated: String, output_path: String,
             write_atomic(output_path, generated);
         }
         return 0;
+    }
+    if command == "pgo-instrument" {
+        return pgo_instrument(c, p, generated, profile, lto);
+    }
+    if profile != "" || lto {
+        let mode = pgo_build_request(c, p, profile, output_path, lto);
+        return build_or_run_configured(generated, output_path, arguments, false, p.natives,
+            p.assets, mode);
     }
     return build_or_run_native(generated, output_path, arguments, command == "run", p.natives,
         p.assets);
@@ -352,6 +400,10 @@ pub fn main() -> Int effects { args, state, io, process } {
             print(
                 "Usage: vela check|symbols|api|query|plan|emit-c|build|run|test|fmt|lock SOURCE_OR_PROJECT");
             print("       vela api --builtins");
+            print("       vela emit-c|build ROOT [--no-ir-simplify]");
+            print("       vela pgo-instrument ROOT --profile NEW_DIRECTORY [--lto]");
+            print("       vela pgo-train DIRECTORY -- APPLICATION_ARGS...");
+            print("       vela build ROOT -o OUTPUT [--pgo-profile DIRECTORY] [--lto]");
             print("       vela init DIRECTORY [--name NAME] [--kind cli|library] [--json]");
             return 0;
         }
@@ -365,6 +417,17 @@ pub fn main() -> Int effects { args, state, io, process } {
     }
     let command = io_value(arg(0));
     let input = io_value(arg(1));
+    if command == "pgo-train" {
+        let training = strings_new();
+        if arg_count() > 2 && io_value(arg(2)) != "--" {
+            eprint("Usage: vela pgo-train DIRECTORY -- APPLICATION_ARGS...");
+            return 2;
+        }
+        for i in 3 .. arg_count() {
+            strings_push(training, io_value(arg(i)));
+        }
+        return pgo_train(input, training);
+    }
     if command == "init" {
         return scaffold_command(input);
     }
@@ -380,6 +443,9 @@ pub fn main() -> Int effects { args, state, io, process } {
     var cache_directory = "";
     var cache_report = false;
     var debug_codegen = false;
+    var reference_ir = false;
+    var profile = "";
+    var lto = false;
     var json_mode = false;
     let arguments = strings_new();
     var index = 2;
@@ -396,6 +462,25 @@ pub fn main() -> Int effects { args, state, io, process } {
             json_mode = true;
         } else if command == "emit-c" && option == "--debug" {
             debug_codegen = true;
+        } else if (command == "emit-c" || command == "build") && option == "--no-ir-simplify" {
+            reference_ir = true;
+        } else if command == "pgo-instrument" && option == "--profile" || command == "build"
+            && option == "--pgo-profile" {
+            index = index + 1;
+            if profile != "" || index >= arg_count() || io_value(arg(index)) == "" {
+                eprint("PGO requires exactly one nonempty profile directory.");
+                return 2;
+            }
+            profile = io_value(absolute_path(io_value(arg(index))));
+        } else if option == "--pgo-profile" {
+            eprint("PGO profiles require the supported build or pgo-instrument command.");
+            return 2;
+        } else if option == "--lto" {
+            if lto || (command != "build" && command != "pgo-instrument") {
+                eprint("Use --lto once with build or pgo-instrument.");
+                return 2;
+            }
+            lto = true;
         } else if command == "fmt" && option == "--check" {
             format_check = true;
         } else if command == "fmt" && option == "--write" {
@@ -430,7 +515,7 @@ pub fn main() -> Int effects { args, state, io, process } {
     }
     if command != "check" && command != "symbols" && command != "emit-c" && command != "build"
         && command != "run" && command != "fmt" && command != "lock" && command != "test" && command
-        != "api" {
+        != "api" && command != "pgo-instrument" {
         eprint("Unknown compiler command.");
         return 2;
     }
@@ -443,11 +528,17 @@ pub fn main() -> Int effects { args, state, io, process } {
         eprint("build requires -o OUTPUT");
         return 2;
     }
+    if command == "pgo-instrument" && (profile == "" || output_path != "" || source_name != ""
+        || strings_len(arguments) != 0) || profile != "" && reference_ir {
+        eprint(
+            "Use pgo-instrument ROOT --profile NEW_DIRECTORY or build ROOT -o OUTPUT --pgo-profile DIRECTORY.");
+        return 2;
+    }
     let p = project_load(io_value(absolute_path(input)), json_mode);
     if command == "lock" {
         return project_write_lock(p, json_mode);
     }
-    project_verify_lock(p, json_mode);
+    let verified_lock = project_verified_lock(p, json_mode);
     if command == "test" {
         return project_test(p, json_mode);
     }
@@ -526,21 +617,35 @@ pub fn main() -> Int effects { args, state, io, process } {
     }
     if cache.directory != "" {
         key = analysis_cache_key(c, p, kind);
+        if command == "check" && verified_lock != "" {
+            key = sha256(key + sha256(verified_lock));
+        }
+        if reference_ir {
+            key = sha256(key + "\nno-ir-simplify");
+        }
         match cache_read(cache, key, kind) {
             Option::None => {}
             Option::Some(saved) => {
                 if command == "check" {
                     if saved == "ok" {
                         cache_event(cache, "read", kind, "hit", "reused", key, "", false);
+                        let count = list_len(c.source_units);
+                        semantic_report(cache, key, count, 0, 0, count, "exact");
                         return checked_output(input, source_name, json_mode);
                     }
                     cache_event(cache, "read", kind, "miss", "invalid_check", key, "", false);
                 } else {
                     cache_event(cache, "read", kind, "hit", "reused", key, "", false);
-                    return generated_output(command, saved, output_path, arguments, p);
+                    return generated_output(command, saved, output_path, arguments, p, c, profile,
+                        lto);
                 }
             }
         }
+    }
+    if command == "check" && cache.directory != "" {
+        check_incrementally(c, p, verified_lock, cache);
+        cache_store(cache, key, "ok", kind);
+        return checked_output(input, source_name, json_mode);
     }
     if command == "fmt" {
         lex(c);
@@ -579,7 +684,11 @@ pub fn main() -> Int effects { args, state, io, process } {
         print(symbol_index(c));
         return 0;
     }
+    if !reference_ir {
+        simplify_checked(c);
+    }
+    prove_ranges(c);
     let generated = generate(c);
     cache_store(cache, key, generated, kind);
-    return generated_output(command, generated, output_path, arguments, p);
+    return generated_output(command, generated, output_path, arguments, p, c, profile, lto);
 }

@@ -1,0 +1,66 @@
+{
+  "stage": "1.3.2",
+  "status": "verified-prototype",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1417,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 511651,
+    "tests_run": true
+  },
+  "focused": "1.3.2-probe.json",
+  "native_dll_imports": [
+    "ADVAPI32.dll",
+    "CRYPT32.dll",
+    "Secur32.dll",
+    "WS2_32.dll",
+    "IPHLPAPI.DLL",
+    "KERNEL32.dll",
+    "USER32.dll"
+  ],
+  "dependencies": {
+    "curl": "8.23.0",
+    "tls": "OpenSSL 3.5.9",
+    "resolver": "c-ares 1.34.8",
+    "target": "windows-x64",
+    "crt": "static",
+    "releases": [
+      {
+        "url": "https://github.com/c-ares/c-ares/releases/download/v1.34.8/c-ares-1.34.8.tar.gz",
+        "sha256": "c222b6d681096f9444d2c4863d2c1174019e27cacca0a4a5c114d36dd7d7bf78",
+        "archive": "c-ares-1.34.8.tar.gz",
+        "name": "c-ares-1.34.8"
+      },
+      {
+        "url": "https://curl.se/download/curl-8.23.0.tar.xz",
+        "sha256": "8dadd7d2536a314f982ad05a651b713f426bf7d02cc2c76cffb9796f2218e6c5",
+        "archive": "curl-8.23.0.tar.xz",
+        "name": "curl-8.23.0"
+      },
+      {
+        "url": "https://github.com/openssl/openssl/releases/download/openssl-3.5.9/openssl-3.5.9.tar.gz",
+        "sha256": "603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a",
+        "archive": "openssl-3.5.9.tar.gz",
+        "name": "openssl-3.5.9"
+      },
+      {
+        "url": "https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_54231_64bit/strawberry-perl-5.42.3.1-64bit-portable.zip",
+        "sha256": "6a081a811781c30aca51dbc036afd93092af91e3297901f02c17043795a10690",
+        "archive": "strawberry-perl-5.42.3.1-64bit-portable.zip",
+        "name": "strawberry-perl-5.42.3.1"
+      }
+    ]
+  },
+  "schannel_candidate": "Rejected: fixture code 60 revocation status unknown; synchronous CertGetCertificateChain not appropriate in bounded host tick",
+  "verify_log_sha256": "406837262624cb10a82b147e65a9e237fc772bc130bfc789bda2e43981181403",
+  "next": "1.3.3"
+}

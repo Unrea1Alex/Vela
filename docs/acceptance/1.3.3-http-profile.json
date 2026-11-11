@@ -1,0 +1,250 @@
+{
+  "schema_version": 1,
+  "stage": "1.3.3",
+  "platform": "win32",
+  "warmup": 1,
+  "native_job_active_process_limit": 1,
+  "meter_source_sha256": "50ea4f87476e27697bb88d7dc44645b9097bf47ee007de49932732a5b7b13ed7",
+  "file_bytes": {
+    "legacy": 1107968,
+    "native": 1121280,
+    "dll": 4363776
+  },
+  "workloads": [
+    {
+      "count": 1,
+      "legacy": [
+        {
+          "wall_ms": 70.6612,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 5578752,
+          "job_total_processes": 4,
+          "connections": 1
+        },
+        {
+          "wall_ms": 82.2035,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 5599232,
+          "job_total_processes": 4,
+          "connections": 1
+        },
+        {
+          "wall_ms": 72.1016,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 5566464,
+          "job_total_processes": 4,
+          "connections": 1
+        },
+        {
+          "wall_ms": 86.4763,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 5582848,
+          "job_total_processes": 4,
+          "connections": 1
+        },
+        {
+          "wall_ms": 85.1,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 5586944,
+          "job_total_processes": 4,
+          "connections": 1
+        }
+      ],
+      "native": [
+        {
+          "wall_ms": 71.3202,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3891200,
+          "job_total_processes": 2,
+          "connections": 1
+        },
+        {
+          "wall_ms": 74.1799,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3883008,
+          "job_total_processes": 2,
+          "connections": 1
+        },
+        {
+          "wall_ms": 62.4638,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3870720,
+          "job_total_processes": 2,
+          "connections": 1
+        },
+        {
+          "wall_ms": 71.2683,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3870720,
+          "job_total_processes": 2,
+          "connections": 1
+        },
+        {
+          "wall_ms": 67.8394,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3895296,
+          "job_total_processes": 2,
+          "connections": 1
+        }
+      ]
+    },
+    {
+      "count": 4,
+      "legacy": [
+        {
+          "wall_ms": 313.5253,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 5701632,
+          "job_total_processes": 10,
+          "connections": 4
+        },
+        {
+          "wall_ms": 302.1671,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 5689344,
+          "job_total_processes": 10,
+          "connections": 4
+        },
+        {
+          "wall_ms": 321.0689,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 5693440,
+          "job_total_processes": 10,
+          "connections": 4
+        },
+        {
+          "wall_ms": 301.8576,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 5701632,
+          "job_total_processes": 10,
+          "connections": 4
+        },
+        {
+          "wall_ms": 320.8492,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 5693440,
+          "job_total_processes": 10,
+          "connections": 4
+        }
+      ],
+      "native": [
+        {
+          "wall_ms": 258.1187,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3964928,
+          "job_total_processes": 2,
+          "connections": 1
+        },
+        {
+          "wall_ms": 259.0927,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3952640,
+          "job_total_processes": 2,
+          "connections": 1
+        },
+        {
+          "wall_ms": 272.6259,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3964928,
+          "job_total_processes": 2,
+          "connections": 1
+        },
+        {
+          "wall_ms": 256.5235,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3956736,
+          "job_total_processes": 2,
+          "connections": 1
+        },
+        {
+          "wall_ms": 253.1643,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3969024,
+          "job_total_processes": 2,
+          "connections": 1
+        }
+      ]
+    },
+    {
+      "count": 10,
+      "legacy": [
+        {
+          "wall_ms": 780.6401,
+          "cpu_ms": 203.125,
+          "peak_job_commit_bytes": 5963776,
+          "job_total_processes": 22,
+          "connections": 10
+        },
+        {
+          "wall_ms": 800.0785,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 5971968,
+          "job_total_processes": 22,
+          "connections": 10
+        },
+        {
+          "wall_ms": 811.5683,
+          "cpu_ms": 203.125,
+          "peak_job_commit_bytes": 5939200,
+          "job_total_processes": 22,
+          "connections": 10
+        },
+        {
+          "wall_ms": 779.9844,
+          "cpu_ms": 218.75,
+          "peak_job_commit_bytes": 5939200,
+          "job_total_processes": 22,
+          "connections": 10
+        },
+        {
+          "wall_ms": 783.0778,
+          "cpu_ms": 187.5,
+          "peak_job_commit_bytes": 5939200,
+          "job_total_processes": 22,
+          "connections": 10
+        }
+      ],
+      "native": [
+        {
+          "wall_ms": 626.9352,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4153344,
+          "job_total_processes": 2,
+          "connections": 1
+        },
+        {
+          "wall_ms": 626.1342,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4153344,
+          "job_total_processes": 2,
+          "connections": 1
+        },
+        {
+          "wall_ms": 632.7926,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4165632,
+          "job_total_processes": 2,
+          "connections": 1
+        },
+        {
+          "wall_ms": 642.5093,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4153344,
+          "job_total_processes": 2,
+          "connections": 1
+        },
+        {
+          "wall_ms": 627.6224,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4153344,
+          "job_total_processes": 2,
+          "connections": 1
+        }
+      ]
+    }
+  ],
+  "guard_control": {
+    "legacy_exit": 2,
+    "network_requests": 0
+  }
+}

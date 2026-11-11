@@ -2,6 +2,10 @@ import "text.vela" as text;
 pub struct Path {
     value: String
 }
+pub opaque struct CheckedPath {
+    value: String,
+    parent_end: Option<Int>
+}
 pub enum Error {
     Empty,
     Nul,
@@ -41,39 +45,35 @@ pub fn checked(value: String) -> Result<Path, Error> {
     }
     return Result<Path, Error>::Ok(Path(value: value));
 }
-fn separator(b: Int) -> Bool {
-    return b == 47 || (platform() == "windows" && b == 92);
+fn separator(b: Int, windows: Bool) -> Bool {
+    return b == 47 || (windows && b == 92);
+}
+fn absolute_valid(raw: String, windows: Bool) -> Bool {
+    return separator(str_byte(raw, 0), windows) || (windows && str_len(raw) >= 3
+        && str_byte(raw, 1) == 58 && separator(str_byte(raw, 2), windows));
 }
 pub fn absolute(value: Path) -> Result<Bool, Error> {
     let valid = checked(value.value)?;
-    if separator(str_byte(valid.value, 0)) {
-        return Result<Bool, Error>::Ok(true);
-    }
-    return Result<Bool, Error>::Ok(platform() == "windows" && str_len(valid.value) >= 3 && str_byte(
-        valid.value, 1) == 58 && separator(str_byte(valid.value, 2)));
+    return Result<Bool, Error>::Ok(absolute_valid(valid.value, platform() == "windows"));
 }
-pub fn parent(value: Path) -> Result<Path, Error> {
-    let valid = checked(value.value)?;
-    let raw = valid.value;
+fn parent_end(raw: String, windows: Bool) -> Int {
     var end = str_len(raw);
     var root = 0;
-    if separator(str_byte(raw, 0)) {
+    if separator(str_byte(raw, 0), windows) {
         root = 1;
     }
-    if platform() == "windows" && end >= 3 && str_byte(raw, 1) == 58 && separator(str_byte(raw,
-        2)) {
+    if windows && end >= 3 && str_byte(raw, 1) == 58 && separator(str_byte(raw, 2), windows) {
         root = 3;
     }
-    if platform() == "windows" && end >= 2 && separator(str_byte(raw, 0)) && separator(str_byte(raw,
-        1)) {
+    if windows && end >= 2 && separator(str_byte(raw, 0), windows) && separator(str_byte(raw, 1), windows) {
         var at = 2;
-        while at < end && !separator(str_byte(raw, at)) {
+        while at < end && !separator(str_byte(raw, at), windows) {
             at = at + 1;
         }
         if at < end {
             at = at + 1;
         }
-        while at < end && !separator(str_byte(raw, at)) {
+        while at < end && !separator(str_byte(raw, at), windows) {
             at = at + 1;
         }
         root = at;
@@ -81,19 +81,26 @@ pub fn parent(value: Path) -> Result<Path, Error> {
             root = at + 1;
         }
     }
-    while end > root && separator(str_byte(raw, end - 1)) {
+    while end > root && separator(str_byte(raw, end - 1), windows) {
         end = end - 1;
     }
-    while end > root && !separator(str_byte(raw, end - 1)) {
+    while end > root && !separator(str_byte(raw, end - 1), windows) {
         end = end - 1;
     }
-    while end > root && separator(str_byte(raw, end - 1)) {
+    while end > root && separator(str_byte(raw, end - 1), windows) {
         end = end - 1;
     }
+    return end;
+}
+fn parent_prefix(raw: String, end: Int) -> String {
     if end == 0 {
-        return checked(".");
+        return ".";
     }
-    return checked(str_slice(raw, 0, end));
+    return str_slice(raw, 0, end);
+}
+pub fn parent(value: Path) -> Result<Path, Error> {
+    let valid = checked(value.value)?;
+    return checked(parent_prefix(valid.value, parent_end(valid.value, platform() == "windows")));
 }
 pub fn join(base: Path, child: Path) -> Result<Path, Error> {
     let left = checked(base.value)?;
@@ -102,4 +109,31 @@ pub fn join(base: Path, child: Path) -> Result<Path, Error> {
         return Result<Path, Error>::Ok(right);
     }
     return checked(left.value + "/" + right.value);
+}
+pub fn validate(value: String) -> Result<CheckedPath, Error> {
+    let valid = checked(value)?;
+    return Result<CheckedPath, Error>::Ok(CheckedPath(value: valid.value,
+        parent_end: Option<Int>::Some(parent_end(valid.value, platform() == "windows"))));
+}
+pub fn checked_data(value: CheckedPath) -> String {
+    return value.value;
+}
+pub fn legacy_path(value: CheckedPath) -> Path {
+    return Path(value: value.value);
+}
+pub fn checked_absolute(value: CheckedPath) -> Bool {
+    return absolute_valid(value.value, platform() == "windows");
+}
+pub fn checked_parent(value: CheckedPath) -> CheckedPath {
+    let end = match value.parent_end {
+        Option::Some(saved) => saved,
+        Option::None => parent_end(value.value, platform() == "windows")
+    };
+    return CheckedPath(value: parent_prefix(value.value, end), parent_end: Option<Int>::None);
+}
+pub fn checked_join(base: CheckedPath, child: CheckedPath) -> CheckedPath {
+    if checked_absolute(child) {
+        return child;
+    }
+    return CheckedPath(value: base.value + "/" + child.value, parent_end: Option<Int>::None);
 }

@@ -76,14 +76,16 @@ callbacks into Vela and passing Vela heap objects to C are forbidden in 0.7.
 
 ForeignHandle is opaque and cannot be fabricated from an integer. It carries
 the originating library and a shared live/closed flag; copying aliases that flag.
-A foreign returned null is allowed and can be queried with ffi_is_null. Passing
-a closed non-null handle or one owned by a different library fails before C.
+A foreign returned null is allowed and can be queried with ffi_is_null.
+The runtime rejects a retired handle before passing arguments to the target
+symbol, including a runtime owner whose native pointer was cleared at close.
+A live non-null handle must belong to the target library.
 ffi_close(handle, destructor_name) resolves a void(void*) destructor in that same
 library, calls it once, then invalidates all aliases. Repeated close is a typed
-error; null close is a no-op. The adapter must supply a destructor of precisely
-that signature. Foreign functions must not secretly free an input handle; owned
-resources are released only through ffi_close. This rule is part of the trusted
-C contract, not something the compiler can prove.
+error. Closing a genuine foreign null is a no-op. The adapter must supply a
+destructor of precisely that signature and leave owned input handles for the
+caller to release through ffi_close. The adapter is responsible for this
+lifetime contract.
 
 Wrapper metadata uses the managed heap in 0.8. Libraries stay loaded
 until process exit; no unload is allowed while handles/functions could reference

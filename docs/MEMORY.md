@@ -29,13 +29,21 @@ writes keep their existing semantics. Removed entries and obsolete storage
 become eligible for reclamation once unreachable. Cycles do not keep themselves
 alive. A slice keeps its backing allocation alive.
 
-Generated C registers typed roots for parameters, lexical variables, operands,
-and snapshots. A collection can run before evaluation of a checked temporary.
-The runtime does not collect inside a native operation. Visitor functions read
+Generated C registers typed roots for managed parameters, lexical variables,
+operands and snapshots. In 1.3, the backend omits registrations and visitors for
+aggregate layouts proved to contain no managed references. Collection buffers,
+closure environments and dynamic boxes stay rooted even when their contents have
+no visitor. See the [root elision contract](contracts/GC-ROOTS-1.3.md).
+A collection can run at a retained checkpoint before an allocating expression
+or call, before a native boundary or suspension, and at a loop back edge after
+the iteration's roots are restored. A literal or pure value copy has no separate
+checkpoint. See [collection checkpoints](contracts/GC-SAFEPOINTS-1.3.md).
+Native primitives do not collect internally. A Vela callback can collect at
+its own checkpoints while caller arguments remain rooted. Visitor functions read
 only active enum payloads and live collection entries. Allocation pressure starts
 collection at one MiB of managed storage and then at twice the last retained
 size, with a one MiB minimum. This threshold is a trigger rather than a cap.
-`VELA_GC_STRESS=1` collects at every generated safepoint. `VELA_GC_REPORT=1`
+`VELA_GC_STRESS=1` collects at every retained safepoint. `VELA_GC_REPORT=1`
 prints collection count, peak managed bytes and bytes before teardown to stderr.
 These counts include heap headers and exclude native stack and OS allocations.
 
@@ -48,21 +56,23 @@ exits. Destructors are never called by the collector.
 
 ## Closure environments in 0.10.5
 
-A nonempty capture list allocates one immutable traced environment. Capture
+A nonempty capture list allocates one immutable managed environment. Capture
 slots contain shallow copies of the source values. Each invocation roots its
 own parameters and local values. Copies of a callable share its environment.
-Function names and empty capture lists use a null environment. The descriptor
-marks captured collections and nested environments, including cycles. Captured
+Function names and empty capture lists use a null environment. The visitor marks
+captured collections and nested environments, including cycles. Scalar-only
+environments need no visitor. Captured
 handle metadata can outlive an explicit close through any alias.
 See [the callable contract](contracts/CALLABLES-EFFECTS.md).
 
 ## Dynamic interfaces in 0.10.6
 
-Explicit packing allocates one traced box holding a shallow copy of the
+Explicit packing allocates one managed box holding a shallow copy of the
 concrete value. The wrapper keeps the box reachable. Copying a wrapper shares
 the box and invoking an operation copies the receiver out of the box. The box
 descriptor traces private fields through the same visitors used for concrete
-values. The operation table is immutable and lives for the process.
+values. A scalar-only payload needs no visitor. The operation table is immutable
+and lives for the process.
 See [the interface contract](contracts/INTERFACES.md).
 
 ## File streams in 0.10.7

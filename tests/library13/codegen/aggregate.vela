@@ -1,0 +1,24 @@
+import "input.vela" as input;
+
+type Measure = distinct Int;
+struct Pair<T> { first: T, second: T }
+enum State { Ready(Pair<Measure>), Empty }
+opaque struct Scalar { state: State, bias: Int }
+
+fn make(n: Int) -> Scalar {
+    return Scalar(state: State::Ready(Pair<Measure>(first: Measure(n), second: Measure(2 * n))), bias: 1);
+}
+
+fn score(item: Scalar) -> Int {
+    return match item.state {
+        State::Ready(pair) => pair.first.value + pair.second.value + item.bias,
+        State::Empty => 0
+    };
+}
+
+fn main() -> Unit effects { args, io, process } {
+    let count = input::iterations();
+    var total = 0;
+    for n in 0 .. count { total = total + score(make(n)); }
+    print(total);
+}

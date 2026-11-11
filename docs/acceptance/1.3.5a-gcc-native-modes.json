@@ -1,0 +1,22 @@
+{
+  "host": "gcc",
+  "lto": true,
+  "checks": [
+    "O2 project output",
+    "LTO CLI boundaries, unsupported tools and shared checked C cache",
+    "C hit revalidates native toolchain and flag overrides before publication",
+    "size preference leaves the emitted loop in the normal policy",
+    "unsupported toolchain rejects without publishing",
+    "instrument publishes once and untrained use rejects",
+    "training rejects changed toolchain, flags or companion and publishes nothing on failure",
+    "one concurrent trainer publishes and a second training is rejected",
+    "GCC rejects cross-mode profiles in both directions and ordinary PGO still runs",
+    "PGO use and warm C cache preserve held-out output",
+    "changed payload, receipt, import and locked resource reject with old output intact",
+    "delivered executable and resource work without the profile or tools"
+  ],
+  "payload_bytes": 2352,
+  "plan_sha256": "c1a2e9a750969fcf4bc3bf79c9f4db38d9521b99e071251b1dfe0094df6790ac",
+  "trained_sha256": "9bf932d1f4640cc1c60f272ba04d40446a8f0a889f87f097cec36c09ba247b08",
+  "packaged_executable_sha256": "2d13ce3edf5030f387418176c62ec665578804a70b9218bc4a50fa1fd7138330"
+}

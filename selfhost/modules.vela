@@ -79,21 +79,18 @@ pub fn collect_module(units: List<SourceUnit>, imports: List<ModuleImport>, path
     }
     var start = 0;
     var line_base = 0;
-    for unit in units {
-        start = unit.end + 1;
-        for i in 0 .. str_len(unit.code) {
-            if str_byte(unit.code, i) == 10 {
-                line_base = line_base + 1;
-            }
-        }
-        line_base = line_base + 1;
+    if list_len(units) > 0 {
+        let previous = list_get(units, list_len(units) - 1);
+        start = previous.end + 1;
+        line_base = previous.line_base + previous.line_count;
     }
     if start + str_len(code) > 16777216 {
         bad(local, "E221", "Module graph exceeds 16 MiB.", empty_span());
     }
     let owner = list_len(units);
     list_push(units, SourceUnit(path: path, name: name, identity: identity, code: code,
-        start: start, end: start + str_len(code), line_base: line_base));
+        start: start, end: start + str_len(code), line_base: line_base,
+        line_count: list_len(local.lines)));
     for spec in module_import_specs(local, code, cache) {
         for previous in imports {
             if spec.alias != "" && previous.owner == owner && previous.alias == spec.alias {
@@ -164,18 +161,30 @@ pub fn project_cached_context(path: String, name: String, code: String, json_mod
     c.imports = imports;
     return c;
 }
+pub fn lex_module(c: Context, unit: SourceUnit) -> Context effects { state, io, process } {
+    var local = c;
+    local.tokens = list_new<Token>();
+    local.comments = list_new<Token>();
+    lex_range(local, unit.start, unit.end);
+    return local;
+}
 pub fn parse_program(c: Context) -> Unit effects { state, io, process } {
+    parse_program_tokens(c, Option<List<String>>::None);
+}
+pub fn parse_program_tokens(c: Context, fingerprints: Option<List<String>>) -> Unit effects { state,
+    io, process } {
     for unit in c.source_units {
-        var local = c;
-        local.tokens = list_new<Token>();
-        local.comments = list_new<Token>();
+        var local = lex_module(c, unit);
         local.control = list_new<Control>();
         var control = list_get(c.control, 0);
         control.cursor = 0;
         control.previous_end = unit.start;
         list_push(local.control, control);
-        lex_range(local, unit.start, unit.end);
         parse_module(local);
+        match fingerprints {
+            Option::Some(digests) => { list_push(digests, token_fingerprint(local)); }
+            Option::None => {}
+        }
     }
 }
 pub fn module_canonical(owner: Int, name: String) -> String {
@@ -187,17 +196,19 @@ pub fn module_canonical(owner: Int, name: String) -> String {
 pub fn declare_module_name(c: Context, name: String, exported: Bool,
     span: Span) -> Unit effects { state, io, process } {
     let owner = source_unit_at(c, span.start);
+    while list_len(c.module_names) <= owner {
+        list_push(c.module_names, dict_new<String, Int>());
+    }
+    let names = list_get(c.module_names, owner);
+    if !dict_has(names, name) { dict_set(names, name, list_len(c.declarations)); }
     list_push(c.declarations, ModuleDeclaration(owner: owner, name: name,
         canonical: module_canonical(owner, name), exported: exported, span: span));
 }
 pub fn module_declaration(c: Context, owner: Int, name: String) -> Int effects { state } {
-    for i in 0 .. list_len(c.declarations) {
-        let d = list_get(c.declarations, i);
-        if d.owner == owner && d.name == name {
-            return i;
-        }
-    }
-    return -1;
+    if owner < 0 || owner >= list_len(c.module_names) { return -1; }
+    let names = list_get(c.module_names, owner);
+    if !dict_has(names, name) { return -1; }
+    return dict_get(names, name);
 }
 pub fn module_alias(c: Context, name: String, span: Span) -> Int effects { state } {
     let owner = source_unit_at(c, span.start);
@@ -401,11 +412,10 @@ pub fn bind_impl_owners(c: Context) -> List<Int> effects { state, io, process } 
 pub fn bind_modules(c: Context) -> Unit effects { state, io, process } {
     for i in 0 .. list_len(c.declarations) {
         var d = list_get(c.declarations, i);
-        for j in 0 .. i {
-            let previous = list_get(c.declarations, j);
-            if previous.owner == d.owner && previous.name == d.name {
-                duplicate(c, "Duplicate declaration '" + d.name + "'.", d.span, previous.span);
-            }
+        let first = module_declaration(c, d.owner, d.name);
+        if first < i {
+            let previous = list_get(c.declarations, first);
+            duplicate(c, "Duplicate declaration '" + d.name + "'.", d.span, previous.span);
         }
         let prelude = find_symbol(c, c.signatures, d.name);
         var reserved_function = has_symbol(prelude);

@@ -10,8 +10,11 @@ Unpack the separate MCP archive, run `npm ci --omit=dev` in its root. Compiled
 The lock fixes the official SDK and all dependencies. Native Windows delivery
 is tested; other platforms are not declared supported by the Windows gate.
 Language help and examples are read from the matching native installation.
+MCP builds and tests use the compiler's default checked simplification.
+Use native `emit-c --no-ir-simplify` when comparing the emitted C with that
+pass bypassed.
 
-The 1.2 development adapter starts with compact context. Fetch capabilities or
+The adapter starts with compact context. Fetch capabilities or
 recipes on demand; `vela_get_help` with `topic="api"` and query or name runs the
 native Vela search helper. offset/limit paginate; version/fingerprint detect stale
 catalogs; max_bytes bounds both response forms. The Windows native delivery must
@@ -76,6 +79,9 @@ Copy `agent/vela-app` into the application's `.agents/skills` directory and adap
 
 Tools: vela_get_context, vela_get_help, vela_check, vela_format, vela_symbols,
 vela_query and vela_plan.
+`vela_check` and `vela_query` analyze the current isolated snapshot, including
+unsaved dependencies. The local CLI's opt-in module cache is scoped to disk
+checks and is separate from MCP snapshot handling.
 The help topic `idioms` is an executable example of enums, distinct IDs, generics,
 Result, contracts and interpolation, tested with the matching compiler.
 Help also provides `numbers`, `stdlib`, `testing` and `ffi`. Setup copies the matching
@@ -128,6 +134,11 @@ An exit-zero run returns the output's ID, MIME, size and SHA-256. Use
 `vela_read_output` to retrieve base64 chunks, verify the hash and save explicitly
 in the client. See the [output artifact contract](../../docs/contracts/MCP-OUTPUT-ARTIFACTS.md).
 The executable `artifact_id` is distinct from an `output_id`.
+
+`vela_build` defaults to `native_optimization: "o2"`. Requests for
+`"pgo-instrument"`, `"pgo-use"`, `"lto"` or `"pgo-lto"` return
+`invalid_input`. These modes use the local CLI.
+[PGO](../../docs/contracts/NATIVE-PGO-1.3.md) · [LTO](../../docs/contracts/NATIVE-LTO-1.3.md).
 Native manifests require host-reviewed hashes in
 execution.native_allowlist, empty by default. No arbitrary shell/flags/environment.
 See [execution contract](../../docs/contracts/MCP-EXECUTION.md) for exact limits,
@@ -148,6 +159,11 @@ use the matching manifest from that checkout. Setup also delivers
 `task_group.vela`, `async_io.vela` and `gui.vela`, alongside `event_loop.vela`,
 `tasks.vela` and the extended HTTP modules. The development skill and native help
 describe awaitable operations, GUI ownership and payloadless enum equality.
+Setup includes the JSON modules and their `json_tokens.vela` dependency,
+along with the opt-in configuration snapshot.
+The `http-multi` recipe and `std/http:curl_multi` help describe the sibling
+Windows x64 DLL, bounded requests and explicit pool ownership. The MCP host
+itself does not use the HTTP client DLL.
 
 Optional Windows execution tests require a prepared execution cache and a trusted
 ABI fixture. Build it with `scripts/build-test-fixture.ps1 -NativeRoot ABSOLUTE_NATIVE`,

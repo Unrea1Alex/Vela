@@ -1,0 +1,812 @@
+{
+  "stage": "1.3.5a",
+  "host": "msvc",
+  "work": "G:\\Vela\\build\\stage13\\audit-135a\\compiler-cost-qIPDNM",
+  "flags": [
+    "/nologo",
+    "/TC",
+    "/std:c11",
+    "/utf-8",
+    "/O2",
+    "/fp:strict",
+    "/W3",
+    "/wd4102",
+    "/MT"
+  ],
+  "workload": {
+    "artifacts.vela": {
+      "bytes": 8676,
+      "sha256": "f6ea9d33508b1c9d7f649e5d37c47dd411670b387bb20dcf559c9b41e1b118d6"
+    },
+    "callables.vela": {
+      "bytes": 14487,
+      "sha256": "2ec95c242e180bb76ae34cb4c13e24e273e23c05d881a1103fb060c124527096"
+    },
+    "compiler.vela": {
+      "bytes": 520139,
+      "sha256": "c1690c7a14ad10c298e5520b870bb883d468f7e91565c7e2d5bc546c95a87ad3"
+    },
+    "control.vela": {
+      "bytes": 1853,
+      "sha256": "7bd095b636fc576774ad4de487e8eb9d7f7f70603796cde74a080450d16604c0"
+    },
+    "core.vela": {
+      "bytes": 13238,
+      "sha256": "3115450169d74468a7cf106c25029450bcd9ece9d754056a7ad55d42721b6988"
+    },
+    "driver.vela": {
+      "bytes": 21799,
+      "sha256": "4d0c2603e6fc539e3a04f1a8b808bb026d62ce496c2b1197d54ce2237f735391"
+    },
+    "dynamic.vela": {
+      "bytes": 4423,
+      "sha256": "c7c6261025e8138355e8b3dbf0ab605b2b641370a1b7af182fc1be086062dcc3"
+    },
+    "embedded.vela": {
+      "bytes": 129080,
+      "sha256": "9a3639a34b9c42b9aba748d3977cf11c4cef24f9cc369caed44a906a51212848"
+    },
+    "emitter.vela": {
+      "bytes": 37928,
+      "sha256": "b33b28b4383bbe569265c5b82ed9b9528550ef19b2e5a4d63083c9b6ef803661"
+    },
+    "errors.vela": {
+      "bytes": 2374,
+      "sha256": "64e982313d5652cf929b4c9b725245e9353f1f7c803a021b2fda7995d7a5efc9"
+    },
+    "formatter.vela": {
+      "bytes": 10928,
+      "sha256": "9d48b89f72b414265c3b2e3ae49769ebb7074828bd56f7c53de0a196a61c7f8c"
+    },
+    "generics.vela": {
+      "bytes": 12914,
+      "sha256": "2eb4efcd609db1fe9da8343b6735cc0340cd9e20c43acad98a10d3f7dc725a0a"
+    },
+    "help.vela": {
+      "bytes": 9302,
+      "sha256": "b2c19454051afddff15617fee04062a2e9414e841ced10707a34f2913a6c3bbf"
+    },
+    "incremental.vela": {
+      "bytes": 5509,
+      "sha256": "461f6e09fec4660da57ab70da9d745882b5f50f7946a1fa3b3395e123774b6a7"
+    },
+    "interfaces.vela": {
+      "bytes": 15989,
+      "sha256": "a46edd1bb9c7e664ca59079804b17871f57ac0faa5827a7fd1130c2a42e750cc"
+    },
+    "intrinsics.vela": {
+      "bytes": 7899,
+      "sha256": "1d67c93e6ded331a72edb082694d17c5bcad2c7b66a1ba4f467475cc5316eb24"
+    },
+    "lexer.vela": {
+      "bytes": 8747,
+      "sha256": "8e69d37ee7fcde774c7cf31368f8436dcd4229a05cc12471dd6585b969ddc60e"
+    },
+    "model.vela": {
+      "bytes": 15063,
+      "sha256": "0cbe7409a07b30cc5c734c877109fedbd634ec492e9dfd1a0bd4d38b4e0e297b"
+    },
+    "modules.vela": {
+      "bytes": 24371,
+      "sha256": "57ca31de84e656b9fafe65d252b8d0d6cf40e86e8361fd4daaf8ef9b258fd7e8"
+    },
+    "parser.vela": {
+      "bytes": 32817,
+      "sha256": "703767193f56e6f44b520a0355f8d58708afcc2f6b8335219ad43df30ab618d7"
+    },
+    "projects.vela": {
+      "bytes": 14675,
+      "sha256": "d8258606e2004c8669da39c4c8da8f1f3348f9bc3aa4b5060c512e7612a5f185"
+    },
+    "project_cli.vela": {
+      "bytes": 8372,
+      "sha256": "143aa80404692b709e99389ded1da9aeeca0ce10adf2e5037c68470fe4556f76"
+    },
+    "query.vela": {
+      "bytes": 33462,
+      "sha256": "749d2925efca055bb17cc25dc527069349659c5abe4a539632a9f3548d3d36cd"
+    },
+    "repairs.vela": {
+      "bytes": 16289,
+      "sha256": "482f0d2c025e14fd3d3b6a3e9be7f5651a6c350c71229e4562572b31e15c3e8e"
+    },
+    "scaffold.vela": {
+      "bytes": 7362,
+      "sha256": "6cc565c247784bb20fbe885488055d6c94836e2edec814a311b11d3d1a6aeef4"
+    },
+    "semantic.vela": {
+      "bytes": 34092,
+      "sha256": "3086d000413263bd7134b6b11fb6930ad4f97c5f2c4919e442651d828ac6be6f"
+    },
+    "source.vela": {
+      "bytes": 4677,
+      "sha256": "2274b38e20fed51d59ee2896331f0c28795d8c9549948547d34586c880a41745"
+    },
+    "suspension.vela": {
+      "bytes": 6576,
+      "sha256": "1a4272f6828d157220008637cfc4b6cf889017d08ebc8adbdd05439868244eb2"
+    },
+    "types.vela": {
+      "bytes": 23472,
+      "sha256": "2b5b1bc21a29f67a27af80144a2fee6f454a10a80d47009d70be52863ec956c1"
+    },
+    "vela.project": {
+      "bytes": 52,
+      "sha256": "11ef219470ce55523192f5fd67c8b10f4f9a4648c9aaa8ccd3775164ec6abcb6"
+    }
+  },
+  "variants": {
+    "before-135": {
+      "compiler": {
+        "bytes": 3379200,
+        "sha256": "54e3ddbd5f3feb00b397989b5ae959610d2259d02f91680804f727b6efd53124"
+      },
+      "exe": "G:\\Vela\\build\\stage13\\audit-135a\\compiler-cost-vXKTx1\\before-135\\phases.exe",
+      "instrumented_compiler": {
+        "bytes": 3110400,
+        "sha256": "9ee3b51dc7c4f0b44b5c0cbf4039284b773da0e74f5cd1b79110fabba3af2c93"
+      },
+      "instrumented_c": {
+        "bytes": 7577539,
+        "sha256": "80042434f9e9c65e3a66e2edad21c3825d88f7c761da95a76fbb6fbf41810de8"
+      },
+      "instrumented_driver": {
+        "bytes": 27187,
+        "sha256": "a77b5d54f2aa6158dc41dc2018961a9172c4a7206c827235e58d6f003d59654f"
+      }
+    },
+    "line-only": {
+      "compiler": {
+        "bytes": 3378688,
+        "sha256": "70a26824b457d41733deb293704fa024fac0ad4c65df97b50878b47e5dc8f406"
+      },
+      "exe": "G:\\Vela\\build\\stage13\\audit-135a\\compiler-cost-vXKTx1\\after-135a\\phases.exe",
+      "instrumented_compiler": {
+        "bytes": 3109888,
+        "sha256": "4eaac6d75e8a5737f64ff26fb24282bc15b6497dd6f11cb6b9eef84092d04cc4"
+      },
+      "instrumented_c": {
+        "bytes": 7577684,
+        "sha256": "40d830e13bc3a9527c8ebb8245aa698dea47b143ca2c03db6b49bd0b674ea618"
+      },
+      "instrumented_driver": {
+        "bytes": 27187,
+        "sha256": "a77b5d54f2aa6158dc41dc2018961a9172c4a7206c827235e58d6f003d59654f"
+      }
+    },
+    "after-135a": {
+      "compiler": {
+        "bytes": 3419648,
+        "sha256": "afca31472056fe0f9704d45a93d0d5b4570de2dcb99272190ebc572a415c390c"
+      },
+      "exe": "G:\\Vela\\build\\stage13\\audit-135a\\compiler-cost-qIPDNM\\after-135a\\phases.exe",
+      "instrumented_compiler": {
+        "bytes": 3150848,
+        "sha256": "74a0e137f4bbd21e16fb439ea59731adce8d348a3e49f1b86fd75e026d6c7465"
+      },
+      "instrumented_c": {
+        "bytes": 7583974,
+        "sha256": "3b99adae70c986e81968ddc8d078aa0985908374585d9a9bef8de28bfecb4bbd"
+      },
+      "instrumented_driver": {
+        "bytes": 27187,
+        "sha256": "a77b5d54f2aa6158dc41dc2018961a9172c4a7206c827235e58d6f003d59654f"
+      }
+    }
+  },
+  "ordinary": [
+    {
+      "before-135": {
+        "wall_ms": 1079.1887,
+        "cpu_ms": 1078.125,
+        "peak_tree_bytes": 97071104,
+        "peak_process_bytes": 92835840
+      },
+      "line-only": {
+        "wall_ms": 1040.966,
+        "cpu_ms": 1031.25,
+        "peak_tree_bytes": 96915456,
+        "peak_process_bytes": 92737536
+      },
+      "after-135a": {
+        "wall_ms": 644.7742,
+        "cpu_ms": 593.75,
+        "peak_tree_bytes": 97099776,
+        "peak_process_bytes": 93331456
+      }
+    },
+    {
+      "after-135a": {
+        "wall_ms": 582.9252,
+        "cpu_ms": 562.5,
+        "peak_tree_bytes": 97091584,
+        "peak_process_bytes": 93360128
+      },
+      "line-only": {
+        "wall_ms": 1076.5156,
+        "cpu_ms": 1078.125,
+        "peak_tree_bytes": 96919552,
+        "peak_process_bytes": 92774400
+      },
+      "before-135": {
+        "wall_ms": 1069.109,
+        "cpu_ms": 1062.5,
+        "peak_tree_bytes": 97067008,
+        "peak_process_bytes": 92913664
+      }
+    },
+    {
+      "before-135": {
+        "wall_ms": 1088.9912,
+        "cpu_ms": 1062.5,
+        "peak_tree_bytes": 97062912,
+        "peak_process_bytes": 92889088
+      },
+      "line-only": {
+        "wall_ms": 1108.2126,
+        "cpu_ms": 1109.375,
+        "peak_tree_bytes": 96907264,
+        "peak_process_bytes": 92667904
+      },
+      "after-135a": {
+        "wall_ms": 649.2666,
+        "cpu_ms": 593.75,
+        "peak_tree_bytes": 97095680,
+        "peak_process_bytes": 93306880
+      }
+    },
+    {
+      "after-135a": {
+        "wall_ms": 588.8836,
+        "cpu_ms": 578.125,
+        "peak_tree_bytes": 97107968,
+        "peak_process_bytes": 93364224
+      },
+      "line-only": {
+        "wall_ms": 1024.7256,
+        "cpu_ms": 984.375,
+        "peak_tree_bytes": 96923648,
+        "peak_process_bytes": 92786688
+      },
+      "before-135": {
+        "wall_ms": 1050.1528,
+        "cpu_ms": 1046.875,
+        "peak_tree_bytes": 97079296,
+        "peak_process_bytes": 92901376
+      }
+    },
+    {
+      "before-135": {
+        "wall_ms": 1052.3365,
+        "cpu_ms": 1031.25,
+        "peak_tree_bytes": 97075200,
+        "peak_process_bytes": 92946432
+      },
+      "line-only": {
+        "wall_ms": 1107.9162,
+        "cpu_ms": 1078.125,
+        "peak_tree_bytes": 96915456,
+        "peak_process_bytes": 92753920
+      },
+      "after-135a": {
+        "wall_ms": 589.4819,
+        "cpu_ms": 578.125,
+        "peak_tree_bytes": 97087488,
+        "peak_process_bytes": 93372416
+      }
+    }
+  ],
+  "instrumented": [
+    {
+      "before-135": {
+        "wall_ms": 1120.782,
+        "cpu_ms": 1109.375,
+        "peak_tree_bytes": 97599488,
+        "peak_process_bytes": 92803072,
+        "graph_ms": 157,
+        "parse_ms": 93,
+        "semantic_ms": 813,
+        "copies": 1269285,
+        "copied_bytes": 377217301,
+        "allocations": 731249,
+        "allocated_bytes": 415997506,
+        "executed_polls": 208800635,
+        "gc_pause_total_ns": 157181100,
+        "gc_pause_max_ns": 21343100,
+        "gc_collections": 36,
+        "peak_managed_bytes": 82922598,
+        "before_teardown_bytes": 60580565
+      },
+      "line-only": {
+        "wall_ms": 1076.8997,
+        "cpu_ms": 1062.5,
+        "peak_tree_bytes": 97755136,
+        "peak_process_bytes": 92913664,
+        "graph_ms": 125,
+        "parse_ms": 93,
+        "semantic_ms": 813,
+        "copies": 1269258,
+        "copied_bytes": 377173045,
+        "allocations": 731221,
+        "allocated_bytes": 415953617,
+        "executed_polls": 192201309,
+        "gc_pause_total_ns": 146491000,
+        "gc_pause_max_ns": 21020500,
+        "gc_collections": 35,
+        "peak_managed_bytes": 82922854,
+        "before_teardown_bytes": 60580821
+      },
+      "after-135a": {
+        "wall_ms": 590.6402,
+        "cpu_ms": 593.75,
+        "peak_tree_bytes": 97693696,
+        "peak_process_bytes": 93347840,
+        "graph_ms": 109,
+        "parse_ms": 94,
+        "semantic_ms": 328,
+        "copies": 1270244,
+        "copied_bytes": 377188757,
+        "allocations": 732290,
+        "allocated_bytes": 416083281,
+        "executed_polls": 88178485,
+        "gc_pause_total_ns": 140826000,
+        "gc_pause_max_ns": 21719000,
+        "gc_collections": 35,
+        "peak_managed_bytes": 83291734,
+        "before_teardown_bytes": 59569349
+      }
+    },
+    {
+      "after-135a": {
+        "wall_ms": 611.5665,
+        "cpu_ms": 609.375,
+        "peak_tree_bytes": 97677312,
+        "peak_process_bytes": 93409280,
+        "graph_ms": 125,
+        "parse_ms": 78,
+        "semantic_ms": 359,
+        "copies": 1270244,
+        "copied_bytes": 377188757,
+        "allocations": 732290,
+        "allocated_bytes": 416083281,
+        "executed_polls": 88178485,
+        "gc_pause_total_ns": 156291200,
+        "gc_pause_max_ns": 24261900,
+        "gc_collections": 35,
+        "peak_managed_bytes": 83291734,
+        "before_teardown_bytes": 59569349
+      },
+      "line-only": {
+        "wall_ms": 1120.4308,
+        "cpu_ms": 1109.375,
+        "peak_tree_bytes": 97738752,
+        "peak_process_bytes": 92954624,
+        "graph_ms": 125,
+        "parse_ms": 78,
+        "semantic_ms": 859,
+        "copies": 1269258,
+        "copied_bytes": 377173045,
+        "allocations": 731221,
+        "allocated_bytes": 415953617,
+        "executed_polls": 192201309,
+        "gc_pause_total_ns": 154502500,
+        "gc_pause_max_ns": 22550800,
+        "gc_collections": 35,
+        "peak_managed_bytes": 82922854,
+        "before_teardown_bytes": 60580821
+      },
+      "before-135": {
+        "wall_ms": 1125.0829,
+        "cpu_ms": 1125,
+        "peak_tree_bytes": 97607680,
+        "peak_process_bytes": 92786688,
+        "graph_ms": 172,
+        "parse_ms": 78,
+        "semantic_ms": 828,
+        "copies": 1269285,
+        "copied_bytes": 377217301,
+        "allocations": 731249,
+        "allocated_bytes": 415997506,
+        "executed_polls": 208800635,
+        "gc_pause_total_ns": 153918600,
+        "gc_pause_max_ns": 25374500,
+        "gc_collections": 36,
+        "peak_managed_bytes": 82922598,
+        "before_teardown_bytes": 60580565
+      }
+    },
+    {
+      "before-135": {
+        "wall_ms": 1121.5367,
+        "cpu_ms": 1125,
+        "peak_tree_bytes": 97611776,
+        "peak_process_bytes": 92774400,
+        "graph_ms": 156,
+        "parse_ms": 78,
+        "semantic_ms": 828,
+        "copies": 1269285,
+        "copied_bytes": 377217301,
+        "allocations": 731249,
+        "allocated_bytes": 415997506,
+        "executed_polls": 208800635,
+        "gc_pause_total_ns": 160891900,
+        "gc_pause_max_ns": 24028900,
+        "gc_collections": 36,
+        "peak_managed_bytes": 82922598,
+        "before_teardown_bytes": 60580565
+      },
+      "line-only": {
+        "wall_ms": 1094.6311,
+        "cpu_ms": 1078.125,
+        "peak_tree_bytes": 97738752,
+        "peak_process_bytes": 92966912,
+        "graph_ms": 125,
+        "parse_ms": 94,
+        "semantic_ms": 828,
+        "copies": 1269258,
+        "copied_bytes": 377173045,
+        "allocations": 731221,
+        "allocated_bytes": 415953617,
+        "executed_polls": 192201309,
+        "gc_pause_total_ns": 169320400,
+        "gc_pause_max_ns": 21126700,
+        "gc_collections": 35,
+        "peak_managed_bytes": 82922854,
+        "before_teardown_bytes": 60580821
+      },
+      "after-135a": {
+        "wall_ms": 610.4592,
+        "cpu_ms": 593.75,
+        "peak_tree_bytes": 97689600,
+        "peak_process_bytes": 93323264,
+        "graph_ms": 125,
+        "parse_ms": 78,
+        "semantic_ms": 360,
+        "copies": 1270244,
+        "copied_bytes": 377188757,
+        "allocations": 732290,
+        "allocated_bytes": 416083281,
+        "executed_polls": 88178485,
+        "gc_pause_total_ns": 156548200,
+        "gc_pause_max_ns": 20671200,
+        "gc_collections": 35,
+        "peak_managed_bytes": 83291734,
+        "before_teardown_bytes": 59569349
+      }
+    }
+  ],
+  "summary": {
+    "ordinary": {
+      "before-135": {
+        "wall_ms": {
+          "min": 1050.1528,
+          "median": 1069.109,
+          "max": 1088.9912
+        },
+        "cpu_ms": {
+          "min": 1031.25,
+          "median": 1062.5,
+          "max": 1078.125
+        },
+        "peak_tree_bytes": {
+          "min": 97062912,
+          "median": 97071104,
+          "max": 97079296
+        },
+        "peak_process_bytes": {
+          "min": 92835840,
+          "median": 92901376,
+          "max": 92946432
+        }
+      },
+      "line-only": {
+        "wall_ms": {
+          "min": 1024.7256,
+          "median": 1076.5156,
+          "max": 1108.2126
+        },
+        "cpu_ms": {
+          "min": 984.375,
+          "median": 1078.125,
+          "max": 1109.375
+        },
+        "peak_tree_bytes": {
+          "min": 96907264,
+          "median": 96915456,
+          "max": 96923648
+        },
+        "peak_process_bytes": {
+          "min": 92667904,
+          "median": 92753920,
+          "max": 92786688
+        }
+      },
+      "after-135a": {
+        "wall_ms": {
+          "min": 582.9252,
+          "median": 589.4819,
+          "max": 649.2666
+        },
+        "cpu_ms": {
+          "min": 562.5,
+          "median": 578.125,
+          "max": 593.75
+        },
+        "peak_tree_bytes": {
+          "min": 97087488,
+          "median": 97095680,
+          "max": 97107968
+        },
+        "peak_process_bytes": {
+          "min": 93306880,
+          "median": 93360128,
+          "max": 93372416
+        }
+      }
+    },
+    "instrumented": {
+      "before-135": {
+        "wall_ms": {
+          "min": 1120.782,
+          "median": 1121.5367,
+          "max": 1125.0829
+        },
+        "cpu_ms": {
+          "min": 1109.375,
+          "median": 1125,
+          "max": 1125
+        },
+        "peak_tree_bytes": {
+          "min": 97599488,
+          "median": 97607680,
+          "max": 97611776
+        },
+        "peak_process_bytes": {
+          "min": 92774400,
+          "median": 92786688,
+          "max": 92803072
+        },
+        "graph_ms": {
+          "min": 156,
+          "median": 157,
+          "max": 172
+        },
+        "parse_ms": {
+          "min": 78,
+          "median": 78,
+          "max": 93
+        },
+        "semantic_ms": {
+          "min": 813,
+          "median": 828,
+          "max": 828
+        },
+        "copies": {
+          "min": 1269285,
+          "median": 1269285,
+          "max": 1269285
+        },
+        "copied_bytes": {
+          "min": 377217301,
+          "median": 377217301,
+          "max": 377217301
+        },
+        "allocations": {
+          "min": 731249,
+          "median": 731249,
+          "max": 731249
+        },
+        "allocated_bytes": {
+          "min": 415997506,
+          "median": 415997506,
+          "max": 415997506
+        },
+        "executed_polls": {
+          "min": 208800635,
+          "median": 208800635,
+          "max": 208800635
+        },
+        "gc_pause_total_ns": {
+          "min": 153918600,
+          "median": 157181100,
+          "max": 160891900
+        },
+        "gc_pause_max_ns": {
+          "min": 21343100,
+          "median": 24028900,
+          "max": 25374500
+        },
+        "gc_collections": {
+          "min": 36,
+          "median": 36,
+          "max": 36
+        },
+        "peak_managed_bytes": {
+          "min": 82922598,
+          "median": 82922598,
+          "max": 82922598
+        },
+        "before_teardown_bytes": {
+          "min": 60580565,
+          "median": 60580565,
+          "max": 60580565
+        }
+      },
+      "line-only": {
+        "wall_ms": {
+          "min": 1076.8997,
+          "median": 1094.6311,
+          "max": 1120.4308
+        },
+        "cpu_ms": {
+          "min": 1062.5,
+          "median": 1078.125,
+          "max": 1109.375
+        },
+        "peak_tree_bytes": {
+          "min": 97738752,
+          "median": 97738752,
+          "max": 97755136
+        },
+        "peak_process_bytes": {
+          "min": 92913664,
+          "median": 92954624,
+          "max": 92966912
+        },
+        "graph_ms": {
+          "min": 125,
+          "median": 125,
+          "max": 125
+        },
+        "parse_ms": {
+          "min": 78,
+          "median": 93,
+          "max": 94
+        },
+        "semantic_ms": {
+          "min": 813,
+          "median": 828,
+          "max": 859
+        },
+        "copies": {
+          "min": 1269258,
+          "median": 1269258,
+          "max": 1269258
+        },
+        "copied_bytes": {
+          "min": 377173045,
+          "median": 377173045,
+          "max": 377173045
+        },
+        "allocations": {
+          "min": 731221,
+          "median": 731221,
+          "max": 731221
+        },
+        "allocated_bytes": {
+          "min": 415953617,
+          "median": 415953617,
+          "max": 415953617
+        },
+        "executed_polls": {
+          "min": 192201309,
+          "median": 192201309,
+          "max": 192201309
+        },
+        "gc_pause_total_ns": {
+          "min": 146491000,
+          "median": 154502500,
+          "max": 169320400
+        },
+        "gc_pause_max_ns": {
+          "min": 21020500,
+          "median": 21126700,
+          "max": 22550800
+        },
+        "gc_collections": {
+          "min": 35,
+          "median": 35,
+          "max": 35
+        },
+        "peak_managed_bytes": {
+          "min": 82922854,
+          "median": 82922854,
+          "max": 82922854
+        },
+        "before_teardown_bytes": {
+          "min": 60580821,
+          "median": 60580821,
+          "max": 60580821
+        }
+      },
+      "after-135a": {
+        "wall_ms": {
+          "min": 590.6402,
+          "median": 610.4592,
+          "max": 611.5665
+        },
+        "cpu_ms": {
+          "min": 593.75,
+          "median": 593.75,
+          "max": 609.375
+        },
+        "peak_tree_bytes": {
+          "min": 97677312,
+          "median": 97689600,
+          "max": 97693696
+        },
+        "peak_process_bytes": {
+          "min": 93323264,
+          "median": 93347840,
+          "max": 93409280
+        },
+        "graph_ms": {
+          "min": 109,
+          "median": 125,
+          "max": 125
+        },
+        "parse_ms": {
+          "min": 78,
+          "median": 78,
+          "max": 94
+        },
+        "semantic_ms": {
+          "min": 328,
+          "median": 359,
+          "max": 360
+        },
+        "copies": {
+          "min": 1270244,
+          "median": 1270244,
+          "max": 1270244
+        },
+        "copied_bytes": {
+          "min": 377188757,
+          "median": 377188757,
+          "max": 377188757
+        },
+        "allocations": {
+          "min": 732290,
+          "median": 732290,
+          "max": 732290
+        },
+        "allocated_bytes": {
+          "min": 416083281,
+          "median": 416083281,
+          "max": 416083281
+        },
+        "executed_polls": {
+          "min": 88178485,
+          "median": 88178485,
+          "max": 88178485
+        },
+        "gc_pause_total_ns": {
+          "min": 140826000,
+          "median": 156291200,
+          "max": 156548200
+        },
+        "gc_pause_max_ns": {
+          "min": 20671200,
+          "median": 21719000,
+          "max": 24261900
+        },
+        "gc_collections": {
+          "min": 35,
+          "median": 35,
+          "max": 35
+        },
+        "peak_managed_bytes": {
+          "min": 83291734,
+          "median": 83291734,
+          "max": 83291734
+        },
+        "before_teardown_bytes": {
+          "min": 59569349,
+          "median": 59569349,
+          "max": 59569349
+        }
+      }
+    }
+  },
+  "complete": true
+}

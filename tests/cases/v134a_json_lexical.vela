@@ -1,0 +1,112 @@
+import "../../../std/json.vela" as json;
+import "../../../std/json_decode.vela" as typed;
+import "../../../std/json_stream.vela" as stream;
+import "../../../std/cell.vela" as cell;
+
+fn must<T, E>(answer: Result<T, E>) -> T {
+    match answer {
+        Result::Ok(value) => { return value; }
+        Result::Err(_) => { assert_true(false, "expected successful JSON operation"); }
+    }
+    return must(answer);
+}
+fn tree_syntax(data: String, at: Int, message: String) -> Bool effects { state } {
+    match json::parse(data) {
+        Result::Ok(_) => { return false; }
+        Result::Err(error) => {
+            match error {
+                json::Error::Syntax(offset, reason) => { return offset == at && reason == message; }
+                json::Error::Encoding(_) => {}
+                json::Error::Limit => {}
+                json::Error::NonFinite => {}
+                json::Error::Duplicate(_) => {}
+            }
+        }
+    }
+    return false;
+}
+fn stream_error(data: String) -> stream::Error effects { state } {
+    match stream::create(data, stream::default_limits()) {
+        Result::Err(error) => { return error; }
+        Result::Ok(reader) => {
+            match stream::skip_value(reader) {
+                Result::Err(error) => { return error; }
+                Result::Ok(_) => { assert_true(false, "expected JSON syntax error"); }
+            }
+        }
+    }
+    return stream_error(data);
+}
+fn check_prefixes(data: String) -> Unit effects { state } {
+    for end in 0 .. str_len(data) {
+        let partial = str_slice(data, 0, end);
+        match json::parse(partial) {
+            Result::Err(_) => {}
+            Result::Ok(_) => { assert_true(false, "tree accepted a truncated document"); }
+        }
+        assert_true(stream_error(partial).kind == stream::ErrorKind::Syntax,
+            "reader classified a truncated document");
+    }
+    let tree = must(json::parse(data));
+    let reader = must(stream::create(data, stream::default_limits()));
+    assert_true(must(stream::skip_value(reader)), "reader accepted complete document");
+}
+fn main() -> Unit effects { io, state } {
+    check_prefixes("{\"\\u0061\":\"one\\uD83D\\uDE00two\"}");
+    check_prefixes("{\"n\":-12.5e+7}");
+    let escape = "{\"x\":\"p\\q\"}";
+    assert_true(tree_syntax(escape, 9, "invalid escape"), "tree escape cursor");
+    let pulled = stream_error(escape);
+    assert_true(pulled.offset == 8 && pulled.path == "$[\"x\"]" && pulled.message == "invalid escape",
+        "stream escape byte and path");
+    let low = "[\"\\uD83D\\u0061\"]";
+    assert_true(tree_syntax(low, 14, "invalid low surrogate"), "tree surrogate cursor");
+    assert_true(stream_error(low).offset == 10 && stream_error(low).path == "$[0]",
+        "stream surrogate byte and path");
+    let delimiter = "{\"x\":1z}";
+    assert_true(tree_syntax(delimiter, 6, "expected comma or closing brace"),
+        "tree structural delimiter");
+    assert_true(stream_error(delimiter).offset == 6 && stream_error(delimiter).message
+        == "invalid value delimiter", "reader delimiter");
+    let duplicate = "{\"a\":1,\"\\u0061\":2}";
+    match json::parse(duplicate) {
+        Result::Err(error) => {
+            match error {
+                json::Error::Duplicate(name) => { assert_true(name == "a", "decoded duplicate"); }
+                json::Error::Syntax(_, _) => { assert_true(false, "wrong duplicate kind"); }
+                json::Error::Encoding(_) => { assert_true(false, "wrong duplicate kind"); }
+                json::Error::Limit => { assert_true(false, "wrong duplicate kind"); }
+                json::Error::NonFinite => { assert_true(false, "wrong duplicate kind"); }
+            }
+        }
+        Result::Ok(_) => { assert_true(false, "duplicate accepted"); }
+    }
+    let duplicate_error = stream_error(duplicate);
+    assert_true(duplicate_error.offset == 7 && duplicate_error.path == "$[\"a\"]",
+        "reader duplicate canonical path");
+    let raw = str_from_byte(0) + str_from_byte(92) + str_from_byte(34) + "é";
+    let expected = "\"" + "\\u0000" + "\\\\" + "\\\"" + "é\"";
+    assert_true(must(json::stringify(json::Value::StringValue(raw))) == expected,
+        "bounded writer canonical quoting");
+    let names = list_new<String>();
+    list_push(names, "ok");
+    let integer = must(typed::integer(0, 10));
+    let calls = cell::create(0);
+    let decoder = must(typed::object(names, typed::Unknown::Ignore,
+        fn [integer, calls](fields: typed::Fields) -> Result<Int, typed::Error> effects { state } {
+            cell::set(calls, cell::get(calls) + 1);
+            return typed::required(fields, "ok", integer);
+        }));
+    let limits = stream::default_limits();
+    assert_true(must(typed::decode(decoder, "{\"skip\":[1e99999,{\"deep\":true}],\"\\u006fk\":7}",
+        limits)) == 7 && cell::get(calls) == 1, "validated ignored subtree and escaped selected key");
+    match typed::decode(decoder, "{\"ok\":7,\"skip\":[0,]}", limits) {
+        Result::Err(error) => {
+            assert_true(error.kind == typed::ErrorKind::Syntax && error.path == "$[\"skip\"][1]"
+                && error.offset == 18, "invalid ignored subtree preserves first error");
+        }
+        Result::Ok(_) => { assert_true(false, "invalid ignored subtree accepted"); }
+    }
+    assert_true(cell::get(calls) == 1, "malformed input cannot invoke builder");
+    print("shared JSON lexical checks passed");
+}

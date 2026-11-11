@@ -1,0 +1,35 @@
+{
+  "host": "gcc",
+  "expected": {
+    "authored": "2e24738481220e798e1bafcd0b035c11166d66df1eada6611fd0c0d252af2bd2",
+    "bundle": "8fdc3cd2c951afa5b4859a7bf936be4b4253ef9d0240c72bf6026c6c9e0167de",
+    "bundler": "dd263c3e9402c9c4ed9ece71019472268aaa8f0b71de9727e1407ab854b7deee"
+  },
+  "outcome": {
+    "instrument": {
+      "first_sha256": "2e24738481220e798e1bafcd0b035c11166d66df1eada6611fd0c0d252af2bd2",
+      "second_sha256": "2e24738481220e798e1bafcd0b035c11166d66df1eada6611fd0c0d252af2bd2",
+      "bundler_sha256": "dd263c3e9402c9c4ed9ece71019472268aaa8f0b71de9727e1407ab854b7deee",
+      "recovery_sha256": "8fdc3cd2c951afa5b4859a7bf936be4b4253ef9d0240c72bf6026c6c9e0167de",
+      "fixtures": [
+        "v134j_reachability",
+        "v134i_ranges",
+        "v134d_lowering"
+      ]
+    },
+    "use": {
+      "first_sha256": "2e24738481220e798e1bafcd0b035c11166d66df1eada6611fd0c0d252af2bd2",
+      "second_sha256": "2e24738481220e798e1bafcd0b035c11166d66df1eada6611fd0c0d252af2bd2",
+      "bundler_sha256": "dd263c3e9402c9c4ed9ece71019472268aaa8f0b71de9727e1407ab854b7deee",
+      "recovery_sha256": "8fdc3cd2c951afa5b4859a7bf936be4b4253ef9d0240c72bf6026c6c9e0167de",
+      "fixtures": [
+        "v134j_reachability",
+        "v134i_ranges",
+        "v134d_lowering"
+      ]
+    }
+  },
+  "ffi": {
+    "supported": false
+  }
+}

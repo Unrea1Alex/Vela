@@ -1,0 +1,45 @@
+type Count = distinct Int;
+struct Box<T> { value: T }
+enum Value { Present(Box<Count>), Empty }
+opaque struct Scalar { value: Value }
+struct Mixed { scalar: Scalar, saved: List<String> }
+
+interface Label { fn read(self: Self) -> String; }
+struct TextBox { text: String }
+impl Label for TextBox { fn read(self: TextBox) -> String { return self.text; } }
+impl Label for Scalar { fn read(self: Scalar) -> String { return to_string(number(self)); } }
+
+fn number(item: Scalar) -> Int {
+    return match item.value { Value::Present(box) => box.value.value, Value::Empty => 0 };
+}
+
+fn make() -> Mixed effects { state } {
+    let saved = list_new<String>();
+    list_push(saved, "ke" + "pt");
+    return Mixed(scalar: Scalar(value: Value::Present(Box<Count>(value: Count(6)))), saved: saved);
+}
+
+fn main() -> Unit effects { io, state } {
+    let mixed = make();
+    let scalar = mixed.scalar;
+    let pure_box = dyn Label(scalar);
+    let managed_box = dyn Label(TextBox(text: "pay" + "load"));
+    let capture = fn [scalar]() -> Int { return number(scalar); };
+    let values = list_new<Scalar>();
+    list_push(values, scalar);
+    let lookup = dict_new<Int, Scalar>();
+    dict_set(lookup, 1, scalar);
+    let mixed_values = list_new<Mixed>();
+    list_push(mixed_values, mixed);
+    for item in values {
+        list_truncate(values, 0);
+        assert_true("g" + to_string(number(item)) == "g6", "scalar snapshot remains live");
+    }
+    for item in mixed_values {
+        list_truncate(mixed_values, 0);
+        assert_true(list_get(item.saved, 0) + "!" == "kept!", "managed snapshot fields remain live");
+    }
+    assert_true(capture() == 6 && number(dict_get(lookup, 1)) == 6, "scalar carriers remain usable");
+    assert_true(pure_box.read() == "6" && managed_box.read() == "payload", "dynamic boxes retain ownership");
+    print("precise roots passed");
+}

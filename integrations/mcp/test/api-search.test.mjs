@@ -22,6 +22,13 @@ test('native API lookup, pages, stale metadata and complete response bounds',asy
    const result=await call({name});assert.equal(result.status,'ok');const item=result.data.native.items[0];
    assert.equal(item.id,name);for(const key of ['signature','effects','ownership','limits','example','recipe'])assert.ok(key in item,key);
   }
+  const http = (await call({name:'std/http:curl_multi'})).data.native.items[0];
+  assert.equal(http.recipe,'http-multi');
+  assert.match(http.limits,/multi deadlines include queueing/);
+  assert.match(http.ownership,/close_multi/);
+  const publication = (await call({name:'std/fs:write_atomic_detailed'})).data.native.items[0];
+  assert.match(publication.signature,/Publication effects \{io,state\}/);
+  assert.match(publication.ownership,/commit separately/);
   assert.equal((await call({})).data.native.state,'empty');
   assert.equal((await call({query:'does_not_exist_anywhere'})).data.native.state,'no_matches');
   assert.equal((await call({name:'does_not_exist_anywhere'})).data.native.state,'not_found');

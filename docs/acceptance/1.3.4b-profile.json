@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "stage": "1.3.4b",
+  "warmup": 1,
+  "chunk_bytes": 8192,
+  "workloads": [
+    {
+      "size": 2097152,
+      "sha256": "51da329c207e4946b3c6fc2fbfa070966f4800b0ee531e556d2d7e9cddd2d9b3",
+      "samples": [
+        {
+          "wall_ms": 26.487,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3948544
+        },
+        {
+          "wall_ms": 27.3628,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3948544
+        },
+        {
+          "wall_ms": 26.2666,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3940352
+        },
+        {
+          "wall_ms": 25.5055,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3952640
+        },
+        {
+          "wall_ms": 24.5142,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3919872
+        }
+      ],
+      "median": {
+        "wall_ms": 26.2666,
+        "cpu_ms": 15.625,
+        "peak_job_commit_bytes": 3948544
+      },
+      "gc": {
+        "collections": 2,
+        "managed_peak_bytes": 1050772,
+        "before_teardown_bytes": 37030
+      }
+    },
+    {
+      "size": 20971520,
+      "sha256": "92e68ba18b66202898c13c88de0983bec5fbb0772da8bedc94f61b51f3eb3b09",
+      "samples": [
+        {
+          "wall_ms": 42.6522,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4554752
+        },
+        {
+          "wall_ms": 43.1722,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4526080
+        },
+        {
+          "wall_ms": 45.1544,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4550656
+        },
+        {
+          "wall_ms": 46.6352,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 4542464
+        },
+        {
+          "wall_ms": 45.5306,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4530176
+        }
+      ],
+      "median": {
+        "wall_ms": 45.1544,
+        "cpu_ms": 31.25,
+        "peak_job_commit_bytes": 4542464
+      },
+      "gc": {
+        "collections": 20,
+        "managed_peak_bytes": 1050787,
+        "before_teardown_bytes": 333681
+      }
+    }
+  ]
+}

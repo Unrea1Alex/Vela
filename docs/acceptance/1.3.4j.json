@@ -1,0 +1,1373 @@
+{
+  "stage": "1.3.4j",
+  "status": "verified",
+  "contract": "contracts/C-REACHABILITY-1.3.md",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1449,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 540585,
+    "tests_run": true
+  },
+  "verify_log_sha256": "49e212617841cd87f0072e448c90d011e0ae674ce9715498bd1fce0bfb303233",
+  "fixed_baseline": "1.3.4d",
+  "previous": "1.3.4i",
+  "profile": {
+    "msvc": {
+      "file": "1.3.4j-msvc.json",
+      "sha256": "705a5a67150f923d0308058568254dbb509331267f4365835ce2ec14eec8cb02",
+      "toolchain": "��⨬������騩 ��������� Microsoft (R) C/C++ ���ᨨ 19.44.35222 ��� x64",
+      "compilers": [
+        {
+          "label": "reference",
+          "version": "Vela 1.2.0 (self-hosted)",
+          "bytes": 3112960,
+          "sha256": "5b9a94dfead2c6b9df8da238609d05d744522b96b4a869b59e66323be84bc869"
+        },
+        {
+          "label": "candidate",
+          "version": "Vela 1.2.0 (self-hosted)",
+          "bytes": 3150336,
+          "sha256": "29f9885f1f176039e0320ce4ef668a4c117268bdca1aa01d2275f96ea55a5dc6"
+        }
+      ],
+      "group_count": 30,
+      "pair_count": 5,
+      "builds": {
+        "buildlens": {
+          "emitted": {
+            "roots": {
+              "fixed": 6482,
+              "previous": 6138,
+              "candidate": 4263,
+              "previous_percent": -30.547409579667644,
+              "fixed_percent": -34.23326133909287
+            },
+            "polls": {
+              "fixed": 8503,
+              "previous": 1587,
+              "candidate": 1161,
+              "previous_percent": -26.843100189035916,
+              "fixed_percent": -86.34599553098906
+            },
+            "arithmetic_guards": {
+              "fixed": 250,
+              "previous": 216,
+              "candidate": 185,
+              "previous_percent": -14.351851851851851,
+              "fixed_percent": -26
+            },
+            "temporaries": {
+              "fixed": 12246,
+              "previous": 12246,
+              "candidate": 8901,
+              "previous_percent": -27.31504164625184,
+              "fixed_percent": -27.31504164625184
+            },
+            "branches": {
+              "fixed": null,
+              "previous": 659,
+              "candidate": 514,
+              "previous_percent": -22.003034901365705,
+              "fixed_percent": null
+            },
+            "functions": {
+              "fixed": 524,
+              "previous": 502,
+              "candidate": 331,
+              "previous_percent": -34.06374501992032,
+              "fixed_percent": -36.83206106870229
+            },
+            "types": {
+              "fixed": 204,
+              "previous": 204,
+              "candidate": 142,
+              "previous_percent": -30.392156862745097,
+              "fixed_percent": -30.392156862745097
+            },
+            "traces": {
+              "fixed": 186,
+              "previous": 166,
+              "candidate": 118,
+              "previous_percent": -28.91566265060241,
+              "fixed_percent": -36.55913978494624
+            }
+          },
+          "sizes": {
+            "package": {
+              "fixed": 436130,
+              "previous": 315136,
+              "candidate": 314479,
+              "previous_percent": -0.20848141754670999,
+              "fixed_percent": -27.893288698323893
+            },
+            "c": {
+              "fixed": 1908870,
+              "previous": 1781776,
+              "candidate": 1299560,
+              "previous_percent": -27.063783550794263,
+              "fixed_percent": -31.919931687333342
+            },
+            "exe": {
+              "fixed": 920064,
+              "previous": 640512,
+              "candidate": 638976,
+              "previous_percent": -0.23980815347721823,
+              "fixed_percent": -30.550918196994992
+            }
+          },
+          "native_link": {
+            "wall_ms": {
+              "fixed": 2409.7776,
+              "previous": 1699.3612,
+              "candidate": 1658.6621,
+              "previous_percent": -2.3949646490693115,
+              "fixed_percent": -31.169494645480974
+            },
+            "cpu_ms": {
+              "fixed": 8171.875,
+              "previous": 4843.75,
+              "candidate": 4796.875,
+              "previous_percent": -0.967741935483871,
+              "fixed_percent": -41.30019120458891
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 263135232,
+              "previous": 165715968,
+              "candidate": 169979904,
+              "previous_percent": 2.573038706807059,
+              "fixed_percent": -35.40207340991874
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 271998976,
+              "previous": 186519552,
+              "candidate": 184778752,
+              "previous_percent": -0.9333069811362189,
+              "fixed_percent": -32.06637954401711
+            }
+          },
+          "total": {
+            "wall_ms": {
+              "fixed": 2731.82,
+              "previous": 1926.6529,
+              "candidate": 1903.1194,
+              "previous_percent": -1.2214706655256897,
+              "fixed_percent": -30.335109926715525
+            },
+            "cpu_ms": {
+              "fixed": 8468.75,
+              "previous": 4953.125,
+              "candidate": 5015.625,
+              "previous_percent": 1.2618296529968454,
+              "fixed_percent": -40.77490774907749
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 58613760,
+              "previous": 58458112,
+              "candidate": 54292480,
+              "previous_percent": -7.125840807174888,
+              "fixed_percent": -7.37246680642907
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 325603328,
+              "previous": 227315712,
+              "candidate": 224096256,
+              "previous_percent": -1.4162927725823018,
+              "fixed_percent": -31.175072018919906
+            }
+          },
+          "c_emission": {
+            "wall_ms": {
+              "fixed": 322.7478,
+              "previous": 261.3319,
+              "candidate": 243.8975,
+              "previous_percent": -6.671363120996713,
+              "fixed_percent": -24.430933378941695
+            },
+            "cpu_ms": {
+              "fixed": 312.5,
+              "previous": 250,
+              "candidate": 234.375,
+              "previous_percent": -6.25,
+              "fixed_percent": -25
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 58540032,
+              "previous": 57556992,
+              "candidate": 52465664,
+              "previous_percent": -8.845715912325648,
+              "fixed_percent": -10.376434368877694
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 56098816,
+              "previous": 55971840,
+              "candidate": 50434048,
+              "previous_percent": -9.893889498719355,
+              "fixed_percent": -10.09783878504673
+            }
+          }
+        },
+        "fielddesk": {
+          "emitted": {
+            "roots": {
+              "fixed": 9338,
+              "previous": 8922,
+              "candidate": 7108,
+              "previous_percent": -20.33176417843533,
+              "fixed_percent": -23.880916684514887
+            },
+            "polls": {
+              "fixed": 11990,
+              "previous": 2252,
+              "candidate": 1822,
+              "previous_percent": -19.094138543516873,
+              "fixed_percent": -84.80400333611342
+            },
+            "arithmetic_guards": {
+              "fixed": 332,
+              "previous": 246,
+              "candidate": 182,
+              "previous_percent": -26.016260162601625,
+              "fixed_percent": -45.18072289156626
+            },
+            "temporaries": {
+              "fixed": 17550,
+              "previous": 17548,
+              "candidate": 13866,
+              "previous_percent": -20.982448142238432,
+              "fixed_percent": -20.99145299145299
+            },
+            "branches": {
+              "fixed": null,
+              "previous": 1100,
+              "candidate": 917,
+              "previous_percent": -16.636363636363637,
+              "fixed_percent": null
+            },
+            "functions": {
+              "fixed": 766,
+              "previous": 734,
+              "candidate": 569,
+              "previous_percent": -22.47956403269755,
+              "fixed_percent": -25.718015665796344
+            },
+            "types": {
+              "fixed": 286,
+              "previous": 286,
+              "candidate": 230,
+              "previous_percent": -19.58041958041958,
+              "fixed_percent": -19.58041958041958
+            },
+            "traces": {
+              "fixed": 254,
+              "previous": 222,
+              "candidate": 178,
+              "previous_percent": -19.81981981981982,
+              "fixed_percent": -29.921259842519685
+            }
+          },
+          "sizes": {
+            "package": {
+              "fixed": 2587997,
+              "previous": 2407339,
+              "candidate": 2407281,
+              "previous_percent": -0.0024092992303950543,
+              "fixed_percent": -6.98285198939566
+            },
+            "c": {
+              "fixed": 2748960,
+              "previous": 2570279,
+              "candidate": 2068571,
+              "previous_percent": -19.519593009163597,
+              "fixed_percent": -24.750778476223736
+            },
+            "exe": {
+              "fixed": 1261056,
+              "previous": 870912,
+              "candidate": 870912,
+              "previous_percent": 0,
+              "fixed_percent": -30.937880633373933
+            }
+          },
+          "native_link": {
+            "wall_ms": {
+              "fixed": 8617.2041,
+              "previous": 7600.614,
+              "candidate": 7591.2971,
+              "previous_percent": -0.12258088622839952,
+              "fixed_percent": -11.905334817356838
+            },
+            "cpu_ms": {
+              "fixed": 15375,
+              "previous": 11500,
+              "candidate": 11546.875,
+              "previous_percent": 0.4076086956521739,
+              "fixed_percent": -24.898373983739837
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 221515776,
+              "previous": 163835904,
+              "candidate": 163545088,
+              "previous_percent": -0.17750443761094029,
+              "fixed_percent": -26.170004252879938
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 246751232,
+              "previous": 181555200,
+              "candidate": 185745408,
+              "previous_percent": 2.307952622673435,
+              "fixed_percent": -24.723614753826233
+            }
+          },
+          "total": {
+            "wall_ms": {
+              "fixed": 9087.0508,
+              "previous": 8007.0197,
+              "candidate": 7990.7414,
+              "previous_percent": -0.20330036155649706,
+              "fixed_percent": -12.064523728644732
+            },
+            "cpu_ms": {
+              "fixed": 15875,
+              "previous": 11921.875,
+              "candidate": 11984.375,
+              "previous_percent": 0.5242463958060288,
+              "fixed_percent": -24.507874015748033
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 73732096,
+              "previous": 71991296,
+              "candidate": 68743168,
+              "previous_percent": -4.511834319526627,
+              "fixed_percent": -6.766290761624354
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 312811520,
+              "previous": 245702656,
+              "candidate": 255098880,
+              "previous_percent": 3.8242256526522853,
+              "fixed_percent": -18.44965300510672
+            }
+          },
+          "c_emission": {
+            "wall_ms": {
+              "fixed": 530.7462,
+              "previous": 438.6737,
+              "candidate": 418.9445,
+              "previous_percent": -4.497465884095625,
+              "fixed_percent": -21.06500244372923
+            },
+            "cpu_ms": {
+              "fixed": 531.25,
+              "previous": 437.5,
+              "candidate": 406.25,
+              "previous_percent": -7.142857142857143,
+              "fixed_percent": -23.529411764705884
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 73551872,
+              "previous": 71929856,
+              "candidate": 68534272,
+              "previous_percent": -4.720687887933489,
+              "fixed_percent": -6.821852202483711
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 72421376,
+              "previous": 71544832,
+              "candidate": 67158016,
+              "previous_percent": -6.13156237476384,
+              "fixed_percent": -7.267688479158418
+            }
+          }
+        },
+        "compiler": {
+          "emitted": {
+            "roots": {
+              "fixed": 21920,
+              "previous": 19072,
+              "candidate": 19051,
+              "previous_percent": -0.11010906040268456,
+              "fixed_percent": -13.088503649635037
+            },
+            "polls": {
+              "fixed": 29961,
+              "previous": 7375,
+              "candidate": 7370,
+              "previous_percent": -0.06779661016949153,
+              "fixed_percent": -75.40135509495677
+            },
+            "arithmetic_guards": {
+              "fixed": 716,
+              "previous": 472,
+              "candidate": 472,
+              "previous_percent": 0,
+              "fixed_percent": -34.07821229050279
+            },
+            "temporaries": {
+              "fixed": 39698,
+              "previous": 39698,
+              "candidate": 39669,
+              "previous_percent": -0.07305153912035871,
+              "fixed_percent": -0.07305153912035871
+            },
+            "branches": {
+              "fixed": null,
+              "previous": 2222,
+              "candidate": 2222,
+              "previous_percent": 0,
+              "fixed_percent": null
+            },
+            "functions": {
+              "fixed": 517,
+              "previous": 509,
+              "candidate": 504,
+              "previous_percent": -0.9823182711198428,
+              "fixed_percent": -2.514506769825919
+            },
+            "types": {
+              "fixed": 68,
+              "previous": 68,
+              "candidate": 68,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            },
+            "traces": {
+              "fixed": 63,
+              "previous": 55,
+              "candidate": 55,
+              "previous_percent": 0,
+              "fixed_percent": -12.698412698412698
+            }
+          },
+          "sizes": {
+            "package": {
+              "fixed": 2649314,
+              "previous": 2084980,
+              "candidate": 2084541,
+              "previous_percent": -0.021055357845159186,
+              "fixed_percent": -21.317707149850868
+            },
+            "c": {
+              "fixed": 6067085,
+              "previous": 6036429,
+              "candidate": 6029257,
+              "previous_percent": -0.11881196647885696,
+              "fixed_percent": -0.6234954677575805
+            },
+            "exe": {
+              "fixed": 4188160,
+              "previous": 3038720,
+              "candidate": 3038720,
+              "previous_percent": 0,
+              "fixed_percent": -27.444987775061126
+            }
+          },
+          "native_link": {
+            "wall_ms": {
+              "fixed": 38163.974,
+              "previous": 23764.0611,
+              "candidate": 23676.486,
+              "previous_percent": -0.3685190827926217,
+              "fixed_percent": -37.9611620110631
+            },
+            "cpu_ms": {
+              "fixed": 142046.875,
+              "previous": 84000,
+              "candidate": 83828.125,
+              "previous_percent": -0.20461309523809523,
+              "fixed_percent": -40.98559014409856
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 652800000,
+              "previous": 395911168,
+              "candidate": 412348416,
+              "previous_percent": 4.151751536344638,
+              "fixed_percent": -36.833882352941174
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 659189760,
+              "previous": 418836480,
+              "candidate": 421097472,
+              "previous_percent": 0.5398269033299106,
+              "fixed_percent": -36.11893000279616
+            }
+          },
+          "total": {
+            "wall_ms": {
+              "fixed": 40441.4847,
+              "previous": 25337.0616,
+              "candidate": 25267.6816,
+              "previous_percent": -0.27382812220025154,
+              "fixed_percent": -37.52039078822445
+            },
+            "cpu_ms": {
+              "fixed": 144046.875,
+              "previous": 85562.5,
+              "candidate": 86062.5,
+              "previous_percent": 0.5843681519357194,
+              "fixed_percent": -40.25382362512203
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 149155840,
+              "previous": 153899008,
+              "candidate": 153042944,
+              "previous_percent": -0.5562504990285577,
+              "fixed_percent": 2.606068927639709
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 786239488,
+              "previous": 577433600,
+              "candidate": 564424704,
+              "previous_percent": -2.2528817166164212,
+              "fixed_percent": -28.212114423843335
+            }
+          },
+          "c_emission": {
+            "wall_ms": {
+              "fixed": 1762.2903,
+              "previous": 1501.1336,
+              "candidate": 1528.1144,
+              "previous_percent": 1.797361673871003,
+              "fixed_percent": -13.288156894468521
+            },
+            "cpu_ms": {
+              "fixed": 1750,
+              "previous": 1484.375,
+              "candidate": 1500,
+              "previous_percent": 1.0526315789473684,
+              "fixed_percent": -14.285714285714286
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 149168128,
+              "previous": 153649152,
+              "candidate": 152727552,
+              "previous_percent": -0.5998080614203455,
+              "fixed_percent": 2.3861826569278928
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 154165248,
+              "previous": 158674944,
+              "candidate": 158244864,
+              "previous_percent": -0.2710446836521335,
+              "fixed_percent": 2.6462617567352145
+            }
+          }
+        }
+      }
+    },
+    "gcc": {
+      "file": "1.3.4j-gcc.json",
+      "sha256": "141a264bc867b8b6213d51caeecd1c7a8a746e59c12df154a88853f54e115e3e",
+      "toolchain": "gcc (Alpine 14.2.0) 14.2.0",
+      "compilers": [
+        {
+          "label": "reference",
+          "version": "Vela 1.2.0 (self-hosted)",
+          "bytes": 2820496,
+          "sha256": "bbb89d0788a7e7c89c1838314baf3e478b4eb2b034037d01d3252dfa8edf2a4a"
+        },
+        {
+          "label": "candidate",
+          "version": "Vela 1.2.0 (self-hosted)",
+          "bytes": 2857848,
+          "sha256": "710b35a1acd49c9963eb6daceb2d2e55025517ce285d35ffbbb41a64798c168b"
+        }
+      ],
+      "group_count": 28,
+      "pair_count": 5,
+      "builds": {
+        "buildlens": {
+          "emitted": {
+            "roots": {
+              "fixed": 6482,
+              "previous": 6138,
+              "candidate": 4263,
+              "previous_percent": -30.547409579667644,
+              "fixed_percent": -34.23326133909287
+            },
+            "polls": {
+              "fixed": 8503,
+              "previous": 1587,
+              "candidate": 1161,
+              "previous_percent": -26.843100189035916,
+              "fixed_percent": -86.34599553098906
+            },
+            "arithmetic_guards": {
+              "fixed": 250,
+              "previous": 216,
+              "candidate": 185,
+              "previous_percent": -14.351851851851851,
+              "fixed_percent": -26
+            },
+            "temporaries": {
+              "fixed": 12246,
+              "previous": 12246,
+              "candidate": 8901,
+              "previous_percent": -27.31504164625184,
+              "fixed_percent": -27.31504164625184
+            },
+            "branches": {
+              "fixed": null,
+              "previous": 659,
+              "candidate": 514,
+              "previous_percent": -22.003034901365705,
+              "fixed_percent": null
+            },
+            "functions": {
+              "fixed": 524,
+              "previous": 502,
+              "candidate": 331,
+              "previous_percent": -34.06374501992032,
+              "fixed_percent": -36.83206106870229
+            },
+            "types": {
+              "fixed": 204,
+              "previous": 204,
+              "candidate": 142,
+              "previous_percent": -30.392156862745097,
+              "fixed_percent": -30.392156862745097
+            },
+            "traces": {
+              "fixed": 186,
+              "previous": 166,
+              "candidate": 118,
+              "previous_percent": -28.91566265060241,
+              "fixed_percent": -36.55913978494624
+            }
+          },
+          "sizes": {
+            "package": {
+              "fixed": 463211,
+              "previous": 225622,
+              "candidate": 225622,
+              "previous_percent": 0,
+              "fixed_percent": -51.29174393526924
+            },
+            "c": {
+              "fixed": 2069182,
+              "previous": 1938468,
+              "candidate": 1410284,
+              "previous_percent": -27.247496476599046,
+              "fixed_percent": -31.843404785079322
+            },
+            "exe": {
+              "fixed": 1159000,
+              "previous": 547640,
+              "candidate": 547640,
+              "previous_percent": 0,
+              "fixed_percent": -52.748921484037965
+            }
+          },
+          "native_link": {
+            "wall_ms": {
+              "fixed": 10402.487,
+              "previous": 5280.919,
+              "candidate": 5353.055,
+              "previous_percent": 1.3659743692338477,
+              "fixed_percent": -48.54062302601291
+            },
+            "cpu_ms": {
+              "fixed": 10064.29,
+              "previous": 4955.032,
+              "candidate": 5018.106,
+              "previous_percent": 1.2729282071235788,
+              "fixed_percent": -50.1394931982286
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 2031616,
+              "previous": 2007040,
+              "candidate": 2035712,
+              "previous_percent": 1.4285714285714286,
+              "fixed_percent": 0.20161290322580644
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 358428672,
+              "previous": 255033344,
+              "candidate": 250179584,
+              "previous_percent": -1.903186431967108,
+              "fixed_percent": -30.20101249042934
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 356360192,
+              "previous": 252887040,
+              "candidate": 248098816,
+              "previous_percent": -1.8934240362811792,
+              "fixed_percent": -30.379761384795753
+            },
+            "observed_processes": {
+              "fixed": 3,
+              "previous": 3,
+              "candidate": 3,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "total": {
+            "wall_ms": {
+              "fixed": 10916.375,
+              "previous": 5846.271,
+              "candidate": 5822.952,
+              "previous_percent": -0.39886963844131595,
+              "fixed_percent": -46.6585565263194
+            },
+            "cpu_ms": {
+              "fixed": 10403.809,
+              "previous": 5342.4,
+              "candidate": 5330.811,
+              "previous_percent": -0.21692497753818402,
+              "fixed_percent": -48.76096821846691
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 52875264,
+              "previous": 49119232,
+              "candidate": 46854144,
+              "previous_percent": -4.611407605070046,
+              "fixed_percent": -11.387404136648849
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 411336704,
+              "previous": 304168960,
+              "candidate": 297058304,
+              "previous_percent": -2.3377322919472125,
+              "fixed_percent": -27.782203457340874
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 356450304,
+              "previous": 252919808,
+              "candidate": 248025088,
+              "previous_percent": -1.935285353371769,
+              "fixed_percent": -30.418045596617024
+            },
+            "observed_processes": {
+              "fixed": 4,
+              "previous": 4,
+              "candidate": 4,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "c_emission": {
+            "wall_ms": {
+              "fixed": 599.538,
+              "previous": 571.725,
+              "candidate": 536.029,
+              "previous_percent": -6.243561152652066,
+              "fixed_percent": -10.592989935583734
+            },
+            "cpu_ms": {
+              "fixed": 420.796,
+              "previous": 404.568,
+              "candidate": 374.802,
+              "previous_percent": -7.357477605742413,
+              "fixed_percent": -10.93023697943896
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 52805632,
+              "previous": 49098752,
+              "candidate": 46825472,
+              "previous_percent": -4.630015850504713,
+              "fixed_percent": -11.32485262178095
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 52805632,
+              "previous": 49098752,
+              "candidate": 46825472,
+              "previous_percent": -4.630015850504713,
+              "fixed_percent": -11.32485262178095
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 52621312,
+              "previous": 48889856,
+              "candidate": 46575616,
+              "previous_percent": -4.73357908847185,
+              "fixed_percent": -11.489063594613528
+            },
+            "observed_processes": {
+              "fixed": 1,
+              "previous": 1,
+              "candidate": 1,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          }
+        },
+        "fielddesk": {
+          "emitted": {
+            "roots": {
+              "fixed": 9338,
+              "previous": 8922,
+              "candidate": 7108,
+              "previous_percent": -20.33176417843533,
+              "fixed_percent": -23.880916684514887
+            },
+            "polls": {
+              "fixed": 11990,
+              "previous": 2252,
+              "candidate": 1822,
+              "previous_percent": -19.094138543516873,
+              "fixed_percent": -84.80400333611342
+            },
+            "arithmetic_guards": {
+              "fixed": 332,
+              "previous": 246,
+              "candidate": 182,
+              "previous_percent": -26.016260162601625,
+              "fixed_percent": -45.18072289156626
+            },
+            "temporaries": {
+              "fixed": 17550,
+              "previous": 17548,
+              "candidate": 13866,
+              "previous_percent": -20.982448142238432,
+              "fixed_percent": -20.99145299145299
+            },
+            "branches": {
+              "fixed": null,
+              "previous": 1100,
+              "candidate": 917,
+              "previous_percent": -16.636363636363637,
+              "fixed_percent": null
+            },
+            "functions": {
+              "fixed": 766,
+              "previous": 734,
+              "candidate": 569,
+              "previous_percent": -22.47956403269755,
+              "fixed_percent": -25.718015665796344
+            },
+            "types": {
+              "fixed": 286,
+              "previous": 286,
+              "candidate": 230,
+              "previous_percent": -19.58041958041958,
+              "fixed_percent": -19.58041958041958
+            },
+            "traces": {
+              "fixed": 254,
+              "previous": 222,
+              "candidate": 178,
+              "previous_percent": -19.81981981981982,
+              "fixed_percent": -29.921259842519685
+            }
+          },
+          "sizes": {
+            "package": {
+              "fixed": 610060,
+              "previous": 295929,
+              "candidate": 295920,
+              "previous_percent": -0.0030412700343663513,
+              "fixed_percent": -51.493295741402484
+            },
+            "c": {
+              "fixed": 2956984,
+              "previous": 2771411,
+              "candidate": 2217907,
+              "previous_percent": -19.971920440526503,
+              "fixed_percent": -24.994284717130697
+            },
+            "exe": {
+              "fixed": 1484168,
+              "previous": 711952,
+              "candidate": 711952,
+              "previous_percent": 0,
+              "fixed_percent": -52.03022838384873
+            }
+          },
+          "native_link": {
+            "wall_ms": {
+              "fixed": 13797.402,
+              "previous": 7346.427,
+              "candidate": 7324.437,
+              "previous_percent": -0.2993291841054132,
+              "fixed_percent": -46.91437561941009
+            },
+            "cpu_ms": {
+              "fixed": 13446.802,
+              "previous": 6999.252,
+              "candidate": 6985.028,
+              "previous_percent": -0.20322171569190764,
+              "fixed_percent": -48.054355228849204
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 2011136,
+              "previous": 2035712,
+              "candidate": 2007040,
+              "previous_percent": -1.408450704225352,
+              "fixed_percent": -0.20366598778004075
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 375406592,
+              "previous": 359915520,
+              "candidate": 354635776,
+              "previous_percent": -1.4669397974280187,
+              "fixed_percent": -5.532885261641863
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 373374976,
+              "previous": 357756928,
+              "candidate": 352559104,
+              "previous_percent": -1.4528926187559392,
+              "fixed_percent": -5.575058142086094
+            },
+            "observed_processes": {
+              "fixed": 3,
+              "previous": 3,
+              "candidate": 3,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "total": {
+            "wall_ms": {
+              "fixed": 14760.704,
+              "previous": 8320.57,
+              "candidate": 8250.506,
+              "previous_percent": -0.8420576955665334,
+              "fixed_percent": -44.1049288706013
+            },
+            "cpu_ms": {
+              "fixed": 14107.979,
+              "previous": 7667.441,
+              "candidate": 7620.378,
+              "previous_percent": -0.6138032232657559,
+              "fixed_percent": -45.98533213013714
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 67883008,
+              "previous": 66412544,
+              "candidate": 60706816,
+              "previous_percent": -8.591340816578265,
+              "fixed_percent": -10.571411331684065
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 442417152,
+              "previous": 424660992,
+              "candidate": 414597120,
+              "previous_percent": -2.3698602390115453,
+              "fixed_percent": -6.288190201088768
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 373383168,
+              "previous": 357814272,
+              "candidate": 352661504,
+              "previous_percent": -1.4400677678949598,
+              "fixed_percent": -5.549704907962
+            },
+            "observed_processes": {
+              "fixed": 4,
+              "previous": 4,
+              "candidate": 4,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "c_emission": {
+            "wall_ms": {
+              "fixed": 1007.565,
+              "previous": 1008.348,
+              "candidate": 939.539,
+              "previous_percent": -6.823933800632319,
+              "fixed_percent": -6.751524715527045
+            },
+            "cpu_ms": {
+              "fixed": 699.235,
+              "previous": 699.558,
+              "candidate": 641.242,
+              "previous_percent": -8.336120807710016,
+              "fixed_percent": -8.29377820046194
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 67993600,
+              "previous": 66424832,
+              "candidate": 60706816,
+              "previous_percent": -8.608250601220941,
+              "fixed_percent": -10.716867469879517
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 67993600,
+              "previous": 66424832,
+              "candidate": 60706816,
+              "previous_percent": -8.608250601220941,
+              "fixed_percent": -10.716867469879517
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 67891200,
+              "previous": 66097152,
+              "candidate": 60444672,
+              "previous_percent": -8.551775422941066,
+              "fixed_percent": -10.968325791855204
+            },
+            "observed_processes": {
+              "fixed": 1,
+              "previous": 1,
+              "candidate": 1,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          }
+        },
+        "compiler": {
+          "emitted": {
+            "roots": {
+              "fixed": 21920,
+              "previous": 19072,
+              "candidate": 19051,
+              "previous_percent": -0.11010906040268456,
+              "fixed_percent": -13.088503649635037
+            },
+            "polls": {
+              "fixed": 29961,
+              "previous": 7375,
+              "candidate": 7370,
+              "previous_percent": -0.06779661016949153,
+              "fixed_percent": -75.40135509495677
+            },
+            "arithmetic_guards": {
+              "fixed": 716,
+              "previous": 472,
+              "candidate": 472,
+              "previous_percent": 0,
+              "fixed_percent": -34.07821229050279
+            },
+            "temporaries": {
+              "fixed": 39698,
+              "previous": 39698,
+              "candidate": 39669,
+              "previous_percent": -0.07305153912035871,
+              "fixed_percent": -0.07305153912035871
+            },
+            "branches": {
+              "fixed": null,
+              "previous": 2222,
+              "candidate": 2222,
+              "previous_percent": 0,
+              "fixed_percent": null
+            },
+            "functions": {
+              "fixed": 517,
+              "previous": 509,
+              "candidate": 504,
+              "previous_percent": -0.9823182711198428,
+              "fixed_percent": -2.514506769825919
+            },
+            "types": {
+              "fixed": 68,
+              "previous": 68,
+              "candidate": 68,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            },
+            "traces": {
+              "fixed": 63,
+              "previous": 55,
+              "candidate": 55,
+              "previous_percent": 0,
+              "fixed_percent": -12.698412698412698
+            }
+          },
+          "sizes": {
+            "package": {
+              "fixed": 3289360,
+              "previous": 2051354,
+              "candidate": 2050789,
+              "previous_percent": -0.027542783936853416,
+              "fixed_percent": -37.65385971739183
+            },
+            "c": {
+              "fixed": 6301785,
+              "previous": 6259537,
+              "candidate": 6252137,
+              "previous_percent": -0.11821960633829627,
+              "fixed_percent": -0.7878402706534736
+            },
+            "exe": {
+              "fixed": 5869864,
+              "previous": 2767096,
+              "candidate": 2767096,
+              "previous_percent": 0,
+              "fixed_percent": -52.85928260007387
+            }
+          },
+          "native_link": {
+            "wall_ms": {
+              "fixed": 52537.549,
+              "previous": 23830.065,
+              "candidate": 23558.622,
+              "previous_percent": -1.139077883337705,
+              "fixed_percent": -55.15850577650663
+            },
+            "cpu_ms": {
+              "fixed": 52126.31,
+              "previous": 23450.311,
+              "candidate": 23172.603,
+              "previous_percent": -1.1842401578384285,
+              "fixed_percent": -55.545284137703206
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 1998848,
+              "previous": 2027520,
+              "candidate": 2043904,
+              "previous_percent": 0.8080808080808081,
+              "fixed_percent": 2.2540983606557377
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 482963456,
+              "previous": 387301376,
+              "candidate": 387280896,
+              "previous_percent": -0.0052878717373831385,
+              "fixed_percent": -19.811552781335074
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 480854016,
+              "previous": 385282048,
+              "candidate": 385327104,
+              "previous_percent": 0.011694289997129584,
+              "fixed_percent": -19.866094245119083
+            },
+            "observed_processes": {
+              "fixed": 3,
+              "previous": 3,
+              "candidate": 3,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "total": {
+            "wall_ms": {
+              "fixed": 55118.133,
+              "previous": 26849.982,
+              "candidate": 27418.937,
+              "previous_percent": 2.1190144559501074,
+              "fixed_percent": -50.25423484500101
+            },
+            "cpu_ms": {
+              "fixed": 54200.313,
+              "previous": 25886.64,
+              "candidate": 26442.177,
+              "previous_percent": 2.146037492698938,
+              "fixed_percent": -51.21397730673622
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 155189248,
+              "previous": 139419648,
+              "candidate": 139739136,
+              "previous_percent": 0.22915564956812973,
+              "fixed_percent": -9.955658783783784
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 631148544,
+              "previous": 519774208,
+              "candidate": 519720960,
+              "previous_percent": -0.010244448297057479,
+              "fixed_percent": -17.654732005529272
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 480772096,
+              "previous": 385318912,
+              "candidate": 385335296,
+              "previous_percent": 0.0042520622501913425,
+              "fixed_percent": -19.850736095965104
+            },
+            "observed_processes": {
+              "fixed": 4,
+              "previous": 4,
+              "candidate": 4,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "c_emission": {
+            "wall_ms": {
+              "fixed": 2514.794,
+              "previous": 3078.681,
+              "candidate": 3063.742,
+              "previous_percent": -0.48524027010267873,
+              "fixed_percent": 21.82874621141932
+            },
+            "cpu_ms": {
+              "fixed": 2031.917,
+              "previous": 2488.883,
+              "candidate": 2469.391,
+              "previous_percent": -0.7831625673042781,
+              "fixed_percent": 21.530111712240224
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 155111424,
+              "previous": 139411456,
+              "candidate": 139767808,
+              "previous_percent": 0.25561170525326127,
+              "fixed_percent": -9.89199609179012
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 155111424,
+              "previous": 139411456,
+              "candidate": 139767808,
+              "previous_percent": 0.25561170525326127,
+              "fixed_percent": -9.89199609179012
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 154877952,
+              "previous": 139108352,
+              "candidate": 139497472,
+              "previous_percent": 0.2797243978564278,
+              "fixed_percent": -9.930709827567968
+            },
+            "observed_processes": {
+              "fixed": 1,
+              "previous": 1,
+              "candidate": 1,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          }
+        }
+      }
+    }
+  },
+  "limits": {
+    "anomalies": [
+      {
+        "host": "msvc",
+        "name": "data/small/fold",
+        "metric": "wall_ms",
+        "fixed": 20.3913,
+        "previous": 19.1307,
+        "candidate": 22.781,
+        "previous_percent": 19.080849106410103,
+        "fixed_percent": 11.719213586186253
+      },
+      {
+        "host": "gcc",
+        "name": "numeric/large",
+        "metric": "peak_tree_rss_bytes",
+        "fixed": 462848,
+        "previous": 413696,
+        "candidate": 479232,
+        "previous_percent": 15.841584158415841,
+        "fixed_percent": 3.5398230088495577
+      }
+    ],
+    "repeats": [
+      {
+        "file": "1.3.4j-msvc-recheck-previous.json",
+        "sha256": "f3b2bb7b23ffcd8634978b0a36562eecdb56b0b9e00b750278b7e37e50b6728c"
+      },
+      {
+        "file": "1.3.4j-msvc-recheck-fixed.json",
+        "sha256": "cf0138797aac3b58deed9a26811cee0cf3f20b1da7a99389cb262750e4229bd3"
+      },
+      {
+        "file": "1.3.4j-gcc-recheck-previous.json",
+        "sha256": "380f07cb0281690c7dd6677110d0b9bd6c99b7074ffad77210c862b6cc9c56ca"
+      }
+    ],
+    "decisions": {}
+  },
+  "focused": {
+    "modes": {
+      "default": "436d2d5d9dd5c375857cfdb7d0d2664118fd02f8c93449618b9d5d8696186777",
+      "bypass": "436d2d5d9dd5c375857cfdb7d0d2664118fd02f8c93449618b9d5d8696186777"
+    },
+    "unreachable_diagnostic": {
+      "severity": "error",
+      "code": "E201",
+      "message": "Expected Int, found String.",
+      "source": "G:\\Vela\\tests\\cases\\v134j_unused_error.vela",
+      "span": {
+        "start": 22,
+        "end": 38,
+        "line": 1,
+        "column": 23,
+        "end_line": 1,
+        "end_column": 39
+      },
+      "range": {
+        "document": 0,
+        "start": {
+          "line": 0,
+          "character": 22,
+          "byte": 22
+        },
+        "end": {
+          "line": 0,
+          "character": 38,
+          "byte": 38
+        }
+      },
+      "notes": [],
+      "details": {
+        "expected_type": "Int",
+        "actual_type": "String"
+      },
+      "related": [],
+      "explanation": {
+        "category": "types",
+        "root_cause": "Expected Int, found String.",
+        "expected": "Int",
+        "actual": "String",
+        "guidance": "Choose whether the value or its declared type is wrong. No implicit cast or literal replacement is proposed."
+      }
+    },
+    "test_roots": [
+      [
+        "first root",
+        "first\n",
+        "",
+        0
+      ],
+      [
+        "second root",
+        "second\n",
+        "",
+        0
+      ]
+    ],
+    "live_output": [
+      "5",
+      "1",
+      "cleanup"
+    ],
+    "buildlens": {
+      "baseline": 502,
+      "candidate": 331
+    }
+  },
+  "oracles": {
+    "file": "1.3.4j-oracles.json",
+    "sha256": "2e26b9ff4d4bb2bd6c83fd022d113480b8d5f30af05d63f399315a4e14cb63ca",
+    "cases": 22,
+    "modes": 2,
+    "hosts": 2
+  },
+  "debug": [
+    "MSVC PDB Vela source path and profiled normal cleanup",
+    "generic panic, source location and nested stack",
+    "regular C export omits instrumentation",
+    "fiber isolation, cancellation cleanup and frame completion",
+    "panic through a native callback terminates with Vela frames"
+  ],
+  "gui": {
+    "field": "FieldDesk window: load, concurrent edit, cancel, close",
+    "pulse": "PulseDeck window: cancel, save, run again, close",
+    "open_sockets_after": 0
+  },
+  "recovery": {
+    "canonical_bundle_sha256": "31e1f8ceec9cde8e35fce979930a2742a53ac687b7c704def9fae7a8ff8d8e4f",
+    "authored_windows_sha256": "5bf487d1cd28cf30599aa3d505a2b351b021c19168588e3f42e0b0a48706f8ef"
+  },
+  "mcp": {
+    "tests": 2,
+    "passed": 2,
+    "skipped": 0
+  },
+  "next": "1.3.4k"
+}

@@ -1,0 +1,345 @@
+{
+  "schema_version": 1,
+  "stage": "1.3.6",
+  "rounds": 300,
+  "warmup": 1,
+  "expected": "2100",
+  "workloads": [
+    {
+      "label": "small",
+      "keys": 8,
+      "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296",
+      "legacy": [
+        {
+          "wall_ms": 58.7737,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3989504
+        },
+        {
+          "wall_ms": 50.4958,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3981312
+        },
+        {
+          "wall_ms": 51.2048,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3981312
+        },
+        {
+          "wall_ms": 49.8071,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3985408
+        },
+        {
+          "wall_ms": 50.7268,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 3997696
+        }
+      ],
+      "candidate": [
+        {
+          "wall_ms": 33.0041,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3940352
+        },
+        {
+          "wall_ms": 30.042,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3932160
+        },
+        {
+          "wall_ms": 33.7172,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3956736
+        },
+        {
+          "wall_ms": 29.5908,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3936256
+        },
+        {
+          "wall_ms": 29.863,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3936256
+        }
+      ],
+      "metrics": {
+        "wall_ms": {
+          "historical": {
+            "min": 48.2178,
+            "median": 52.0705,
+            "max": 55.2643
+          },
+          "legacy": {
+            "min": 49.8071,
+            "median": 50.7268,
+            "max": 58.7737
+          },
+          "candidate": {
+            "min": 29.5908,
+            "median": 30.042,
+            "max": 33.7172
+          }
+        },
+        "cpu_ms": {
+          "historical": {
+            "min": 46.875,
+            "median": 46.875,
+            "max": 46.875
+          },
+          "legacy": {
+            "min": 31.25,
+            "median": 31.25,
+            "max": 78.125
+          },
+          "candidate": {
+            "min": 15.625,
+            "median": 15.625,
+            "max": 31.25
+          }
+        },
+        "peak_job_commit_bytes": {
+          "historical": {
+            "min": 4075520,
+            "median": 4079616,
+            "max": 4087808
+          },
+          "legacy": {
+            "min": 3981312,
+            "median": 3985408,
+            "max": 3997696
+          },
+          "candidate": {
+            "min": 3932160,
+            "median": 3936256,
+            "max": 3956736
+          }
+        }
+      }
+    },
+    {
+      "label": "medium",
+      "keys": 64,
+      "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077",
+      "legacy": [
+        {
+          "wall_ms": 204.6108,
+          "cpu_ms": 218.75,
+          "peak_job_commit_bytes": 4096000
+        },
+        {
+          "wall_ms": 206.332,
+          "cpu_ms": 171.875,
+          "peak_job_commit_bytes": 4096000
+        },
+        {
+          "wall_ms": 206.3207,
+          "cpu_ms": 187.5,
+          "peak_job_commit_bytes": 4091904
+        },
+        {
+          "wall_ms": 210.2437,
+          "cpu_ms": 218.75,
+          "peak_job_commit_bytes": 4100096
+        },
+        {
+          "wall_ms": 217.9203,
+          "cpu_ms": 218.75,
+          "peak_job_commit_bytes": 4100096
+        }
+      ],
+      "candidate": [
+        {
+          "wall_ms": 61.4987,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4055040
+        },
+        {
+          "wall_ms": 60.6541,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 4059136
+        },
+        {
+          "wall_ms": 62.801,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 4075520
+        },
+        {
+          "wall_ms": 67.5748,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 4055040
+        },
+        {
+          "wall_ms": 66.7942,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 4055040
+        }
+      ],
+      "metrics": {
+        "wall_ms": {
+          "historical": {
+            "min": 195.915,
+            "median": 197.7743,
+            "max": 209.7842
+          },
+          "legacy": {
+            "min": 204.6108,
+            "median": 206.332,
+            "max": 217.9203
+          },
+          "candidate": {
+            "min": 60.6541,
+            "median": 62.801,
+            "max": 67.5748
+          }
+        },
+        "cpu_ms": {
+          "historical": {
+            "min": 187.5,
+            "median": 187.5,
+            "max": 218.75
+          },
+          "legacy": {
+            "min": 171.875,
+            "median": 218.75,
+            "max": 218.75
+          },
+          "candidate": {
+            "min": 46.875,
+            "median": 62.5,
+            "max": 78.125
+          }
+        },
+        "peak_job_commit_bytes": {
+          "historical": {
+            "min": 4161536,
+            "median": 4169728,
+            "max": 4177920
+          },
+          "legacy": {
+            "min": 4091904,
+            "median": 4096000,
+            "max": 4100096
+          },
+          "candidate": {
+            "min": 4055040,
+            "median": 4055040,
+            "max": 4075520
+          }
+        }
+      }
+    },
+    {
+      "label": "large",
+      "keys": 256,
+      "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a",
+      "legacy": [
+        {
+          "wall_ms": 753.6139,
+          "cpu_ms": 781.25,
+          "peak_job_commit_bytes": 4145152
+        },
+        {
+          "wall_ms": 718.5842,
+          "cpu_ms": 703.125,
+          "peak_job_commit_bytes": 4153344
+        },
+        {
+          "wall_ms": 729.7042,
+          "cpu_ms": 687.5,
+          "peak_job_commit_bytes": 4145152
+        },
+        {
+          "wall_ms": 751.2792,
+          "cpu_ms": 703.125,
+          "peak_job_commit_bytes": 4153344
+        },
+        {
+          "wall_ms": 775.8476,
+          "cpu_ms": 750,
+          "peak_job_commit_bytes": 4136960
+        }
+      ],
+      "candidate": [
+        {
+          "wall_ms": 175.2058,
+          "cpu_ms": 171.875,
+          "peak_job_commit_bytes": 4038656
+        },
+        {
+          "wall_ms": 170.2605,
+          "cpu_ms": 156.25,
+          "peak_job_commit_bytes": 4042752
+        },
+        {
+          "wall_ms": 173.8614,
+          "cpu_ms": 171.875,
+          "peak_job_commit_bytes": 4042752
+        },
+        {
+          "wall_ms": 167.8331,
+          "cpu_ms": 187.5,
+          "peak_job_commit_bytes": 4030464
+        },
+        {
+          "wall_ms": 170.0767,
+          "cpu_ms": 171.875,
+          "peak_job_commit_bytes": 4042752
+        }
+      ],
+      "metrics": {
+        "wall_ms": {
+          "historical": {
+            "min": 718.7242,
+            "median": 731.0279,
+            "max": 755.8667
+          },
+          "legacy": {
+            "min": 718.5842,
+            "median": 751.2792,
+            "max": 775.8476
+          },
+          "candidate": {
+            "min": 167.8331,
+            "median": 170.2605,
+            "max": 175.2058
+          }
+        },
+        "cpu_ms": {
+          "historical": {
+            "min": 703.125,
+            "median": 718.75,
+            "max": 750
+          },
+          "legacy": {
+            "min": 687.5,
+            "median": 703.125,
+            "max": 781.25
+          },
+          "candidate": {
+            "min": 156.25,
+            "median": 171.875,
+            "max": 187.5
+          }
+        },
+        "peak_job_commit_bytes": {
+          "historical": {
+            "min": 4214784,
+            "median": 4218880,
+            "max": 4222976
+          },
+          "legacy": {
+            "min": 4136960,
+            "median": 4145152,
+            "max": 4153344
+          },
+          "candidate": {
+            "min": 4030464,
+            "median": 4042752,
+            "max": 4042752
+          }
+        }
+      }
+    }
+  ]
+}

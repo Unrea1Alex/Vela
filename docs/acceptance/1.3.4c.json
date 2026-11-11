@@ -1,0 +1,216 @@
+{
+  "stage": "1.3.4c",
+  "status": "verified",
+  "contract": "contracts/COMPILER-OWNERSHIP-1.3.md",
+  "inventory": "COMPILER-AUDIT-1.3.md",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1428,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 520139,
+    "tests_run": true
+  },
+  "verify_log_sha256": "c92a66816f231adc7bff672574cadc948b669e0c93aa1628380c6098a18a0c79",
+  "rejections": [
+    {
+      "name": "v105_capture_missing",
+      "code": "E238",
+      "span": {
+        "start": 81,
+        "end": 87,
+        "line": 3,
+        "column": 43,
+        "end_line": 3,
+        "end_column": 49
+      },
+      "related": 1
+    },
+    {
+      "name": "v105_effect_union_ceiling",
+      "code": "E209",
+      "span": {
+        "start": 225,
+        "end": 244,
+        "line": 4,
+        "column": 27,
+        "end_line": 4,
+        "end_column": 46
+      },
+      "related": 1
+    },
+    {
+      "name": "v109_callback_effect",
+      "code": "E209",
+      "span": {
+        "start": 121,
+        "end": 212,
+        "line": 2,
+        "column": 41,
+        "end_line": 5,
+        "end_column": 6
+      },
+      "related": 0
+    },
+    {
+      "name": "v111_async_blocking",
+      "code": "E241",
+      "span": {
+        "start": 50,
+        "end": 67,
+        "line": 1,
+        "column": 51,
+        "end_line": 1,
+        "end_column": 68
+      },
+      "related": 1
+    },
+    {
+      "name": "v111_async_unknown",
+      "code": "E241",
+      "span": {
+        "start": 52,
+        "end": 62,
+        "line": 1,
+        "column": 53,
+        "end_line": 1,
+        "end_column": 63
+      },
+      "related": 1
+    }
+  ],
+  "closed_alias": {
+    "before_exit": 0,
+    "before_stdout": [
+      "closed fiber accepted as null by ffi_close",
+      "external read -1"
+    ],
+    "after_exit": 70,
+    "after_stress_exit": 70,
+    "after_stdout": "",
+    "after_diagnostic": "tests\\ffi\\closed-fiber.vela:19:48: runtime error: foreign handle is closed",
+    "collections": 17
+  },
+  "forced_gc": {
+    "ffi": 180,
+    "callbacks": 491,
+    "dynamic_windows": 142,
+    "dynamic_linux": 142,
+    "defer_windows": 89,
+    "defer_linux": 89,
+    "parallel_values": 5034,
+    "http": "vela gc: collections=53855 peak=12694 bytes=200"
+  },
+  "native_ffi": {
+    "main": "ffi ABI 1 passed",
+    "callbacks": "callbacks passed",
+    "platform": "Windows x64",
+    "fixture_sha256": "6e16a629e13df916cccfd4cae596a8880567b4976a01dbb33fcf42ad4224b46c"
+  },
+  "live_http": {
+    "checks": [
+      "pinned libcurl, OpenSSL and c-ares",
+      "native response/cancel/deadline/cleanup assertions",
+      "ten GETs on one TCP connection",
+      "idle cache expired",
+      "credential header connection isolation",
+      "redirect remains a response",
+      "server observed global and per-origin active limits",
+      "single cancel preserved peer and subsequent request",
+      "expired, cancelled or over-budget work never sent",
+      "deadline priority on an already-sent request",
+      "owner closed while server was holding an active response",
+      "TLS reuse and CA change isolation",
+      "server observed distinct TCP attempts for trust policies",
+      "connect budget expired inside TLS handshake",
+      "slow headers exhaust the total budget after connection",
+      "injected storage and driver faults release request ownership",
+      "all sockets closed after owner close"
+    ],
+    "vela_run_sizes": [
+      20,
+      20
+    ],
+    "receipt_sha256": "21e2c7be33d9909d40053cb94aa6bfd79e276e81e405cdb013662797a9bd47d8",
+    "gui_controls": [
+      "FieldDesk window: load, concurrent edit, cancel, close",
+      "PulseDeck window: cancel, save, run again, close"
+    ],
+    "gui_requests": {
+      "field": [
+        1,
+        1,
+        1,
+        2
+      ],
+      "pulse": [
+        3,
+        4
+      ]
+    },
+    "open_sockets_after": 0,
+    "gui_receipt_sha256": "0baf9121c0f44ac6e8cbe5bf122e66a5b362b35defd31bdfce6312df57496adb"
+  },
+  "recovery": {
+    "windows": {
+      "cc": "MSVC /std:c11 /O2 /fp:strict /MT",
+      "sha256": "f7fcc25e09a29d211f1fde73f62e6c9529844527ed85f33a505c7f4b908ebc30"
+    },
+    "linux": {
+      "cc": "Alpine GCC 14.2.0 -std=c11 -O2 -ffp-contract=off",
+      "sha256": "b576ed974e228505a8d39a7a40ad0841c6c40d446a63ba0c851f5b749eb9c75e"
+    },
+    "method": "Compile emitted C, check the agent-idioms example and emit authored compiler again. Linux compiles the Linux re-emission and verifies its byte fixed point independently. The cross-platform text matched after removing platform source path prefixes from octal-encoded locations.",
+    "seed_transition": {
+      "seed.exe": {
+        "bytes": 4187136,
+        "sha256": "98d4aad8c2592962e01d90d9f8572a4e855ec4e2ceb8c70ef34a65a2e24e4570"
+      },
+      "stage1.exe": {
+        "bytes": 4188160,
+        "sha256": "19213d4057cd63e2a841a7188cb38a2d5a8f1d56e0ebd90ab1f6bb913a4874fb"
+      },
+      "stage2.exe": {
+        "bytes": 4188160,
+        "sha256": "fd4870fed69ef08b48ffb333c289bee63102436695635cfd7564d6b95e502d62"
+      },
+      "stage3.exe": {
+        "bytes": 4188160,
+        "sha256": "adce8743e9ad9a8f53b713122929d63f7b5274f831ea9d83b8bfe5f2aefd1e0c"
+      },
+      "stage1.c": {
+        "bytes": 6067085,
+        "sha256": "f7fcc25e09a29d211f1fde73f62e6c9529844527ed85f33a505c7f4b908ebc30"
+      },
+      "stage2.c": {
+        "bytes": 6067085,
+        "sha256": "f7fcc25e09a29d211f1fde73f62e6c9529844527ed85f33a505c7f4b908ebc30"
+      },
+      "stage3.c": {
+        "bytes": 6067085,
+        "sha256": "f7fcc25e09a29d211f1fde73f62e6c9529844527ed85f33a505c7f4b908ebc30"
+      },
+      "compiler.vela": {
+        "bytes": 520139,
+        "sha256": "c1690c7a14ad10c298e5520b870bb883d468f7e91565c7e2d5bc546c95a87ad3"
+      },
+      "rebundled.vela": {
+        "bytes": 520139,
+        "sha256": "c1690c7a14ad10c298e5520b870bb883d468f7e91565c7e2d5bc546c95a87ad3"
+      }
+    }
+  },
+  "mcp": {
+    "passed": 2,
+    "tests": ["native API lookup", "setup and real handshake"]
+  },
+  "next": "1.3.4d"
+}

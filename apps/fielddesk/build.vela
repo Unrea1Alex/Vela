@@ -1,4 +1,5 @@
 import "../../tools/test.vela" as test;
+import "../../tools/stage-http.vela" as http_adapter;
 fn main() -> Int effects { io, process, state } {
     if platform() != "windows" || env("VELA_CC_KIND") != "msvc" {
         eprint("FieldDesk requires Windows x64 and MSVC.");
@@ -25,6 +26,7 @@ fn main() -> Int effects { io, process, state } {
         eprint(adapter.out + adapter.err);
         return 2;
     }
+    if !http_adapter::stage(root, output) { return 2; }
     let lock_args = test::compiler_command(suite, "lock", root + "/apps/fielddesk/vela.project");
     let locked = test::invoke(suite, lock_args, 30000);
     if locked.code != 0 {

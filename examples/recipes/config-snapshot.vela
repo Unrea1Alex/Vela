@@ -1,0 +1,16 @@
+import "../../std/config_snapshot.vela" as config;
+
+fn port() -> Result<Int, config::Error> effects { state } {
+    let settings = config::parse("{\"port\":8080,\"debug\":false}")?;
+    let allowed = list_new<String>();
+    list_push(allowed, "port");
+    list_push(allowed, "debug");
+    let valid = config::allow_only(settings, allowed)?;
+    return config::integer(settings, "port");
+}
+fn main() -> Int effects { state, io } {
+    match port() {
+        Result::Ok(value) => { print("port=" + to_string(value)); return 0; }
+        Result::Err(_) => { eprint("Invalid configuration"); return 1; }
+    }
+}

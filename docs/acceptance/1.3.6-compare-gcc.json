@@ -1,0 +1,4360 @@
+{
+  "host": "gcc",
+  "workloads": {
+    "numeric/small": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 3.167,
+          "previous": 3.344,
+          "candidate": 3.282,
+          "previous_percent": -1.8540669856459282,
+          "fixed_percent": 3.631196716135151
+        },
+        "cpu_ms": {
+          "fixed": 0.652,
+          "previous": 0.685,
+          "candidate": 0.676,
+          "previous_percent": -1.3138686131386872,
+          "fixed_percent": 3.6809815950920277
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 405504,
+          "previous": 385024,
+          "candidate": 458752,
+          "previous_percent": 19.148936170212767,
+          "fixed_percent": 13.131313131313131
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 471040,
+          "previous": 462848,
+          "candidate": 458752,
+          "previous_percent": -0.8849557522123894,
+          "fixed_percent": -2.608695652173913
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 471040,
+          "previous": 446464,
+          "candidate": 438272,
+          "previous_percent": -1.834862385321101,
+          "fixed_percent": -6.956521739130435
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 2.267284049177702,
+      "counters": {
+        "allocations": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "allocated_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "executed_polls": {
+          "fixed": 220171,
+          "previous": 220171,
+          "candidate": 20045,
+          "previous_percent": -90.89571287771777,
+          "fixed_percent": -90.89571287771777
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "before_teardown_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        }
+      }
+    },
+    "numeric/medium": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 3.573,
+          "previous": 3.842,
+          "candidate": 3.555,
+          "previous_percent": -7.470067673086931,
+          "fixed_percent": -0.5037783375314804
+        },
+        "cpu_ms": {
+          "fixed": 1.029,
+          "previous": 1.156,
+          "candidate": 0.849,
+          "previous_percent": -26.557093425605533,
+          "fixed_percent": -17.492711370262384
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 389120,
+          "previous": 385024,
+          "candidate": 360448,
+          "previous_percent": -6.382978723404255,
+          "fixed_percent": -7.368421052631579
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 471040,
+          "previous": 462848,
+          "candidate": 430080,
+          "previous_percent": -7.079646017699115,
+          "fixed_percent": -8.695652173913043
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 471040,
+          "previous": 462848,
+          "candidate": 430080,
+          "previous_percent": -7.079646017699115,
+          "fixed_percent": -8.695652173913043
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 1.4380212827149792,
+      "counters": {
+        "allocations": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "allocated_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "executed_polls": {
+          "fixed": 2201431,
+          "previous": 2201431,
+          "candidate": 200405,
+          "previous_percent": -90.89660316403285,
+          "fixed_percent": -90.89660316403285
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "before_teardown_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        }
+      }
+    },
+    "numeric/large": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 5.255,
+          "previous": 5.338,
+          "candidate": 4.096,
+          "previous_percent": -23.26714125140502,
+          "fixed_percent": -22.05518553758325
+        },
+        "cpu_ms": {
+          "fixed": 2.591,
+          "previous": 2.652,
+          "candidate": 1.45,
+          "previous_percent": -45.32428355957768,
+          "fixed_percent": -44.03705133153223
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 380928,
+          "previous": 376832,
+          "candidate": 372736,
+          "previous_percent": -1.0869565217391304,
+          "fixed_percent": -2.150537634408602
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 462848,
+          "previous": 446464,
+          "candidate": 438272,
+          "previous_percent": -1.834862385321101,
+          "fixed_percent": -5.3097345132743365
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 462848,
+          "previous": 446464,
+          "candidate": 438272,
+          "previous_percent": -1.834862385321101,
+          "fixed_percent": -5.3097345132743365
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 4.435058078141497,
+      "counters": {
+        "allocations": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "allocated_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "executed_polls": {
+          "fixed": 11007031,
+          "previous": 11007031,
+          "candidate": 1002005,
+          "previous_percent": -90.89668231151525,
+          "fixed_percent": -90.89668231151525
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "before_teardown_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        }
+      }
+    },
+    "aggregate/small": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 3.689,
+          "previous": 3.759,
+          "candidate": 3.209,
+          "previous_percent": -14.631550944400104,
+          "fixed_percent": -13.01165627541339
+        },
+        "cpu_ms": {
+          "fixed": 1.163,
+          "previous": 1.175,
+          "candidate": 0.638,
+          "previous_percent": -45.70212765957447,
+          "fixed_percent": -45.14187446259673
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 360448,
+          "previous": 376832,
+          "candidate": 376832,
+          "previous_percent": 0,
+          "fixed_percent": 4.545454545454546
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 446464,
+          "previous": 454656,
+          "candidate": 454656,
+          "previous_percent": 0,
+          "fixed_percent": 1.834862385321101
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 446464,
+          "previous": 454656,
+          "candidate": 454656,
+          "previous_percent": 0,
+          "fixed_percent": 1.834862385321101
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 2.716879623402824,
+      "counters": {
+        "allocations": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "allocated_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "executed_polls": {
+          "fixed": 560020,
+          "previous": 560020,
+          "candidate": 60004,
+          "previous_percent": -89.28538266490483,
+          "fixed_percent": -89.28538266490483
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "before_teardown_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        }
+      }
+    },
+    "aggregate/medium": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 8.766,
+          "previous": 8.809,
+          "candidate": 3.493,
+          "previous_percent": -60.34737200590305,
+          "fixed_percent": -60.15286333561487
+        },
+        "cpu_ms": {
+          "fixed": 6.161,
+          "previous": 6.2,
+          "candidate": 0.904,
+          "previous_percent": -85.41935483870968,
+          "fixed_percent": -85.32705729589352
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 573440,
+          "previous": 532480,
+          "candidate": 368640,
+          "previous_percent": -30.76923076923077,
+          "fixed_percent": -35.714285714285715
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 573440,
+          "previous": 532480,
+          "candidate": 438272,
+          "previous_percent": -17.692307692307693,
+          "fixed_percent": -23.571428571428573
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 454656,
+          "previous": 462848,
+          "candidate": 438272,
+          "previous_percent": -5.3097345132743365,
+          "fixed_percent": -3.6036036036036037
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 3.599888548342161,
+      "counters": {
+        "allocations": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "allocated_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "executed_polls": {
+          "fixed": 5600020,
+          "previous": 5600020,
+          "candidate": 600004,
+          "previous_percent": -89.28568112256742,
+          "fixed_percent": -89.28568112256742
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "before_teardown_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        }
+      }
+    },
+    "aggregate/large": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 30.593,
+          "previous": 32.175,
+          "candidate": 4.814,
+          "previous_percent": -85.03807303807304,
+          "fixed_percent": -84.26437420324912
+        },
+        "cpu_ms": {
+          "fixed": 27.81,
+          "previous": 29.449,
+          "candidate": 2.155,
+          "previous_percent": -92.68226425345513,
+          "fixed_percent": -92.25098885293059
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 548864,
+          "previous": 540672,
+          "candidate": 372736,
+          "previous_percent": -31.060606060606062,
+          "fixed_percent": -32.08955223880597
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 548864,
+          "previous": 540672,
+          "candidate": 446464,
+          "previous_percent": -17.424242424242426,
+          "fixed_percent": -18.65671641791045
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 446464,
+          "previous": 454656,
+          "candidate": 446464,
+          "previous_percent": -1.8018018018018018,
+          "fixed_percent": 0
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 0.5646809240800456,
+      "counters": {
+        "allocations": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "allocated_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "executed_polls": {
+          "fixed": 28000020,
+          "previous": 28000020,
+          "candidate": 3000004,
+          "previous_percent": -89.28570765306596,
+          "fixed_percent": -89.28570765306596
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "before_teardown_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        }
+      }
+    },
+    "mixed/small": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 7.797,
+          "previous": 8.439,
+          "candidate": 8.135,
+          "previous_percent": -3.602322550065177,
+          "fixed_percent": 4.335000641272286
+        },
+        "cpu_ms": {
+          "fixed": 5.11,
+          "previous": 5.738,
+          "candidate": 5.391,
+          "previous_percent": -6.047403276402935,
+          "fixed_percent": 5.4990215264187805
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 720896,
+          "previous": 1560576,
+          "candidate": 1024000,
+          "previous_percent": -34.38320209973753,
+          "fixed_percent": 42.04545454545455
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 1773568,
+          "previous": 1728512,
+          "candidate": 1650688,
+          "previous_percent": -4.502369668246446,
+          "fixed_percent": -6.928406466512702
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 1773568,
+          "previous": 1675264,
+          "candidate": 1650688,
+          "previous_percent": -1.466992665036675,
+          "fixed_percent": -6.928406466512702
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 5.837563451776638,
+      "counters": {
+        "allocations": {
+          "fixed": 40002,
+          "previous": 40002,
+          "candidate": 40002,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 2769090,
+          "previous": 2769090,
+          "candidate": 2769090,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 680024,
+          "previous": 680024,
+          "candidate": 160006,
+          "previous_percent": -76.47053633401174,
+          "fixed_percent": -76.47053633401174
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 605406,
+          "candidate": 699998,
+          "previous_percent": 15.624556083025276,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 337318,
+          "candidate": 403135,
+          "previous_percent": 19.511855281959456,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 2,
+          "previous": 2,
+          "candidate": 2,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1048644,
+          "previous": 1048644,
+          "candidate": 1048644,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 672404,
+          "previous": 672404,
+          "candidate": 672404,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "mixed/medium": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 47.422,
+          "previous": 51.296,
+          "candidate": 53.324,
+          "previous_percent": 3.9535246412975646,
+          "fixed_percent": 12.445700307873985
+        },
+        "cpu_ms": {
+          "fixed": 44.541,
+          "previous": 47.926,
+          "candidate": 50.405,
+          "previous_percent": 5.1725576931102095,
+          "fixed_percent": 13.165398172470319
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 1720320,
+          "previous": 1716224,
+          "candidate": 1744896,
+          "previous_percent": 1.6706443914081146,
+          "fixed_percent": 1.4285714285714286
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 1773568,
+          "previous": 1781760,
+          "candidate": 1781760,
+          "previous_percent": 0,
+          "fixed_percent": 0.4618937644341801
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 1773568,
+          "previous": 1781760,
+          "candidate": 1773568,
+          "previous_percent": -0.45977011494252873,
+          "fixed_percent": 0
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 3.5490561689468114,
+      "counters": {
+        "allocations": {
+          "fixed": 400002,
+          "previous": 400002,
+          "candidate": 400002,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 27889090,
+          "previous": 27889090,
+          "candidate": 27889090,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 6800024,
+          "previous": 6800024,
+          "candidate": 1600006,
+          "previous_percent": -76.47058304500102,
+          "fixed_percent": -76.47058304500102
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 7755518,
+          "candidate": 7683542,
+          "previous_percent": -0.9280618006431034,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 442279,
+          "candidate": 423313,
+          "previous_percent": -4.2882433938758115,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 26,
+          "previous": 26,
+          "candidate": 26,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1048644,
+          "previous": 1048644,
+          "candidate": 1048644,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 632500,
+          "previous": 632500,
+          "candidate": 632500,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "mixed/large": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 224.859,
+          "previous": 247.141,
+          "candidate": 238.929,
+          "previous_percent": -3.322799535487835,
+          "fixed_percent": 6.257254546182271
+        },
+        "cpu_ms": {
+          "fixed": 222.099,
+          "previous": 244.346,
+          "candidate": 235.934,
+          "previous_percent": -3.4426591800152266,
+          "fixed_percent": 6.229204093669944
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 1777664,
+          "previous": 1814528,
+          "candidate": 1781760,
+          "previous_percent": -1.8058690744920993,
+          "fixed_percent": 0.2304147465437788
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 1777664,
+          "previous": 1814528,
+          "candidate": 1781760,
+          "previous_percent": -1.8058690744920993,
+          "fixed_percent": 0.2304147465437788
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 1757184,
+          "previous": 1757184,
+          "candidate": 1748992,
+          "previous_percent": -0.4662004662004662,
+          "fixed_percent": -0.4662004662004662
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 2.32140688054202,
+      "counters": {
+        "allocations": {
+          "fixed": 2000002,
+          "previous": 2000002,
+          "candidate": 2000002,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 139889090,
+          "previous": 139889090,
+          "candidate": 139889090,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 34000024,
+          "previous": 34000024,
+          "candidate": 8000006,
+          "previous_percent": -76.47058719723256,
+          "fixed_percent": -76.47058719723256
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 34321636,
+          "candidate": 34193023,
+          "previous_percent": -0.37472864055781024,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 458700,
+          "candidate": 453941,
+          "previous_percent": -1.0374972749073468,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 133,
+          "previous": 133,
+          "candidate": 133,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1048644,
+          "previous": 1048644,
+          "candidate": 1048644,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 462260,
+          "previous": 462260,
+          "candidate": 462260,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "dispatch/small": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 3.426,
+          "previous": 3.5,
+          "candidate": 3.51,
+          "previous_percent": 0.28571428571427965,
+          "fixed_percent": 2.4518388791593586
+        },
+        "cpu_ms": {
+          "fixed": 0.866,
+          "previous": 0.907,
+          "candidate": 0.888,
+          "previous_percent": -2.0948180815876536,
+          "fixed_percent": 2.540415704387993
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 462848,
+          "previous": 360448,
+          "candidate": 385024,
+          "previous_percent": 6.818181818181818,
+          "fixed_percent": -16.8141592920354
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 462848,
+          "previous": 454656,
+          "candidate": 462848,
+          "previous_percent": 1.8018018018018018,
+          "fixed_percent": 0
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 438272,
+          "previous": 454656,
+          "candidate": 462848,
+          "previous_percent": 1.8018018018018018,
+          "fixed_percent": 5.607476635514018
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 1.8054746651135651,
+      "counters": {
+        "allocations": {
+          "fixed": 3,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 205,
+          "previous": 205,
+          "candidate": 205,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 420029,
+          "previous": 420029,
+          "candidate": 100007,
+          "previous_percent": -76.19045351630483,
+          "fixed_percent": -76.19045351630483
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 205,
+          "previous": 205,
+          "candidate": 205,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 205,
+          "previous": 205,
+          "candidate": 205,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "dispatch/medium": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 6.062,
+          "previous": 6.177,
+          "candidate": 5.614,
+          "previous_percent": -9.114456856078998,
+          "fixed_percent": -7.390300230946888
+        },
+        "cpu_ms": {
+          "fixed": 3.364,
+          "previous": 3.607,
+          "candidate": 2.819,
+          "previous_percent": -21.846409758802334,
+          "fixed_percent": -16.20095124851367
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 393216,
+          "previous": 380928,
+          "candidate": 372736,
+          "previous_percent": -2.150537634408602,
+          "fixed_percent": -5.208333333333333
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 454656,
+          "previous": 454656,
+          "candidate": 462848,
+          "previous_percent": 1.8018018018018018,
+          "fixed_percent": 1.8018018018018018
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 446464,
+          "previous": 446464,
+          "candidate": 462848,
+          "previous_percent": 3.669724770642202,
+          "fixed_percent": 3.669724770642202
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 1.2137559002022937,
+      "counters": {
+        "allocations": {
+          "fixed": 3,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 205,
+          "previous": 205,
+          "candidate": 205,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 4200029,
+          "previous": 4200029,
+          "candidate": 1000007,
+          "previous_percent": -76.19047392291814,
+          "fixed_percent": -76.19047392291814
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 205,
+          "previous": 205,
+          "candidate": 205,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 205,
+          "previous": 205,
+          "candidate": 205,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "dispatch/large": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 17.645,
+          "previous": 17.982,
+          "candidate": 14.543,
+          "previous_percent": -19.124680235791345,
+          "fixed_percent": -17.580051005950697
+        },
+        "cpu_ms": {
+          "fixed": 14.57,
+          "previous": 15.223,
+          "candidate": 11.823,
+          "previous_percent": -22.33462523812652,
+          "fixed_percent": -18.853809196980094
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 507904,
+          "previous": 528384,
+          "candidate": 569344,
+          "previous_percent": 7.751937984496124,
+          "fixed_percent": 12.096774193548388
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 507904,
+          "previous": 528384,
+          "candidate": 569344,
+          "previous_percent": 7.751937984496124,
+          "fixed_percent": 12.096774193548388
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 446464,
+          "previous": 454656,
+          "candidate": 454656,
+          "previous_percent": 0,
+          "fixed_percent": 1.834862385321101
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 3.2834978843441305,
+      "counters": {
+        "allocations": {
+          "fixed": 3,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 205,
+          "previous": 205,
+          "candidate": 205,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 21000029,
+          "previous": 21000029,
+          "candidate": 5000007,
+          "previous_percent": -76.19047573696207,
+          "fixed_percent": -76.19047573696207
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 205,
+          "previous": 205,
+          "candidate": 205,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 205,
+          "previous": 205,
+          "candidate": 205,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "constant/small": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 3.22,
+          "previous": 3.432,
+          "candidate": 3.306,
+          "previous_percent": -3.671328671328668,
+          "fixed_percent": 2.6708074534161446
+        },
+        "cpu_ms": {
+          "fixed": 0.709,
+          "previous": 0.776,
+          "candidate": 0.678,
+          "previous_percent": -12.62886597938144,
+          "fixed_percent": -4.372355430183346
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 389120,
+          "previous": 376832,
+          "candidate": 376832,
+          "previous_percent": 0,
+          "fixed_percent": -3.1578947368421053
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 471040,
+          "previous": 446464,
+          "candidate": 471040,
+          "previous_percent": 5.504587155963303,
+          "fixed_percent": 0
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 471040,
+          "previous": 446464,
+          "candidate": 471040,
+          "previous_percent": 5.504587155963303,
+          "fixed_percent": 0
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 4.803362353647557,
+      "counters": {
+        "allocations": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "allocated_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "executed_polls": {
+          "fixed": 980020,
+          "previous": 980020,
+          "candidate": 40004,
+          "previous_percent": -95.91804248892879,
+          "fixed_percent": -95.91804248892879
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "before_teardown_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        }
+      }
+    },
+    "constant/medium": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 4.168,
+          "previous": 4.254,
+          "candidate": 3.377,
+          "previous_percent": -20.615890926187113,
+          "fixed_percent": -18.977927063339738
+        },
+        "cpu_ms": {
+          "fixed": 1.587,
+          "previous": 1.673,
+          "candidate": 0.795,
+          "previous_percent": -52.48057381948595,
+          "fixed_percent": -49.905482041587895
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 368640,
+          "previous": 376832,
+          "candidate": 368640,
+          "previous_percent": -2.1739130434782608,
+          "fixed_percent": 0
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 438272,
+          "previous": 454656,
+          "candidate": 454656,
+          "previous_percent": 0,
+          "fixed_percent": 3.7383177570093458
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 438272,
+          "previous": 454656,
+          "candidate": 454656,
+          "previous_percent": 0,
+          "fixed_percent": 3.7383177570093458
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 2.307785740313367,
+      "counters": {
+        "allocations": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "allocated_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "executed_polls": {
+          "fixed": 9800020,
+          "previous": 9800020,
+          "candidate": 400004,
+          "previous_percent": -95.9183348605411,
+          "fixed_percent": -95.9183348605411
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "before_teardown_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        }
+      }
+    },
+    "constant/large": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 8.128,
+          "previous": 8.525,
+          "candidate": 4.198,
+          "previous_percent": -50.7565982404692,
+          "fixed_percent": -48.351377952755904
+        },
+        "cpu_ms": {
+          "fixed": 5.541,
+          "previous": 5.749,
+          "candidate": 1.58,
+          "previous_percent": -72.51695947121239,
+          "fixed_percent": -71.48529146363472
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 561152,
+          "previous": 540672,
+          "candidate": 376832,
+          "previous_percent": -30.303030303030305,
+          "fixed_percent": -32.846715328467155
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 561152,
+          "previous": 540672,
+          "candidate": 462848,
+          "previous_percent": -14.393939393939394,
+          "fixed_percent": -17.51824817518248
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 438272,
+          "previous": 462848,
+          "candidate": 462848,
+          "previous_percent": 0,
+          "fixed_percent": 5.607476635514018
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 2.1639817263765293,
+      "counters": {
+        "allocations": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "allocated_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "executed_polls": {
+          "fixed": 49000020,
+          "previous": 49000020,
+          "candidate": 2000004,
+          "previous_percent": -95.91836084964864,
+          "fixed_percent": -95.91836084964864
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "before_teardown_bytes": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        }
+      }
+    },
+    "data/small/typed-json": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 18.514,
+          "previous": 18.826,
+          "candidate": 15.164,
+          "previous_percent": -19.451821948369282,
+          "fixed_percent": -18.09441503726909
+        },
+        "cpu_ms": {
+          "fixed": 11.254,
+          "previous": 11.643,
+          "candidate": 9.678,
+          "previous_percent": -16.877093532594692,
+          "fixed_percent": -14.003909720988084
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 1990656,
+          "previous": 1867776,
+          "candidate": 1863680,
+          "previous_percent": -0.21929824561403508,
+          "fixed_percent": -6.378600823045267
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 2486272,
+          "previous": 2486272,
+          "candidate": 2084864,
+          "previous_percent": -16.14497528830313,
+          "fixed_percent": -16.14497528830313
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 2486272,
+          "previous": 2486272,
+          "candidate": 2084864,
+          "previous_percent": -16.14497528830313,
+          "fixed_percent": -16.14497528830313
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 1.1676396997497926,
+      "counters": {
+        "allocations": {
+          "fixed": 36615,
+          "previous": 36615,
+          "candidate": 36615,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 4150232,
+          "previous": 4150232,
+          "candidate": 4150232,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 5196524,
+          "previous": 5196524,
+          "candidate": 905150,
+          "previous_percent": -82.58162571749885,
+          "fixed_percent": -82.58162571749885
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 1403418,
+          "candidate": 1441560,
+          "previous_percent": 2.7177932732799492,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 548667,
+          "candidate": 583473,
+          "previous_percent": 6.343738551799179,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 3,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1048896,
+          "previous": 1048896,
+          "candidate": 1048896,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 1016482,
+          "previous": 1016482,
+          "candidate": 1016482,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/small/strings": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 6.151,
+          "previous": 6.07,
+          "candidate": 5.777,
+          "previous_percent": -4.82701812191104,
+          "fixed_percent": -6.080312144366764
+        },
+        "cpu_ms": {
+          "fixed": 1.913,
+          "previous": 1.962,
+          "candidate": 1.904,
+          "previous_percent": -2.9561671763506654,
+          "fixed_percent": -0.4704652378463209
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 380928,
+          "previous": 360448,
+          "candidate": 372736,
+          "previous_percent": 3.409090909090909,
+          "fixed_percent": -2.150537634408602
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 1130496,
+          "previous": 1126400,
+          "candidate": 1138688,
+          "previous_percent": 1.0909090909090908,
+          "fixed_percent": 0.7246376811594203
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 1130496,
+          "previous": 1126400,
+          "candidate": 1138688,
+          "previous_percent": 1.0909090909090908,
+          "fixed_percent": 0.7246376811594203
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 3.0526834071885762,
+      "counters": {
+        "allocations": {
+          "fixed": 4006,
+          "previous": 4006,
+          "candidate": 4006,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 496939,
+          "previous": 496939,
+          "candidate": 496939,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 104094,
+          "previous": 104094,
+          "candidate": 32013,
+          "previous_percent": -69.24606605568044,
+          "fixed_percent": -69.24606605568044
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 496939,
+          "previous": 496939,
+          "candidate": 496939,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 496939,
+          "previous": 496939,
+          "candidate": 496939,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/small/fold": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 4.011,
+          "previous": 4.09,
+          "candidate": 4.156,
+          "previous_percent": 1.6136919315403384,
+          "fixed_percent": 3.6150585888805677
+        },
+        "cpu_ms": {
+          "fixed": 0.893,
+          "previous": 0.939,
+          "candidate": 0.911,
+          "previous_percent": -2.981895633652813,
+          "fixed_percent": 2.0156774916013456
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 360448,
+          "previous": 360448,
+          "candidate": 339968,
+          "previous_percent": -5.681818181818182,
+          "fixed_percent": -5.681818181818182
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 598016,
+          "previous": 606208,
+          "candidate": 598016,
+          "previous_percent": -1.3513513513513513,
+          "fixed_percent": 0
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 598016,
+          "previous": 606208,
+          "candidate": 598016,
+          "previous_percent": -1.3513513513513513,
+          "fixed_percent": 0
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 2.316412025628396,
+      "counters": {
+        "allocations": {
+          "fixed": 79,
+          "previous": 79,
+          "candidate": 79,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 30136,
+          "previous": 30136,
+          "candidate": 30136,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 22261,
+          "previous": 22261,
+          "candidate": 9560,
+          "previous_percent": -57.05493913121603,
+          "fixed_percent": -57.05493913121603
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 30136,
+          "previous": 30136,
+          "candidate": 30136,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 30136,
+          "previous": 30136,
+          "candidate": 30136,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/medium/typed-json": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 64.164,
+          "previous": 66.548,
+          "candidate": 53.356,
+          "previous_percent": -19.823285448097614,
+          "fixed_percent": -16.844336388005733
+        },
+        "cpu_ms": {
+          "fixed": 56.483,
+          "previous": 59.344,
+          "candidate": 47.761,
+          "previous_percent": -19.51840118630358,
+          "fixed_percent": -15.44181435122071
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 2478080,
+          "previous": 2551808,
+          "candidate": 2195456,
+          "previous_percent": -13.964686998394864,
+          "fixed_percent": -11.40495867768595
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 2535424,
+          "previous": 2551808,
+          "candidate": 2203648,
+          "previous_percent": -13.643659711075442,
+          "fixed_percent": -13.08562197092084
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 2531328,
+          "previous": 2531328,
+          "candidate": 2121728,
+          "previous_percent": -16.181229773462782,
+          "fixed_percent": -16.181229773462782
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 4.189110136977962,
+      "counters": {
+        "allocations": {
+          "fixed": 205515,
+          "previous": 205515,
+          "candidate": 205515,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 22485685,
+          "previous": 22485685,
+          "candidate": 22485685,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 40725824,
+          "previous": 40725824,
+          "candidate": 7005050,
+          "previous_percent": -82.7994885996659,
+          "fixed_percent": -82.7994885996659
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 7006490,
+          "candidate": 8212481,
+          "previous_percent": 17.212484425154393,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 412928,
+          "candidate": 469636,
+          "previous_percent": 13.733144761314321,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 21,
+          "previous": 21,
+          "candidate": 21,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1052352,
+          "previous": 1052352,
+          "candidate": 1052352,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 676521,
+          "previous": 676521,
+          "candidate": 676521,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/medium/strings": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 8.062,
+          "previous": 8.156,
+          "candidate": 7.792,
+          "previous_percent": -4.462972045120166,
+          "fixed_percent": -3.349044902009422
+        },
+        "cpu_ms": {
+          "fixed": 3.815,
+          "previous": 3.99,
+          "candidate": 3.838,
+          "previous_percent": -3.809523809523813,
+          "fixed_percent": 0.6028833551769366
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 1392640,
+          "previous": 909312,
+          "candidate": 1548288,
+          "previous_percent": 70.27027027027027,
+          "fixed_percent": 11.176470588235293
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 1785856,
+          "previous": 1757184,
+          "candidate": 1798144,
+          "previous_percent": 2.331002331002331,
+          "fixed_percent": 0.6880733944954128
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 1785856,
+          "previous": 1757184,
+          "candidate": 1789952,
+          "previous_percent": 1.8648018648018647,
+          "fixed_percent": 0.22935779816513763
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 0.7190160832544986,
+      "counters": {
+        "allocations": {
+          "fixed": 4006,
+          "previous": 4006,
+          "candidate": 4006,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 4338860,
+          "previous": 4338860,
+          "candidate": 4338860,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 104094,
+          "previous": 104094,
+          "candidate": 32013,
+          "previous_percent": -69.24606605568044,
+          "fixed_percent": -69.24606605568044
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 762847,
+          "candidate": 720525,
+          "previous_percent": -5.547901479588961,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 210552,
+          "candidate": 201685,
+          "previous_percent": -4.211311220031156,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 4,
+          "previous": 4,
+          "candidate": 4,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1049312,
+          "previous": 1049312,
+          "candidate": 1049312,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 150756,
+          "previous": 150756,
+          "candidate": 150756,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/medium/fold": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 4.842,
+          "previous": 4.805,
+          "candidate": 4.665,
+          "previous_percent": -2.913631633714874,
+          "fixed_percent": -3.6555142503097815
+        },
+        "cpu_ms": {
+          "fixed": 1.496,
+          "previous": 1.539,
+          "candidate": 1.493,
+          "previous_percent": -2.988953866146837,
+          "fixed_percent": -0.20053475935828152
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 376832,
+          "previous": 413696,
+          "candidate": 385024,
+          "previous_percent": -6.930693069306931,
+          "fixed_percent": 2.1739130434782608
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 1142784,
+          "previous": 1122304,
+          "candidate": 1138688,
+          "previous_percent": 1.4598540145985401,
+          "fixed_percent": -0.35842293906810035
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 1142784,
+          "previous": 1122304,
+          "candidate": 1138688,
+          "previous_percent": 1.4598540145985401,
+          "fixed_percent": -0.35842293906810035
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 3.090889441262308,
+      "counters": {
+        "allocations": {
+          "fixed": 131,
+          "previous": 131,
+          "candidate": 131,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 431992,
+          "previous": 431992,
+          "candidate": 431992,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 350581,
+          "previous": 350581,
+          "candidate": 151640,
+          "previous_percent": -56.74608720951792,
+          "fixed_percent": -56.74608720951792
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 431992,
+          "previous": 431992,
+          "candidate": 431992,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 431992,
+          "previous": 431992,
+          "candidate": 431992,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/large/typed-json": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 217.435,
+          "previous": 224.719,
+          "candidate": 185.136,
+          "previous_percent": -17.614442926499315,
+          "fixed_percent": -14.854554234598847
+        },
+        "cpu_ms": {
+          "fixed": 209.667,
+          "previous": 217.371,
+          "candidate": 179.567,
+          "previous_percent": -17.391464362771483,
+          "fixed_percent": -14.35609800302384
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 2568192,
+          "previous": 2510848,
+          "candidate": 2191360,
+          "previous_percent": -12.724306688417618,
+          "fixed_percent": -14.67304625199362
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 2572288,
+          "previous": 2535424,
+          "candidate": 2191360,
+          "previous_percent": -13.5702746365105,
+          "fixed_percent": -14.80891719745223
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 2527232,
+          "previous": 2498560,
+          "candidate": 2121728,
+          "previous_percent": -15.081967213114755,
+          "fixed_percent": -16.045380875202593
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 1.372733523091247,
+      "counters": {
+        "allocations": {
+          "fixed": 782115,
+          "previous": 782115,
+          "candidate": 782115,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 85528952,
+          "previous": 85528952,
+          "candidate": 85528952,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 168242924,
+          "previous": 168242924,
+          "candidate": 28761950,
+          "previous_percent": -82.90451133623903,
+          "fixed_percent": -82.90451133623903
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 24597711,
+          "candidate": 26518969,
+          "previous_percent": 7.810718647763607,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 435751,
+          "candidate": 499724,
+          "previous_percent": 14.6810908064468,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 85,
+          "previous": 85,
+          "candidate": 85,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1059848,
+          "previous": 1059848,
+          "candidate": 1059848,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 666765,
+          "previous": 666765,
+          "candidate": 666765,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/large/strings": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 19.62,
+          "previous": 19.938,
+          "candidate": 20.063,
+          "previous_percent": 0.6269435249272746,
+          "fixed_percent": 2.257900101936788
+        },
+        "cpu_ms": {
+          "fixed": 15.188,
+          "previous": 15.728,
+          "candidate": 15.886,
+          "previous_percent": 1.004577822990841,
+          "fixed_percent": 4.595733473795093
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 1458176,
+          "previous": 1728512,
+          "candidate": 1781760,
+          "previous_percent": 3.080568720379147,
+          "fixed_percent": 22.191011235955056
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 1843200,
+          "previous": 1855488,
+          "candidate": 1851392,
+          "previous_percent": -0.22075055187637968,
+          "fixed_percent": 0.4444444444444444
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 1843200,
+          "previous": 1855488,
+          "candidate": 1851392,
+          "previous_percent": -0.22075055187637968,
+          "fixed_percent": 0.4444444444444444
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 3.1360230695950038,
+      "counters": {
+        "allocations": {
+          "fixed": 4007,
+          "previous": 4007,
+          "candidate": 4007,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 33025243,
+          "previous": 33025243,
+          "candidate": 33025243,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 104094,
+          "previous": 104094,
+          "candidate": 32013,
+          "previous_percent": -69.24606605568044,
+          "fixed_percent": -69.24606605568044
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 2310239,
+          "candidate": 2244281,
+          "previous_percent": -2.8550292848488836,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 130710,
+          "candidate": 106473,
+          "previous_percent": -18.542575166398898,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 31,
+          "previous": 31,
+          "candidate": 31,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1056256,
+          "previous": 1056256,
+          "candidate": 1056256,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 800524,
+          "previous": 800524,
+          "candidate": 800524,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/large/fold": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 8.122,
+          "previous": 8.415,
+          "candidate": 8.213,
+          "previous_percent": -2.400475341651812,
+          "fixed_percent": 1.1204136912090532
+        },
+        "cpu_ms": {
+          "fixed": 4.883,
+          "previous": 5.189,
+          "candidate": 4.868,
+          "previous_percent": -6.186163037194059,
+          "fixed_percent": -0.30718820397296087
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 1519616,
+          "previous": 1261568,
+          "candidate": 1462272,
+          "previous_percent": 15.909090909090908,
+          "fixed_percent": -3.7735849056603774
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 1630208,
+          "previous": 1654784,
+          "candidate": 1630208,
+          "previous_percent": -1.4851485148514851,
+          "fixed_percent": 0
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 1630208,
+          "previous": 1654784,
+          "candidate": 1630208,
+          "previous_percent": -1.4851485148514851,
+          "fixed_percent": 0
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 1.1354028264283271,
+      "counters": {
+        "allocations": {
+          "fixed": 170,
+          "previous": 170,
+          "candidate": 170,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 3415752,
+          "previous": 3415752,
+          "candidate": 3415752,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 2802037,
+          "previous": 2802037,
+          "candidate": 1212504,
+          "previous_percent": -56.727766264328416,
+          "fixed_percent": -56.727766264328416
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 548266,
+          "candidate": 390545,
+          "previous_percent": -28.76724071892111,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 171357,
+          "candidate": 119067,
+          "previous_percent": -30.515240112747072,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 4,
+          "previous": 4,
+          "candidate": 4,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1050976,
+          "previous": 1050976,
+          "candidate": 1050976,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 262496,
+          "previous": 262496,
+          "candidate": 262496,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "buildlens/small": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 18.057,
+          "previous": 17.864,
+          "candidate": 13.088,
+          "previous_percent": -26.735333631885364,
+          "fixed_percent": -27.518413911502464
+        },
+        "cpu_ms": {
+          "fixed": 7.821,
+          "previous": 8.116,
+          "candidate": 6.574,
+          "previous_percent": -18.999507146377525,
+          "fixed_percent": -15.944252653113411
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 2666496,
+          "previous": 2670592,
+          "candidate": 2064384,
+          "previous_percent": -22.699386503067483,
+          "fixed_percent": -22.580645161290324
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 2842624,
+          "previous": 2850816,
+          "candidate": 2330624,
+          "previous_percent": -18.24712643678161,
+          "fixed_percent": -18.011527377521613
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 2842624,
+          "previous": 2850816,
+          "candidate": 2330624,
+          "previous_percent": -18.24712643678161,
+          "fixed_percent": -18.011527377521613
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 2.7473577846355526,
+      "counters": {
+        "allocations": {
+          "fixed": 20813,
+          "previous": 20813,
+          "candidate": 20813,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 2557207,
+          "previous": 2557207,
+          "candidate": 2557207,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 1866828,
+          "previous": 1866828,
+          "candidate": 343415,
+          "previous_percent": -81.60435776622164,
+          "fixed_percent": -81.60435776622164
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 1056306,
+          "candidate": 800067,
+          "previous_percent": -24.258027503393905,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 549148,
+          "candidate": 439068,
+          "previous_percent": -20.04559790803208,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 2,
+          "previous": 2,
+          "candidate": 2,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1048941,
+          "previous": 1048941,
+          "candidate": 1048941,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 609122,
+          "previous": 609122,
+          "candidate": 609122,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "buildlens/medium": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 58.349,
+          "previous": 59.552,
+          "candidate": 51.62,
+          "previous_percent": -13.319451907576576,
+          "fixed_percent": -11.532331316732076
+        },
+        "cpu_ms": {
+          "fixed": 47.437,
+          "previous": 48.392,
+          "candidate": 43.65,
+          "previous_percent": -9.799140353777492,
+          "fixed_percent": -7.983219849484579
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 2867200,
+          "previous": 2908160,
+          "candidate": 2301952,
+          "previous_percent": -20.845070422535212,
+          "fixed_percent": -19.714285714285715
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 2879488,
+          "previous": 2908160,
+          "candidate": 2301952,
+          "previous_percent": -20.845070422535212,
+          "fixed_percent": -20.056899004267425
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 2879488,
+          "previous": 2875392,
+          "candidate": 2265088,
+          "previous_percent": -21.225071225071225,
+          "fixed_percent": -21.337126600284495
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 1.2121212121212155,
+      "counters": {
+        "allocations": {
+          "fixed": 203528,
+          "previous": 203528,
+          "candidate": 203528,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 23717586,
+          "previous": 23717586,
+          "candidate": 23717586,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 17539924,
+          "previous": 17539924,
+          "candidate": 3200264,
+          "previous_percent": -81.7544021285383,
+          "fixed_percent": -81.7544021285383
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 9760073,
+          "candidate": 10155376,
+          "previous_percent": 4.0502053621935,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 430732,
+          "candidate": 508364,
+          "previous_percent": 18.023272011366696,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 28,
+          "previous": 28,
+          "candidate": 28,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1048993,
+          "previous": 1048993,
+          "candidate": 1048993,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 794302,
+          "previous": 794302,
+          "candidate": 794302,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "buildlens/large": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 490.168,
+          "previous": 539.877,
+          "candidate": 455.326,
+          "previous_percent": -15.66115985678218,
+          "fixed_percent": -7.1081751562729485
+        },
+        "cpu_ms": {
+          "fixed": 466.598,
+          "previous": 515.685,
+          "candidate": 436.25,
+          "previous_percent": -15.403783317335186,
+          "fixed_percent": -6.504099888983667
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 7663616,
+          "previous": 7847936,
+          "candidate": 7086080,
+          "previous_percent": -9.707724425887266,
+          "fixed_percent": -7.536076964190273
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 7892992,
+          "previous": 7979008,
+          "candidate": 7327744,
+          "previous_percent": -8.162217659137577,
+          "fixed_percent": -7.161390762843799
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 7892992,
+          "previous": 7897088,
+          "candidate": 7299072,
+          "previous_percent": -7.572614107883817,
+          "fixed_percent": -7.524649714582252
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 1.039716344053826,
+      "counters": {
+        "allocations": {
+          "fixed": 2030631,
+          "previous": 2030631,
+          "candidate": 2030631,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 235432829,
+          "previous": 235432829,
+          "candidate": 235432829,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 175270146,
+          "previous": 175270146,
+          "candidate": 31939746,
+          "previous_percent": -81.77684749575093,
+          "fixed_percent": -81.77684749575093
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 126050008,
+          "candidate": 121487938,
+          "previous_percent": -3.6192540344781254,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 1830805,
+          "candidate": 2013185,
+          "previous_percent": 9.96173814251108,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 193,
+          "previous": 193,
+          "candidate": 193,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 5512870,
+          "previous": 5512870,
+          "candidate": 5512870,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 5512870,
+          "previous": 5512870,
+          "candidate": 5512870,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "fielddesk/demo": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 35.755,
+          "previous": 35.15,
+          "candidate": 31.983,
+          "previous_percent": -9.009957325746795,
+          "fixed_percent": -10.549573486225707
+        },
+        "cpu_ms": {
+          "fixed": 5.83,
+          "previous": 5.89,
+          "candidate": 5.145,
+          "previous_percent": -12.648556876061123,
+          "fixed_percent": -11.749571183533456
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 2039808,
+          "previous": 2019328,
+          "candidate": 1429504,
+          "previous_percent": -29.20892494929006,
+          "fixed_percent": -29.919678714859437
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 2981888,
+          "previous": 2961408,
+          "candidate": 2301952,
+          "previous_percent": -22.26832641770401,
+          "fixed_percent": -22.802197802197803
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 2027520,
+          "previous": 2097152,
+          "candidate": 1548288,
+          "previous_percent": -26.171875,
+          "fixed_percent": -23.636363636363637
+        },
+        "observed_processes": {
+          "fixed": 2,
+          "previous": 2,
+          "candidate": 2,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "fixed_wall_noise_percent": 0.7089472560324644,
+      "counters": {
+        "allocations": {
+          "fixed": 2183,
+          "previous": 2183,
+          "candidate": 2183,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 290464,
+          "previous": 290464,
+          "candidate": 290464,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 606674,
+          "previous": 606674,
+          "candidate": 101186,
+          "previous_percent": -83.32119062297049,
+          "fixed_percent": -83.32119062297049
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 290464,
+          "previous": 290464,
+          "candidate": 290464,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 290464,
+          "previous": 290464,
+          "candidate": 290464,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    }
+  },
+  "code": {
+    "numeric": {
+      "emitted": {
+        "roots": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 5,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 62,
+          "previous": 62,
+          "candidate": 10,
+          "previous_percent": -83.87096774193549,
+          "fixed_percent": -83.87096774193549
+        },
+        "arithmetic_guards": {
+          "fixed": 13,
+          "previous": 13,
+          "candidate": 8,
+          "previous_percent": -38.46153846153846,
+          "fixed_percent": -38.46153846153846
+        },
+        "temporaries": {
+          "fixed": 102,
+          "previous": 102,
+          "candidate": 102,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 26,
+          "previous": 26,
+          "candidate": 26,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 12,
+          "previous": 12,
+          "candidate": 12,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 10,
+          "previous": 10,
+          "candidate": 10,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "c_bytes": {
+        "fixed": 137744,
+        "previous": 137744,
+        "candidate": 136315,
+        "previous_percent": -1.03743175746312,
+        "fixed_percent": -1.03743175746312
+      },
+      "executable_bytes": {
+        "fixed": 23648,
+        "previous": 23648,
+        "candidate": 19512,
+        "previous_percent": -17.489851150202977,
+        "fixed_percent": -17.489851150202977
+      }
+    },
+    "aggregate": {
+      "emitted": {
+        "roots": {
+          "fixed": 21,
+          "previous": 21,
+          "candidate": 5,
+          "previous_percent": -76.19047619047619,
+          "fixed_percent": -76.19047619047619
+        },
+        "polls": {
+          "fixed": 51,
+          "previous": 51,
+          "candidate": 8,
+          "previous_percent": -84.31372549019608,
+          "fixed_percent": -84.31372549019608
+        },
+        "arithmetic_guards": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 4,
+          "previous_percent": -20,
+          "fixed_percent": -20
+        },
+        "temporaries": {
+          "fixed": 81,
+          "previous": 81,
+          "candidate": 81,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 30,
+          "previous": 30,
+          "candidate": 26,
+          "previous_percent": -13.333333333333334,
+          "fixed_percent": -13.333333333333334
+        },
+        "types": {
+          "fixed": 16,
+          "previous": 16,
+          "candidate": 16,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 14,
+          "previous": 14,
+          "candidate": 10,
+          "previous_percent": -28.571428571428573,
+          "fixed_percent": -28.571428571428573
+        }
+      },
+      "c_bytes": {
+        "fixed": 137162,
+        "previous": 137162,
+        "candidate": 134804,
+        "previous_percent": -1.7191350374010295,
+        "fixed_percent": -1.7191350374010295
+      },
+      "executable_bytes": {
+        "fixed": 23760,
+        "previous": 23760,
+        "candidate": 19512,
+        "previous_percent": -17.87878787878788,
+        "fixed_percent": -17.87878787878788
+      }
+    },
+    "mixed": {
+      "emitted": {
+        "roots": {
+          "fixed": 33,
+          "previous": 33,
+          "candidate": 33,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 61,
+          "previous": 61,
+          "candidate": 15,
+          "previous_percent": -75.40983606557377,
+          "fixed_percent": -75.40983606557377
+        },
+        "arithmetic_guards": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 4,
+          "previous_percent": -20,
+          "fixed_percent": -20
+        },
+        "temporaries": {
+          "fixed": 94,
+          "previous": 94,
+          "candidate": 94,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 29,
+          "previous": 29,
+          "candidate": 29,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 15,
+          "previous": 15,
+          "candidate": 15,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 13,
+          "previous": 13,
+          "candidate": 13,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "c_bytes": {
+        "fixed": 140043,
+        "previous": 140043,
+        "candidate": 139616,
+        "previous_percent": -0.3049063501924409,
+        "fixed_percent": -0.3049063501924409
+      },
+      "executable_bytes": {
+        "fixed": 32224,
+        "previous": 32224,
+        "candidate": 24032,
+        "previous_percent": -25.42204568023833,
+        "fixed_percent": -25.42204568023833
+      }
+    },
+    "dispatch": {
+      "emitted": {
+        "roots": {
+          "fixed": 24,
+          "previous": 24,
+          "candidate": 24,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 52,
+          "previous": 52,
+          "candidate": 13,
+          "previous_percent": -75,
+          "fixed_percent": -75
+        },
+        "arithmetic_guards": {
+          "fixed": 6,
+          "previous": 6,
+          "candidate": 5,
+          "previous_percent": -16.666666666666668,
+          "fixed_percent": -16.666666666666668
+        },
+        "temporaries": {
+          "fixed": 85,
+          "previous": 85,
+          "candidate": 85,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 29,
+          "previous": 29,
+          "candidate": 29,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 14,
+          "previous": 14,
+          "candidate": 14,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 11,
+          "previous": 11,
+          "candidate": 11,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "c_bytes": {
+        "fixed": 138485,
+        "previous": 138485,
+        "candidate": 138137,
+        "previous_percent": -0.2512907535112106,
+        "fixed_percent": -0.2512907535112106
+      },
+      "executable_bytes": {
+        "fixed": 24088,
+        "previous": 24088,
+        "candidate": 24088,
+        "previous_percent": 0,
+        "fixed_percent": 0
+      }
+    },
+    "constant": {
+      "emitted": {
+        "roots": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 5,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 89,
+          "previous": 89,
+          "candidate": 7,
+          "previous_percent": -92.13483146067416,
+          "fixed_percent": -92.13483146067416
+        },
+        "arithmetic_guards": {
+          "fixed": 22,
+          "previous": 22,
+          "candidate": 5,
+          "previous_percent": -77.27272727272727,
+          "fixed_percent": -77.27272727272727
+        },
+        "temporaries": {
+          "fixed": 130,
+          "previous": 130,
+          "candidate": 73,
+          "previous_percent": -43.84615384615385,
+          "fixed_percent": -43.84615384615385
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 9,
+          "candidate": 3,
+          "previous_percent": -66.66666666666667,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 25,
+          "previous": 25,
+          "candidate": 25,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 12,
+          "previous": 12,
+          "candidate": 12,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 10,
+          "previous": 10,
+          "candidate": 10,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "c_bytes": {
+        "fixed": 139975,
+        "previous": 139975,
+        "candidate": 133452,
+        "previous_percent": -4.660117878192534,
+        "fixed_percent": -4.660117878192534
+      },
+      "executable_bytes": {
+        "fixed": 23648,
+        "previous": 23648,
+        "candidate": 19512,
+        "previous_percent": -17.489851150202977,
+        "fixed_percent": -17.489851150202977
+      }
+    },
+    "data": {
+      "emitted": {
+        "roots": {
+          "fixed": 4624,
+          "previous": 4624,
+          "candidate": 3102,
+          "previous_percent": -32.91522491349481,
+          "fixed_percent": -32.91522491349481
+        },
+        "polls": {
+          "fixed": 6129,
+          "previous": 6129,
+          "candidate": 856,
+          "previous_percent": -86.03361070321422,
+          "fixed_percent": -86.03361070321422
+        },
+        "arithmetic_guards": {
+          "fixed": 214,
+          "previous": 214,
+          "candidate": 154,
+          "previous_percent": -28.037383177570092,
+          "fixed_percent": -28.037383177570092
+        },
+        "temporaries": {
+          "fixed": 9148,
+          "previous": 9148,
+          "candidate": 6873,
+          "previous_percent": -24.868823786620027,
+          "fixed_percent": -24.868823786620027
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 503,
+          "candidate": 387,
+          "previous_percent": -23.061630218687874,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 446,
+          "previous": 446,
+          "candidate": 313,
+          "previous_percent": -29.820627802690584,
+          "fixed_percent": -29.820627802690584
+        },
+        "types": {
+          "fixed": 162,
+          "previous": 162,
+          "candidate": 128,
+          "previous_percent": -20.987654320987655,
+          "fixed_percent": -20.987654320987655
+        },
+        "traces": {
+          "fixed": 145,
+          "previous": 145,
+          "candidate": 101,
+          "previous_percent": -30.344827586206897,
+          "fixed_percent": -30.344827586206897
+        }
+      },
+      "c_bytes": {
+        "fixed": 1544807,
+        "previous": 1544807,
+        "candidate": 1090848,
+        "previous_percent": -29.386130435711387,
+        "fixed_percent": -29.386130435711387
+      },
+      "executable_bytes": {
+        "fixed": 871456,
+        "previous": 871456,
+        "candidate": 407232,
+        "previous_percent": -53.26992986450263,
+        "fixed_percent": -53.26992986450263
+      }
+    },
+    "buildlens": {
+      "emitted": {
+        "roots": {
+          "fixed": 6482,
+          "previous": 6482,
+          "candidate": 4263,
+          "previous_percent": -34.23326133909287,
+          "fixed_percent": -34.23326133909287
+        },
+        "polls": {
+          "fixed": 8503,
+          "previous": 8503,
+          "candidate": 1161,
+          "previous_percent": -86.34599553098906,
+          "fixed_percent": -86.34599553098906
+        },
+        "arithmetic_guards": {
+          "fixed": 250,
+          "previous": 250,
+          "candidate": 185,
+          "previous_percent": -26,
+          "fixed_percent": -26
+        },
+        "temporaries": {
+          "fixed": 12246,
+          "previous": 12246,
+          "candidate": 8901,
+          "previous_percent": -27.31504164625184,
+          "fixed_percent": -27.31504164625184
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 659,
+          "candidate": 514,
+          "previous_percent": -22.003034901365705,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 524,
+          "previous": 524,
+          "candidate": 331,
+          "previous_percent": -36.83206106870229,
+          "fixed_percent": -36.83206106870229
+        },
+        "types": {
+          "fixed": 204,
+          "previous": 204,
+          "candidate": 142,
+          "previous_percent": -30.392156862745097,
+          "fixed_percent": -30.392156862745097
+        },
+        "traces": {
+          "fixed": 186,
+          "previous": 186,
+          "candidate": 118,
+          "previous_percent": -36.55913978494624,
+          "fixed_percent": -36.55913978494624
+        }
+      },
+      "c_bytes": {
+        "fixed": 2069182,
+        "previous": 2069182,
+        "candidate": 1416595,
+        "previous_percent": -31.53840503155353,
+        "fixed_percent": -31.53840503155353
+      },
+      "executable_bytes": {
+        "fixed": 1159000,
+        "previous": 1159000,
+        "candidate": 547640,
+        "previous_percent": -52.748921484037965,
+        "fixed_percent": -52.748921484037965
+      }
+    },
+    "fielddesk": {
+      "emitted": {
+        "roots": {
+          "fixed": 9338,
+          "previous": 9338,
+          "candidate": 7108,
+          "previous_percent": -23.880916684514887,
+          "fixed_percent": -23.880916684514887
+        },
+        "polls": {
+          "fixed": 11990,
+          "previous": 11990,
+          "candidate": 1822,
+          "previous_percent": -84.80400333611342,
+          "fixed_percent": -84.80400333611342
+        },
+        "arithmetic_guards": {
+          "fixed": 332,
+          "previous": 332,
+          "candidate": 182,
+          "previous_percent": -45.18072289156626,
+          "fixed_percent": -45.18072289156626
+        },
+        "temporaries": {
+          "fixed": 17550,
+          "previous": 17550,
+          "candidate": 13866,
+          "previous_percent": -20.99145299145299,
+          "fixed_percent": -20.99145299145299
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 1100,
+          "candidate": 917,
+          "previous_percent": -16.636363636363637,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 766,
+          "previous": 766,
+          "candidate": 569,
+          "previous_percent": -25.718015665796344,
+          "fixed_percent": -25.718015665796344
+        },
+        "types": {
+          "fixed": 286,
+          "previous": 286,
+          "candidate": 230,
+          "previous_percent": -19.58041958041958,
+          "fixed_percent": -19.58041958041958
+        },
+        "traces": {
+          "fixed": 254,
+          "previous": 254,
+          "candidate": 178,
+          "previous_percent": -29.921259842519685,
+          "fixed_percent": -29.921259842519685
+        }
+      },
+      "c_bytes": {
+        "fixed": 2956984,
+        "previous": 2956984,
+        "candidate": 2229762,
+        "previous_percent": -24.593369460233806,
+        "fixed_percent": -24.593369460233806
+      },
+      "executable_bytes": {
+        "fixed": 1484168,
+        "previous": 1484168,
+        "candidate": 711952,
+        "previous_percent": -52.03022838384873,
+        "fixed_percent": -52.03022838384873
+      }
+    }
+  },
+  "builds": {
+    "buildlens": {
+      "phases": {
+        "frontend": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 438.293,
+              "previous": 439.565,
+              "candidate": 353.269,
+              "previous_percent": -19.63213631658571,
+              "fixed_percent": -19.39889525956381
+            },
+            "cpu_ms": {
+              "fixed": 284.382,
+              "previous": 288.422,
+              "candidate": 210.785,
+              "previous_percent": -26.917849539910275,
+              "fixed_percent": -25.879626699298832
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 30945280,
+              "previous": 31453184,
+              "candidate": 29274112,
+              "previous_percent": -6.927985414767548,
+              "fixed_percent": -5.400397088021178
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 32043008,
+              "previous": 31961088,
+              "candidate": 29392896,
+              "previous_percent": -8.035371011149557,
+              "fixed_percent": -8.270484468873834
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 32038912,
+              "previous": 31924224,
+              "candidate": 29392896,
+              "previous_percent": -7.929176289453426,
+              "fixed_percent": -8.25875735106111
+            },
+            "observed_processes": {
+              "fixed": 1,
+              "previous": 1,
+              "candidate": 1,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "fixed_wall_noise_percent": 1.4480525584413608
+        },
+        "emit_c_total": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 599.538,
+              "previous": 595.661,
+              "candidate": 473.007,
+              "previous_percent": -20.59124233414643,
+              "fixed_percent": -21.104750658006665
+            },
+            "cpu_ms": {
+              "fixed": 420.796,
+              "previous": 419.287,
+              "candidate": 304.79,
+              "previous_percent": -27.30754829031188,
+              "fixed_percent": -27.568227834865343
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 52805632,
+              "previous": 52801536,
+              "candidate": 45744128,
+              "previous_percent": -13.365914203708014,
+              "fixed_percent": -13.372634191746819
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 52805632,
+              "previous": 52801536,
+              "candidate": 45744128,
+              "previous_percent": -13.365914203708014,
+              "fixed_percent": -13.372634191746819
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 52621312,
+              "previous": 52555776,
+              "candidate": 45510656,
+              "previous_percent": -13.405034681630426,
+              "fixed_percent": -13.512882384992606
+            },
+            "observed_processes": {
+              "fixed": 1,
+              "previous": 1,
+              "candidate": 1,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "fixed_wall_noise_percent": 0.7586152049525238
+        },
+        "c_compile_link": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 10402.487,
+              "previous": 10413.648,
+              "candidate": 5011.45,
+              "previous_percent": -51.87613408864981,
+              "fixed_percent": -51.8245011986076
+            },
+            "cpu_ms": {
+              "fixed": 10064.29,
+              "previous": 10337.165,
+              "candidate": 4947.548,
+              "previous_percent": -52.138250671243036,
+              "fixed_percent": -50.84056600117843
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 2031616,
+              "previous": 2019328,
+              "candidate": 2015232,
+              "previous_percent": -0.2028397565922921,
+              "fixed_percent": -0.8064516129032258
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 358428672,
+              "previous": 358440960,
+              "candidate": 250155008,
+              "previous_percent": -30.210261684378928,
+              "fixed_percent": -30.207869084758933
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 356360192,
+              "previous": 356376576,
+              "candidate": 248020992,
+              "previous_percent": -30.404799668988346,
+              "fixed_percent": -30.401599963219237
+            },
+            "observed_processes": {
+              "fixed": 3,
+              "previous": 3,
+              "candidate": 3,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "fixed_wall_noise_percent": 0.8122219436199654
+        },
+        "build_total": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 10916.375,
+              "previous": 11108.741,
+              "candidate": 5743.145,
+              "previous_percent": -48.30066701528103,
+              "fixed_percent": -47.389632547434466
+            },
+            "cpu_ms": {
+              "fixed": 10403.809,
+              "previous": 10852.207,
+              "candidate": 5501.664,
+              "previous_percent": -49.30373148982507,
+              "fixed_percent": -47.118752372328245
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 52875264,
+              "previous": 52736000,
+              "candidate": 45760512,
+              "previous_percent": -13.227184466019418,
+              "fixed_percent": -13.455728561468742
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 411336704,
+              "previous": 411164672,
+              "candidate": 295890944,
+              "previous_percent": -28.035902851108766,
+              "fixed_percent": -28.066000159324464
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 356450304,
+              "previous": 356372480,
+              "candidate": 247988224,
+              "previous_percent": -30.413194643985978,
+              "fixed_percent": -30.428387571244713
+            },
+            "observed_processes": {
+              "fixed": 4,
+              "previous": 4,
+              "candidate": 4,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "fixed_wall_noise_percent": 1.0447271606244788
+        }
+      },
+      "emitted": {
+        "roots": {
+          "fixed": 6482,
+          "previous": 6482,
+          "candidate": 4263,
+          "previous_percent": -34.23326133909287,
+          "fixed_percent": -34.23326133909287
+        },
+        "polls": {
+          "fixed": 8503,
+          "previous": 8503,
+          "candidate": 1161,
+          "previous_percent": -86.34599553098906,
+          "fixed_percent": -86.34599553098906
+        },
+        "arithmetic_guards": {
+          "fixed": 250,
+          "previous": 250,
+          "candidate": 185,
+          "previous_percent": -26,
+          "fixed_percent": -26
+        },
+        "temporaries": {
+          "fixed": 12246,
+          "previous": 12246,
+          "candidate": 8901,
+          "previous_percent": -27.31504164625184,
+          "fixed_percent": -27.31504164625184
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 659,
+          "candidate": 514,
+          "previous_percent": -22.003034901365705,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 524,
+          "previous": 524,
+          "candidate": 331,
+          "previous_percent": -36.83206106870229,
+          "fixed_percent": -36.83206106870229
+        },
+        "types": {
+          "fixed": 204,
+          "previous": 204,
+          "candidate": 142,
+          "previous_percent": -30.392156862745097,
+          "fixed_percent": -30.392156862745097
+        },
+        "traces": {
+          "fixed": 186,
+          "previous": 186,
+          "candidate": 118,
+          "previous_percent": -36.55913978494624,
+          "fixed_percent": -36.55913978494624
+        }
+      },
+      "sizes": {
+        "package": {
+          "fixed": 463211,
+          "previous": 463211,
+          "candidate": 225617,
+          "previous_percent": -51.29282335695827,
+          "fixed_percent": -51.29282335695827
+        },
+        "c": {
+          "fixed": 2069182,
+          "previous": 2069182,
+          "candidate": 1416595,
+          "previous_percent": -31.53840503155353,
+          "fixed_percent": -31.53840503155353
+        },
+        "exe": {
+          "fixed": 1159000,
+          "previous": 1159000,
+          "candidate": 547640,
+          "previous_percent": -52.748921484037965,
+          "fixed_percent": -52.748921484037965
+        }
+      }
+    },
+    "fielddesk": {
+      "phases": {
+        "frontend": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 791.506,
+              "previous": 768.523,
+              "candidate": 616.208,
+              "previous_percent": -19.819185632700655,
+              "fixed_percent": -22.147400019709263
+            },
+            "cpu_ms": {
+              "fixed": 499.38,
+              "previous": 488.751,
+              "candidate": 350.353,
+              "previous_percent": -28.31666840579354,
+              "fixed_percent": -29.842404581681283
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 43438080,
+              "previous": 43954176,
+              "candidate": 41832448,
+              "previous_percent": -4.827136333985649,
+              "fixed_percent": -3.6963696369636962
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 43704320,
+              "previous": 43954176,
+              "candidate": 42098688,
+              "previous_percent": -4.221414593234554,
+              "fixed_percent": -3.6738519212746015
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 43606016,
+              "previous": 43569152,
+              "candidate": 41926656,
+              "previous_percent": -3.769859922910595,
+              "fixed_percent": -3.851211722712756
+            },
+            "observed_processes": {
+              "fixed": 1,
+              "previous": 1,
+              "candidate": 1,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "fixed_wall_noise_percent": 1.6002271857677182
+        },
+        "emit_c_total": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 1007.565,
+              "previous": 996.197,
+              "candidate": 792.268,
+              "previous_percent": -20.47075026325114,
+              "fixed_percent": -21.368050696481124
+            },
+            "cpu_ms": {
+              "fixed": 699.235,
+              "previous": 687.22,
+              "candidate": 504.489,
+              "previous_percent": -26.589883879980217,
+              "fixed_percent": -27.85129462913041
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 67993600,
+              "previous": 68001792,
+              "candidate": 62771200,
+              "previous_percent": -7.691844356101675,
+              "fixed_percent": -7.680722891566265
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 67993600,
+              "previous": 68001792,
+              "candidate": 62771200,
+              "previous_percent": -7.691844356101675,
+              "fixed_percent": -7.680722891566265
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 67891200,
+              "previous": 67874816,
+              "candidate": 62664704,
+              "previous_percent": -7.676060587773822,
+              "fixed_percent": -7.698340874811463
+            },
+            "observed_processes": {
+              "fixed": 1,
+              "previous": 1,
+              "candidate": 1,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "fixed_wall_noise_percent": 1.3022584211357502
+        },
+        "c_compile_link": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 13797.402,
+              "previous": 14172.401,
+              "candidate": 7323.707,
+              "previous_percent": -48.3241618692556,
+              "fixed_percent": -46.919666470542786
+            },
+            "cpu_ms": {
+              "fixed": 13446.802,
+              "previous": 14083.007,
+              "candidate": 7247.668,
+              "previous_percent": -48.5360761377169,
+              "fixed_percent": -46.10117706797497
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 2011136,
+              "previous": 2027520,
+              "candidate": 2011136,
+              "previous_percent": -0.8080808080808081,
+              "fixed_percent": 0
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 375406592,
+              "previous": 375345152,
+              "candidate": 354541568,
+              "previous_percent": -5.542521034080121,
+              "fixed_percent": -5.557980185920656
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 373374976,
+              "previous": 373436416,
+              "candidate": 352509952,
+              "previous_percent": -5.60375558017352,
+              "fixed_percent": -5.5882223879942075
+            },
+            "observed_processes": {
+              "fixed": 3,
+              "previous": 3,
+              "candidate": 3,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "fixed_wall_noise_percent": 2.049964598839477
+        },
+        "build_total": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 14760.704,
+              "previous": 15596.495,
+              "candidate": 8427.892,
+              "previous_percent": -45.96291025643903,
+              "fixed_percent": -42.90318402157512
+            },
+            "cpu_ms": {
+              "fixed": 14107.979,
+              "previous": 15193.084,
+              "candidate": 8043.92,
+              "previous_percent": -47.05538388387769,
+              "fixed_percent": -42.983187031962544
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 67883008,
+              "previous": 68022272,
+              "candidate": 62767104,
+              "previous_percent": -7.725657855121335,
+              "fixed_percent": -7.536354311229108
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 442417152,
+              "previous": 442454016,
+              "candidate": 416747520,
+              "previous_percent": -5.809981392507012,
+              "fixed_percent": -5.802133096322631
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 373383168,
+              "previous": 373346304,
+              "candidate": 352591872,
+              "previous_percent": -5.559029720567422,
+              "fixed_percent": -5.568353847166458
+            },
+            "observed_processes": {
+              "fixed": 4,
+              "previous": 4,
+              "candidate": 4,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "fixed_wall_noise_percent": 0.26313809716626285
+        }
+      },
+      "emitted": {
+        "roots": {
+          "fixed": 9338,
+          "previous": 9338,
+          "candidate": 7108,
+          "previous_percent": -23.880916684514887,
+          "fixed_percent": -23.880916684514887
+        },
+        "polls": {
+          "fixed": 11990,
+          "previous": 11990,
+          "candidate": 1822,
+          "previous_percent": -84.80400333611342,
+          "fixed_percent": -84.80400333611342
+        },
+        "arithmetic_guards": {
+          "fixed": 332,
+          "previous": 332,
+          "candidate": 182,
+          "previous_percent": -45.18072289156626,
+          "fixed_percent": -45.18072289156626
+        },
+        "temporaries": {
+          "fixed": 17550,
+          "previous": 17550,
+          "candidate": 13866,
+          "previous_percent": -20.99145299145299,
+          "fixed_percent": -20.99145299145299
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 1100,
+          "candidate": 917,
+          "previous_percent": -16.636363636363637,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 766,
+          "previous": 766,
+          "candidate": 569,
+          "previous_percent": -25.718015665796344,
+          "fixed_percent": -25.718015665796344
+        },
+        "types": {
+          "fixed": 286,
+          "previous": 286,
+          "candidate": 230,
+          "previous_percent": -19.58041958041958,
+          "fixed_percent": -19.58041958041958
+        },
+        "traces": {
+          "fixed": 254,
+          "previous": 254,
+          "candidate": 178,
+          "previous_percent": -29.921259842519685,
+          "fixed_percent": -29.921259842519685
+        }
+      },
+      "sizes": {
+        "package": {
+          "fixed": 610060,
+          "previous": 610051,
+          "candidate": 295927,
+          "previous_percent": -51.49143268349695,
+          "fixed_percent": -51.49214831328066
+        },
+        "c": {
+          "fixed": 2956984,
+          "previous": 2956984,
+          "candidate": 2229762,
+          "previous_percent": -24.593369460233806,
+          "fixed_percent": -24.593369460233806
+        },
+        "exe": {
+          "fixed": 1484168,
+          "previous": 1484168,
+          "candidate": 711952,
+          "previous_percent": -52.03022838384873,
+          "fixed_percent": -52.03022838384873
+        }
+      }
+    },
+    "compiler": {
+      "phases": {
+        "frontend": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 1989.154,
+              "previous": 2010.68,
+              "candidate": 1257.733,
+              "previous_percent": -37.44738098553724,
+              "fixed_percent": -36.770456183885216
+            },
+            "cpu_ms": {
+              "fixed": 1540.436,
+              "previous": 1563.669,
+              "candidate": 704.743,
+              "previous_percent": -54.93016744592366,
+              "fixed_percent": -54.25042001095793
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 92602368,
+              "previous": 92667904,
+              "candidate": 91226112,
+              "previous_percent": -1.5558698727015559,
+              "fixed_percent": -1.4861995753715498
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 92602368,
+              "previous": 92667904,
+              "candidate": 91226112,
+              "previous_percent": -1.5558698727015559,
+              "fixed_percent": -1.4861995753715498
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 92061696,
+              "previous": 92291072,
+              "candidate": 90984448,
+              "previous_percent": -1.4157642464051128,
+              "fixed_percent": -1.1701370350596192
+            },
+            "observed_processes": {
+              "fixed": 1,
+              "previous": 1,
+              "candidate": 1,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "fixed_wall_noise_percent": 0.24227159876409077
+        },
+        "emit_c_total": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 2514.794,
+              "previous": 2679.62,
+              "candidate": 1922.227,
+              "previous_percent": -28.264940551272186,
+              "fixed_percent": -23.5632421582046
+            },
+            "cpu_ms": {
+              "fixed": 2031.917,
+              "previous": 2206.156,
+              "candidate": 1331.956,
+              "previous_percent": -39.62548432658434,
+              "fixed_percent": -34.448306697566885
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 155111424,
+              "previous": 144773120,
+              "candidate": 139259904,
+              "previous_percent": -3.808176545480266,
+              "fixed_percent": -10.219440703477778
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 155111424,
+              "previous": 144773120,
+              "candidate": 139259904,
+              "previous_percent": -3.808176545480266,
+              "fixed_percent": -10.219440703477778
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 154877952,
+              "previous": 144506880,
+              "candidate": 138956800,
+              "previous_percent": -3.840702947845805,
+              "fixed_percent": -10.279805352798054
+            },
+            "observed_processes": {
+              "fixed": 1,
+              "previous": 1,
+              "candidate": 1,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "fixed_wall_noise_percent": 0.9478901815143812
+        },
+        "c_compile_link": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 52537.549,
+              "previous": 56073.54,
+              "candidate": 24511.258,
+              "previous_percent": -56.287300569930125,
+              "fixed_percent": -53.34525788403261
+            },
+            "cpu_ms": {
+              "fixed": 52126.31,
+              "previous": 55921.715,
+              "candidate": 24392.29,
+              "previous_percent": -56.381362767576064,
+              "fixed_percent": -53.2054158447049
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 1998848,
+              "previous": 2027520,
+              "candidate": 1998848,
+              "previous_percent": -1.4141414141414141,
+              "fixed_percent": 0
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 482963456,
+              "previous": 483942400,
+              "candidate": 387321856,
+              "previous_percent": -19.96529834955565,
+              "fixed_percent": -19.80307180839786
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 480854016,
+              "previous": 481959936,
+              "candidate": 385273856,
+              "previous_percent": -20.061020175751704,
+              "fixed_percent": -19.877167876247913
+            },
+            "observed_processes": {
+              "fixed": 3,
+              "previous": 3,
+              "candidate": 3,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "fixed_wall_noise_percent": 0.3570821054054097
+        },
+        "build_total": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 55118.133,
+              "previous": 58808.331,
+              "candidate": 26842.503,
+              "previous_percent": -54.355951710311246,
+              "fixed_percent": -51.30005038450776
+            },
+            "cpu_ms": {
+              "fixed": 54200.313,
+              "previous": 58144.664,
+              "candidate": 26115.728,
+              "previous_percent": -55.08491028514671,
+              "fixed_percent": -51.81627825654808
+            },
+            "peak_process_rss_bytes": {
+              "fixed": 155189248,
+              "previous": 144715776,
+              "candidate": 139259904,
+              "previous_percent": -3.770060287000085,
+              "fixed_percent": -10.264463682432432
+            },
+            "peak_tree_rss_bytes": {
+              "fixed": 631148544,
+              "previous": 625954816,
+              "candidate": 519315456,
+              "previous_percent": -17.03627119309519,
+              "fixed_percent": -17.718980589140042
+            },
+            "peak_single_rss_wait4_bytes": {
+              "fixed": 480772096,
+              "previous": 481738752,
+              "candidate": 385269760,
+              "previous_percent": -20.025167499914975,
+              "fixed_percent": -19.86436750272628
+            },
+            "observed_processes": {
+              "fixed": 4,
+              "previous": 4,
+              "candidate": 4,
+              "previous_percent": 0,
+              "fixed_percent": 0
+            }
+          },
+          "fixed_wall_noise_percent": 0.3786820034744291
+        }
+      },
+      "emitted": {
+        "roots": {
+          "fixed": 21920,
+          "previous": 21920,
+          "candidate": 19051,
+          "previous_percent": -13.088503649635037,
+          "fixed_percent": -13.088503649635037
+        },
+        "polls": {
+          "fixed": 29961,
+          "previous": 29961,
+          "candidate": 7370,
+          "previous_percent": -75.40135509495677,
+          "fixed_percent": -75.40135509495677
+        },
+        "arithmetic_guards": {
+          "fixed": 716,
+          "previous": 716,
+          "candidate": 472,
+          "previous_percent": -34.07821229050279,
+          "fixed_percent": -34.07821229050279
+        },
+        "temporaries": {
+          "fixed": 39698,
+          "previous": 39698,
+          "candidate": 39669,
+          "previous_percent": -0.07305153912035871,
+          "fixed_percent": -0.07305153912035871
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 2222,
+          "candidate": 2222,
+          "previous_percent": 0,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 517,
+          "previous": 517,
+          "candidate": 504,
+          "previous_percent": -2.514506769825919,
+          "fixed_percent": -2.514506769825919
+        },
+        "types": {
+          "fixed": 68,
+          "previous": 68,
+          "candidate": 68,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 63,
+          "previous": 63,
+          "candidate": 55,
+          "previous_percent": -12.698412698412698,
+          "fixed_percent": -12.698412698412698
+        }
+      },
+      "sizes": {
+        "package": {
+          "fixed": 3289360,
+          "previous": 3298771,
+          "candidate": 2053384,
+          "previous_percent": -37.75306015482736,
+          "fixed_percent": -37.574968990928326
+        },
+        "c": {
+          "fixed": 6301785,
+          "previous": 6859065,
+          "candidate": 6262232,
+          "previous_percent": -8.70137547901937,
+          "fixed_percent": -0.6276475633491145
+        },
+        "exe": {
+          "fixed": 5869864,
+          "previous": 5869864,
+          "candidate": 2767096,
+          "previous_percent": -52.85928260007387,
+          "fixed_percent": -52.85928260007387
+        }
+      }
+    }
+  }
+}

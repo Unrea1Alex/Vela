@@ -1,11 +1,44 @@
 import "text.vela" as text;
 import "path.vela" as path;
+import "io.vela" as stream;
 pub enum Error {
     InvalidPath(path::Error),
     Encoding(text::Error),
     Limit(Int),
     Io(String, String),
     Cleanup(String, Bool)
+}
+pub enum FilePhase {
+    Validate,
+    Stage,
+    OpenSource,
+    OpenTarget,
+    Read,
+    Write,
+    Close,
+    Replace,
+    RemoveContent,
+    RemoveDirectory
+}
+pub enum FileCause {
+    File(Error),
+    Stream(stream::Error)
+}
+pub struct FileFailure {
+    phase: FilePhase,
+    path: path::Path,
+    position: Option<Int>,
+    cause: FileCause
+}
+pub struct Publication {
+    operation: Result<Int, FileFailure>,
+    cleanup: List<FileFailure>,
+    committed: Bool
+}
+struct Staging {
+    destination: String,
+    directory: String,
+    content: String
 }
 fn valid(value: path::Path) -> Result < path::Path, Error > {
     match path::checked(value.value) {
@@ -55,18 +88,14 @@ fn written(value: WriteResult, file: String) -> Result<Bool, Error> {
         }
     }
 }
-pub fn write_atomic(file: path::Path, data: text::Bytes) -> Result<Bool, Error> effects { io } {
-    let p = valid(file)?;
-    if str_len(data.data) > 268435456 {
-        return Result<Bool, Error>::Err(Error::Limit(268435456));
-    }
+fn staging(p: path::Path) -> Result<Staging, Error> effects { io } {
     var absolute = "";
     match absolute_path(p.value) {
         StringResult::Ok(s) => {
             absolute = s;
         }
         StringResult::Err(message) => {
-            return Result<Bool, Error>::Err(Error::Io(p.value, message));
+            return Result<Staging, Error>::Err(Error::Io(p.value, message));
         }
     }
     var parent = "";
@@ -75,7 +104,7 @@ pub fn write_atomic(file: path::Path, data: text::Bytes) -> Result<Bool, Error> 
             parent = value.value;
         }
         Result::Err(error) => {
-            return Result<Bool, Error>::Err(Error::InvalidPath(error));
+            return Result<Staging, Error>::Err(Error::InvalidPath(error));
         }
     }
     var directory = "";
@@ -84,15 +113,24 @@ pub fn write_atomic(file: path::Path, data: text::Bytes) -> Result<Bool, Error> 
             directory = s;
         }
         StringResult::Err(message) => {
-            return Result<Bool, Error>::Err(Error::Io(parent, message));
+            return Result<Staging, Error>::Err(Error::Io(parent, message));
         }
     }
-    let temporary = directory + "/content";
+    return Result<Staging, Error>::Ok(Staging(destination: absolute, directory: directory,
+        content: directory + "/content"));
+}
+pub fn write_atomic(file: path::Path, data: text::Bytes) -> Result<Bool, Error> effects { io } {
+    let p = valid(file)?;
+    if str_len(data.data) > 268435456 {
+        return Result<Bool, Error>::Err(Error::Limit(268435456));
+    }
+    let stage = staging(p)?;
+    let temporary = stage.content;
     var outcome = written(write_file(temporary, data.data), temporary);
     var committed = false;
     match outcome {
         Result::Ok(_) => {
-            outcome = written(replace_file(temporary, absolute), absolute);
+            outcome = written(replace_file(temporary, stage.destination), stage.destination);
             match outcome {
                 Result::Ok(_) => {
                     committed = true;
@@ -106,13 +144,195 @@ pub fn write_atomic(file: path::Path, data: text::Bytes) -> Result<Bool, Error> 
         // Missing temporary is harmless; remove_dir below confirms no file was left.
         let removed = remove_file(temporary);
     }
-    match remove_dir(directory) {
+    match remove_dir(stage.directory) {
         WriteResult::Ok => {}
         WriteResult::Err(_) => {
-            return Result<Bool, Error>::Err(Error::Cleanup(directory, committed));
+            return Result<Bool, Error>::Err(Error::Cleanup(stage.directory, committed));
         }
     }
     return outcome;
+}
+fn file_failure(phase: FilePhase, file: path::Path, cause: Error) -> FileFailure {
+    let actual = match cause {
+        Error::Io(name, _) => path::Path(value: name),
+        Error::Cleanup(name, _) => path::Path(value: name),
+        Error::InvalidPath(_) => file,
+        Error::Encoding(_) => file,
+        Error::Limit(_) => file
+    };
+    return FileFailure(phase: phase, path: actual, position: Option<Int>::None,
+        cause: FileCause::File(cause));
+}
+fn stream_failure(phase: FilePhase, file: path::Path, cause: stream::Error) -> FileFailure {
+    return FileFailure(phase: phase, path: file, position: Option<Int>::Some(cause.offset),
+        cause: FileCause::Stream(cause));
+}
+pub fn describe_failure(error: FileFailure) -> String {
+    let phase = match error.phase {
+        FilePhase::Validate => "validate",
+        FilePhase::Stage => "stage",
+        FilePhase::OpenSource => "open source",
+        FilePhase::OpenTarget => "open staged target",
+        FilePhase::Read => "read",
+        FilePhase::Write => "write",
+        FilePhase::Close => "close",
+        FilePhase::Replace => "replace",
+        FilePhase::RemoveContent => "remove content",
+        FilePhase::RemoveDirectory => "remove directory"
+    };
+    let location = match error.position {
+        Option::None => error.path.value,
+        Option::Some(offset) => error.path.value + " at byte " + to_string(offset)
+    };
+    let cause = match error.cause {
+        FileCause::Stream(value) => value.cause,
+        FileCause::File(value) => match value {
+            Error::InvalidPath(_) => "invalid path",
+            Error::Encoding(_) => "invalid text encoding",
+            Error::Limit(limit) => "byte limit " + to_string(limit),
+            Error::Io(_, message) => message,
+            Error::Cleanup(_, _) => "cleanup failed"
+        }
+    };
+    return phase + " " + location + " — " + cause;
+}
+fn aborted(error: FileFailure, cleanup: List<FileFailure>) -> Publication {
+    return Publication(operation: Result<Int, FileFailure>::Err(error), cleanup: cleanup,
+        committed: false);
+}
+fn prepare(file: path::Path, buffer: Int) -> Result<Staging, FileFailure> effects { io } {
+    if buffer < 1 || buffer > 65536 {
+        return Result<Staging, FileFailure>::Err(stream_failure(FilePhase::Validate, file,
+            stream::error(stream::ErrorKind::InvalidLimit, 0, "buffer must be 1..65536")));
+    }
+    match valid(file) {
+        Result::Err(error) => {
+            return Result<Staging, FileFailure>::Err(file_failure(FilePhase::Validate, file, error));
+        }
+        Result::Ok(p) => {
+            return match staging(p) {
+                Result::Ok(stage) => Result<Staging, FileFailure>::Ok(stage),
+                Result::Err(error) => Result<Staging, FileFailure>::Err(file_failure(FilePhase::Stage,
+                    file, error))
+            };
+        }
+    }
+}
+fn close_result(answer: Result<Unit, stream::Error>, file: path::Path,
+    cleanup: List<FileFailure>) -> Unit effects { state } {
+    match answer {
+        Result::Ok(_) => {}
+        Result::Err(error) => { list_push(cleanup, stream_failure(FilePhase::Close, file, error)); }
+    }
+}
+fn copied(answer: Result<stream::Statistics, stream::CopyError>, source: path::Path,
+    target: path::Path) -> Result<Int, FileFailure> {
+    match answer {
+        Result::Ok(stats) => { return Result<Int, FileFailure>::Ok(stats.bytes); }
+        Result::Err(failure) => {
+            let error = match failure.side {
+                stream::CopySide::Source => stream_failure(FilePhase::Read, source, failure.cause),
+                stream::CopySide::Destination => stream_failure(FilePhase::Write, target, failure.cause),
+                stream::CopySide::Control => stream_failure(FilePhase::Validate, target, failure.cause)
+            };
+            return Result<Int, FileFailure>::Err(error);
+        }
+    }
+}
+fn remove_result(answer: WriteResult, phase: FilePhase, name: String,
+    cleanup: List<FileFailure>) -> Unit effects { state } {
+    match written(answer, name) {
+        Result::Ok(_) => {}
+        Result::Err(error) => {
+            list_push(cleanup, file_failure(phase, path::Path(value: name), error));
+        }
+    }
+}
+fn finish_publication(stage: Staging, operation: Result<Int, FileFailure>,
+    cleanup: List<FileFailure>) -> Publication effects { io, state } {
+    var answer = operation;
+    var committed = false;
+    if list_len(cleanup) == 0 {
+        match operation {
+            Result::Ok(_) => {
+                match written(replace_file(stage.content, stage.destination), stage.destination) {
+                    Result::Ok(_) => { committed = true; }
+                    Result::Err(error) => {
+                        answer = Result<Int, FileFailure>::Err(file_failure(FilePhase::Replace,
+                            path::Path(value: stage.destination), error));
+                    }
+                }
+            }
+            Result::Err(_) => {}
+        }
+    }
+    if !committed {
+        let remains = match file_identity(stage.content) {
+            StringResult::Ok(identity) => identity != "",
+            StringResult::Err(_) => true
+        };
+        if remains {
+            remove_result(remove_file(stage.content), FilePhase::RemoveContent, stage.content, cleanup);
+        }
+    }
+    remove_result(remove_dir(stage.directory), FilePhase::RemoveDirectory, stage.directory, cleanup);
+    return Publication(operation: answer, cleanup: cleanup, committed: committed);
+}
+pub fn publish_owned(source: stream::Reader, source_path: path::Path, destination: path::Path,
+    buffer: Int) -> Publication effects { io, state } {
+    let cleanup = list_new<FileFailure>();
+    match prepare(destination, buffer) {
+        Result::Err(error) => {
+            close_result(stream::close_reader(source), source_path, cleanup);
+            return aborted(error, cleanup);
+        }
+        Result::Ok(stage) => {
+            let target_path = path::Path(value: stage.content);
+            match stream::create(stage.content) {
+                Result::Err(error) => {
+                    close_result(stream::close_reader(source), source_path, cleanup);
+                    let failure = stream_failure(FilePhase::OpenTarget, target_path, error);
+                    return finish_publication(stage, Result<Int, FileFailure>::Err(failure), cleanup);
+                }
+                Result::Ok(target) => {
+                    let answer = copied(stream::copy_detailed(source, target, buffer), source_path, target_path);
+                    close_result(stream::close_reader(source), source_path, cleanup);
+                    close_result(stream::close_writer(target), target_path, cleanup);
+                    return finish_publication(stage, answer, cleanup);
+                }
+            }
+        }
+    }
+}
+pub fn copy_atomic(source: path::Path, destination: path::Path, total: Int,
+    buffer: Int) -> Publication effects { io, state } {
+    match valid(source) {
+        Result::Err(error) => {
+            return aborted(file_failure(FilePhase::Validate, source, error), list_new<FileFailure>());
+        }
+        Result::Ok(p) => {
+            match stream::open(p.value, total) {
+                Result::Err(error) => {
+                    return aborted(stream_failure(FilePhase::OpenSource, p, error), list_new<FileFailure>());
+                }
+                Result::Ok(reader) => { return publish_owned(reader, p, destination, buffer); }
+            }
+        }
+    }
+}
+pub fn write_atomic_detailed(file: path::Path, data: text::Bytes) -> Publication effects { io, state } {
+    let size = str_len(data.data);
+    if size > 268435456 {
+        return aborted(file_failure(FilePhase::Validate, file, Error::Limit(268435456)),
+            list_new<FileFailure>());
+    }
+    let total = size + 1;
+    match stream::memory_reader(data.data, 65536, total) {
+        Result::Err(error) => {
+            return aborted(stream_failure(FilePhase::Read, file, error), list_new<FileFailure>());
+        }
+        Result::Ok(source) => { return publish_owned(source, file, file, 65536); }
+    }
 }
 pub fn write_text_atomic(file: path::Path, data: text::Text) -> Result<Bool, Error> effects { io } {
     match text::encode(data) {

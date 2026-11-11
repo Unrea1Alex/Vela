@@ -463,3 +463,25 @@ v127_parallel_sync|check|1|E201|
 v128a_order|run|0||
 v128a_nominal|check|1|E201|
 v128b_frontend|run|0||
+v131a_checked_values|run|0||
+v131a_text_construct|check|1|E232|
+v131a_path_construct|check|1|E232|
+v131a_text_private|check|1|E223|
+v131a_path_private|check|1|E223|
+v131b_config_snapshot|run|0||
+v131b_config_construct|check|1|E232|
+v131b_config_effect|check|1|E209|
+v133_multi_unavailable|run|0||
+v133_multi_effect|check|1|E209|
+v133_multi_wait_effect|check|1|E209|
+v134a_json_lexical|run|0||
+v134b_file_publication|run|0||
+v134d_lowering|run|0||
+v134f_precise_roots|run|0||
+v134g_gc_pressure|run|0||
+v134h_ir|run|0||
+v134h_ir_dead_type|check|1|E201|
+v134i_ranges|run|0||
+v134i_range_trap|run|70||integer overflow in multiplication
+v134j_reachability|run|0||
+v134j_unused_error|check|1|E201|

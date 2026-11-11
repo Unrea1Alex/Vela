@@ -38,6 +38,9 @@ counters are cumulative; copy counters are local. `copy_owned` always closes
 both endpoints, independently, and retains the operation error and both close
 errors in Failure; no rollback or automatic retry. Neither helper catches a
 language panic. Limits/counter overflow return typed errors before overflow.
+The 1.3 opt-in `copy_detailed` also identifies the failing endpoint or copy
+control. [File publication](FILE-PUBLICATION-1.3.md) uses the same stream loop
+and separately records each close and publication outcome.
 
 `std/stream_lines.vela` wraps a borrowed Reader; explicit `close` closes that
 shared source. Limits: buffer 1..65536, record 1..1048576, source total positive

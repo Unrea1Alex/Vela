@@ -25,6 +25,14 @@
       "recipe": "json"
     },
     {
+      "module": "std/json_tokens",
+      "purpose": "JSON implementation shared lexical scanner string number escape and validated span boundaries",
+      "ownership": "Implementation policy: decoded strings are detached copies, scanner offsets describe the supplied immutable input.",
+      "limits": "Internal scanner for the bounded json and json_stream entry points. Those entry points validate UTF-8 and apply their own structural budgets.",
+      "example": "json_stream::create(data, json_stream::default_limits())",
+      "recipe": "json"
+    },
+    {
       "module": "std/json",
       "purpose": "JSON tree decode field array object number typed path",
       "ownership": "Module policy: Array/Object contain shared mutable List payloads; ordinary shallow value copies.",
@@ -34,35 +42,35 @@
     },
     {
       "module": "std/http",
-      "purpose": "HTTP HTTPS client curl request deadline timeout body headers network сеть",
-      "ownership": "Module policy: Exchange owns supervised process/temp files; cancel/drain to terminal then release.",
-      "limits": "Windows trusted curl 8.4+; curl_transfer preserves exact transfer timeout with bounded helper overhead.",
-      "example": "http::from_url(\"http://127.0.0.1/health\", 100, 1024)",
-      "recipe": "http"
+      "purpose": "HTTP HTTPS client libcurl multi connection pool keep-alive request deadline timeout body headers network сеть",
+      "ownership": "Keep one curl_multi owner; cancel/drain and release exchanges, then close_multi. Explicit curl compatibility exchanges own private files.",
+      "limits": "Windows x64 sibling DLL; multi deadlines include queueing. Legacy curl_transfer preserves exact transfer timeout with bounded helper overhead.",
+      "example": "http::curl_multi(http::multi_limits(), Option<path::Path>::None)",
+      "recipe": "http-multi"
     },
     {
       "module": "std/fs",
-      "purpose": "file read binary bytes text atomic write filesystem files файлы",
-      "ownership": "Module policy: immutable returned bytes; atomic publication owns temporary files and cleanup.",
-      "limits": "Legacy bounded reads <=256 MiB; text validates UTF-8; close/cleanup failures remain typed.",
+      "purpose": "file read binary bytes text atomic write stream publication cleanup commit filesystem files файлы",
+      "ownership": "Module policy: immutable returned bytes; detailed publication owns its reader, staging and cleanup and reports commit separately.",
+      "limits": "Legacy bounded reads <=256 MiB; text validates UTF-8. Detailed stream publication uses an explicit buffer and preserves each cause.",
       "example": "fs::read_bytes(path::Path(value: input), 1024)",
       "recipe": "bytes"
     },
     {
       "module": "std/path",
       "purpose": "path filesystem resource executable join parent directory путь",
-      "ownership": "Module policy: public String record; validation is not proof of OS identity or containment.",
-      "limits": "Nonempty/NUL/UTF-8 validation; preserve platform path rules.",
-      "example": "path::checked(input)",
-      "recipe": "directory"
+      "ownership": "Module policy: legacy Path is a public String record; CheckedPath keeps immutable validated storage.",
+      "limits": "Nonempty/NUL/UTF-8 validation; lexical platform path rules without OS identity or containment.",
+      "example": "path::validate(input)",
+      "recipe": "checked-values"
     },
     {
       "module": "std/text",
       "purpose": "text UTF-8 bytes encode decode validate builder string",
-      "ownership": "Module policy: immutable String backing; builders share mutable storage; open Text revalidated.",
+      "ownership": "Module policy: immutable String backing; builders share mutable storage; CheckedText validates at construction.",
       "limits": "Explicit byte/codepoint and builder limits; invalid UTF-8 has an offset.",
-      "example": "text::checked(input)",
-      "recipe": "bytes"
+      "example": "text::validate(input)",
+      "recipe": "checked-values"
     },
     {
       "module": "std/collections",
@@ -103,6 +111,14 @@
       "limits": "Typed missing/type/unknown/duplicate/text errors; bounded JSON tree.",
       "example": "config::integer(settings, \"count\")",
       "recipe": "json"
+    },
+    {
+      "module": "std/config_snapshot",
+      "purpose": "indexed immutable configuration snapshot JSON lookup config validation",
+      "ownership": "Module policy: snapshot owns nested containers; aggregate reads return detached copies.",
+      "limits": "64 depth, 100000 nodes and 8 MiB; missing, null, wrong type and unknown fields remain distinct.",
+      "example": "config_snapshot::integer(settings, \"port\")",
+      "recipe": "config-snapshot"
     },
     {
       "module": "std/testing",
@@ -243,7 +259,7 @@
     {
       "module": "std/io",
       "purpose": "synchronous byte Reader Writer memory file copy short reads writes EOF close поток копирование",
-      "ownership": "Opaque shared cursor/failure/close; borrowed copy, copy_owned preserves operation and both cleanup causes; explicit close required.",
+      "ownership": "Opaque shared cursor/failure/close; copy_detailed identifies the failing endpoint, copy_owned preserves both cleanup causes; explicit close required.",
       "limits": "buffer 1..65536, positive Int64 total; file read chunks <=8192; old 256 MiB stream cap unchanged. Typed sticky errors, no retry/rollback.",
       "example": "io::memory_reader(\"bytes\", 1, 64)",
       "recipe": "streams"

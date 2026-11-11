@@ -1,0 +1,17 @@
+import "input.vela" as input;
+
+interface Reader { fn read(self: Self, n: Int) -> Int; }
+struct Constant { prefix: String, value: Int }
+impl Reader for Constant {
+    fn read(self: Constant, n: Int) -> Int { return self.value + str_len(self.prefix) + n; }
+}
+
+fn main() -> Unit effects { args, io, process } {
+    let count = input::iterations();
+    let bias = "he" + "llo";
+    let closure = fn [bias](n: Int) -> Int { return str_len(bias) + n; };
+    let reader = dyn Reader(Constant(prefix: bias, value: 3));
+    var total = 0;
+    for n in 0 .. count { total = total + closure(n) + reader.read(n); }
+    print(total);
+}

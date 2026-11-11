@@ -1,0 +1,70 @@
+import "../../std/config_snapshot.vela" as config;
+import "../../std/json.vela" as json;
+
+fn tree(value: json::Value) -> json::Value effects { state } {
+    let members = list_new<json::Member>();
+    list_push(members, json::Member(name: "", value: value));
+    return json::Value::Object(members);
+}
+fn validate_nodes() -> Unit effects { state } {
+    let values = list_new<json::Value>();
+    for i in 0 .. 99998 { list_push(values, json::Value::Null); }
+    match config::from_value(tree(json::Value::Array(values))) {
+        Result::Err(_) => { assert_true(false, "100000 nodes valid"); }
+        Result::Ok(_) => {}
+    }
+    list_push(values, json::Value::Null);
+    match config::from_value(tree(json::Value::Array(values))) {
+        Result::Err(e) => {
+            let node = match e {
+                config::Error::NodeLimit => true,
+                config::Error::Json(_) => false,
+                config::Error::RootType => false,
+                config::Error::Duplicate(_) => false,
+                config::Error::InvalidText(_, _) => false,
+                config::Error::NonFinite => false,
+                config::Error::DepthLimit => false,
+                config::Error::TextLimit => false,
+                config::Error::Missing(_) => false,
+                config::Error::WrongType(_) => false,
+                config::Error::Unknown(_) => false
+            };
+            assert_true(node, "expected node limit");
+        }
+        Result::Ok(_) => { assert_true(false, "100001 nodes rejected"); }
+    }
+}
+fn validate_bytes() -> Unit effects { state } {
+    var large = "x";
+    for i in 0 .. 23 { large = large + large; }
+    assert_true(str_len(large) == 8388608, "exact fixture bytes");
+    match config::from_value(tree(json::Value::StringValue(large))) {
+        Result::Err(_) => { assert_true(false, "8 MiB text accepted"); }
+        Result::Ok(_) => {}
+    }
+    let too_large = large + "x";
+    match config::from_value(tree(json::Value::StringValue(too_large))) {
+        Result::Err(e) => {
+            let text = match e {
+                config::Error::TextLimit => true,
+                config::Error::Json(_) => false,
+                config::Error::RootType => false,
+                config::Error::Duplicate(_) => false,
+                config::Error::InvalidText(_, _) => false,
+                config::Error::NonFinite => false,
+                config::Error::DepthLimit => false,
+                config::Error::NodeLimit => false,
+                config::Error::Missing(_) => false,
+                config::Error::WrongType(_) => false,
+                config::Error::Unknown(_) => false
+            };
+            assert_true(text, "expected text limit");
+        }
+        Result::Ok(_) => { assert_true(false, "8 MiB + 1 text rejected"); }
+    }
+}
+fn main() -> Unit effects { state, io } {
+    validate_nodes();
+    validate_bytes();
+    print("config limits passed");
+}

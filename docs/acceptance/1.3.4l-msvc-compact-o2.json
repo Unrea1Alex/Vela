@@ -1,0 +1,24 @@
+{
+  "purpose": "Isolate the compact function policy from LTO on the BuildLens C input.",
+  "scope": "EXE bytes only",
+  "flags": [
+    "/TC",
+    "/std:c11",
+    "/utf-8",
+    "/O2",
+    "/fp:strict",
+    "/W3",
+    "/wd4102",
+    "/MT",
+    "/DVELA_LTO_COMPACT",
+    "/INCREMENTAL:NO"
+  ],
+  "c": {
+    "bytes": 1305871,
+    "sha256": "75b99f7608c2c0021281f3482ab836acdc8df87dc67e7738233c7558671a3fd0"
+  },
+  "binary": {
+    "bytes": 617472,
+    "sha256": "ef522c56808ac1c3dce19b5f59be377bcd7bd97968fdd432ae830f74af439504"
+  }
+}

@@ -1,7 +1,14 @@
 # HTTP and TLS contract
 
-The client block uses curl with libcurl as its HTTP and TLS engine in a
-supervised process. It requires a trusted executable, curl 8.4 or later,
+The Windows x64 client uses `http::curl_multi` with a sibling adapter containing
+libcurl, OpenSSL and c-ares. Its owner fixes the root trust source and retains
+eligible HTTP/1.1 connections across exchanges. See the
+[native transport contract](HTTP-MULTI-1.3.md) for TLS, deadlines and packaging.
+
+## Explicit process transport compatibility
+
+The `http::curl` and `http::curl_transfer` factories use a supervised process.
+This path requires a trusted executable, curl 8.4 or later,
 and the Windows process adapter. The executable and optional CA file are
 explicit configuration. Windows Schannel uses its normal certificate and
 hostname verification. An explicit CA file is per transport. Tests use
@@ -20,8 +27,8 @@ timeout or limit failure has its own error.
 Each request owns a private directory for its outputs and optional upload.
 `http::curl` preserves the 1.0 contract: the supervisor deadline covers launch
 and transfer, and the worker uses the same budget for curl's internal timeout.
-For new transfer-deadline applications, 1.1 adds the opt-in `http::curl_transfer`
-factory. Curl receives exactly the original request timeout for the complete body;
+The 1.1 compatibility factory `http::curl_transfer` gives curl exactly the
+original request timeout for the complete body.
 the helper supervisor receives timeout+1000 ms (at most 121000 ms) for startup/drain.
 Acquire an application concurrency slot before calling Transport.start: queued
 application work is outside this transfer budget. This separate helper allowance
@@ -61,8 +68,8 @@ same socket. Unsupported request syntax receives 400. Headers are limited to
 has a monotonic deadline from accept through its final response write.
 Response includes a validated `content_type`; HEAD includes the representation's
 Content-Length and no body, including error responses. Methods with request bodies
-remain unsupported by this server. Neither adapter pools connections; persistent
-connections and their ownership/cancellation contract are retained after 1.0.
+remain unsupported by this server. Test multi connection reuse against a
+keep-alive server.
 
 Readiness is polled by the host. A turn accepts at most one client, reads
 or writes at most one chunk per existing client and handles partial sends.

@@ -53,6 +53,25 @@ const changed=await invoke(emit);
 assert.notEqual(changed.stdout,plain.stdout);
 assert.ok(changed.events.some(x=>x.layer==='c-v1'&&x.status==='miss'));
 checks.push('C stdout parity and source-change invalidation');
+await fs.writeFile(source, 'fn main() -> Int { return 2 + 3; }\n');
+for (const debug of [false, true]) {
+  const layer = debug ? 'debug-c-v1' : 'c-v1';
+  const options = debug ? [...emit, '--debug'] : emit;
+  const normal = await invoke(options);
+  const reference = await invoke([...options, '--no-ir-simplify']);
+  const normalMiss = normal.events.find(event => event.layer === layer && event.status === 'miss');
+  const referenceMiss = reference.events.find(event => event.layer === layer && event.status === 'miss');
+  assert.ok(normalMiss && referenceMiss);
+  assert.notEqual(normalMiss.key, referenceMiss.key);
+  assert.notEqual(normal.stdout, reference.stdout);
+  for (const [flags, expected, key] of [[[], normal.stdout, normalMiss.key],
+    [['--no-ir-simplify'], reference.stdout, referenceMiss.key]]) {
+    const warm = await invoke([...options, ...flags]);
+    assert.equal(warm.stdout, expected);
+    assert.ok(warm.events.some(event => event.layer === layer && event.status === 'hit' && event.key === key));
+  }
+  checks.push(layer + ' separates default and bypass results on cold and warm cache');
+}
 await assert.rejects(run(compiler,['check',source,'--cache'],{windowsHide:true}),e=>e.code===2&&/requires a directory/.test(e.stderr));
 checks.push('missing cache argument rejects without panic');
 const evidence={schema_version:1,checks,passed:checks.length,failed:0};

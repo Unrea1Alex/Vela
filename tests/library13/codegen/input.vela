@@ -1,0 +1,14 @@
+pub fn iterations() -> Int effects { args, process } {
+    match arg(0) {
+        StringResult::Ok(text) => {
+            match parse_int(text) {
+                IntResult::Ok(count) => {
+                    if count > 0 && count <= 1000000 { return count; }
+                }
+                IntResult::Err(_) => {}
+            }
+        }
+        StringResult::Err(_) => {}
+    }
+    panic("expected an iteration count in 1..1000000");
+}

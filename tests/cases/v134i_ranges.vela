@@ -1,0 +1,31 @@
+enum Choice { Low, High, Unknown(Int) }
+
+fn proved_join(choice: Choice) -> Int {
+    let n = match choice { Choice::Low => -3, Choice::High => 4, Choice::Unknown(_) => 0 };
+    return n * n + (-n) + (n + 5) + (n - 7);
+}
+
+fn unknown_join(choice: Choice) -> Int {
+    let n = match choice { Choice::Low => -3, Choice::High => 4, Choice::Unknown(value) => value };
+    return n + 5;
+}
+
+fn main() -> Unit effects { io } {
+    assert_true(proved_join(Choice::Low) == 4 && proved_join(Choice::High) == 18, "joined bounds");
+    assert_true(unknown_join(Choice::Unknown(-40)) == -35, "unknown match arm");
+    var squares = 0;
+    for n in -3 ..= 3 { squares = squares + n * n; }
+    assert_true(squares == 28, "signed induction interval");
+    let high = 9223372036854775807;
+    let low = -9223372036854775808;
+    var visited = 0;
+    for n in high - 1 ..= high {
+        visited = visited + 1;
+        if n == high { continue; }
+        assert_true(n + 1 == high, "bounded runtime arithmetic");
+    }
+    for n in low .. low { visited = visited + 100; }
+    for n in low .. low + 1 { assert_true(n == low, "exclusive minimum"); }
+    assert_true(visited == 2, "private counter stops at the inclusive maximum");
+    print("checked ranges passed");
+}

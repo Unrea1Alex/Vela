@@ -1,0 +1,191 @@
+import "../../../std/fs.vela" as fs;
+import "../../../std/io.vela" as io;
+import "../../../std/path.vela" as path;
+import "../../../std/text.vela" as text;
+import "../../../std/directory.vela" as directory;
+import "../../../std/cell.vela" as cell;
+
+fn must<T, E>(value: Result<T, E>) -> T {
+    match value {
+        Result::Ok(item) => { return item; }
+        Result::Err(_) => { assert_true(false, "expected successful file operation"); }
+    }
+    return must(value);
+}
+fn string_value(value: StringResult) -> String {
+    match value {
+        StringResult::Ok(item) => { return item; }
+        StringResult::Err(error) => { assert_true(false, error); }
+    }
+    return "";
+}
+fn integer(value: IntResult) -> Int {
+    match value {
+        IntResult::Ok(item) => { return item; }
+        IntResult::Err(error) => { assert_true(false, error); }
+    }
+    return 0;
+}
+fn done(value: WriteResult) -> Unit {
+    match value {
+        WriteResult::Ok => {}
+        WriteResult::Err(error) => { assert_true(false, error); }
+    }
+}
+fn unit() -> Unit {}
+fn payload() -> String { return "ab" + str_from_byte(0) + "c"; }
+fn close_with_fixture(folder: path::Path, retained: List<String>, closes: cell::Cell<Int>,
+    block: Bool, fail_close: Bool) -> Result<Unit, io::Error> effects { io, state } {
+    cell::set(closes, cell::get(closes) + 1);
+    if block {
+        let entries = must(directory::entries_bounded(folder, 8));
+        for entry in entries {
+            if entry.kind == directory::Kind::Directory {
+                done(write_file(entry.path.value + "/blocker", "owned test marker"));
+                list_push(retained, entry.path.value);
+            }
+        }
+        assert_true(list_len(retained) == 1, "one private stage at close");
+    }
+    if fail_close {
+        return Result<Unit, io::Error>::Err(io::error(io::ErrorKind::Close, 99, "source close cause"));
+    }
+    return Result<Unit, io::Error>::Ok(unit());
+}
+fn source(folder: path::Path, retained: List<String>, closes: cell::Cell<Int>,
+    fail_read: Bool, fail_close: Bool, block: Bool) -> io::Reader effects { state } {
+    let turns = cell::create(0);
+    return must(io::reader(fn [turns, fail_read](requested: Int) -> Result<io::Chunk, io::Error> effects { state } {
+        let step = cell::get(turns);
+        cell::set(turns, step + 1);
+        if step == 0 { return Result<io::Chunk, io::Error>::Ok(io::Chunk::Data(payload())); }
+        if fail_read {
+            return Result<io::Chunk, io::Error>::Err(io::error(io::ErrorKind::Read, 99, "source read cause"));
+        }
+        return Result<io::Chunk, io::Error>::Ok(io::Chunk::End);
+    }, fn [folder, retained, closes, block, fail_close]() -> Result<Unit, io::Error> effects { io, state } {
+        return close_with_fixture(folder, retained, closes, block, fail_close);
+    }, 8));
+}
+fn failed(operation: Result<Int, fs::FileFailure>) -> fs::FileFailure {
+    match operation {
+        Result::Err(error) => { return error; }
+        Result::Ok(_) => { assert_true(false, "expected file failure"); }
+    }
+    return failed(operation);
+}
+fn stream_cause(error: fs::FileFailure, phase: fs::FilePhase, name: String,
+    offset: Int, message: String) -> Unit {
+    assert_true(error.phase == phase && error.path.value == name, "failure phase and path");
+    match error.position {
+        Option::Some(at) => { assert_true(at == offset, "file failure byte offset"); }
+        Option::None => { assert_true(false, "file failure needs a position"); }
+    }
+    match error.cause {
+        fs::FileCause::Stream(cause) => {
+            assert_true(cause.offset == offset && cause.cause == message, "original stream cause");
+        }
+        fs::FileCause::File(_) => { assert_true(false, "expected stream cause"); }
+    }
+}
+fn clear_marker(stages: List<String>) -> Unit effects { state, io } {
+    let owned = list_get(stages, 0);
+    done(remove_file(owned + "/blocker"));
+    done(remove_dir(owned));
+    list_truncate(stages, 0);
+}
+fn failure_paths(folder: path::Path, target: path::Path) -> Unit effects { state, io } {
+    let retained = list_new<String>();
+    let closes = cell::create(0);
+    let label = path::Path(value: "injected-source");
+    let reader = source(folder, retained, closes, true, true, true);
+    let alias = reader;
+    let rejected = fs::publish_owned(reader, label, target, 4);
+    assert_true(!rejected.committed && list_len(rejected.cleanup) == 2, "independent cleanup failures");
+    stream_cause(failed(rejected.operation), fs::FilePhase::Read, label.value, 4, "source read cause");
+    stream_cause(list_get(rejected.cleanup, 0), fs::FilePhase::Close, label.value, 4, "source close cause");
+    assert_true(list_get(rejected.cleanup, 1).phase == fs::FilePhase::RemoveDirectory,
+        "separate failed directory cleanup");
+    assert_true(must(fs::read_bytes(target, 64)).data == "previous", "partial staging kept previous output");
+    match io::close_reader(alias) {
+        Result::Err(error) => { assert_true(error.cause == "source close cause" && error.offset == 4, "cached close error"); }
+        Result::Ok(_) => { assert_true(false, "lost close error"); }
+    }
+    assert_true(cell::get(closes) == 1, "shared reader closed exactly once");
+    clear_marker(retained);
+    let partial = fs::publish_owned(source(folder, retained, closes, false, false, true), label, target, 4);
+    assert_true(partial.committed && must(partial.operation) == 4 && list_len(partial.cleanup) == 1,
+        "committed despite failed directory cleanup");
+    assert_true(list_get(partial.cleanup, 0).phase == fs::FilePhase::RemoveDirectory
+        && must(fs::read_bytes(target, 64)).data == payload(), "published binary bytes");
+    clear_marker(retained);
+    let invalid = source(folder, retained, closes, false, false, false);
+    let bad = fs::publish_owned(invalid, label, target, 0);
+    assert_true(!bad.committed && failed(bad.operation).phase == fs::FilePhase::Validate
+        && io::reader_counters(invalid).calls == 0 && cell::get(closes) == 3,
+        "early failure closes without reading");
+    let close_only = fs::publish_owned(source(folder, retained, closes, false, true, false), label, target, 4);
+    assert_true(!close_only.committed && must(close_only.operation) == 4 && list_len(close_only.cleanup) == 1
+        && cell::get(closes) == 4,
+        "successful copy and failed close");
+}
+fn write_side() -> Unit effects { state, io } {
+    let reader = must(io::memory_reader("abc", 3, 3));
+    let turns = cell::create(0);
+    let writer = io::writer(fn [turns](data: String) -> Result<Int, io::Error> effects { state } {
+        if cell::get(turns) == 0 {
+            cell::set(turns, 1);
+            return Result<Int, io::Error>::Ok(2);
+        }
+        return Result<Int, io::Error>::Err(io::error(io::ErrorKind::Write, 99, "sink cause"));
+    }, fn []() -> Result<Unit, io::Error> { return Result<Unit, io::Error>::Ok(unit()); });
+    match io::copy_detailed(reader, writer, 3) {
+        Result::Ok(_) => { assert_true(false, "expected short write then error"); }
+        Result::Err(error) => {
+            assert_true(error.side == io::CopySide::Destination && error.cause.kind == io::ErrorKind::Write
+                && error.cause.offset == 2 && error.cause.cause == "sink cause", "writer failure keeps position and side");
+        }
+    }
+    must(io::close_reader(reader));
+    must(io::close_writer(writer));
+}
+fn main() -> Unit effects { args, state, io } {
+    if arg_count() > 0 {
+        let source_path = path::Path(value: string_value(arg(0)));
+        let destination = path::Path(value: string_value(arg(1)));
+        let size = integer(arg_int(2));
+        let outcome = fs::copy_atomic(source_path, destination, size, 8192);
+        assert_true(outcome.committed && list_len(outcome.cleanup) == 0 && must(outcome.operation) == size,
+            "streamed file committed");
+        print(to_string(size));
+        return;
+    }
+    let root = path::Path(value: string_value(temp_dir(string_value(absolute_path(".")))));
+    let target = path::Path(value: root.value + "/отчёт.bin");
+    let initial = must(fs::write_atomic(target, text::Bytes(data: "previous")));
+    failure_paths(root, target);
+    let same = fs::copy_atomic(target, target, 4, 2);
+    assert_true(same.committed && must(same.operation) == 4 && must(fs::read_bytes(target, 4)).data == payload(),
+        "same source and destination closes before replacing");
+    let missing = fs::copy_atomic(path::Path(value: root.value + "/missing"), target, 4, 2);
+    assert_true(!missing.committed && failed(missing.operation).phase == fs::FilePhase::OpenSource
+        && must(fs::read_bytes(target, 4)).data == payload(), "source open failure preserves output");
+    let bounded = fs::copy_atomic(target, target, 3, 2);
+    let limit = failed(bounded.operation);
+    assert_true(!bounded.committed && list_len(bounded.cleanup) == 0
+        && limit.phase == fs::FilePhase::OpenSource && limit.path.value == target.value
+        && must(fs::read_bytes(target, 4)).data == payload(), "source size bound precedes staging");
+    let empty = fs::write_atomic_detailed(target, text::Bytes(data: ""));
+    assert_true(empty.committed && must(empty.operation) == 0 && must(fs::read_bytes(target, 0)).data == "",
+        "empty publication");
+    let reserved = path::Path(value: root.value + "/directory");
+    done(make_dir(reserved.value));
+    let replacement = fs::write_atomic_detailed(reserved, text::Bytes(data: "failed replace"));
+    assert_true(!replacement.committed && failed(replacement.operation).phase == fs::FilePhase::Replace
+        && list_len(replacement.cleanup) == 0, "failed replace removes all private staging");
+    done(remove_dir(reserved.value));
+    write_side();
+    done(remove_file(target.value));
+    done(remove_dir(root.value));
+    print("typed file publication passed");
+}

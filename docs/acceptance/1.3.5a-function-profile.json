@@ -1,0 +1,1985 @@
+{
+  "vela_profile": 1,
+  "functions": [
+    {
+      "name": "@3::cat",
+      "file": "G:\\Vela\\selfhost\\core.vela",
+      "line": 6,
+      "column": 1,
+      "calls": 2,
+      "completed": 2,
+      "inclusive_us": 0
+    },
+    {
+      "name": "@3::json_string",
+      "file": "G:\\Vela\\selfhost\\core.vela",
+      "line": 73,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 15
+    },
+    {
+      "name": "checked_output",
+      "file": "G:\\Vela\\selfhost\\driver.vela",
+      "line": 361,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 43
+    },
+    {
+      "name": "@21::cache_store",
+      "file": "G:\\Vela\\selfhost\\incremental.vela",
+      "line": 59,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 0
+    },
+    {
+      "name": "@9::order_type",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 530,
+      "column": 1,
+      "calls": 474,
+      "completed": 474,
+      "inclusive_us": 259
+    },
+    {
+      "name": "@17::check_suspension_graph",
+      "file": "G:\\Vela\\selfhost\\suspension.vela",
+      "line": 122,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 102
+    },
+    {
+      "name": "@9::finish_analysis",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 654,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 580
+    },
+    {
+      "name": "@15::effects_subset",
+      "file": "G:\\Vela\\selfhost\\interfaces.vela",
+      "line": 84,
+      "column": 1,
+      "calls": 18,
+      "completed": 18,
+      "inclusive_us": 3
+    },
+    {
+      "name": "@16::require_callable_effects",
+      "file": "G:\\Vela\\selfhost\\callables.vela",
+      "line": 138,
+      "column": 1,
+      "calls": 18,
+      "completed": 18,
+      "inclusive_us": 5
+    },
+    {
+      "name": "@16::checked_indirect_call",
+      "file": "G:\\Vela\\selfhost\\callables.vela",
+      "line": 191,
+      "column": 1,
+      "calls": 18,
+      "completed": 18,
+      "inclusive_us": 464
+    },
+    {
+      "name": "@9::lookup_method",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 84,
+      "column": 1,
+      "calls": 35,
+      "completed": 35,
+      "inclusive_us": 3904
+    },
+    {
+      "name": "@15::find_interface",
+      "file": "G:\\Vela\\selfhost\\interfaces.vela",
+      "line": 11,
+      "column": 1,
+      "calls": 35,
+      "completed": 35,
+      "inclusive_us": 2
+    },
+    {
+      "name": "@9::check_construct",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 122,
+      "column": 1,
+      "calls": 35,
+      "completed": 35,
+      "inclusive_us": 13759
+    },
+    {
+      "name": "@1::set_symbol",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 502,
+      "column": 1,
+      "calls": 8,
+      "completed": 8,
+      "inclusive_us": 2
+    },
+    {
+      "name": "@16::check_closure",
+      "file": "G:\\Vela\\selfhost\\callables.vela",
+      "line": 222,
+      "column": 1,
+      "calls": 3,
+      "completed": 3,
+      "inclusive_us": 3043
+    },
+    {
+      "name": "@9::check_interpolation",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 806,
+      "column": 1,
+      "calls": 30,
+      "completed": 30,
+      "inclusive_us": 16043
+    },
+    {
+      "name": "@5::check_record",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 502,
+      "column": 1,
+      "calls": 130,
+      "completed": 130,
+      "inclusive_us": 31247
+    },
+    {
+      "name": "@5::check_opaque_constructor",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 490,
+      "column": 1,
+      "calls": 130,
+      "completed": 130,
+      "inclusive_us": 4
+    },
+    {
+      "name": "@8::propagation_family",
+      "file": "G:\\Vela\\selfhost\\errors.vela",
+      "line": 5,
+      "column": 1,
+      "calls": 40,
+      "completed": 40,
+      "inclusive_us": 98
+    },
+    {
+      "name": "@8::check_propagation",
+      "file": "G:\\Vela\\selfhost\\errors.vela",
+      "line": 19,
+      "column": 1,
+      "calls": 20,
+      "completed": 20,
+      "inclusive_us": 7721
+    },
+    {
+      "name": "@1::ints_type",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 414,
+      "column": 1,
+      "calls": 156,
+      "completed": 156,
+      "inclusive_us": 5
+    },
+    {
+      "name": "@1::strings_type",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 417,
+      "column": 1,
+      "calls": 156,
+      "completed": 156,
+      "inclusive_us": 3
+    },
+    {
+      "name": "@19::check_for",
+      "file": "G:\\Vela\\selfhost\\control.vela",
+      "line": 20,
+      "column": 1,
+      "calls": 244,
+      "completed": 244,
+      "inclusive_us": 448496
+    },
+    {
+      "name": "@19::leave_loop",
+      "file": "G:\\Vela\\selfhost\\control.vela",
+      "line": 15,
+      "column": 1,
+      "calls": 383,
+      "completed": 383,
+      "inclusive_us": 24
+    },
+    {
+      "name": "@5::supports_scalar",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 98,
+      "column": 1,
+      "calls": 1378,
+      "completed": 1378,
+      "inclusive_us": 870
+    },
+    {
+      "name": "@19::enter_loop",
+      "file": "G:\\Vela\\selfhost\\control.vela",
+      "line": 10,
+      "column": 1,
+      "calls": 383,
+      "completed": 383,
+      "inclusive_us": 21
+    },
+    {
+      "name": "@5::check_access",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 541,
+      "column": 1,
+      "calls": 3644,
+      "completed": 3644,
+      "inclusive_us": 83864
+    },
+    {
+      "name": "@9::condition",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 375,
+      "column": 1,
+      "calls": 1431,
+      "completed": 1431,
+      "inclusive_us": 247664
+    },
+    {
+      "name": "@9::normalize_integer",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 149,
+      "column": 1,
+      "calls": 1988,
+      "completed": 1988,
+      "inclusive_us": 865
+    },
+    {
+      "name": "@5::builtin_call",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 416,
+      "column": 1,
+      "calls": 2280,
+      "completed": 2280,
+      "inclusive_us": 704436
+    },
+    {
+      "name": "@19::block_exits",
+      "file": "G:\\Vela\\selfhost\\control.vela",
+      "line": 5,
+      "column": 1,
+      "calls": 1712,
+      "completed": 1712,
+      "inclusive_us": 285
+    },
+    {
+      "name": "@4::record_query_use",
+      "file": "G:\\Vela\\selfhost\\query.vela",
+      "line": 14,
+      "column": 1,
+      "calls": 736,
+      "completed": 736,
+      "inclusive_us": 14
+    },
+    {
+      "name": "@9::check_match_arms",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 733,
+      "column": 1,
+      "calls": 54,
+      "completed": 54,
+      "inclusive_us": 42271
+    },
+    {
+      "name": "@1::unit_type",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 411,
+      "column": 1,
+      "calls": 1488,
+      "completed": 1488,
+      "inclusive_us": 38
+    },
+    {
+      "name": "@1::last<@1::StmtId>",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 543,
+      "column": 1,
+      "calls": 3835,
+      "completed": 3835,
+      "inclusive_us": 112
+    },
+    {
+      "name": "@9::block_returns",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 390,
+      "column": 1,
+      "calls": 2123,
+      "completed": 2123,
+      "inclusive_us": 444
+    },
+    {
+      "name": "@1::table_get<@1::CheckedStmt>",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 540,
+      "column": 1,
+      "calls": 9409,
+      "completed": 9409,
+      "inclusive_us": 573
+    },
+    {
+      "name": "@1::checked_stmt",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 457,
+      "column": 1,
+      "calls": 9409,
+      "completed": 9409,
+      "inclusive_us": 1057
+    },
+    {
+      "name": "@1::add_stmt",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 478,
+      "column": 1,
+      "calls": 6399,
+      "completed": 6399,
+      "inclusive_us": 1159
+    },
+    {
+      "name": "@10::instantiate_function",
+      "file": "G:\\Vela\\selfhost\\generics.vela",
+      "line": 251,
+      "column": 1,
+      "calls": 11,
+      "completed": 11,
+      "inclusive_us": 1244
+    },
+    {
+      "name": "@5::require_type",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 124,
+      "column": 1,
+      "calls": 12404,
+      "completed": 12404,
+      "inclusive_us": 2711
+    },
+    {
+      "name": "@5::unify_pattern",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 259,
+      "column": 1,
+      "calls": 4573,
+      "completed": 4573,
+      "inclusive_us": 229570
+    },
+    {
+      "name": "@2::has_bit",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 445,
+      "column": 1,
+      "calls": 30293,
+      "completed": 30293,
+      "inclusive_us": 527
+    },
+    {
+      "name": "@17::require_await_call",
+      "file": "G:\\Vela\\selfhost\\suspension.vela",
+      "line": 15,
+      "column": 1,
+      "calls": 5635,
+      "completed": 5635,
+      "inclusive_us": 108
+    },
+    {
+      "name": "@5::require_effects",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 294,
+      "column": 1,
+      "calls": 5617,
+      "completed": 5617,
+      "inclusive_us": 3181
+    },
+    {
+      "name": "@5::require_type_at",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 128,
+      "column": 1,
+      "calls": 19216,
+      "completed": 19216,
+      "inclusive_us": 537
+    },
+    {
+      "name": "@1::table_get<@1::CheckedExpr>",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 540,
+      "column": 1,
+      "calls": 37561,
+      "completed": 37561,
+      "inclusive_us": 2289
+    },
+    {
+      "name": "@1::checked_expr",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 454,
+      "column": 1,
+      "calls": 37561,
+      "completed": 37561,
+      "inclusive_us": 4057
+    },
+    {
+      "name": "@1::add_expr",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 474,
+      "column": 1,
+      "calls": 30287,
+      "completed": 30287,
+      "inclusive_us": 5176
+    },
+    {
+      "name": "@1::has_expr",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 393,
+      "column": 1,
+      "calls": 33251,
+      "completed": 33251,
+      "inclusive_us": 609
+    },
+    {
+      "name": "@9::check_arguments_with_receiver",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 60,
+      "column": 1,
+      "calls": 3205,
+      "completed": 3205,
+      "inclusive_us": 252014
+    },
+    {
+      "name": "@9::check_arguments",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 57,
+      "column": 1,
+      "calls": 3205,
+      "completed": 3205,
+      "inclusive_us": 252367
+    },
+    {
+      "name": "@10::generic_function_call",
+      "file": "G:\\Vela\\selfhost\\generics.vela",
+      "line": 186,
+      "column": 1,
+      "calls": 11,
+      "completed": 11,
+      "inclusive_us": 4023
+    },
+    {
+      "name": "@9::lookup",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 17,
+      "column": 1,
+      "calls": 17339,
+      "completed": 17339,
+      "inclusive_us": 22913
+    },
+    {
+      "name": "@1::expression_record",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 515,
+      "column": 1,
+      "calls": 36458,
+      "completed": 36458,
+      "inclusive_us": 14990
+    },
+    {
+      "name": "@9::check_expr",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 169,
+      "column": 1,
+      "calls": 30046,
+      "completed": 30046,
+      "inclusive_us": 2891673
+    },
+    {
+      "name": "@1::no_expr",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 378,
+      "column": 1,
+      "calls": 119568,
+      "completed": 119568,
+      "inclusive_us": 2434
+    },
+    {
+      "name": "@1::statement_record",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 520,
+      "column": 1,
+      "calls": 6643,
+      "completed": 6643,
+      "inclusive_us": 2526
+    },
+    {
+      "name": "@1::table_get<@1::SyntaxStmt>",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 540,
+      "column": 1,
+      "calls": 6306,
+      "completed": 6306,
+      "inclusive_us": 960
+    },
+    {
+      "name": "@1::ast_stmt",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 451,
+      "column": 1,
+      "calls": 6306,
+      "completed": 6306,
+      "inclusive_us": 1292
+    },
+    {
+      "name": "@9::check_statement",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 417,
+      "column": 1,
+      "calls": 6306,
+      "completed": 6306,
+      "inclusive_us": 3854394
+    },
+    {
+      "name": "@9::check_block",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 395,
+      "column": 1,
+      "calls": 3504,
+      "completed": 3504,
+      "inclusive_us": 3858346
+    },
+    {
+      "name": "@9::pop_scope",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 39,
+      "column": 1,
+      "calls": 3957,
+      "completed": 3957,
+      "inclusive_us": 143
+    },
+    {
+      "name": "@9::checked_conditions",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 381,
+      "column": 1,
+      "calls": 872,
+      "completed": 872,
+      "inclusive_us": 134
+    },
+    {
+      "name": "@9::bind",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 42,
+      "column": 1,
+      "calls": 3327,
+      "completed": 3327,
+      "inclusive_us": 4599
+    },
+    {
+      "name": "@9::push_scope",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 36,
+      "column": 1,
+      "calls": 3957,
+      "completed": 3957,
+      "inclusive_us": 471
+    },
+    {
+      "name": "@9::check_selected_functions",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 665,
+      "column": 1,
+      "calls": 2,
+      "completed": 2,
+      "inclusive_us": 1446635
+    },
+    {
+      "name": "@9::check_function_instances",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 662,
+      "column": 1,
+      "calls": 2,
+      "completed": 2,
+      "inclusive_us": 1446829
+    },
+    {
+      "name": "@15::verify_interface_bounds",
+      "file": "G:\\Vela\\selfhost\\interfaces.vela",
+      "line": 233,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 374
+    },
+    {
+      "name": "@15::install_interface_operations",
+      "file": "G:\\Vela\\selfhost\\interfaces.vela",
+      "line": 174,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 1
+    },
+    {
+      "name": "@16::callable_type",
+      "file": "G:\\Vela\\selfhost\\callables.vela",
+      "line": 107,
+      "column": 1,
+      "calls": 5,
+      "completed": 5,
+      "inclusive_us": 32
+    },
+    {
+      "name": "@16::resolve_callable_type",
+      "file": "G:\\Vela\\selfhost\\callables.vela",
+      "line": 116,
+      "column": 1,
+      "calls": 2,
+      "completed": 2,
+      "inclusive_us": 970
+    },
+    {
+      "name": "@10::instance_name",
+      "file": "G:\\Vela\\selfhost\\generics.vela",
+      "line": 62,
+      "column": 1,
+      "calls": 69,
+      "completed": 69,
+      "inclusive_us": 118
+    },
+    {
+      "name": "@10::generic_mapping",
+      "file": "G:\\Vela\\selfhost\\generics.vela",
+      "line": 27,
+      "column": 1,
+      "calls": 64,
+      "completed": 64,
+      "inclusive_us": 135
+    },
+    {
+      "name": "@16::resolve_effect_pattern",
+      "file": "G:\\Vela\\selfhost\\callables.vela",
+      "line": 79,
+      "column": 1,
+      "calls": 441,
+      "completed": 441,
+      "inclusive_us": 521
+    },
+    {
+      "name": "@10::concrete_signature",
+      "file": "G:\\Vela\\selfhost\\generics.vela",
+      "line": 148,
+      "column": 1,
+      "calls": 436,
+      "completed": 436,
+      "inclusive_us": 100938
+    },
+    {
+      "name": "@1::float_type",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 420,
+      "column": 1,
+      "calls": 1065,
+      "completed": 1065,
+      "inclusive_us": 15
+    },
+    {
+      "name": "@1::string_type",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 408,
+      "column": 1,
+      "calls": 7783,
+      "completed": 7783,
+      "inclusive_us": 130
+    },
+    {
+      "name": "@1::bool_type",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 405,
+      "column": 1,
+      "calls": 6756,
+      "completed": 6756,
+      "inclusive_us": 113
+    },
+    {
+      "name": "@5::scalar_type",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 85,
+      "column": 1,
+      "calls": 1470,
+      "completed": 1470,
+      "inclusive_us": 375
+    },
+    {
+      "name": "@5::type_name",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 42,
+      "column": 1,
+      "calls": 573,
+      "completed": 573,
+      "inclusive_us": 103
+    },
+    {
+      "name": "@5::collection_type",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 186,
+      "column": 1,
+      "calls": 402,
+      "completed": 402,
+      "inclusive_us": 1378
+    },
+    {
+      "name": "@10::instantiate_type",
+      "file": "G:\\Vela\\selfhost\\generics.vela",
+      "line": 114,
+      "column": 1,
+      "calls": 455,
+      "completed": 455,
+      "inclusive_us": 1845
+    },
+    {
+      "name": "@1::set_type",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 499,
+      "column": 1,
+      "calls": 132,
+      "completed": 132,
+      "inclusive_us": 4
+    },
+    {
+      "name": "@1::int_type",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 402,
+      "column": 1,
+      "calls": 9068,
+      "completed": 9068,
+      "inclusive_us": 160
+    },
+    {
+      "name": "@5::is_scalar",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 95,
+      "column": 1,
+      "calls": 1430,
+      "completed": 1430,
+      "inclusive_us": 131
+    },
+    {
+      "name": "@10::fill_type",
+      "file": "G:\\Vela\\selfhost\\generics.vela",
+      "line": 69,
+      "column": 1,
+      "calls": 53,
+      "completed": 53,
+      "inclusive_us": 13604
+    },
+    {
+      "name": "@10::validate_type_parameters",
+      "file": "G:\\Vela\\selfhost\\generics.vela",
+      "line": 10,
+      "column": 1,
+      "calls": 480,
+      "completed": 480,
+      "inclusive_us": 416
+    },
+    {
+      "name": "@9::declaration_name_available",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 723,
+      "column": 1,
+      "calls": 478,
+      "completed": 478,
+      "inclusive_us": 29006
+    },
+    {
+      "name": "@15::validate_interface_implementations",
+      "file": "G:\\Vela\\selfhost\\interfaces.vela",
+      "line": 108,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 1
+    },
+    {
+      "name": "@15::builtin_bound",
+      "file": "G:\\Vela\\selfhost\\interfaces.vela",
+      "line": 63,
+      "column": 1,
+      "calls": 117,
+      "completed": 117,
+      "inclusive_us": 8
+    },
+    {
+      "name": "@16::direct_effect_parameter",
+      "file": "G:\\Vela\\selfhost\\callables.vela",
+      "line": 91,
+      "column": 1,
+      "calls": 1005,
+      "completed": 1005,
+      "inclusive_us": 596
+    },
+    {
+      "name": "@6::bind_impl_owners",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 327,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 295
+    },
+    {
+      "name": "@6::module_type_name",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 282,
+      "column": 1,
+      "calls": 2012,
+      "completed": 2012,
+      "inclusive_us": 263344
+    },
+    {
+      "name": "@15::bind_type_bounds",
+      "file": "G:\\Vela\\selfhost\\interfaces.vela",
+      "line": 66,
+      "column": 1,
+      "calls": 478,
+      "completed": 478,
+      "inclusive_us": 130
+    },
+    {
+      "name": "@15::bind_interfaces",
+      "file": "G:\\Vela\\selfhost\\interfaces.vela",
+      "line": 25,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 4
+    },
+    {
+      "name": "@6::module_alias",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 211,
+      "column": 1,
+      "calls": 6122,
+      "completed": 6122,
+      "inclusive_us": 62394
+    },
+    {
+      "name": "@1::has_symbol",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 399,
+      "column": 1,
+      "calls": 78628,
+      "completed": 78628,
+      "inclusive_us": 1465
+    },
+    {
+      "name": "@1::table_get<@1::Symbol>",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 540,
+      "column": 1,
+      "calls": 1384567,
+      "completed": 1384567,
+      "inclusive_us": 103564
+    },
+    {
+      "name": "@1::symbol_info",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 463,
+      "column": 1,
+      "calls": 1384567,
+      "completed": 1384567,
+      "inclusive_us": 186877
+    },
+    {
+      "name": "@5::find_symbol",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 114,
+      "column": 1,
+      "calls": 60943,
+      "completed": 60943,
+      "inclusive_us": 248547
+    },
+    {
+      "name": "@6::bind_modules",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 410,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 250284
+    },
+    {
+      "name": "@5::post_stable_builtin",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 322,
+      "column": 1,
+      "calls": 114,
+      "completed": 114,
+      "inclusive_us": 37
+    },
+    {
+      "name": "@5::install_generic_enum",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 573,
+      "column": 1,
+      "calls": 2,
+      "completed": 2,
+      "inclusive_us": 7
+    },
+    {
+      "name": "@1::add_symbol",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 492,
+      "column": 1,
+      "calls": 7536,
+      "completed": 7536,
+      "inclusive_us": 2527
+    },
+    {
+      "name": "@5::type_kind",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 79,
+      "column": 1,
+      "calls": 25003,
+      "completed": 25003,
+      "inclusive_us": 2611
+    },
+    {
+      "name": "@1::has_type",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 396,
+      "column": 1,
+      "calls": 48276,
+      "completed": 48276,
+      "inclusive_us": 851
+    },
+    {
+      "name": "@1::primitive_type_id",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 432,
+      "column": 1,
+      "calls": 12278,
+      "completed": 12278,
+      "inclusive_us": 229
+    },
+    {
+      "name": "@5::find_type",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 34,
+      "column": 1,
+      "calls": 20911,
+      "completed": 20911,
+      "inclusive_us": 19137
+    },
+    {
+      "name": "@6::module_declaration",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 202,
+      "column": 1,
+      "calls": 111969,
+      "completed": 111969,
+      "inclusive_us": 1188581
+    },
+    {
+      "name": "@6::module_global_name",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 220,
+      "column": 1,
+      "calls": 13882,
+      "completed": 13882,
+      "inclusive_us": 1309464
+    },
+    {
+      "name": "@16::effect_argument_pattern",
+      "file": "G:\\Vela\\selfhost\\callables.vela",
+      "line": 12,
+      "column": 1,
+      "calls": 6178,
+      "completed": 6178,
+      "inclusive_us": 207
+    },
+    {
+      "name": "@18::dynamic_pattern",
+      "file": "G:\\Vela\\selfhost\\dynamic.vela",
+      "line": 9,
+      "column": 1,
+      "calls": 8141,
+      "completed": 8141,
+      "inclusive_us": 167
+    },
+    {
+      "name": "@16::callable_pattern",
+      "file": "G:\\Vela\\selfhost\\callables.vela",
+      "line": 104,
+      "column": 1,
+      "calls": 15576,
+      "completed": 15576,
+      "inclusive_us": 339
+    },
+    {
+      "name": "@5::type_parts",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 158,
+      "column": 1,
+      "calls": 16813,
+      "completed": 16813,
+      "inclusive_us": 17056
+    },
+    {
+      "name": "@5::resolve_pattern",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 215,
+      "column": 1,
+      "calls": 6865,
+      "completed": 6865,
+      "inclusive_us": 608733
+    },
+    {
+      "name": "@5::resolve_type",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 256,
+      "column": 1,
+      "calls": 2278,
+      "completed": 2278,
+      "inclusive_us": 258691
+    },
+    {
+      "name": "@1::no_symbol",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 387,
+      "column": 1,
+      "calls": 128458,
+      "completed": 128458,
+      "inclusive_us": 2300
+    },
+    {
+      "name": "@1::symbol_record",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 531,
+      "column": 1,
+      "calls": 5683,
+      "completed": 5683,
+      "inclusive_us": 2115
+    },
+    {
+      "name": "@1::table_get<@1::TypeInfo>",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 540,
+      "column": 1,
+      "calls": 36988,
+      "completed": 36988,
+      "inclusive_us": 2322
+    },
+    {
+      "name": "@1::type_info",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 460,
+      "column": 1,
+      "calls": 36988,
+      "completed": 36988,
+      "inclusive_us": 4149
+    },
+    {
+      "name": "@13::builtin_source",
+      "file": "G:\\Vela\\selfhost\\embedded.vela",
+      "line": 1,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 0
+    },
+    {
+      "name": "@1::add_type",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 488,
+      "column": 1,
+      "calls": 130,
+      "completed": 130,
+      "inclusive_us": 74
+    },
+    {
+      "name": "@1::type_record",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 525,
+      "column": 1,
+      "calls": 130,
+      "completed": 130,
+      "inclusive_us": 42
+    },
+    {
+      "name": "@5::install_prelude",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 347,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 5507
+    },
+    {
+      "name": "@9::analyze_declarations",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 574,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 401132
+    },
+    {
+      "name": "@9::analyze_mode",
+      "file": "G:\\Vela\\selfhost\\semantic.vela",
+      "line": 569,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 1848577
+    },
+    {
+      "name": "@2::parse_closure",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 479,
+      "column": 1,
+      "calls": 3,
+      "completed": 3,
+      "inclusive_us": 170
+    },
+    {
+      "name": "@2::interpolation_hole",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 761,
+      "column": 1,
+      "calls": 123,
+      "completed": 123,
+      "inclusive_us": 1813
+    },
+    {
+      "name": "@2::interpolation_literal",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 758,
+      "column": 1,
+      "calls": 153,
+      "completed": 153,
+      "inclusive_us": 82
+    },
+    {
+      "name": "@2::parse_interpolation",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 779,
+      "column": 1,
+      "calls": 30,
+      "completed": 30,
+      "inclusive_us": 2168
+    },
+    {
+      "name": "@5::join_text",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 27,
+      "column": 1,
+      "calls": 713,
+      "completed": 713,
+      "inclusive_us": 276
+    },
+    {
+      "name": "@2::parse_type_parameters",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 691,
+      "column": 1,
+      "calls": 48,
+      "completed": 48,
+      "inclusive_us": 15
+    },
+    {
+      "name": "@2::type_list",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 128,
+      "column": 1,
+      "calls": 241,
+      "completed": 241,
+      "inclusive_us": 800
+    },
+    {
+      "name": "@2::generic_token",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 45,
+      "column": 1,
+      "calls": 904,
+      "completed": 904,
+      "inclusive_us": 595
+    },
+    {
+      "name": "@1::table_index",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 441,
+      "column": 1,
+      "calls": 1527130,
+      "completed": 1527130,
+      "inclusive_us": 28094
+    },
+    {
+      "name": "@1::table_get<@1::SyntaxExpr>",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 540,
+      "column": 1,
+      "calls": 52159,
+      "completed": 52159,
+      "inclusive_us": 4927
+    },
+    {
+      "name": "@1::ast_expr",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 448,
+      "column": 1,
+      "calls": 52159,
+      "completed": 52159,
+      "inclusive_us": 7498
+    },
+    {
+      "name": "@2::parse_arms",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 717,
+      "column": 1,
+      "calls": 53,
+      "completed": 53,
+      "inclusive_us": 2173
+    },
+    {
+      "name": "@1::add_ast_stmt",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 470,
+      "column": 1,
+      "calls": 6296,
+      "completed": 6296,
+      "inclusive_us": 1323
+    },
+    {
+      "name": "@2::precedence",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 60,
+      "column": 1,
+      "calls": 30424,
+      "completed": 30424,
+      "inclusive_us": 1082
+    },
+    {
+      "name": "@2::expression_suffix",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 281,
+      "column": 1,
+      "calls": 22072,
+      "completed": 22072,
+      "inclusive_us": 71913
+    },
+    {
+      "name": "@1::has_ast_expr",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 390,
+      "column": 1,
+      "calls": 22713,
+      "completed": 22713,
+      "inclusive_us": 417
+    },
+    {
+      "name": "@2::expressions",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 169,
+      "column": 1,
+      "calls": 5621,
+      "completed": 5621,
+      "inclusive_us": 67235
+    },
+    {
+      "name": "@1::add_ast_expr",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 466,
+      "column": 1,
+      "calls": 35631,
+      "completed": 35631,
+      "inclusive_us": 18407
+    },
+    {
+      "name": "@2::generic_call_ahead",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 143,
+      "column": 1,
+      "calls": 33423,
+      "completed": 33423,
+      "inclusive_us": 6067
+    },
+    {
+      "name": "@1::syntax_expression",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 505,
+      "column": 1,
+      "calls": 30040,
+      "completed": 30040,
+      "inclusive_us": 7729
+    },
+    {
+      "name": "@2::expression_atom",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 199,
+      "column": 1,
+      "calls": 22017,
+      "completed": 22017,
+      "inclusive_us": 105622
+    },
+    {
+      "name": "@2::expression",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 185,
+      "column": 1,
+      "calls": 22072,
+      "completed": 22072,
+      "inclusive_us": 189867
+    },
+    {
+      "name": "@1::no_ast_expr",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 372,
+      "column": 1,
+      "calls": 116874,
+      "completed": 116874,
+      "inclusive_us": 2103
+    },
+    {
+      "name": "@1::syntax_statement",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 510,
+      "column": 1,
+      "calls": 6296,
+      "completed": 6296,
+      "inclusive_us": 2225
+    },
+    {
+      "name": "@2::statement",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 342,
+      "column": 1,
+      "calls": 6296,
+      "completed": 6296,
+      "inclusive_us": 353032
+    },
+    {
+      "name": "@2::block",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 331,
+      "column": 1,
+      "calls": 2302,
+      "completed": 2302,
+      "inclusive_us": 251639
+    },
+    {
+      "name": "@16::effect_pattern_constant",
+      "file": "G:\\Vela\\selfhost\\callables.vela",
+      "line": 37,
+      "column": 1,
+      "calls": 871,
+      "completed": 871,
+      "inclusive_us": 375
+    },
+    {
+      "name": "@5::split_text",
+      "file": "G:\\Vela\\selfhost\\types.vela",
+      "line": 13,
+      "column": 1,
+      "calls": 2284,
+      "completed": 2284,
+      "inclusive_us": 901
+    },
+    {
+      "name": "@16::validate_effect_names",
+      "file": "G:\\Vela\\selfhost\\callables.vela",
+      "line": 42,
+      "column": 1,
+      "calls": 432,
+      "completed": 432,
+      "inclusive_us": 342
+    },
+    {
+      "name": "@2::effect_bit",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 430,
+      "column": 1,
+      "calls": 1012,
+      "completed": 1012,
+      "inclusive_us": 21
+    },
+    {
+      "name": "@16::parse_effect_pattern",
+      "file": "G:\\Vela\\selfhost\\callables.vela",
+      "line": 15,
+      "column": 1,
+      "calls": 435,
+      "completed": 435,
+      "inclusive_us": 1613
+    },
+    {
+      "name": "@2::through_previous",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 57,
+      "column": 1,
+      "calls": 30740,
+      "completed": 30740,
+      "inclusive_us": 838
+    },
+    {
+      "name": "@2::parse_type",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 81,
+      "column": 1,
+      "calls": 2282,
+      "completed": 2282,
+      "inclusive_us": 3769
+    },
+    {
+      "name": "@2::name_fields",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 318,
+      "column": 1,
+      "calls": 475,
+      "completed": 475,
+      "inclusive_us": 4437
+    },
+    {
+      "name": "@6::module_canonical",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 190,
+      "column": 1,
+      "calls": 478,
+      "completed": 478,
+      "inclusive_us": 215
+    },
+    {
+      "name": "@6::declare_module_name",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 196,
+      "column": 1,
+      "calls": 478,
+      "completed": 478,
+      "inclusive_us": 388
+    },
+    {
+      "name": "@2::parse_generic_parameters",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 694,
+      "column": 1,
+      "calls": 478,
+      "completed": 478,
+      "inclusive_us": 122
+    },
+    {
+      "name": "@20::keyword",
+      "file": "G:\\Vela\\selfhost\\lexer.vela",
+      "line": 10,
+      "column": 1,
+      "calls": 28664,
+      "completed": 28664,
+      "inclusive_us": 1446
+    },
+    {
+      "name": "@2::identifier",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 50,
+      "column": 1,
+      "calls": 11970,
+      "completed": 11970,
+      "inclusive_us": 4218
+    },
+    {
+      "name": "@2::parse_function_body",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 448,
+      "column": 1,
+      "calls": 430,
+      "completed": 430,
+      "inclusive_us": 130280
+    },
+    {
+      "name": "@2::async_fn_ahead",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 33,
+      "column": 1,
+      "calls": 3142,
+      "completed": 3142,
+      "inclusive_us": 494
+    },
+    {
+      "name": "@3::source_unit_at",
+      "file": "G:\\Vela\\selfhost\\core.vela",
+      "line": 31,
+      "column": 1,
+      "calls": 20814,
+      "completed": 20814,
+      "inclusive_us": 3701
+    },
+    {
+      "name": "@2::parse_module",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 552,
+      "column": 1,
+      "calls": 28,
+      "completed": 28,
+      "inclusive_us": 133775
+    },
+    {
+      "name": "@6::lex_module",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 164,
+      "column": 1,
+      "calls": 28,
+      "completed": 28,
+      "inclusive_us": 68581
+    },
+    {
+      "name": "@6::parse_program_tokens",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 174,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 202747
+    },
+    {
+      "name": "@6::parse_program",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 171,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 202748
+    },
+    {
+      "name": "@20::quoted_end",
+      "file": "G:\\Vela\\selfhost\\lexer.vela",
+      "line": 151,
+      "column": 1,
+      "calls": 21,
+      "completed": 21,
+      "inclusive_us": 1
+    },
+    {
+      "name": "@3::leave",
+      "file": "G:\\Vela\\selfhost\\core.vela",
+      "line": 268,
+      "column": 1,
+      "calls": 80865,
+      "completed": 80865,
+      "inclusive_us": 4341
+    },
+    {
+      "name": "@20::interpolation_hole_end",
+      "file": "G:\\Vela\\selfhost\\lexer.vela",
+      "line": 170,
+      "column": 1,
+      "calls": 369,
+      "completed": 369,
+      "inclusive_us": 396
+    },
+    {
+      "name": "@3::enter",
+      "file": "G:\\Vela\\selfhost\\core.vela",
+      "line": 260,
+      "column": 1,
+      "calls": 80865,
+      "completed": 80865,
+      "inclusive_us": 5004
+    },
+    {
+      "name": "@20::interpolation_end",
+      "file": "G:\\Vela\\selfhost\\lexer.vela",
+      "line": 204,
+      "column": 1,
+      "calls": 60,
+      "completed": 60,
+      "inclusive_us": 486
+    },
+    {
+      "name": "@2::accept",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 26,
+      "column": 1,
+      "calls": 84814,
+      "completed": 84814,
+      "inclusive_us": 16525
+    },
+    {
+      "name": "@2::take",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 16,
+      "column": 1,
+      "calls": 84619,
+      "completed": 84619,
+      "inclusive_us": 11200
+    },
+    {
+      "name": "@2::expect",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 39,
+      "column": 1,
+      "calls": 27179,
+      "completed": 27179,
+      "inclusive_us": 9101
+    },
+    {
+      "name": "@6::parse_import",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 14,
+      "column": 1,
+      "calls": 402,
+      "completed": 402,
+      "inclusive_us": 972
+    },
+    {
+      "name": "@2::current",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 9,
+      "column": 1,
+      "calls": 442869,
+      "completed": 442869,
+      "inclusive_us": 18384
+    },
+    {
+      "name": "@2::at",
+      "file": "G:\\Vela\\selfhost\\parser.vela",
+      "line": 12,
+      "column": 1,
+      "calls": 272822,
+      "completed": 272822,
+      "inclusive_us": 30240
+    },
+    {
+      "name": "@20::contains_byte",
+      "file": "G:\\Vela\\selfhost\\lexer.vela",
+      "line": 13,
+      "column": 1,
+      "calls": 83203,
+      "completed": 83203,
+      "inclusive_us": 3916
+    },
+    {
+      "name": "@20::raw_delimiter",
+      "file": "G:\\Vela\\selfhost\\lexer.vela",
+      "line": 148,
+      "column": 1,
+      "calls": 105046,
+      "completed": 105046,
+      "inclusive_us": 2072
+    },
+    {
+      "name": "@20::is_digit",
+      "file": "G:\\Vela\\selfhost\\lexer.vela",
+      "line": 4,
+      "column": 1,
+      "calls": 172997,
+      "completed": 172997,
+      "inclusive_us": 3136
+    },
+    {
+      "name": "@20::is_alpha",
+      "file": "G:\\Vela\\selfhost\\lexer.vela",
+      "line": 7,
+      "column": 1,
+      "calls": 549507,
+      "completed": 549507,
+      "inclusive_us": 10150
+    },
+    {
+      "name": "@7::codepoint",
+      "file": "G:\\Vela\\selfhost\\source.vela",
+      "line": 46,
+      "column": 1,
+      "calls": 395108,
+      "completed": 395108,
+      "inclusive_us": 22652
+    },
+    {
+      "name": "@7::whitespace",
+      "file": "G:\\Vela\\selfhost\\source.vela",
+      "line": 66,
+      "column": 1,
+      "calls": 395108,
+      "completed": 395108,
+      "inclusive_us": 37655
+    },
+    {
+      "name": "@3::source",
+      "file": "G:\\Vela\\selfhost\\core.vela",
+      "line": 12,
+      "column": 1,
+      "calls": 179,
+      "completed": 179,
+      "inclusive_us": 3
+    },
+    {
+      "name": "@20::lex_range",
+      "file": "G:\\Vela\\selfhost\\lexer.vela",
+      "line": 26,
+      "column": 1,
+      "calls": 179,
+      "completed": 179,
+      "inclusive_us": 146482
+    },
+    {
+      "name": "@20::lex",
+      "file": "G:\\Vela\\selfhost\\lexer.vela",
+      "line": 23,
+      "column": 1,
+      "calls": 28,
+      "completed": 28,
+      "inclusive_us": 77805
+    },
+    {
+      "name": "@6::module_import_specs",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 32,
+      "column": 1,
+      "calls": 28,
+      "completed": 28,
+      "inclusive_us": 79093
+    },
+    {
+      "name": "@6::collect_module",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 66,
+      "column": 1,
+      "calls": 202,
+      "completed": 202,
+      "inclusive_us": 8330786
+    },
+    {
+      "name": "@6::project_cached_context",
+      "file": "G:\\Vela\\selfhost\\modules.vela",
+      "line": 148,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 1099106
+    },
+    {
+      "name": "@1::no_type",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 384,
+      "column": 1,
+      "calls": 53545,
+      "completed": 53545,
+      "inclusive_us": 983
+    },
+    {
+      "name": "@1::empty_span",
+      "file": "G:\\Vela\\selfhost\\model.vela",
+      "line": 369,
+      "column": 1,
+      "calls": 6358,
+      "completed": 6358,
+      "inclusive_us": 105
+    },
+    {
+      "name": "@3::make_context",
+      "file": "G:\\Vela\\selfhost\\core.vela",
+      "line": 273,
+      "column": 1,
+      "calls": 30,
+      "completed": 30,
+      "inclusive_us": 4642
+    },
+    {
+      "name": "@7::source_text_result",
+      "file": "G:\\Vela\\selfhost\\source.vela",
+      "line": 136,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 4484
+    },
+    {
+      "name": "@7::load_source",
+      "file": "G:\\Vela\\selfhost\\source.vela",
+      "line": 139,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 4484
+    },
+    {
+      "name": "@21::cache_event",
+      "file": "G:\\Vela\\selfhost\\incremental.vela",
+      "line": 10,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 0
+    },
+    {
+      "name": "@21::cache_prepare",
+      "file": "G:\\Vela\\selfhost\\incremental.vela",
+      "line": 18,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 0
+    },
+    {
+      "name": "@22::project_verified_lock",
+      "file": "G:\\Vela\\selfhost\\projects.vela",
+      "line": 290,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 1
+    },
+    {
+      "name": "parent_path",
+      "file": "G:\\Vela\\selfhost\\driver.vela",
+      "line": 161,
+      "column": 1,
+      "calls": 202,
+      "completed": 202,
+      "inclusive_us": 36
+    },
+    {
+      "name": "@22::project_relative",
+      "file": "G:\\Vela\\selfhost\\projects.vela",
+      "line": 78,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 9
+    },
+    {
+      "name": "@22::project_identifier",
+      "file": "G:\\Vela\\selfhost\\projects.vela",
+      "line": 39,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 0
+    },
+    {
+      "name": "@22::project_split",
+      "file": "G:\\Vela\\selfhost\\projects.vela",
+      "line": 27,
+      "column": 1,
+      "calls": 5,
+      "completed": 5,
+      "inclusive_us": 4
+    },
+    {
+      "name": "@7::normalized",
+      "file": "G:\\Vela\\selfhost\\source.vela",
+      "line": 70,
+      "column": 1,
+      "calls": 203,
+      "completed": 203,
+      "inclusive_us": 177468
+    },
+    {
+      "name": "@7::utf8_width",
+      "file": "G:\\Vela\\selfhost\\source.vela",
+      "line": 5,
+      "column": 1,
+      "calls": 8775650,
+      "completed": 8775650,
+      "inclusive_us": 157088
+    },
+    {
+      "name": "@7::utf8_valid",
+      "file": "G:\\Vela\\selfhost\\source.vela",
+      "line": 20,
+      "column": 1,
+      "calls": 406,
+      "completed": 406,
+      "inclusive_us": 328408
+    },
+    {
+      "name": "@7::source_inside_boundary",
+      "file": "G:\\Vela\\selfhost\\source.vela",
+      "line": 105,
+      "column": 1,
+      "calls": 203,
+      "completed": 203,
+      "inclusive_us": 193
+    },
+    {
+      "name": "@7::query_source_text",
+      "file": "G:\\Vela\\selfhost\\source.vela",
+      "line": 120,
+      "column": 1,
+      "calls": 203,
+      "completed": 203,
+      "inclusive_us": 775092
+    },
+    {
+      "name": "@22::project_is_manifest",
+      "file": "G:\\Vela\\selfhost\\projects.vela",
+      "line": 100,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 0
+    },
+    {
+      "name": "@22::project_load_with",
+      "file": "G:\\Vela\\selfhost\\projects.vela",
+      "line": 118,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 3756
+    },
+    {
+      "name": "@22::project_load",
+      "file": "G:\\Vela\\selfhost\\projects.vela",
+      "line": 249,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 3987
+    },
+    {
+      "name": "@8::io_result<String>",
+      "file": "G:\\Vela\\selfhost\\errors.vela",
+      "line": 56,
+      "column": 1,
+      "calls": 408,
+      "completed": 408,
+      "inclusive_us": 14
+    },
+    {
+      "name": "@8::from_string",
+      "file": "G:\\Vela\\selfhost\\errors.vela",
+      "line": 46,
+      "column": 1,
+      "calls": 611,
+      "completed": 611,
+      "inclusive_us": 41
+    },
+    {
+      "name": "io_value",
+      "file": "G:\\Vela\\selfhost\\driver.vela",
+      "line": 23,
+      "column": 1,
+      "calls": 408,
+      "completed": 408,
+      "inclusive_us": 73
+    },
+    {
+      "name": "main",
+      "file": "G:\\Vela\\selfhost\\driver.vela",
+      "line": 392,
+      "column": 1,
+      "calls": 1,
+      "completed": 1,
+      "inclusive_us": 3161570
+    }
+  ]
+}

@@ -73,6 +73,16 @@ pub fn cache_store(cache: Cache, key: String, body: String, layer: String) -> Un
 pub fn import_cache_key(code: String) -> String {
     return sha256("imports-v1\n" + compiler_fingerprint() + sha256(code));
 }
+pub fn token_fingerprint(c: Context) -> String effects { state } {
+    let parts = strings_new();
+    for token in c.tokens {
+        let size = token.span.end - token.span.start;
+        strings_push(parts, to_string(size));
+        strings_push(parts, ":");
+        strings_push(parts, str_slice(c.source_text, token.span.start, token.span.end));
+    }
+    return sha256(strings_join(parts, ""));
+}
 pub fn encode_imports(specs: List<ImportSpec>) -> String effects { state } {
     let parts = strings_new();
     for spec in specs {

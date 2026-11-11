@@ -1,0 +1,193 @@
+import "json.vela" as json;
+import "text.vela" as text;
+
+pub opaque struct Snapshot {
+    fields: Dict<String, json::Value>,
+    order: List<String>
+}
+pub enum Error {
+    Json(json::ParseError),
+    RootType,
+    Duplicate(String),
+    InvalidText(String, Int),
+    NonFinite,
+    DepthLimit,
+    NodeLimit,
+    TextLimit,
+    Missing(String),
+    WrongType(String),
+    Unknown(String)
+}
+struct Budget {
+    nodes: Int,
+    text_bytes: Int
+}
+fn text_budget(value: String, context: String, budget: List<Budget>) -> Result<Bool, Error> effects { state } {
+    var left = list_get(budget, 0);
+    if str_len(value) > left.text_bytes {
+        return Result<Bool, Error>::Err(Error::TextLimit);
+    }
+    let invalid = text::invalid_offset(value);
+    if invalid >= 0 {
+        return Result<Bool, Error>::Err(Error::InvalidText(context, invalid));
+    }
+    left.text_bytes = left.text_bytes - str_len(value);
+    list_set(budget, 0, left);
+    return Result<Bool, Error>::Ok(true);
+}
+fn checked_copy(value: json::Value, budget: List<Budget>, depth: Int) -> Result<json::Value, Error> effects { state } {
+    if depth > 64 {
+        return Result<json::Value, Error>::Err(Error::DepthLimit);
+    }
+    var left = list_get(budget, 0);
+    if left.nodes == 0 {
+        return Result<json::Value, Error>::Err(Error::NodeLimit);
+    }
+    left.nodes = left.nodes - 1;
+    list_set(budget, 0, left);
+    match value {
+        json::Value::Object(members) => {
+            let copied = list_new<json::Member>();
+            let seen = dict_new<String, Bool>();
+            for member in members {
+                let valid = text_budget(member.name, member.name, budget)?;
+                if dict_has(seen, member.name) {
+                    return Result<json::Value, Error>::Err(Error::Duplicate(member.name));
+                }
+                dict_set(seen, member.name, true);
+                list_push(copied, json::Member(name: member.name, value: checked_copy(member.value, budget, depth + 1)?));
+            }
+            return Result<json::Value, Error>::Ok(json::Value::Object(copied));
+        }
+        json::Value::Array(items) => {
+            let copied = list_new<json::Value>();
+            for item in items { list_push(copied, checked_copy(item, budget, depth + 1)?); }
+            return Result<json::Value, Error>::Ok(json::Value::Array(copied));
+        }
+        json::Value::StringValue(s) => { let valid = text_budget(s, "value", budget)?; }
+        json::Value::Number(n) => {
+            if !float_is_finite(n) { return Result<json::Value, Error>::Err(Error::NonFinite); }
+        }
+        json::Value::Null => {}
+        json::Value::Boolean(_) => {}
+        json::Value::Integer(_) => {}
+    }
+    return Result<json::Value, Error>::Ok(value);
+}
+fn detached(value: json::Value) -> json::Value effects { state } {
+    match value {
+        json::Value::Object(members) => {
+            let copied = list_new<json::Member>();
+            for member in members {
+                list_push(copied, json::Member(name: member.name, value: detached(member.value)));
+            }
+            return json::Value::Object(copied);
+        }
+        json::Value::Array(items) => {
+            let copied = list_new<json::Value>();
+            for item in items { list_push(copied, detached(item)); }
+            return json::Value::Array(copied);
+        }
+        json::Value::StringValue(_) => {}
+        json::Value::Number(_) => {}
+        json::Value::Null => {}
+        json::Value::Boolean(_) => {}
+        json::Value::Integer(_) => {}
+    }
+    return value;
+}
+fn index(value: json::Value) -> Result<Snapshot, Error> effects { state } {
+    match value {
+        json::Value::Object(members) => {
+            let fields = dict_new<String, json::Value>();
+            let order = list_new<String>();
+            for member in members {
+                dict_set(fields, member.name, member.value);
+                list_push(order, member.name);
+            }
+            return Result<Snapshot, Error>::Ok(Snapshot(fields: fields, order: order));
+        }
+        json::Value::Array(_) => {}
+        json::Value::StringValue(_) => {}
+        json::Value::Number(_) => {}
+        json::Value::Null => {}
+        json::Value::Boolean(_) => {}
+        json::Value::Integer(_) => {}
+    }
+    return Result<Snapshot, Error>::Err(Error::RootType);
+}
+pub fn from_value(value: json::Value) -> Result<Snapshot, Error> effects { state } {
+    match value {
+        json::Value::Object(_) => {
+            let budget = list_new<Budget>();
+            list_push(budget, Budget(nodes: 100000, text_bytes: 8388608));
+            return index(checked_copy(value, budget, 0)?);
+        }
+        json::Value::Array(_) => {}
+        json::Value::StringValue(_) => {}
+        json::Value::Number(_) => {}
+        json::Value::Null => {}
+        json::Value::Boolean(_) => {}
+        json::Value::Integer(_) => {}
+    }
+    return Result<Snapshot, Error>::Err(Error::RootType);
+}
+pub fn parse(data: String) -> Result<Snapshot, Error> effects { state } {
+    // The parser produces private, fully validated containers. Transfer them
+    // directly. Decoded key/string bytes cannot exceed the raw JSON byte limit.
+    match json::parse_with_limits(data, json::Limits(bytes: 8388608, depth: 64, nodes: 100000)) {
+        Result::Ok(value) => { return index(value); }
+        Result::Err(error) => { return Result<Snapshot, Error>::Err(Error::Json(error)); }
+    }
+}
+pub fn keys(value: Snapshot) -> List<String> effects { state } {
+    let output = list_new<String>();
+    for key in value.order { list_push(output, key); }
+    return output;
+}
+pub fn find(value: Snapshot, name: String) -> Option<json::Value> effects { state } {
+    if !dict_has(value.fields, name) { return Option<json::Value>::None; }
+    return Option<json::Value>::Some(detached(dict_get(value.fields, name)));
+}
+fn known(value: Snapshot, name: String) -> Result<json::Value, Error> effects { state } {
+    if !dict_has(value.fields, name) { return Result<json::Value, Error>::Err(Error::Missing(name)); }
+    return Result<json::Value, Error>::Ok(dict_get(value.fields, name));
+}
+pub fn required(value: Snapshot, name: String) -> Result<json::Value, Error> effects { state } {
+    return Result<json::Value, Error>::Ok(detached(known(value, name)?));
+}
+fn typed<T, E>(outcome: Result<T, E>, name: String) -> Result<T, Error> {
+    return match outcome {
+        Result::Ok(value) => Result<T, Error>::Ok(value),
+        Result::Err(_) => Result<T, Error>::Err(Error::WrongType(name))
+    };
+}
+pub fn string(value: Snapshot, name: String) -> Result<String, Error> effects { state } {
+    return typed(json::as_string(json::root(known(value, name)?)), name);
+}
+pub fn integer(value: Snapshot, name: String) -> Result<Int, Error> effects { state } {
+    return typed(json::as_int(json::root(known(value, name)?)), name);
+}
+pub fn boolean(value: Snapshot, name: String) -> Result<Bool, Error> effects { state } {
+    return typed(json::as_bool(json::root(known(value, name)?)), name);
+}
+pub fn number(value: Snapshot, name: String) -> Result<Float64, Error> effects { state } {
+    match known(value, name)? {
+        json::Value::Number(n) => { return Result<Float64, Error>::Ok(n); }
+        json::Value::Array(_) => {}
+        json::Value::Object(_) => {}
+        json::Value::StringValue(_) => {}
+        json::Value::Null => {}
+        json::Value::Boolean(_) => {}
+        json::Value::Integer(_) => {}
+    }
+    return Result<Float64, Error>::Err(Error::WrongType(name));
+}
+pub fn allow_only(value: Snapshot, allowed: List<String>) -> Result<Bool, Error> effects { state } {
+    let names = dict_new<String, Bool>();
+    for name in allowed { dict_set(names, name, true); }
+    for name in value.order {
+        if !dict_has(names, name) { return Result<Bool, Error>::Err(Error::Unknown(name)); }
+    }
+    return Result<Bool, Error>::Ok(true);
+}

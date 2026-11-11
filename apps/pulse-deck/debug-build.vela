@@ -31,7 +31,7 @@ fn main() -> Int effects { io, process, state } {
         eprint(built.out + built.err);
         return 2;
     }
-    for file in test::split("vela-gui.dll|vela-http-server.dll", 124) {
+    for file in test::split("vela-gui.dll|vela-http-server.dll|vela-http.dll", 124) {
         test::done(write_file(output + "/" + file, test::value(read_file(app + "/bin/" + file))));
     }
     test::done(make_dir(output + "/assets"));

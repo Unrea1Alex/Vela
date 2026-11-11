@@ -1,0 +1,64 @@
+struct Pair { first: Int, second: Int }
+enum Choice { Yes(Int), No }
+
+fn note(log: List<String>, name: String, value: Int) -> Int effects { state } {
+    list_push(log, name);
+    return value;
+}
+
+fn skipped(log: List<String>) -> Bool effects { state } {
+    list_push(log, "unexpected");
+    return true;
+}
+
+fn check_int32(input: Int, valid: Bool) -> Unit {
+    match int32_from_int(input) {
+        Int32Result::Ok(value) => { assert_true(valid && int32_to_int(value) == input, "Int32 round trip"); }
+        Int32Result::Err(_) => { assert_true(!valid, "Int32 valid bound"); }
+    }
+}
+
+fn main() -> Unit effects { state, io } {
+    let low = -0009223372036854775808;
+    let high = 0009223372036854775807;
+    assert_true(010 == 10 && 08 == 8 && -00017 == -17, "decimal literal normalization");
+    assert_true(low + 1 == -9223372036854775807 && high - 1 == 9223372036854775806, "signed endpoints");
+    assert_true(low * 0 == 0 && low * 1 == low && high * -1 == -9223372036854775807, "multiplication at bounds");
+    assert_true(low % -1 == 0 && -7 / 3 == -2 && -7 % 3 == -1 && 7 % -3 == 1, "division and remainder signs");
+    assert_true(low / 2 == -4611686018427387904 && high / -1 == -9223372036854775807, "division at bounds");
+    let upper = list_new<Int>();
+    for n in high - 1 ..= high { list_push(upper, n); }
+    assert_true(list_len(upper) == 2 && list_get(upper, 1) == high, "inclusive maximum terminates");
+    var lower = low;
+    for n in low .. low + 1 { lower = n; }
+    assert_true(lower == low, "exclusive minimum");
+    check_int32(-2147483649, false);
+    check_int32(-2147483648, true);
+    check_int32(2147483647, true);
+    check_int32(2147483648, false);
+    assert_true(float_to_string(-1e-99999) == "-0", "signed underflow");
+    assert_true(2.4703282292062327e-324 == 0.0, "below subnormal midpoint");
+    assert_true(2.4703282292062328e-324 == 4.9406564584124654e-324, "above subnormal midpoint");
+    assert_true(1.00000000000000011102230246251565404236316680908203125 == 1.0, "ties to even");
+    assert_true(1.00000000000000011102230246251565404236316680908203126 > 1.0, "above ordinary midpoint");
+    assert_true(sha256("") == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "empty SHA-256");
+    assert_true(sha256("abc") == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", "short SHA-256");
+    let two_blocks = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
+    assert_true(sha256(two_blocks) == "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1", "two-block SHA-256");
+    let log = list_new<String>();
+    let pair = Pair(second: note(log, "second", 2), first: note(log, "first", 1));
+    let f = fn [log](a: Int, b: Int) -> Int effects { state } {
+        defer { list_push(log, "defer"); }
+        return note(log, "return", a * 10 + b);
+    };
+    let selected = match Choice::Yes(f(note(log, "a", pair.first), note(log, "b", pair.second))) {
+        Choice::Yes(value) => note(log, "yes", value),
+        Choice::No => note(log, "unexpected", -1)
+    };
+    assert_true(!(false && skipped(log)) && (true || skipped(log)), "short circuit");
+    assert_true(selected == 12 && list_len(log) == 7, "single evaluation");
+    var transcript = "";
+    for name in log { transcript = transcript + name + " "; }
+    assert_true(transcript == "second first a b return defer yes ", "written evaluation order");
+    print("lowering boundaries passed");
+}

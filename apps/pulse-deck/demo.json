@@ -1,6 +1,5 @@
 {
   "demo": true,
-  "curl": "system",
   "ca_file": "",
   "concurrency": 3,
   "endpoints": [

@@ -1,0 +1,127 @@
+import "model.vela";
+import "simplify.vela";
+
+struct IntBounds { low: Int, high: Int }
+
+fn range_min(a: Int, b: Int) -> Int {
+    if a < b { return a; }
+    return b;
+}
+fn range_max(a: Int, b: Int) -> Int {
+    if a > b { return a; }
+    return b;
+}
+fn join_int_bounds(left: Option<IntBounds>, right: Option<IntBounds>) -> Option<IntBounds> {
+    let a = left?;
+    let b = right?;
+    return Option<IntBounds>::Some(IntBounds(low: range_min(a.low, b.low), high: range_max(a.high, b.high)));
+}
+fn prove_int_binary(op: String, a: IntBounds, b: IntBounds) -> Option<IntBounds> {
+    if op == "+" {
+        let low = evaluate_int_arithmetic("+", a.low, b.low)?;
+        let high = evaluate_int_arithmetic("+", a.high, b.high)?;
+        return Option<IntBounds>::Some(IntBounds(low: low, high: high));
+    }
+    if op == "-" {
+        let low = evaluate_int_arithmetic("-", a.low, b.high)?;
+        let high = evaluate_int_arithmetic("-", a.high, b.low)?;
+        return Option<IntBounds>::Some(IntBounds(low: low, high: high));
+    }
+    if op == "*" {
+        let aa = evaluate_int_arithmetic("*", a.low, b.low)?;
+        let ab = evaluate_int_arithmetic("*", a.low, b.high)?;
+        let ba = evaluate_int_arithmetic("*", a.high, b.low)?;
+        let bb = evaluate_int_arithmetic("*", a.high, b.high)?;
+        return Option<IntBounds>::Some(IntBounds(
+            low: range_min(range_min(aa, ab), range_min(ba, bb)),
+            high: range_max(range_max(aa, ab), range_max(ba, bb))));
+    }
+    return Option<IntBounds>::None;
+}
+fn prove_int_negation(input: IntBounds) -> Option<IntBounds> {
+    if input.low == -9223372036854775808 { return Option<IntBounds>::None; }
+    return Option<IntBounds>::Some(IntBounds(low: -input.high, high: -input.low));
+}
+fn record_arithmetic_proof(c: Context, id: ExprId, original: CheckedExpr, proof: Option<IntBounds>) -> Option<IntBounds> effects { state, io, process } {
+    match proof {
+        Option::Some(_) => {
+            var node = original;
+            node.safe_arithmetic = true;
+            set_checked_expr(c, id, node);
+        }
+        Option::None => {}
+    }
+    return proof;
+}
+fn int_bounds(c: Context, bindings: Dict<SymbolId, IntBounds>, id: ExprId) -> Option<IntBounds> effects { state, io, process } {
+    if !has_expr(id) { return Option<IntBounds>::None; }
+    let node = checked_expr(c, id);
+    if node.kind == 101 {
+        return match parse_int(node.text) {
+            IntResult::Ok(value) => Option<IntBounds>::Some(IntBounds(low: value, high: value)),
+            IntResult::Err(_) => Option<IntBounds>::None
+        };
+    }
+    if node.kind == 104 {
+        if dict_has(bindings, node.symbol) { return Option<IntBounds>::Some(dict_get(bindings, node.symbol)); }
+        return Option<IntBounds>::None;
+    }
+    let left = int_bounds(c, bindings, node.left);
+    let right = int_bounds(c, bindings, node.right);
+    for i in 0 .. list_len(node.arguments) {
+        let ignored = int_bounds(c, bindings, list_get(node.arguments, i));
+    }
+    var joined = Option<IntBounds>::None;
+    for i in 0 .. list_len(node.arms) {
+        let arm = int_bounds(c, bindings, list_get(node.arms, i).value);
+        if i == 0 { joined = arm; }
+        else { joined = join_int_bounds(joined, arm); }
+    }
+    if node.type_id != int_type() { return Option<IntBounds>::None; }
+    if node.kind == 113 { return joined; }
+    if node.kind == 106 {
+        let proof = prove_int_binary(node.text, left?, right?);
+        return record_arithmetic_proof(c, id, node, proof);
+    }
+    if node.kind == 105 && node.text == "-" {
+        return record_arithmetic_proof(c, id, node, prove_int_negation(left?));
+    }
+    return Option<IntBounds>::None;
+}
+fn loop_bounds(mode: Int, start: Option<IntBounds>, end: Option<IntBounds>) -> Option<IntBounds> {
+    let first = start?;
+    let last = end?;
+    var high = last.high;
+    if mode == 1 { high = evaluate_int_arithmetic("-", high, 1)?; }
+    if first.low > high { return Option<IntBounds>::None; }
+    return Option<IntBounds>::Some(IntBounds(low: first.low, high: high));
+}
+fn remember_bounds(bindings: Dict<SymbolId, IntBounds>, binding: SymbolId, bounds: Option<IntBounds>) -> Unit effects { state } {
+    match bounds {
+        Option::Some(value) => { dict_set(bindings, binding, value); }
+        Option::None => {}
+    }
+}
+fn prove_block_ranges(c: Context, bindings: Dict<SymbolId, IntBounds>, body: List<StmtId>) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(body) {
+        let node = checked_stmt(c, list_get(body, i));
+        let value = int_bounds(c, bindings, node.value);
+        if node.kind == 130 && !symbol_info(c, node.binding).mutable {
+            remember_bounds(bindings, node.binding, value);
+        } else if node.kind == 141 && node.mode != 0 {
+            let end = int_bounds(c, bindings, node.target);
+            remember_bounds(bindings, node.binding, loop_bounds(node.mode, value, end));
+        }
+        prove_block_ranges(c, bindings, node.yes);
+        prove_block_ranges(c, bindings, node.no);
+        for j in 0 .. list_len(node.arms) {
+            prove_block_ranges(c, bindings, list_get(node.arms, j).body);
+        }
+    }
+}
+pub fn prove_ranges(c: Context) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(c.functions) {
+        let bindings = dict_new<SymbolId, IntBounds>();
+        prove_block_ranges(c, bindings, list_get(c.functions, i).body);
+    }
+}

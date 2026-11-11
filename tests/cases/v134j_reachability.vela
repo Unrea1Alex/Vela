@@ -1,0 +1,49 @@
+interface Read { fn read(self: Self) -> Int; }
+struct LivePayload { value: String }
+struct Live { payload: LivePayload }
+struct Dead { payload: String }
+impl Read for Live {
+    fn read(self: Live) -> Int { return str_len(self.payload.value); }
+}
+impl Read for Dead {
+    fn read(self: Dead) -> Int { return str_len(self.payload); }
+}
+
+fn first(n: Int) -> Int {
+    if n == 0 { return 1; }
+    return second(n - 1);
+}
+fn second(n: Int) -> Int {
+    if n == 0 { return 2; }
+    return first(n - 1);
+}
+fn identity<T>(item: T) -> T { return item; }
+fn positive(n: Int) -> Bool { return n > 0; }
+fn emit_cleanup() -> Unit effects { io, process } { print("cleanup"); }
+fn dead_branch() -> Int {
+    let dead = Dead(payload: "unused");
+    let closure = fn [dead]() -> Int { return str_len(dead.payload); };
+    let receiver = dyn Read(dead);
+    return closure() + receiver.read();
+}
+fn execute(read: fn() -> Int, dynamic_value: dyn Read) -> Int
+    ensures positive(result);
+{
+    return read() + dynamic_value.read();
+}
+fn main() -> Unit effects { state, io, process } {
+    defer { emit_cleanup(); }
+    let payload = LivePayload(value: "a" + "bc");
+    let values = list_new<LivePayload>();
+    list_push(values, payload);
+    let ignored = Option<LivePayload>::Some(payload);
+    let chosen = match ignored {
+        Option::Some(_) => list_get(values, 0),
+        Option::None => payload
+    };
+    let receiver = dyn Read(identity<Live>(Live(payload: chosen)));
+    let call = fn [chosen]() -> Int { return first(str_len(chosen.value)); };
+    print(execute(call, receiver));
+    let address = second;
+    print(address(1));
+}

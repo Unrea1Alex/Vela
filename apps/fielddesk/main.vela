@@ -96,6 +96,9 @@ fn work() -> Result<Int, String> effects { args, io, process, state } {
     let folder = result::explain(path::resource_base(), "Cannot locate resources")?;
     let adapter = result::explain(path::join(folder, path::Path(value: "vela-gui.dll")),
         "Invalid adapter path")?;
+    let http_sibling = result::explain(path::join(folder, path::Path(value: "vela-http.dll")),
+        "Invalid HTTP adapter path")?;
+    let http_adapter = absolute(http_sibling.value)?;
     let shipped_settings = result::explain(path::join(folder, path::Path(
         value: "assets/settings.json")), "Invalid packaged settings path")?;
     if graphical || arg_count() == 0 {
@@ -111,15 +114,22 @@ fn work() -> Result<Int, String> effects { args, io, process, state } {
         let protected = list_new<path::Path>();
         list_push(protected, executable);
         list_push(protected, adapter);
+        list_push(protected, http_adapter);
         list_push(protected, shipped_settings);
         list_push(protected, output);
         var endpoint = Option<network::Endpoint>::None;
+        let endpoints = list_new<network::Endpoint>();
+        defer { for remote in endpoints { let closed = network::close_endpoint(remote); } }
         if configured {
             let file = absolute(dict_get(options.options, "endpoint"))?;
             list_push(protected, file);
             let data = result::map_error(fs::read_bytes(file, 16384), workflow::file_error)?;
             let remote = network::parse(data.data)?;
-            list_push(protected, absolute(remote.executable.value)?);
+            list_push(endpoints, remote);
+            let transport_path = absolute(remote.executable.value)?;
+            if transport_path.value != http_adapter.value {
+                list_push(protected, transport_path);
+            }
             match remote.trust {
                 Option::None => {}
                 Option::Some(certificate) => {
@@ -140,6 +150,7 @@ fn work() -> Result<Int, String> effects { args, io, process, state } {
             workflow::file_error)?;
         let shown = gui::show(gui::Options(output: output, directory: directory,
             settings: model::settings(settings_data.data)?, endpoint: endpoint))?;
+        for remote in endpoints { let closed = network::close_endpoint(remote)?; }
         return Result<Int, String>::Ok(0);
     }
     if (demo && count != 1) || (!demo && count != 3) {
@@ -162,6 +173,7 @@ fn work() -> Result<Int, String> effects { args, io, process, state } {
     list_push(paths, stderr);
     list_push(paths, executable);
     list_push(paths, adapter);
+    list_push(paths, http_adapter);
     list_push(paths, shipped_settings);
     if !demo {
         list_push(paths, config);

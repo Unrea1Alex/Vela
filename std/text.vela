@@ -4,6 +4,9 @@ pub struct Bytes {
 pub struct Text {
     data: String
 }
+pub opaque struct CheckedText {
+    data: String
+}
 pub enum Error {
     InvalidUtf8(Int),
     InvalidSlice,
@@ -68,18 +71,39 @@ pub fn encode(value: Text) -> Result<Bytes, Error> {
     let valid = checked(value.data)?;
     return Result<Bytes, Error>::Ok(Bytes(data: valid.data));
 }
+fn boundary(data: String, at: Int) -> Bool {
+    if at == str_len(data) {
+        return true;
+    }
+    let byte = str_byte(data, at);
+    return byte < 128 || byte > 191;
+}
+fn valid_slice(data: String, start: Int, end: Int) -> Bool {
+    return start >= 0 && end >= start && end <= str_len(data)
+        && boundary(data, start) && boundary(data, end);
+}
 pub fn slice(value: Text, start: Int, end: Int) -> Result<Text, Error> {
     let valid = checked(value.data)?;
-    if start < 0 || end < start || end > str_len(valid.data) {
-        return Result<Text, Error>::Err(Error::InvalidSlice);
-    }
-    if start < str_len(valid.data) && str_byte(valid.data, start) >= 128 && str_byte(valid.data, start) <= 191 {
-        return Result<Text, Error>::Err(Error::InvalidSlice);
-    }
-    if end < str_len(valid.data) && str_byte(valid.data, end) >= 128 && str_byte(valid.data, end) <= 191 {
+    if !valid_slice(valid.data, start, end) {
         return Result<Text, Error>::Err(Error::InvalidSlice);
     }
     return checked(str_slice(valid.data, start, end));
+}
+pub fn validate(data: String) -> Result<CheckedText, Error> {
+    let valid = checked(data)?;
+    return Result<CheckedText, Error>::Ok(CheckedText(data: valid.data));
+}
+pub fn checked_data(value: CheckedText) -> String {
+    return value.data;
+}
+pub fn legacy_text(value: CheckedText) -> Text {
+    return Text(data: value.data);
+}
+pub fn checked_slice(value: CheckedText, start: Int, end: Int) -> Result<CheckedText, Error> {
+    if !valid_slice(value.data, start, end) {
+        return Result<CheckedText, Error>::Err(Error::InvalidSlice);
+    }
+    return Result<CheckedText, Error>::Ok(CheckedText(data: str_slice(value.data, start, end)));
 }
 pub fn codepoint(value: Int) -> Result<Text, Error> {
     if value < 0 || value > 1114111 || (value >= 55296 && value <= 57343) {

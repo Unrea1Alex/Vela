@@ -1,0 +1,18 @@
+import "lowering-errors.vela" as bounds;
+
+fn first() -> Int effects { io } {
+    print("first argument");
+    return 9223372036854775807;
+}
+
+fn second() -> Int effects { io } {
+    print("unexpected second argument");
+    return 2;
+}
+
+fn add(left: Int, right: Int) -> Int { return left + right; }
+
+fn main() -> Unit effects { io } {
+    defer { print("unexpected defer after panic"); }
+    print(add(bounds::next_at_limit(first()), second()));
+}

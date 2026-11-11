@@ -64,6 +64,12 @@ fn numeric(data: String) -> stream::Number effects { state } {
     assert_true(false, "expected number");
     return numeric(data);
 }
+fn read_text(data: String) -> String effects { state } {
+    let reader = must(stream::create(data, stream::default_limits()));
+    let result_value = must(stream::read_string(reader));
+    let ended = must(stream::finish(reader));
+    return result_value;
+}
 fn main() -> Unit effects { state, io } {
     let limits = stream::default_limits();
     assert_true(valid("{\"ignored\":[1e9999,999999999999999999999999999999999999],\"ok\":true}",
@@ -95,6 +101,18 @@ fn main() -> Unit effects { state, io } {
     let encoding = failure("{\"x\":\"" + str_from_byte(255) + "\"}", limits);
     assert_true(encoding.offset == 6 && encoding.path == "$" && encoding.kind
         == stream::ErrorKind::Encoding, "UTF-8 offset");
+    let control = failure(" [\"é" + str_from_byte(10) + "\"]", limits);
+    assert_true(control.offset == 5 && control.path == "$[0]" && control.message
+        == "unescaped control character", "ordinary prefix before unescaped control");
+    let unterminated = failure("[\"abc", limits);
+    assert_true(unterminated.offset == 5 && unterminated.path == "$[0]" && unterminated.message
+        == "unterminated string", "ordinary prefix before end of input");
+    let escape = failure("{\"key\":\"prefix\\x\"}", limits);
+    assert_true(escape.offset == 15 && escape.path == "$[\"key\"]" && escape.message
+        == "invalid escape", "ordinary prefix before malformed escape");
+    let text = read_text(" \"é文:" + to_string(17) + "\" ");
+    assert_true(read_text("\"\"") == "" && read_text("\"é\\n文\"") == "é\n文",
+        "empty and escaped string payloads");
     assert_true(failure("[true]", stream::Limits(bytes: 5, depth: 1, nodes: 2)).kind
         == stream::ErrorKind::ByteLimit, "byte bound");
     assert_true(failure("[true]", stream::Limits(bytes: 6, depth: 0, nodes: 2)).kind
@@ -129,6 +147,7 @@ fn main() -> Unit effects { state, io } {
     for i in 0 .. 100 {
         let garbage = "unrelated allocation " + to_string(i);
     }
+    assert_true(text == "é文:17", "plain text survives reader lifetime");
     assert_true(stream::spelling(huge) == "1e9999", "number retains input after reader lifetime");
     assert_true(stream::spelling(numeric("-0")) == "-0" && must(stream::integer(numeric("-0")))
         == 0, "negative zero spelling");

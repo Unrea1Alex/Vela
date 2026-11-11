@@ -143,6 +143,7 @@ pub fn foreign_ctype(c: Context, t: TypeId) -> String effects { state, io, proce
 pub fn emit_foreign(c: Context, n: CheckedExpr, args: StringList) -> String effects { state, io, process } {
     let sig = symbol_info(c, n.symbol);
     let loc = location(c, n.span);
+    emit(c, "v_gc_poll();");
     let library = raw_temp(c, "v_foreign_library*", "v_foreign_require(" + cquote(sig.foreign_library) + ", " + loc + ")");
     let types = strings_new();
     for i in 0 .. list_len(sig.parameters) {

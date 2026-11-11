@@ -14,6 +14,7 @@ const exe = path.join(app, 'bin/pulse-deck.exe');
 const base = await fs.mkdtemp(path.join(await fs.mkdir(path.join(app, 'work'), {recursive:true}).then(()=>path.join(app,'work')), 'gate-'));
 const openssl = process.env.PULSE_OPENSSL || 'C:/Program Files/Git/usr/bin/openssl.exe';
 const curl = path.join(process.env.SystemRoot, 'System32/curl.exe');
+const legacy = process.argv.includes('--legacy');
 const checks = [];
 const binary = Buffer.from([0,255,65,208,175]);
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -53,7 +54,7 @@ async function stop(server) {
 function endpoint(target='/ok', extra={}) {
   return {name:target,scheme:'http',host:'127.0.0.1',port,target,expect:200,delay_ms:0,timeout_ms:3000,body_limit:1024,...extra};
 }
-function config(entries,extra={}) {return {demo:false,curl,ca_file:'',concurrency:3,endpoints:entries,...extra};}
+function config(entries,extra={}) {return {demo:false,ca_file:'',concurrency:3,endpoints:entries,...(legacy ? {curl} : {}),...extra};}
 async function run(name, settings, expectedCode, more=[]) {
   const input = path.join(base, `${checks.length}-${name.replace(/[^a-z0-9]+/gi,'-')}.json`);
   await fs.writeFile(input, JSON.stringify(settings));
@@ -86,7 +87,7 @@ try {
   if(process.argv.includes('--interactive')) {
     const folder=path.join(base,'интерактивная поставка');
     await fs.mkdir(path.join(folder,'assets'),{recursive:true});
-    for(const file of ['pulse-deck.exe','vela-gui.dll','vela-http-server.dll']) await fs.copyFile(path.join(app,'bin',file),path.join(folder,file));
+    for(const file of ['pulse-deck.exe','vela-gui.dll','vela-http-server.dll','vela-http.dll']) await fs.copyFile(path.join(app,'bin',file),path.join(folder,file));
     const settings=config([
       endpoint('/unicode',{name:'Москва · Unicode'}),
       endpoint('/hang',{name:'Slow HTTPS A',scheme:'https',host:'localhost',port:tlsPort,timeout_ms:120000}),
@@ -129,8 +130,8 @@ try {
     await run('invalid byte limit',config([endpoint('/ok',{body_limit:0})]),2);
     await run('invalid timeout',config([endpoint('/ok',{timeout_ms:0})]),2);
     await run('relative curl path',config([endpoint()],{curl:'curl.exe'}),2);
-    const report={schema:1,application:'PulseDeck 1.0',vela:(await execute(compiler,['--version'])).stdout.trim(),platform:process.platform,checks,passed:checks.length,failed:0,real_server_peak:peak};
-    await fs.writeFile(path.join(app,'network-validation.json'),JSON.stringify(report,null,2)+'\n');
+    const report={schema:1,application:'PulseDeck 1.0',vela:(await execute(compiler,['--version'])).stdout.trim(),platform:process.platform,transport:legacy?'legacy':'multi',checks,passed:checks.length,failed:0,real_server_peak:peak};
+    await fs.writeFile(path.join(base,'network-validation.json'),JSON.stringify(report,null,2)+'\n');
     console.log(JSON.stringify(report,null,2));
   }
 } finally {

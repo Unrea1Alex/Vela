@@ -1,4 +1,5 @@
 import "../../tools/test.vela" as test;
+import "../../tools/stage-http.vela" as http_adapter;
 fn adapter(suite: test::Suite, source: String, name: String,
     libraries: String) -> Bool effects { io, process, state } {
     let args = test::command(env("VELA_CC"));
@@ -38,6 +39,7 @@ fn main() -> Int effects { io, process, state } {
     if !adapter(suite, "native/http-server/adapter.c", "vela-http-server", "ws2_32.lib") {
         return 2;
     }
+    if !http_adapter::stage(root, output) { return 2; }
     let project = root + "/apps/pulse-deck/vela.project";
     let locked = test::invoke(suite, test::compiler_command(suite, "lock", project), 30000);
     if locked.code != 0 {

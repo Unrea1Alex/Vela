@@ -48,7 +48,8 @@ pub async fn fetch(scope: group::Scope, transport: dyn http::Transport, request:
     Error<http::Error>> effects { state } {
     let schedulers = list_new<loop::Loop<process::Completed>>();
     let exchanges = list_new<http::Exchange>();
-    let resume = fn [ scope, transport, request, directory, schedulers,
+    let submitted = group::time(scope);
+    let resume = fn [ scope, transport, request, directory, schedulers, submitted, timeout,
         exchanges ]() -> group::Step<http::Response, http::Error> effects { io, process, state } {
         if list_len(schedulers) == 0 {
             match loop::create<process::Completed>(group::time(scope)) {
@@ -60,7 +61,8 @@ pub async fn fetch(scope: group::Scope, transport: dyn http::Transport, request:
                     list_push(schedulers, scheduler);
                 }
             }
-            match transport.start(list_get(schedulers, 0), request, directory) {
+            let remaining = timeout - (group::time(scope) - submitted);
+            match transport.start(list_get(schedulers, 0), http::with_remaining_budget(request, remaining), directory) {
                 Result::Err(error) => {
                     return group::Step<http::Response, http::Error>::Failed(error);
                 }

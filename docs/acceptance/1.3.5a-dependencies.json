@@ -1,0 +1,71 @@
+{
+  "status": "passed",
+  "checks": [
+    "compiler source fingerprint isolates exact and semantic records",
+    "checked C from normal, debug and bypass pipelines survives cache hits and corruption",
+    "empty module, BOM, CRLF and trailing lines preserve imported diagnostics and overlay query",
+    "indexed duplicate names retain the first declaration and related span",
+    "module index remains reachable under forced GC",
+    "bundler incorporates catalog bytes and invalidates semantic and C records",
+    "C reuse preserves native lock and profile invalidation and publishes current companion bytes"
+  ],
+  "c_hashes": {
+    "normal": "ceea29532ce80612f1b3642dee95fe4a475727f167177db24f38713cf422dd86",
+    "debug": "a0709765ff3972211663a7d2af50cd97640697d26db4a801cf2020456ed9297e",
+    "reference": "ceea29532ce80612f1b3642dee95fe4a475727f167177db24f38713cf422dd86"
+  },
+  "diagnostic": {
+    "severity": "error",
+    "code": "E201",
+    "message": "Expected Int, found Bool.",
+    "source": "G:\\Vela\\build\\stage13\\audit-135a\\focused\\cost-cache-Ayza39\\leaf.vela",
+    "span": {
+      "start": 30,
+      "end": 42,
+      "line": 2,
+      "column": 25,
+      "end_line": 2,
+      "end_column": 37
+    },
+    "range": {
+      "document": 3,
+      "start": {
+        "line": 1,
+        "character": 24,
+        "byte": 34
+      },
+      "end": {
+        "line": 1,
+        "character": 36,
+        "byte": 46
+      }
+    },
+    "notes": [],
+    "details": {
+      "expected_type": "Int",
+      "actual_type": "Bool"
+    },
+    "related": [],
+    "explanation": {
+      "category": "types",
+      "root_cause": "Expected Int, found Bool.",
+      "expected": "Int",
+      "actual": "Bool",
+      "guidance": "Choose whether the value or its declared type is wrong. No implicit cast or literal replacement is proposed."
+    }
+  },
+  "catalog": {
+    "original": "b51d2f4e78c13029d382c3917ff5ddfcbc08e24635babafd0329ef7e225d37c0",
+    "changed": "b10634cf289731d60d71058afc597883fc1746bd143115a8e3010def7ad8eea5",
+    "bundle_sha256": "ba8600424205db8c0a8e348453557dcdc587393ba92de5fa5862c4616f508b3a"
+  },
+  "companion": {
+    "before": "0b52a954a8841805bd943a1d6af5dbea4a9c4cb1117a168578fb47b9ab28df2b",
+    "after": "30b320a9b01ea93aa0fac46f4ac41c0536f2a4f4efbb5794fc97f7bf68ca0464"
+  },
+  "gc": {
+    "collections": 90755,
+    "peak_managed_bytes": 216238
+  },
+  "work": "G:\\Vela\\build\\stage13\\audit-135a\\focused\\cost-cache-Ayza39"
+}

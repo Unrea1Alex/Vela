@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "stage": "1.3.4a",
+  "instrumentation": "Separate emitted-C allocation, copy and GC counters",
+  "workloads": [
+    {
+      "mode": "json-typed",
+      "label": "small",
+      "input": {
+        "bytes": 152,
+        "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296"
+      },
+      "rounds": 300,
+      "expected": 2100,
+      "profile": {
+        "allocations": 36618,
+        "allocated_bytes": 4150475,
+        "copies": 82205,
+        "copied_bytes": 1014656,
+        "gc_collections": 3,
+        "peak_managed_bytes": 1049051,
+        "before_teardown_bytes": 1016637
+      }
+    },
+    {
+      "mode": "json-typed",
+      "label": "medium",
+      "input": {
+        "bytes": 1378,
+        "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077"
+      },
+      "rounds": 300,
+      "expected": 2100,
+      "profile": {
+        "allocations": 205518,
+        "allocated_bytes": 22485930,
+        "copies": 586205,
+        "copied_bytes": 7614108,
+        "gc_collections": 21,
+        "peak_managed_bytes": 1052735,
+        "before_teardown_bytes": 677290
+      }
+    },
+    {
+      "mode": "json-typed",
+      "label": "large",
+      "input": {
+        "bytes": 5912,
+        "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a"
+      },
+      "rounds": 300,
+      "expected": 2100,
+      "profile": {
+        "allocations": 782118,
+        "allocated_bytes": 85529195,
+        "copies": 2314205,
+        "copied_bytes": 30538976,
+        "gc_collections": 85,
+        "peak_managed_bytes": 1060091,
+        "before_teardown_bytes": 666978
+      }
+    }
+  ]
+}

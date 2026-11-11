@@ -1,0 +1,1230 @@
+{
+  "stage": "1.3.4g",
+  "status": "verified",
+  "contract": "contracts/GC-SAFEPOINTS-1.3.md",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1434,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 522177,
+    "tests_run": true
+  },
+  "verify_log_sha256": "fc912eca238863b3d4292e367d8dc65c452a7a647c60f9f28add6b4847641875",
+  "fixed_baseline": "1.3.4d",
+  "previous": "1.3.4f",
+  "profile": {
+    "msvc": {
+      "file": "1.3.4g-msvc.json",
+      "sha256": "ba4232681eca13e4bd45d54b8a6f0f81af2918bb516122c56a09c83d5b84da48",
+      "toolchain": "��⨬������騩 ��������� Microsoft (R) C/C++ ���ᨨ 19.44.35222 ��� x64",
+      "compared_compilers": [
+        {
+          "label": "reference",
+          "version": "Vela 1.2.0 (self-hosted)",
+          "bytes": 4083712,
+          "sha256": "ce5f480a1a0101e067a71ccae7f1e81bc4dea410d28f918c013f0e5a38b33542"
+        },
+        {
+          "label": "candidate",
+          "version": "Vela 1.2.0 (self-hosted)",
+          "bytes": 3064320,
+          "sha256": "7881dec8c5f1b86780943ca3fe3308f063a816a4100e55d91da5422705af7054"
+        }
+      ],
+      "group_count": 30,
+      "pair_count": 5,
+      "numeric": {
+        "roots": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 5,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 62,
+          "previous": 62,
+          "candidate": 10,
+          "previous_percent": -83.87096774193549,
+          "fixed_percent": -83.87096774193549
+        },
+        "arithmetic_guards": {
+          "fixed": 13,
+          "previous": 13,
+          "candidate": 13,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "temporaries": {
+          "fixed": 102,
+          "previous": 102,
+          "candidate": 102,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "functions": {
+          "fixed": 26,
+          "previous": 26,
+          "candidate": 26,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 12,
+          "previous": 12,
+          "candidate": 12,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 10,
+          "previous": 10,
+          "candidate": 10,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "numeric_large": {
+        "timing": {
+          "wall_ms": {
+            "fixed": 25.529,
+            "previous": 24.432,
+            "candidate": 20.5217,
+            "previous_percent": -16.004829731499672,
+            "fixed_percent": -19.61416428375573
+          },
+          "cpu_ms": {
+            "fixed": 15.625,
+            "previous": 15.625,
+            "candidate": 15.625,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "peak_process_working_set_bytes": {
+            "fixed": 6643712,
+            "previous": 6643712,
+            "candidate": 6631424,
+            "previous_percent": -0.18495684340320592,
+            "fixed_percent": -0.18495684340320592
+          },
+          "peak_tree_commit_bytes": {
+            "fixed": 2686976,
+            "previous": 2691072,
+            "candidate": 2682880,
+            "previous_percent": -0.30441400304414,
+            "fixed_percent": -0.1524390243902439
+          }
+        },
+        "fixed_wall_noise_percent": 5.920478752472012,
+        "counters": {
+          "allocations": {
+            "fixed": 1,
+            "previous": 1,
+            "candidate": 1,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "allocated_bytes": {
+            "fixed": 56,
+            "previous": 56,
+            "candidate": 56,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "executed_polls": {
+            "fixed": 11007031,
+            "previous": 11007031,
+            "candidate": 1002005,
+            "previous_percent": -90.89668231151525,
+            "fixed_percent": -90.89668231151525
+          },
+          "gc_pause_total_ns": {
+            "fixed": null,
+            "previous": 0,
+            "candidate": 0,
+            "previous_percent": null,
+            "fixed_percent": null
+          },
+          "gc_pause_max_ns": {
+            "fixed": null,
+            "previous": 0,
+            "candidate": 0,
+            "previous_percent": null,
+            "fixed_percent": null
+          },
+          "gc_collections": {
+            "fixed": 0,
+            "previous": 0,
+            "candidate": 0,
+            "previous_percent": null,
+            "fixed_percent": null
+          },
+          "peak_managed_bytes": {
+            "fixed": 56,
+            "previous": 56,
+            "candidate": 56,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "before_teardown_bytes": {
+            "fixed": 56,
+            "previous": 56,
+            "candidate": 56,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          }
+        }
+      },
+      "mixed_large": {
+        "timing": {
+          "wall_ms": {
+            "fixed": 192.8117,
+            "previous": 194.9695,
+            "candidate": 188.0489,
+            "previous_percent": -3.549580831873707,
+            "fixed_percent": -2.4701820480811065
+          },
+          "cpu_ms": {
+            "fixed": 171.875,
+            "previous": 171.875,
+            "candidate": 171.875,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "peak_process_working_set_bytes": {
+            "fixed": 7614464,
+            "previous": 7610368,
+            "candidate": 7610368,
+            "previous_percent": 0,
+            "fixed_percent": -0.05379236148466918
+          },
+          "peak_tree_commit_bytes": {
+            "fixed": 4390912,
+            "previous": 4386816,
+            "candidate": 4386816,
+            "previous_percent": 0,
+            "fixed_percent": -0.09328358208955224
+          }
+        },
+        "fixed_wall_noise_percent": 1.2907585984139174,
+        "counters": {
+          "allocations": {
+            "fixed": 2000003,
+            "previous": 2000003,
+            "candidate": 2000003,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "allocated_bytes": {
+            "fixed": 139889146,
+            "previous": 139889146,
+            "candidate": 139889146,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "executed_polls": {
+            "fixed": 34000024,
+            "previous": 34000024,
+            "candidate": 8000006,
+            "previous_percent": -76.47058719723256,
+            "fixed_percent": -76.47058719723256
+          },
+          "gc_pause_total_ns": {
+            "fixed": null,
+            "previous": 24819700,
+            "candidate": 24844496,
+            "previous_percent": 0.09990451133575345,
+            "fixed_percent": null
+          },
+          "gc_pause_max_ns": {
+            "fixed": null,
+            "previous": 260300,
+            "candidate": 285701,
+            "previous_percent": 9.75835574337303,
+            "fixed_percent": null
+          },
+          "gc_collections": {
+            "fixed": 133,
+            "previous": 133,
+            "candidate": 133,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "peak_managed_bytes": {
+            "fixed": 1048618,
+            "previous": 1048618,
+            "candidate": 1048618,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "before_teardown_bytes": {
+            "fixed": 462400,
+            "previous": 462400,
+            "candidate": 462400,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          }
+        }
+      },
+      "compiler": {
+        "phases": {
+          "frontend": {
+            "timing": {
+              "wall_ms": {
+                "fixed": 1295.1257,
+                "previous": 1204.5005,
+                "candidate": 951.4038,
+                "previous_percent": -21.012585714991403,
+                "fixed_percent": -26.539655571656095
+              },
+              "cpu_ms": {
+                "fixed": 1281.25,
+                "previous": 1187.5,
+                "candidate": 937.5,
+                "previous_percent": -21.05263157894737,
+                "fixed_percent": -26.829268292682926
+              },
+              "peak_process_working_set_bytes": {
+                "fixed": 92622848,
+                "previous": 92610560,
+                "candidate": 92278784,
+                "previous_percent": -0.3582485625829279,
+                "fixed_percent": -0.37146773979569275
+              },
+              "peak_tree_commit_bytes": {
+                "fixed": 96395264,
+                "previous": 97234944,
+                "candidate": 96444416,
+                "previous_percent": -0.8130081300813008,
+                "fixed_percent": 0.05099005693889692
+              }
+            },
+            "fixed_wall_noise_percent": 0.6123829283201944
+          },
+          "emit_c_total": {
+            "timing": {
+              "wall_ms": {
+                "fixed": 1762.2903,
+                "previous": 1803.0197,
+                "candidate": 1505.0808,
+                "previous_percent": -16.52443952775447,
+                "fixed_percent": -14.59518332479047
+              },
+              "cpu_ms": {
+                "fixed": 1750,
+                "previous": 1781.25,
+                "candidate": 1500,
+                "previous_percent": -15.789473684210526,
+                "fixed_percent": -14.285714285714286
+              },
+              "peak_process_working_set_bytes": {
+                "fixed": 149168128,
+                "previous": 157605888,
+                "candidate": 148901888,
+                "previous_percent": -5.52263631165861,
+                "fixed_percent": -0.1784831676643418
+              },
+              "peak_tree_commit_bytes": {
+                "fixed": 154165248,
+                "previous": 164671488,
+                "candidate": 154161152,
+                "previous_percent": -6.382608263064945,
+                "fixed_percent": -0.002656889313991179
+              }
+            },
+            "fixed_wall_noise_percent": 1.0255283613290553
+          },
+          "c_compile_link": {
+            "timing": {
+              "wall_ms": {
+                "fixed": 38163.974,
+                "previous": 33050.326,
+                "candidate": 24148.0196,
+                "previous_percent": -26.935608441502215,
+                "fixed_percent": -36.725615629022286
+              },
+              "cpu_ms": {
+                "fixed": 142046.875,
+                "previous": 124000,
+                "candidate": 84281.25,
+                "previous_percent": -32.03125,
+                "fixed_percent": -40.66659333406666
+              },
+              "peak_process_working_set_bytes": {
+                "fixed": 652800000,
+                "previous": 626528256,
+                "candidate": 400146432,
+                "previous_percent": -36.132739717967326,
+                "fixed_percent": -38.70305882352941
+              },
+              "peak_tree_commit_bytes": {
+                "fixed": 659189760,
+                "previous": 633757696,
+                "candidate": 413736960,
+                "previous_percent": -34.71685431019996,
+                "fixed_percent": -37.235529872308696
+              }
+            },
+            "fixed_wall_noise_percent": 0.3449174853185191
+          },
+          "build_total": {
+            "timing": {
+              "wall_ms": {
+                "fixed": 40441.4847,
+                "previous": 34851.0351,
+                "candidate": 25455.1912,
+                "previous_percent": -26.960013879186043,
+                "fixed_percent": -37.05673422024489
+              },
+              "cpu_ms": {
+                "fixed": 144046.875,
+                "previous": 125687.5,
+                "candidate": 85875,
+                "previous_percent": -31.67578319244157,
+                "fixed_percent": -40.383989586723075
+              },
+              "peak_process_working_set_bytes": {
+                "fixed": 149155840,
+                "previous": 158162944,
+                "candidate": 148676608,
+                "previous_percent": -5.997824623193661,
+                "fixed_percent": -0.32129616916106
+              },
+              "peak_tree_commit_bytes": {
+                "fixed": 786239488,
+                "previous": 802742272,
+                "candidate": 570642432,
+                "previous_percent": -28.913369595166902,
+                "fixed_percent": -27.421295838043687
+              }
+            },
+            "fixed_wall_noise_percent": 1.0319318983530714
+          }
+        },
+        "emitted": {
+          "roots": {
+            "fixed": 21920,
+            "previous": 19072,
+            "candidate": 19072,
+            "previous_percent": 0,
+            "fixed_percent": -12.992700729927007
+          },
+          "polls": {
+            "fixed": 29961,
+            "previous": 29961,
+            "candidate": 7375,
+            "previous_percent": -75.38466673342012,
+            "fixed_percent": -75.38466673342012
+          },
+          "arithmetic_guards": {
+            "fixed": 716,
+            "previous": 716,
+            "candidate": 716,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "temporaries": {
+            "fixed": 39698,
+            "previous": 39698,
+            "candidate": 39698,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "functions": {
+            "fixed": 517,
+            "previous": 509,
+            "candidate": 509,
+            "previous_percent": 0,
+            "fixed_percent": -1.5473887814313345
+          },
+          "types": {
+            "fixed": 68,
+            "previous": 68,
+            "candidate": 68,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "traces": {
+            "fixed": 63,
+            "previous": 55,
+            "candidate": 55,
+            "previous_percent": 0,
+            "fixed_percent": -12.698412698412698
+          }
+        },
+        "sizes": {
+          "package": {
+            "fixed": 2649314,
+            "previous": 2570402,
+            "candidate": 2092094,
+            "previous_percent": -18.608295511752637,
+            "fixed_percent": -21.032614480578747
+          },
+          "c": {
+            "fixed": 6067085,
+            "previous": 6389946,
+            "candidate": 6096328,
+            "previous_percent": -4.59499970735277,
+            "fixed_percent": 0.48199423611174064
+          }
+        }
+      },
+      "pressure": {
+        "fixed": [
+          {
+            "allocations": 616,
+            "allocated_bytes": 2514209,
+            "executed_polls": 41036,
+            "gc_pause_total_ns": 71900,
+            "gc_pause_max_ns": 42800,
+            "gc_collections": 2,
+            "peak_managed_bytes": 1049121,
+            "before_teardown_bytes": 449662
+          },
+          {
+            "allocations": 616,
+            "allocated_bytes": 2514209,
+            "executed_polls": 41036,
+            "gc_pause_total_ns": 1050198,
+            "gc_pause_max_ns": 400,
+            "gc_collections": 41036,
+            "peak_managed_bytes": 16706,
+            "before_teardown_bytes": 8623
+          }
+        ],
+        "previous": [
+          {
+            "allocations": 616,
+            "allocated_bytes": 2514209,
+            "executed_polls": 41036,
+            "gc_pause_total_ns": 86300,
+            "gc_pause_max_ns": 48000,
+            "gc_collections": 2,
+            "peak_managed_bytes": 1049121,
+            "before_teardown_bytes": 449662
+          },
+          {
+            "allocations": 616,
+            "allocated_bytes": 2514209,
+            "executed_polls": 41036,
+            "gc_pause_total_ns": 1052392,
+            "gc_pause_max_ns": 299,
+            "gc_collections": 41036,
+            "peak_managed_bytes": 16706,
+            "before_teardown_bytes": 8623
+          }
+        ],
+        "candidate": [
+          {
+            "allocations": 616,
+            "allocated_bytes": 2514209,
+            "executed_polls": 5534,
+            "gc_pause_total_ns": 74699,
+            "gc_pause_max_ns": 43800,
+            "gc_collections": 2,
+            "peak_managed_bytes": 1049121,
+            "before_teardown_bytes": 449662
+          },
+          {
+            "allocations": 616,
+            "allocated_bytes": 2514209,
+            "executed_polls": 5534,
+            "gc_pause_total_ns": 150606,
+            "gc_pause_max_ns": 201,
+            "gc_collections": 5534,
+            "peak_managed_bytes": 16706,
+            "before_teardown_bytes": 8623
+          }
+        ]
+      }
+    },
+    "gcc": {
+      "file": "1.3.4g-gcc.json",
+      "sha256": "f0ed2341f95f41218764f029da387562138eca70a4cdb8a63f5d153791c3576c",
+      "toolchain": "gcc (Alpine 14.2.0) 14.2.0",
+      "compared_compilers": [
+        {
+          "label": "reference",
+          "version": "Vela 1.2.0 (self-hosted)",
+          "bytes": 5484072,
+          "sha256": "eb272c7925453289080709eb347724faf706be39b32b9b178d7c5ce43f976057"
+        },
+        {
+          "label": "candidate",
+          "version": "Vela 1.2.0 (self-hosted)",
+          "bytes": 2762464,
+          "sha256": "6b916c7ddb8f6e7c9f14c3b448e16bd39d8df7105bc97f842d1de0486d5677ca"
+        }
+      ],
+      "group_count": 28,
+      "pair_count": 5,
+      "numeric": {
+        "roots": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 5,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 62,
+          "previous": 62,
+          "candidate": 10,
+          "previous_percent": -83.87096774193549,
+          "fixed_percent": -83.87096774193549
+        },
+        "arithmetic_guards": {
+          "fixed": 13,
+          "previous": 13,
+          "candidate": 13,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "temporaries": {
+          "fixed": 102,
+          "previous": 102,
+          "candidate": 102,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "functions": {
+          "fixed": 26,
+          "previous": 26,
+          "candidate": 26,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 12,
+          "previous": 12,
+          "candidate": 12,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 10,
+          "previous": 10,
+          "candidate": 10,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "numeric_large": {
+        "timing": {
+          "wall_ms": {
+            "fixed": 5.255,
+            "previous": 5.28,
+            "candidate": 4.899,
+            "previous_percent": -7.215909090909095,
+            "fixed_percent": -6.774500475737391
+          },
+          "cpu_ms": {
+            "fixed": 2.591,
+            "previous": 2.616,
+            "candidate": 2.176,
+            "previous_percent": -16.81957186544342,
+            "fixed_percent": -16.016981860285604
+          },
+          "peak_process_rss_bytes": {
+            "fixed": 380928,
+            "previous": 364544,
+            "candidate": 348160,
+            "previous_percent": -4.49438202247191,
+            "fixed_percent": -8.602150537634408
+          },
+          "peak_tree_rss_bytes": {
+            "fixed": 462848,
+            "previous": 479232,
+            "candidate": 462848,
+            "previous_percent": -3.4188034188034186,
+            "fixed_percent": 0
+          },
+          "peak_single_rss_wait4_bytes": {
+            "fixed": 462848,
+            "previous": 479232,
+            "candidate": 462848,
+            "previous_percent": -3.4188034188034186,
+            "fixed_percent": 0
+          },
+          "observed_processes": {
+            "fixed": 1,
+            "previous": 1,
+            "candidate": 1,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          }
+        },
+        "fixed_wall_noise_percent": 4.435058078141497,
+        "counters": {
+          "allocations": {
+            "fixed": 0,
+            "previous": 0,
+            "candidate": 0,
+            "previous_percent": null,
+            "fixed_percent": null
+          },
+          "allocated_bytes": {
+            "fixed": 0,
+            "previous": 0,
+            "candidate": 0,
+            "previous_percent": null,
+            "fixed_percent": null
+          },
+          "executed_polls": {
+            "fixed": 11007031,
+            "previous": 11007031,
+            "candidate": 1002005,
+            "previous_percent": -90.89668231151525,
+            "fixed_percent": -90.89668231151525
+          },
+          "gc_pause_total_ns": {
+            "fixed": null,
+            "previous": 0,
+            "candidate": 0,
+            "previous_percent": null,
+            "fixed_percent": null
+          },
+          "gc_pause_max_ns": {
+            "fixed": null,
+            "previous": 0,
+            "candidate": 0,
+            "previous_percent": null,
+            "fixed_percent": null
+          },
+          "gc_collections": {
+            "fixed": 0,
+            "previous": 0,
+            "candidate": 0,
+            "previous_percent": null,
+            "fixed_percent": null
+          },
+          "peak_managed_bytes": {
+            "fixed": 0,
+            "previous": 0,
+            "candidate": 0,
+            "previous_percent": null,
+            "fixed_percent": null
+          },
+          "before_teardown_bytes": {
+            "fixed": 0,
+            "previous": 0,
+            "candidate": 0,
+            "previous_percent": null,
+            "fixed_percent": null
+          }
+        }
+      },
+      "mixed_large": {
+        "timing": {
+          "wall_ms": {
+            "fixed": 224.859,
+            "previous": 247.949,
+            "candidate": 250.532,
+            "previous_percent": 1.0417464881891028,
+            "fixed_percent": 11.417377111879
+          },
+          "cpu_ms": {
+            "fixed": 222.099,
+            "previous": 244.931,
+            "candidate": 247.634,
+            "previous_percent": 1.1035761091899248,
+            "fixed_percent": 11.497125155898944
+          },
+          "peak_process_rss_bytes": {
+            "fixed": 1777664,
+            "previous": 1785856,
+            "candidate": 1802240,
+            "previous_percent": 0.9174311926605505,
+            "fixed_percent": 1.3824884792626728
+          },
+          "peak_tree_rss_bytes": {
+            "fixed": 1777664,
+            "previous": 1798144,
+            "candidate": 1802240,
+            "previous_percent": 0.22779043280182232,
+            "fixed_percent": 1.3824884792626728
+          },
+          "peak_single_rss_wait4_bytes": {
+            "fixed": 1757184,
+            "previous": 1748992,
+            "candidate": 1757184,
+            "previous_percent": 0.468384074941452,
+            "fixed_percent": 0
+          },
+          "observed_processes": {
+            "fixed": 1,
+            "previous": 1,
+            "candidate": 1,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          }
+        },
+        "fixed_wall_noise_percent": 2.32140688054202,
+        "counters": {
+          "allocations": {
+            "fixed": 2000002,
+            "previous": 2000002,
+            "candidate": 2000002,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "allocated_bytes": {
+            "fixed": 139889090,
+            "previous": 139889090,
+            "candidate": 139889090,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "executed_polls": {
+            "fixed": 34000024,
+            "previous": 34000024,
+            "candidate": 8000006,
+            "previous_percent": -76.47058719723256,
+            "fixed_percent": -76.47058719723256
+          },
+          "gc_pause_total_ns": {
+            "fixed": null,
+            "previous": 36521296,
+            "candidate": 39757965,
+            "previous_percent": 8.86241550683196,
+            "fixed_percent": null
+          },
+          "gc_pause_max_ns": {
+            "fixed": null,
+            "previous": 397243,
+            "candidate": 466655,
+            "previous_percent": 17.473435655253837,
+            "fixed_percent": null
+          },
+          "gc_collections": {
+            "fixed": 133,
+            "previous": 133,
+            "candidate": 133,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "peak_managed_bytes": {
+            "fixed": 1048644,
+            "previous": 1048644,
+            "candidate": 1048644,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "before_teardown_bytes": {
+            "fixed": 462260,
+            "previous": 462260,
+            "candidate": 462260,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          }
+        }
+      },
+      "compiler": {
+        "phases": {
+          "frontend": {
+            "timing": {
+              "wall_ms": {
+                "fixed": 1989.154,
+                "previous": 2151.824,
+                "candidate": 2506.446,
+                "previous_percent": 16.480065284149624,
+                "fixed_percent": 26.00562852348284
+              },
+              "cpu_ms": {
+                "fixed": 1540.436,
+                "previous": 1572.95,
+                "candidate": 1943.537,
+                "previous_percent": 23.559998728503764,
+                "fixed_percent": 26.16798101316771
+              },
+              "peak_process_rss_bytes": {
+                "fixed": 92602368,
+                "previous": 92348416,
+                "candidate": 90714112,
+                "previous_percent": -1.7697152488246253,
+                "fixed_percent": -2.039101203113942
+              },
+              "peak_tree_rss_bytes": {
+                "fixed": 92602368,
+                "previous": 92348416,
+                "candidate": 90714112,
+                "previous_percent": -1.7697152488246253,
+                "fixed_percent": -2.039101203113942
+              },
+              "peak_single_rss_wait4_bytes": {
+                "fixed": 92061696,
+                "previous": 92078080,
+                "candidate": 90476544,
+                "previous_percent": -1.73932384341637,
+                "fixed_percent": -1.7218366257341164
+              },
+              "observed_processes": {
+                "fixed": 1,
+                "previous": 1,
+                "candidate": 1,
+                "previous_percent": 0,
+                "fixed_percent": 0
+              }
+            },
+            "fixed_wall_noise_percent": 0.24227159876409077
+          },
+          "emit_c_total": {
+            "timing": {
+              "wall_ms": {
+                "fixed": 2514.794,
+                "previous": 2757.131,
+                "candidate": 3067.742,
+                "previous_percent": 11.265732386310276,
+                "fixed_percent": 21.987804965337133
+              },
+              "cpu_ms": {
+                "fixed": 2031.917,
+                "previous": 2140.442,
+                "candidate": 2471.231,
+                "previous_percent": 15.45423795645947,
+                "fixed_percent": 21.620666592188574
+              },
+              "peak_process_rss_bytes": {
+                "fixed": 155111424,
+                "previous": 142712832,
+                "candidate": 138907648,
+                "previous_percent": -2.6663222547500145,
+                "fixed_percent": -10.446539385777285
+              },
+              "peak_tree_rss_bytes": {
+                "fixed": 155111424,
+                "previous": 142712832,
+                "candidate": 138907648,
+                "previous_percent": -2.6663222547500145,
+                "fixed_percent": -10.446539385777285
+              },
+              "peak_single_rss_wait4_bytes": {
+                "fixed": 154877952,
+                "previous": 142454784,
+                "candidate": 138592256,
+                "previous_percent": -2.711406308404497,
+                "fixed_percent": -10.515180366021369
+              },
+              "observed_processes": {
+                "fixed": 1,
+                "previous": 1,
+                "candidate": 1,
+                "previous_percent": 0,
+                "fixed_percent": 0
+              }
+            },
+            "fixed_wall_noise_percent": 0.9478901815143812
+          },
+          "c_compile_link": {
+            "timing": {
+              "wall_ms": {
+                "fixed": 52537.549,
+                "previous": 50327.55,
+                "candidate": 23993.206,
+                "previous_percent": -52.32590102240225,
+                "fixed_percent": -54.331318349091624
+              },
+              "cpu_ms": {
+                "fixed": 52126.31,
+                "previous": 49916.657,
+                "candidate": 23602.274,
+                "previous_percent": -52.716637253973154,
+                "fixed_percent": -54.72099598072451
+              },
+              "peak_process_rss_bytes": {
+                "fixed": 1998848,
+                "previous": 2007040,
+                "candidate": 2027520,
+                "previous_percent": 1.0204081632653061,
+                "fixed_percent": 1.4344262295081966
+              },
+              "peak_tree_rss_bytes": {
+                "fixed": 482963456,
+                "previous": 463400960,
+                "candidate": 387801088,
+                "previous_percent": -16.314137976753436,
+                "fixed_percent": -19.70384442503244
+              },
+              "peak_single_rss_wait4_bytes": {
+                "fixed": 480854016,
+                "previous": 461344768,
+                "candidate": 385773568,
+                "previous_percent": -16.380634449939183,
+                "fixed_percent": -19.77324610719275
+              },
+              "observed_processes": {
+                "fixed": 3,
+                "previous": 3,
+                "candidate": 3,
+                "previous_percent": 0,
+                "fixed_percent": 0
+              }
+            },
+            "fixed_wall_noise_percent": 0.3570821054054097
+          },
+          "build_total": {
+            "timing": {
+              "wall_ms": {
+                "fixed": 55118.133,
+                "previous": 53103.705,
+                "candidate": 27199.231,
+                "previous_percent": -48.78091651043934,
+                "fixed_percent": -50.65284413751823
+              },
+              "cpu_ms": {
+                "fixed": 54200.313,
+                "previous": 52072.272,
+                "candidate": 26211.555,
+                "previous_percent": -49.66312397507833,
+                "fixed_percent": -51.639476694534956
+              },
+              "peak_process_rss_bytes": {
+                "fixed": 155189248,
+                "previous": 142704640,
+                "candidate": 138915840,
+                "previous_percent": -2.6549942594718714,
+                "fixed_percent": -10.486169763513514
+              },
+              "peak_tree_rss_bytes": {
+                "fixed": 631148544,
+                "previous": 603688960,
+                "candidate": 519835648,
+                "previous_percent": -13.890151643654374,
+                "fixed_percent": -17.63656068895249
+              },
+              "peak_single_rss_wait4_bytes": {
+                "fixed": 480772096,
+                "previous": 461279232,
+                "candidate": 385769472,
+                "previous_percent": -16.36964223873838,
+                "fixed_percent": -19.760428026172303
+              },
+              "observed_processes": {
+                "fixed": 4,
+                "previous": 4,
+                "candidate": 4,
+                "previous_percent": 0,
+                "fixed_percent": 0
+              }
+            },
+            "fixed_wall_noise_percent": 0.3786820034744291
+          }
+        },
+        "emitted": {
+          "roots": {
+            "fixed": 21920,
+            "previous": 19072,
+            "candidate": 19072,
+            "previous_percent": 0,
+            "fixed_percent": -12.992700729927007
+          },
+          "polls": {
+            "fixed": 29961,
+            "previous": 29961,
+            "candidate": 7375,
+            "previous_percent": -75.38466673342012,
+            "fixed_percent": -75.38466673342012
+          },
+          "arithmetic_guards": {
+            "fixed": 716,
+            "previous": 716,
+            "candidate": 716,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "temporaries": {
+            "fixed": 39698,
+            "previous": 39698,
+            "candidate": 39698,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "functions": {
+            "fixed": 517,
+            "previous": 509,
+            "candidate": 509,
+            "previous_percent": 0,
+            "fixed_percent": -1.5473887814313345
+          },
+          "types": {
+            "fixed": 68,
+            "previous": 68,
+            "candidate": 68,
+            "previous_percent": 0,
+            "fixed_percent": 0
+          },
+          "traces": {
+            "fixed": 63,
+            "previous": 55,
+            "candidate": 55,
+            "previous_percent": 0,
+            "fixed_percent": -12.698412698412698
+          }
+        },
+        "sizes": {
+          "package": {
+            "fixed": 3289360,
+            "previous": 3142813,
+            "candidate": 2053956,
+            "previous_percent": -34.64593661792795,
+            "fixed_percent": -37.55757958995063
+          },
+          "c": {
+            "fixed": 6301785,
+            "previous": 6624646,
+            "candidate": 6331028,
+            "previous_percent": -4.432206641683194,
+            "fixed_percent": 0.4640431242893878
+          }
+        }
+      },
+      "pressure": {
+        "fixed": [
+          {
+            "allocations": 616,
+            "allocated_bytes": 2514209,
+            "executed_polls": 41036,
+            "gc_pause_total_ns": 214647,
+            "gc_pause_max_ns": 133733,
+            "gc_collections": 2,
+            "peak_managed_bytes": 1049121,
+            "before_teardown_bytes": 449662
+          },
+          {
+            "allocations": 616,
+            "allocated_bytes": 2514209,
+            "executed_polls": 41036,
+            "gc_pause_total_ns": 800902,
+            "gc_pause_max_ns": 3927,
+            "gc_collections": 41036,
+            "peak_managed_bytes": 16706,
+            "before_teardown_bytes": 8623
+          }
+        ],
+        "previous": [
+          {
+            "allocations": 616,
+            "allocated_bytes": 2514209,
+            "executed_polls": 41036,
+            "gc_pause_total_ns": 263761,
+            "gc_pause_max_ns": 158180,
+            "gc_collections": 2,
+            "peak_managed_bytes": 1049121,
+            "before_teardown_bytes": 449662
+          },
+          {
+            "allocations": 616,
+            "allocated_bytes": 2514209,
+            "executed_polls": 41036,
+            "gc_pause_total_ns": 802407,
+            "gc_pause_max_ns": 3206,
+            "gc_collections": 41036,
+            "peak_managed_bytes": 16706,
+            "before_teardown_bytes": 8623
+          }
+        ],
+        "candidate": [
+          {
+            "allocations": 616,
+            "allocated_bytes": 2514209,
+            "executed_polls": 5534,
+            "gc_pause_total_ns": 201252,
+            "gc_pause_max_ns": 124266,
+            "gc_collections": 2,
+            "peak_managed_bytes": 1049121,
+            "before_teardown_bytes": 449662
+          },
+          {
+            "allocations": 616,
+            "allocated_bytes": 2514209,
+            "executed_polls": 5534,
+            "gc_pause_total_ns": 124684,
+            "gc_pause_max_ns": 3346,
+            "gc_collections": 5534,
+            "peak_managed_bytes": 16706,
+            "before_teardown_bytes": 8623
+          }
+        ]
+      }
+    }
+  },
+  "limits": {
+    "accepted": true,
+    "initial_pair_anomalies": [
+      {
+        "host": "msvc",
+        "group": "data/large/strings",
+        "key": "cpu_ms",
+        "fixed": 15.625,
+        "previous": 15.625,
+        "candidate": 31.25,
+        "previous_percent": 100,
+        "fixed_percent": 100
+      }
+    ],
+    "windows_repeat": "1.3.4g-msvc-strings-recheck.json",
+    "windows_repeat_sha256": "357f95accc824c1e65aa00c8562bd09039667b85acda435926b1679cc81982c3",
+    "linux_fixed_repeat": "1.3.4g-gcc-fixed-recheck.json",
+    "linux_fixed_repeat_sha256": "6b859ad4f066ce93cd973e8d5c51c5d24bb9de5e7309466bad783de08d97d20e",
+    "interpretation": "MSVC exact-input and amplified repeats returned equal CPU medians. GCC cumulative rows above the ceiling in historical runs passed when the fixed and candidate binaries ran in the same session."
+  },
+  "gc_stress": {
+    "windows": {
+      "v134g_gc_pressure": "vela gc: collections=5534 peak=16706 bytes=8623",
+      "v134f_precise_roots": "vela gc: collections=38 peak=2221 bytes=2027",
+      "main": "vela gc: collections=68 peak=360 bytes=360",
+      "callbacks": "vela gc: collections=71 peak=744 bytes=480",
+      "parallel-values": "vela gc: collections=972 peak=10881 bytes=7449"
+    },
+    "linux": [
+      "pass v134g_gc_pressure vela gc: collections=5534 peak=16706 bytes=8623",
+      "pass v134f_precise_roots vela gc: collections=38 peak=2221 bytes=2027",
+      "pass v106_dynamic vela gc: collections=34 peak=336 bytes=336",
+      "pass v08_defer vela gc: collections=31 peak=139 bytes=0",
+      "pass v134d_lowering vela gc: collections=83 peak=1041 bytes=666"
+    ]
+  },
+  "gui": {
+    "field": "FieldDesk window: load, concurrent edit, cancel, close",
+    "pulse": "PulseDeck window: cancel, save, run again, close",
+    "open_sockets_after": 0
+  },
+  "live_http": {
+    "checks": [
+      "pinned libcurl, OpenSSL and c-ares",
+      "native response/cancel/deadline/cleanup assertions",
+      "ten GETs on one TCP connection",
+      "idle cache expired",
+      "credential header connection isolation",
+      "redirect remains a response",
+      "server observed global and per-origin active limits",
+      "single cancel preserved peer and subsequent request",
+      "expired, cancelled or over-budget work never sent",
+      "deadline priority on an already-sent request",
+      "owner closed while server was holding an active response",
+      "TLS reuse and CA change isolation",
+      "server observed distinct TCP attempts for trust policies",
+      "connect budget expired inside TLS handshake",
+      "slow headers exhaust the total budget after connection",
+      "injected storage and driver faults release request ownership",
+      "all sockets closed after owner close"
+    ],
+    "receipt_sha256": "d0cf50879c19c6a65fa05f8e93cc0e1ecebf9500547ce9afa0d61b9c97430256",
+    "gc": "vela gc: collections=10690 peak=12694 bytes=200"
+  },
+  "recovery": {
+    "canonical_bundle_sha256": "74e8e482ea74956a028c3f62e1732bab04e1091aef6e580f1c2059efa89d885a",
+    "authored_windows_sha256": "947c64f68d3d0c2020c45ec2c867f53ecdb6022699f6924a8cad77e9b773e28e"
+  },
+  "mcp": { "passed": 2, "tests": ["native API lookup", "setup and real handshake"] },
+  "next": "1.3.4h"
+}

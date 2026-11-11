@@ -156,7 +156,7 @@ fn response_row(url: String, answer: Result<http::Response, aio::Error<http::Err
                 aio::Error::Operation(cause) => {
                     label = error_label(cause);
                     if label == "storage" {
-                        return Result<Row, String>::Err("HTTP helper storage/launch failure");
+                        return Result<Row, String>::Err("HTTP transport storage/driver failure");
                     }
                 }
                 aio::Error::TimedOut => {
@@ -185,8 +185,13 @@ fn response_row(url: String, answer: Result<http::Response, aio::Error<http::Err
         + to_string(status) + ",\"bytes\":" + to_string(bytes) + ",\"error\":" + error + "}",
         failed: failed));
 }
+fn drive(pool: http::CurlMulti) -> Result<Bool, http::Error> effects { state, io, process } {
+    let ticked = http::multi_tick(pool)?;
+    return http::multi_wait(pool, 2);
+}
 fn perform(values: Config, directory: path::Path,
-    transport: dyn http::Transport) -> Result<Collected, String> effects { state, io, process } {
+    pool: http::CurlMulti) -> Result<Collected, String> effects { state, io, process } {
+    let transport = dyn http::Transport(pool);
     let urls = values.urls;
     let timeout = values.timeout + 3000;
     let action = async fn [ urls, timeout, directory, transport ](scope: group::Scope,
@@ -200,6 +205,7 @@ fn perform(values: Config, directory: path::Path,
         return "cannot create parallel job";
     })?;
     var ready = false;
+    var driver_failed = false;
     while !ready {
         match parallel::tick(job, clock()) {
             Result::Ok(done) => {
@@ -209,14 +215,27 @@ fn perform(values: Config, directory: path::Path,
                 assert_true(false, "invalid parallel host clock");
             }
         }
-        if !ready {
-            let slept = host_sleep(1);
+        if !ready && !driver_failed {
+            match drive(pool) {
+                Result::Ok(_) => {}
+                Result::Err(_) => {
+                    driver_failed = true;
+                    let stopped = parallel::cancel(job);
+                }
+            }
         }
     }
-    return match parallel::outcome(job) {
-        Option::Some(value) => render(value),
-        Option::None => Result<Collected, String>::Err("missing parallel completion")
-    };
+    match parallel::outcome(job) {
+        Option::Some(value) => {
+            if driver_failed {
+                var message = "HTTP driver failed";
+                if list_len(value.cleanup) > 0 { message = message + ". Cleanup also failed"; }
+                return Result<Collected, String>::Err(message);
+            }
+            return render(value);
+        }
+        Option::None => { return Result<Collected, String>::Err("missing parallel completion"); }
+    }
 }
 fn render(collected: parallel::Completion<Row, String>) -> Result<Collected,
     String> effects { state } {
@@ -254,52 +273,42 @@ fn render(collected: parallel::Completion<Row, String>) -> Result<Collected,
     return Result<Collected, String>::Ok(Collected(output: "{\"results\":[" + strings_join(parts,
         ",") + "]}", failed: failed));
 }
-fn iteration(options: Options) -> Result<Collected, String> effects { state, io, process } {
-    let values = config(options.input)?;
-    let configured = http::curl_transfer(path::Path(value: env("SystemRoot")
-        + "\\System32\\curl.exe"), Option<path::Path>::None);
-    let transport = match configured {
-        Result::Ok(value) => Result<http::Curl, String>::Ok(value),
-        Result::Err(_) => Result<http::Curl, String>::Err("trusted Windows curl 8.4+ is required")
-    };
-    let ready = transport?;
-    let absolute = match absolute_path(options.output) {
-        StringResult::Ok(value) => value,
-        StringResult::Err(_) => ""
-    };
-    let parent = match path::parent(path::Path(value: absolute)) {
-        Result::Ok(value) => Result<path::Path, String>::Ok(value),
-        Result::Err(_) => Result<path::Path, String>::Err("invalid output path")
-    };
-    let directory = match temp_dir(parent?.value) {
-        StringResult::Ok(value) => Result<String, String>::Ok(value),
-        StringResult::Err(_) => Result<String, String>::Err("cannot create HTTP work directory")
-    };
-    let work = directory?;
-    let collected = perform(values, path::Path(value: work), dyn http::Transport(ready));
-    match remove_dir(work) {
-        WriteResult::Err(_) => {
-            return Result<Collected, String>::Err("cannot remove HTTP work directory");
-        }
-        WriteResult::Ok => {}
-    }
-    return collected;
-}
-fn run(options: Options) -> Result<Bool, String> effects { state, io, process } {
+fn collect_runs(options: Options, first: Config, pool: http::CurlMulti) -> Result<Collected, String> effects { state, io, process } {
     var output = "";
     var failed = false;
     for i in 0 .. options.repeat {
-        let value = iteration(options)?;
+        var settings = first;
+        if i > 0 { settings = config(options.input)?; }
+        let value = perform(settings, path::Path(value: "."), pool)?;
         output = value.output;
         failed = failed || value.failed;
     }
-    match fs::write_atomic(path::Path(value: options.output), text::Bytes(data: output)) {
-        Result::Err(_) => {
-            return Result<Bool, String>::Err("cannot publish output");
-        }
+    return Result<Collected, String>::Ok(Collected(output: output, failed: failed));
+}
+fn run(options: Options) -> Result<Bool, String> effects { state, io, process } {
+    let first = config(options.input)?;
+    let limits = http::MultiLimits(connections: 8, per_origin: 8, queue: 32, idle_seconds: 30,
+        connect_ms: 5000);
+    let pool = result::map_error(http::curl_multi(limits, Option<path::Path>::None), http::describe_multi_open)?;
+    let collected = collect_runs(options, first, pool);
+    match http::close_multi(pool) {
+        Result::Err(_) => { return Result<Bool, String>::Err("cannot close HTTP multi pool"); }
         Result::Ok(_) => {}
     }
-    return Result<Bool, String>::Ok(options.fail && failed);
+    let value = collected?;
+    let publication = fs::write_atomic_detailed(path::Path(value: options.output), text::Bytes(data: value.output));
+    let failures = strings_new();
+    match publication.operation {
+        Result::Err(error) => { strings_push(failures, fs::describe_failure(error)); }
+        Result::Ok(_) => {}
+    }
+    for error in publication.cleanup { strings_push(failures, fs::describe_failure(error)); }
+    if !publication.committed || strings_len(failures) > 0 {
+        var message = "cannot publish output";
+        if publication.committed { message = "output published with cleanup failure"; }
+        return Result<Bool, String>::Err(message + " — " + strings_join(failures, " | "));
+    }
+    return Result<Bool, String>::Ok(options.fail && value.failed);
 }
 fn main() -> Int effects { args, state, io, process } {
     match options() {

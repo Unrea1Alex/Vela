@@ -1,0 +1,41 @@
+import "../../std/json.vela" as json;
+
+fn raw() -> String effects { state } {
+    var block = "x";
+    for i in 0 .. 20 { block = block + block; }
+    let pieces = strings_new();
+    for i in 0 .. 16 { strings_push(pieces, block); }
+    return strings_join(pieces, "");
+}
+fn limited(value: String) -> Bool effects { state } {
+    match json::stringify(json::Value::StringValue(value)) {
+        Result::Ok(_) => {}
+        Result::Err(error) => {
+            match error {
+                json::Error::Limit => { return true; }
+                json::Error::Syntax(_, _) => {}
+                json::Error::Encoding(_) => {}
+                json::Error::NonFinite => {}
+                json::Error::Duplicate(_) => {}
+            }
+        }
+    }
+    return false;
+}
+fn main() -> Unit effects { io, state } {
+    let bytes = raw();
+    let capacity = 16777216;
+    let exact = str_slice(bytes, 0, capacity - 2);
+    match json::stringify(json::Value::StringValue(exact)) {
+        Result::Ok(output) => {
+            assert_true(str_len(output) == capacity && str_byte(output, 0) == 34
+                && str_byte(output, capacity - 1) == 34
+                && sha256(str_slice(output, 1, capacity - 1)) == sha256(exact), "exact output byte bound");
+        }
+        Result::Err(_) => { assert_true(false, "exact output bound rejected"); }
+    }
+    assert_true(limited(str_slice(bytes, 0, capacity - 1)), "output one byte above bound");
+    assert_true(limited(str_slice(bytes, 0, capacity - 7) + str_from_byte(0)),
+        "escaped representation crosses output bound");
+    print("JSON writer exact byte budget passed");
+}

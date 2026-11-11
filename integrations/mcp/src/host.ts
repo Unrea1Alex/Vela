@@ -51,7 +51,7 @@ export class Host {
     this.config.toolchain = await fs.realpath(this.config.toolchain);
     const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
     if (manifest.schema_version !== 1 || typeof manifest.version !== 'string'
-        || !/^(0\.9\.0|0\.10\.0(?:-dev\.\d+)?|0\.11\.0(?:-dev\.[1234])?|1\.0\.0(?:-dev\.[12345]|-rc\.[12])?|1\.1\.0|1\.2\.0(?:-dev\.1)?)$/.test(manifest.version)) {
+        || !/^(0\.9\.0|0\.10\.0(?:-dev\.\d+)?|0\.11\.0(?:-dev\.[1234])?|1\.0\.0(?:-dev\.[12345]|-rc\.[12])?|1\.1\.0|1\.2\.0(?:-dev\.1)?|1\.3\.0)$/.test(manifest.version)) {
       throw new HostError('incompatible', 'Unsupported compatibility manifest.');
     }
     this.compilerVersion = manifest.version;

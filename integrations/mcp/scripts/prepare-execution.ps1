@@ -48,18 +48,34 @@ $native = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../native'))
 $helper = Join-Path $owned 'vela-sandbox.exe'
 $probe = Join-Path $cache 'probe.exe'
 $builder = Join-Path $owned 'build-native.cmd'
-$cmd = @"
+$cmd = @'
 @echo off
-call "$vs\VC\Auxiliary\Build\vcvars64.bat" >nul
+call "%VELA_SETUP_VCVARS%" >nul
 if errorlevel 1 exit /b 2
-cl /nologo /std:c11 /W4 /O2 /MT /utf-8 "$native\sandbox.c" /Fo"$owned\sandbox.obj" /Fe"$helper" /link /STACK:16777216 userenv.lib advapi32.lib
+cl /nologo /std:c11 /W4 /O2 /MT /utf-8 "%VELA_SETUP_NATIVE%\sandbox.c" /Fo"%VELA_SETUP_OWNED%\sandbox.obj" /Fe"%VELA_SETUP_HELPER%" /link /STACK:16777216 userenv.lib advapi32.lib
 if errorlevel 1 exit /b 2
-cl /nologo /std:c11 /W4 /O2 /MT /utf-8 "$native\probe.c" /Fo"$owned\probe.obj" /Fe"$probe" /link advapi32.lib ws2_32.lib
+cl /nologo /std:c11 /W4 /O2 /MT /utf-8 "%VELA_SETUP_NATIVE%\probe.c" /Fo"%VELA_SETUP_OWNED%\probe.obj" /Fe"%VELA_SETUP_PROBE%" /link advapi32.lib ws2_32.lib
 exit /b %errorlevel%
-"@
-[IO.File]::WriteAllText($builder,$cmd,[Text.UTF8Encoding]::new($false))
-& $builder
-if($LASTEXITCODE -ne 0){throw 'Supervisor/probe build failed'}
+'@
+# cmd reads batch source in the active code page. Pass filesystem paths in
+# the child environment so a relocated SDK can keep its Unicode paths.
+[IO.File]::WriteAllText($builder,$cmd,[Text.Encoding]::ASCII)
+$start = [Diagnostics.ProcessStartInfo]::new($env:ComSpec)
+$start.UseShellExecute = $false
+$start.Arguments = '/d /v:off /s /c ""%VELA_SETUP_BUILDER%""'
+$start.EnvironmentVariables['VELA_SETUP_BUILDER'] = $builder
+$start.EnvironmentVariables['VELA_SETUP_VCVARS'] = Join-Path $vs 'VC/Auxiliary/Build/vcvars64.bat'
+$start.EnvironmentVariables['VELA_SETUP_NATIVE'] = $native
+$start.EnvironmentVariables['VELA_SETUP_OWNED'] = $owned
+$start.EnvironmentVariables['VELA_SETUP_HELPER'] = $helper
+$start.EnvironmentVariables['VELA_SETUP_PROBE'] = $probe
+$process = [Diagnostics.Process]::Start($start)
+try {
+    $process.WaitForExit()
+    if($process.ExitCode -ne 0){throw 'Supervisor/probe build failed'}
+} finally {
+    $process.Dispose()
+}
 $files=[ordered]@{}
 foreach($file in Get-ChildItem -LiteralPath $cache -File -Recurse | Sort-Object FullName) {
     $files[$file.FullName.Substring($cache.Length + 1).Replace('\','/')] = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()

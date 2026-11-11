@@ -1,0 +1,527 @@
+{
+  "schema_version": 1,
+  "stage": "1.3.3",
+  "version": "libcurl/8.23.0 OpenSSL/3.5.9 c-ares/1.34.8",
+  "checks": [
+    "pinned libcurl, OpenSSL and c-ares",
+    "native response/cancel/deadline/cleanup assertions",
+    "ten GETs on one TCP connection",
+    "idle cache expired",
+    "credential header connection isolation",
+    "redirect remains a response",
+    "server observed global and per-origin active limits",
+    "single cancel preserved peer and subsequent request",
+    "expired, cancelled or over-budget work never sent",
+    "deadline priority on an already-sent request",
+    "owner closed while server was holding an active response",
+    "TLS reuse and CA change isolation",
+    "server observed distinct TCP attempts for trust policies",
+    "connect budget expired inside TLS handshake",
+    "injected storage and driver faults release request ownership",
+    "all sockets closed after owner close"
+  ],
+  "prototype_only": false,
+  "queue_deadline_ms": 78,
+  "server": {
+    "connections": {
+      "first": 12,
+      "other": 2,
+      "tls": 2,
+      "stall": 1
+    },
+    "handshakes": 2,
+    "peak": {
+      "first": 1,
+      "other": 1,
+      "total": 2
+    },
+    "requests": [
+      {
+        "origin": "first",
+        "route": "/reuse",
+        "socket": 1,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/reuse",
+        "socket": 1,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/reuse",
+        "socket": 1,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/reuse",
+        "socket": 1,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/reuse",
+        "socket": 1,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/reuse",
+        "socket": 1,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/reuse",
+        "socket": 1,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/reuse",
+        "socket": 1,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/reuse",
+        "socket": 1,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/reuse",
+        "socket": 1,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/after-idle",
+        "socket": 2,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/auth",
+        "socket": 3,
+        "authorization": "Basic alpha"
+      },
+      {
+        "origin": "first",
+        "route": "/auth",
+        "socket": 4,
+        "authorization": "Basic beta"
+      },
+      {
+        "origin": "first",
+        "route": "/body-limit",
+        "socket": 5,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/redirect",
+        "socket": 6,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/bound",
+        "socket": 7,
+        "authorization": null
+      },
+      {
+        "origin": "other",
+        "route": "/bound",
+        "socket": 8,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/bound",
+        "socket": 7,
+        "authorization": null
+      },
+      {
+        "origin": "other",
+        "route": "/bound",
+        "socket": 8,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/bound",
+        "socket": 7,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/cancel",
+        "socket": 9,
+        "authorization": null
+      },
+      {
+        "origin": "other",
+        "route": "/peer",
+        "socket": 10,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/deadline-beats-response",
+        "socket": 11,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/after-cancel",
+        "socket": 12,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/close-active",
+        "socket": 12,
+        "authorization": null
+      },
+      {
+        "origin": "tls",
+        "route": "/tls",
+        "socket": 13,
+        "authorization": null
+      },
+      {
+        "origin": "tls",
+        "route": "/tls",
+        "socket": 13,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/injected-storage",
+        "socket": 14,
+        "authorization": null
+      },
+      {
+        "origin": "first",
+        "route": "/after-storage",
+        "socket": 15,
+        "authorization": null
+      }
+    ]
+  },
+  "samples": [
+    {
+      "wall_ms": 188.0767,
+      "cpu_ms": 15.625,
+      "peak_job_commit_bytes": 3502080,
+      "connections": 1
+    },
+    {
+      "wall_ms": 201.8381,
+      "cpu_ms": 15.625,
+      "peak_job_commit_bytes": 3506176,
+      "connections": 1
+    },
+    {
+      "wall_ms": 211.6236,
+      "cpu_ms": 15.625,
+      "peak_job_commit_bytes": 3510272,
+      "connections": 1
+    },
+    {
+      "wall_ms": 201.436,
+      "cpu_ms": 15.625,
+      "peak_job_commit_bytes": 3493888,
+      "connections": 1
+    },
+    {
+      "wall_ms": 195.2677,
+      "cpu_ms": 15.625,
+      "peak_job_commit_bytes": 3518464,
+      "connections": 1
+    }
+  ],
+  "phases": {
+    "queries": [
+      "cancel.fixture.invalid",
+      "cancel.fixture.invalid",
+      "deadline.fixture.invalid",
+      "deadline.fixture.invalid"
+    ],
+    "tlsTcpAttempts": 2,
+    "uploadReceived": 589683,
+    "uploadExpected": 1048576,
+    "partialDownloads": 1,
+    "remainingSockets": 0
+  },
+  "vela": [
+    {
+      "stress": false,
+      "gc": "",
+      "observed": [
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 24,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 24,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 24,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 24,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 24,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 24,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 24,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 24,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 24,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 24,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/server-close",
+          "socket": 24,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/after-server-close",
+          "socket": 25,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/hold",
+          "socket": 25,
+          "authorization": null
+        },
+        {
+          "origin": "other",
+          "route": "/peer",
+          "socket": 26,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/redirect",
+          "socket": 27,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/delete",
+          "socket": 28,
+          "authorization": null,
+          "method": "DELETE",
+          "body": "4100ff42"
+        },
+        {
+          "origin": "first",
+          "route": "/no-replay",
+          "socket": 29,
+          "authorization": null,
+          "method": "POST",
+          "body": "636f6d6d6974"
+        },
+        {
+          "origin": "first",
+          "route": "/close",
+          "socket": 30,
+          "authorization": null
+        },
+        {
+          "origin": "tls",
+          "route": "/tls",
+          "socket": 31,
+          "authorization": null
+        },
+        {
+          "origin": "tls",
+          "route": "/tls",
+          "socket": 31,
+          "authorization": null
+        }
+      ]
+    },
+    {
+      "stress": true,
+      "gc": "vela gc: collections=53855 peak=12694 bytes=200",
+      "observed": [
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 32,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 32,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 32,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 32,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 32,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 32,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 32,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 32,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 32,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/reuse",
+          "socket": 32,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/server-close",
+          "socket": 32,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/after-server-close",
+          "socket": 33,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/hold",
+          "socket": 33,
+          "authorization": null
+        },
+        {
+          "origin": "other",
+          "route": "/peer",
+          "socket": 34,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/redirect",
+          "socket": 35,
+          "authorization": null
+        },
+        {
+          "origin": "first",
+          "route": "/delete",
+          "socket": 36,
+          "authorization": null,
+          "method": "DELETE",
+          "body": "4100ff42"
+        },
+        {
+          "origin": "first",
+          "route": "/no-replay",
+          "socket": 37,
+          "authorization": null,
+          "method": "POST",
+          "body": "636f6d6d6974"
+        },
+        {
+          "origin": "first",
+          "route": "/close",
+          "socket": 38,
+          "authorization": null
+        },
+        {
+          "origin": "tls",
+          "route": "/tls",
+          "socket": 39,
+          "authorization": null
+        },
+        {
+          "origin": "tls",
+          "route": "/tls",
+          "socket": 39,
+          "authorization": null
+        }
+      ]
+    }
+  ],
+  "executable": {
+    "bytes": 4371456,
+    "sha256": "cb70381ae79e509ce9e5583e98460c8d4cfae16440c98a3f519a3cf98b22f52b"
+  },
+  "passed": true
+}

@@ -1,0 +1,7 @@
+import "../../../std/http.vela" as http;
+import "../../../std/path.vela" as path;
+
+fn open() -> Result<http::CurlMulti, http::MultiOpenError> effects { io } {
+    return http::curl_multi(http::multi_limits(), Option<path::Path>::None);
+}
+fn main() -> Unit {}

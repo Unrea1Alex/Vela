@@ -74,6 +74,9 @@ maxima are 16 MiB, depth 4096, nodes 1000000. Parsing uses an explicit stack;
 no input-dependent native recursion. Skipping validates the complete grammar,
 escapes, surrogate pairs and UTF-8; even an ignored malformed member fails.
 Duplicate keys are rejected. Errors carry byte offset, JSON path and reason.
+The current reader shares string, number and literal scanners with the tree
+parser. The reader's limits, sticky errors and paths are preserved.
+[Lexical contract](JSON-LEXICAL-1.3.md).
 
 Number tokens preserve their original spelling. Lexical integer (no fraction
 or exponent), Float64 conversion and range failure are separate operations.

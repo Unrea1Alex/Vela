@@ -1,0 +1,5 @@
+import "../../../std/config_snapshot.vela" as config;
+import "../../../std/json.vela" as json;
+fn main() -> Unit effects { state } {
+    let forged = config::Snapshot(fields: dict_new<String, json::Value>(), order: list_new<String>());
+}

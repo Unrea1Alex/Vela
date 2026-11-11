@@ -1,0 +1,862 @@
+{
+  "stage": "1.3.4k",
+  "status": "verified",
+  "contract": "contracts/NATIVE-PGO-1.3.md",
+  "fixed": "1.3.4d",
+  "previous": "1.3.4j",
+  "profile": {
+    "msvc": {
+      "profile": {
+        "file": "1.3.4k-msvc.json",
+        "sha256": "8eed36a238731663ac17cf6e5e0168e71767efae7d505dfa0a5b6e7763004f50"
+      },
+      "compared": {
+        "file": "1.3.4k-msvc-compared.json",
+        "sha256": "734dc80114bc8f62f32d8d324e34c1b228b4419139994eae622b7cd587e0e9e3"
+      },
+      "workloads": {
+        "buildlens": {
+          "profile": {
+            "compiler_id": "6a02cf811ba04d14e144b81b1de67d79cc8f69c0875a78eec16e8a08a5f1fd63",
+            "source_key": "0ad84e9bb45ed64467c72c9890911267b4a1c693fea93323567d0a8bf9141dbe",
+            "generated_c_sha256": "dc0c093ad440f732b5abdccde427e88b2e9a9411f7062553093cc428df5c8b64",
+            "toolchain_id": "2042e92342a4b383abb30282cff80c73a0ac3bdae3dde62bac82b84805723453",
+            "flags_sha256": "11f955f9475beab49e79a7e64b2373f4ab030672c2ecff421661c067a611bb63",
+            "trained": {
+              "sha256": "dc6563a4cd0bdfae7a10d799134186d8cb27164795ddac2a826f44b7953ddb0a",
+              "bytes": 1691648
+            }
+          },
+          "wall_ms": [
+            294.4146,
+            279.7223
+          ],
+          "gain_percent": 4.99034354953864,
+          "noise_percent": 0.6918238041426369,
+          "target": true,
+          "bytes": [
+            638976,
+            641536
+          ],
+          "workflow": {
+            "o2": {
+              "wall_ms": {
+                "median": 1866.5432,
+                "min": 1827.1931,
+                "max": 1938.5887
+              },
+              "cpu_ms": {
+                "median": 4859.375,
+                "min": 4687.5,
+                "max": 5234.375
+              },
+              "peak_tree_bytes": {
+                "median": 236650496,
+                "min": 213282816,
+                "max": 236941312
+              },
+              "peak_process_bytes": {
+                "median": 54222848,
+                "min": 54177792,
+                "max": 54247424
+              }
+            },
+            "instrument": {
+              "wall_ms": {
+                "median": 1150.7048,
+                "min": 1140.4607,
+                "max": 1185.6757
+              },
+              "cpu_ms": {
+                "median": 2187.5,
+                "min": 2109.375,
+                "max": 2328.125
+              },
+              "peak_tree_bytes": {
+                "median": 200318976,
+                "min": 197242880,
+                "max": 209920000
+              },
+              "peak_process_bytes": {
+                "median": 80220160,
+                "min": 80207872,
+                "max": 80273408
+              }
+            },
+            "train": {
+              "wall_ms": {
+                "median": 34463.854,
+                "min": 24825.9267,
+                "max": 36646.8509
+              },
+              "cpu_ms": {
+                "median": 34281.25,
+                "min": 24484.375,
+                "max": 36437.5
+              },
+              "peak_tree_bytes": {
+                "median": 41598976,
+                "min": 41414656,
+                "max": 41787392
+              },
+              "peak_process_bytes": {
+                "median": 31068160,
+                "min": 31047680,
+                "max": 31100928
+              }
+            },
+            "use": {
+              "wall_ms": {
+                "median": 2012.7304,
+                "min": 1971.4199,
+                "max": 2108.6603
+              },
+              "cpu_ms": {
+                "median": 5296.875,
+                "min": 5046.875,
+                "max": 5406.25
+              },
+              "peak_tree_bytes": {
+                "median": 290869248,
+                "min": 287932416,
+                "max": 296361984
+              },
+              "peak_process_bytes": {
+                "median": 79556608,
+                "min": 79519744,
+                "max": 79654912
+              }
+            }
+          },
+          "break_even_runs": 2434,
+          "historical_same_session": {
+            "fixed": {
+              "wall_ms": 355.041,
+              "cpu_ms": 343.75,
+              "peak_tree_bytes": 9478144
+            },
+            "previous": {
+              "wall_ms": 299.2921,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9478144
+            },
+            "o2": {
+              "wall_ms": 307.752,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9940992
+            },
+            "pgo": {
+              "wall_ms": 292.0342,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9441280
+            }
+          }
+        },
+        "compiler": {
+          "profile": {
+            "compiler_id": "6a02cf811ba04d14e144b81b1de67d79cc8f69c0875a78eec16e8a08a5f1fd63",
+            "source_key": "5087e6b18bb801a7eb47017cdc8f86e0a6c893470e4f0ce8384c16aedb914240",
+            "generated_c_sha256": "cd7beab8a0c14a6089edc6297c6bb49e8b241c53a1a08a01a19ee8c16d99a763",
+            "toolchain_id": "2042e92342a4b383abb30282cff80c73a0ac3bdae3dde62bac82b84805723453",
+            "flags_sha256": "11f955f9475beab49e79a7e64b2373f4ab030672c2ecff421661c067a611bb63",
+            "trained": {
+              "sha256": "606832c96c1b23f65333851b14e9ecc0eef091139bc4e5335c98560db17b2a4f",
+              "bytes": 3534848
+            }
+          },
+          "wall_ms": [
+            983.0527,
+            970.5632
+          ],
+          "gain_percent": 1.2704812264896794,
+          "noise_percent": 0.8676997003493039,
+          "target": false,
+          "bytes": [
+            3282944,
+            2857984
+          ],
+          "workflow": {
+            "o2": {
+              "wall_ms": {
+                "median": 24993.7368,
+                "min": 24677.0869,
+                "max": 29418.0368
+              },
+              "cpu_ms": {
+                "median": 86796.875,
+                "min": 85843.75,
+                "max": 97703.125
+              },
+              "peak_tree_bytes": {
+                "median": 571301888,
+                "min": 566153216,
+                "max": 575463424
+              },
+              "peak_process_bytes": {
+                "median": 168869888,
+                "min": 168841216,
+                "max": 168886272
+              }
+            },
+            "instrument": {
+              "wall_ms": {
+                "median": 16755.4062,
+                "min": 16336.5812,
+                "max": 17052.7536
+              },
+              "cpu_ms": {
+                "median": 54093.75,
+                "min": 53296.875,
+                "max": 54390.625
+              },
+              "peak_tree_bytes": {
+                "median": 485027840,
+                "min": 483999744,
+                "max": 490127360
+              },
+              "peak_process_bytes": {
+                "median": 183209984,
+                "min": 183152640,
+                "max": 183234560
+              }
+            },
+            "train": {
+              "wall_ms": {
+                "median": 10163.2799,
+                "min": 8190.8644,
+                "max": 11029.5885
+              },
+              "cpu_ms": {
+                "median": 10109.375,
+                "min": 8125,
+                "max": 10906.25
+              },
+              "peak_tree_bytes": {
+                "median": 67981312,
+                "min": 67334144,
+                "max": 68206592
+              },
+              "peak_process_bytes": {
+                "median": 31584256,
+                "min": 31580160,
+                "max": 31629312
+              }
+            },
+            "use": {
+              "wall_ms": {
+                "median": 12049.3847,
+                "min": 11856.1935,
+                "max": 12085.0067
+              },
+              "cpu_ms": {
+                "median": 60234.375,
+                "min": 59921.875,
+                "max": 60656.25
+              },
+              "peak_tree_bytes": {
+                "median": 620740608,
+                "min": 618250240,
+                "max": 631554048
+              },
+              "peak_process_bytes": {
+                "median": 180830208,
+                "min": 180715520,
+                "max": 180862976
+              }
+            }
+          },
+          "break_even_runs": 1119,
+          "historical_same_session": {
+            "fixed": {
+              "wall_ms": 1299.3412,
+              "cpu_ms": 1296.875,
+              "peak_tree_bytes": 96890880
+            },
+            "previous": {
+              "wall_ms": 971.6273,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97095680
+            },
+            "o2": {
+              "wall_ms": 962.0084,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97181696
+            },
+            "pgo": {
+              "wall_ms": 945.2368,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97001472
+            }
+          }
+        }
+      }
+    },
+    "gcc": {
+      "profile": {
+        "file": "1.3.4k-gcc.json",
+        "sha256": "323c96fd5578cea23207b79ccbd582f86237d7cb3d5a9e55dfe7536104facd3f"
+      },
+      "compared": {
+        "file": "1.3.4k-gcc-compared.json",
+        "sha256": "b356c9abfeb7132c281c5c9b2a56c3d089f5359487cbb6afa34472578be498bc"
+      },
+      "workloads": {
+        "buildlens": {
+          "profile": {
+            "compiler_id": "6a02cf811ba04d14e144b81b1de67d79cc8f69c0875a78eec16e8a08a5f1fd63",
+            "source_key": "28c5e6a9a23b9fba8ad2d30036c142eb4eea48707e355d0710ec38e917595081",
+            "generated_c_sha256": "4228786c341c6f991c9469332b260f46565f69c28cb925aec4c47c3aca01a8e3",
+            "toolchain_id": "f5f21f26376e7a9870659cf5473aed5a9043ec28ffdd9f7c5d889459ce45dc5b",
+            "flags_sha256": "b8a6f56e8d1c1de7a5b60bd90532adad50f9f1b28ae51b9908919a673ec24c84",
+            "trained": {
+              "sha256": "bf33035db725a2bdcb4841fe12e015bcba65f157374b797313e2ede577c2fe11",
+              "bytes": 57368
+            }
+          },
+          "wall_ms": [
+            441.491,
+            427.102
+          ],
+          "gain_percent": 3.259183086404935,
+          "noise_percent": 1.8912497268953465,
+          "target": true,
+          "bytes": [
+            547640,
+            470472
+          ],
+          "workflow": {
+            "o2": {
+              "wall_ms": {
+                "median": 5714.874,
+                "min": 5690.199,
+                "max": 5862.351
+              },
+              "cpu_ms": {
+                "median": 5288.463,
+                "min": 5262.64,
+                "max": 5452.9
+              },
+              "peak_tree_bytes": {
+                "median": 297160704,
+                "min": 296984576,
+                "max": 297177088
+              },
+              "peak_process_bytes": {
+                "median": 46972928,
+                "min": 46845952,
+                "max": 46989312
+              }
+            },
+            "instrument": {
+              "wall_ms": {
+                "median": 5125.062,
+                "min": 5097.126,
+                "max": 5331.687
+              },
+              "cpu_ms": {
+                "median": 4596.952,
+                "min": 4548.117,
+                "max": 4786.653
+              },
+              "peak_tree_bytes": {
+                "median": 312360960,
+                "min": 312197120,
+                "max": 312381440
+              },
+              "peak_process_bytes": {
+                "median": 119484416,
+                "min": 117702656,
+                "max": 123961344
+              }
+            },
+            "train": {
+              "wall_ms": {
+                "median": 2521.327,
+                "min": 2470.054,
+                "max": 2634.79
+              },
+              "cpu_ms": {
+                "median": 2316.464,
+                "min": 2267.034,
+                "max": 2427.822
+              },
+              "peak_tree_bytes": {
+                "median": 80908288,
+                "min": 80826368,
+                "max": 85790720
+              },
+              "peak_process_bytes": {
+                "median": 77705216,
+                "min": 72396800,
+                "max": 80084992
+              }
+            },
+            "use": {
+              "wall_ms": {
+                "median": 5708.527,
+                "min": 5659.127,
+                "max": 5724.627
+              },
+              "cpu_ms": {
+                "median": 4936.075,
+                "min": 4890.504,
+                "max": 4953.817
+              },
+              "peak_tree_bytes": {
+                "median": 310054912,
+                "min": 309989376,
+                "max": 310157312
+              },
+              "peak_process_bytes": {
+                "median": 122261504,
+                "min": 119910400,
+                "max": 123662336
+              }
+            }
+          },
+          "break_even_runs": 531,
+          "historical_same_session": {
+            "fixed": {
+              "wall_ms": 502.128,
+              "cpu_ms": 479.856,
+              "peak_tree_bytes": 7929856
+            },
+            "previous": {
+              "wall_ms": 448.245,
+              "cpu_ms": 428.899,
+              "peak_tree_bytes": 7262208
+            },
+            "o2": {
+              "wall_ms": 433.972,
+              "cpu_ms": 416.529,
+              "peak_tree_bytes": 7360512
+            },
+            "pgo": {
+              "wall_ms": 417.572,
+              "cpu_ms": 399.668,
+              "peak_tree_bytes": 7254016
+            }
+          }
+        },
+        "compiler": {
+          "profile": {
+            "compiler_id": "6a02cf811ba04d14e144b81b1de67d79cc8f69c0875a78eec16e8a08a5f1fd63",
+            "source_key": "9e8f0e32f3bf7b0862b8c0e43e3c92ff9b35b8e42ded85b42a6aeb7e8292dd5b",
+            "generated_c_sha256": "2e24738481220e798e1bafcd0b035c11166d66df1eada6611fd0c0d252af2bd2",
+            "toolchain_id": "f5f21f26376e7a9870659cf5473aed5a9043ec28ffdd9f7c5d889459ce45dc5b",
+            "flags_sha256": "b8a6f56e8d1c1de7a5b60bd90532adad50f9f1b28ae51b9908919a673ec24c84",
+            "trained": {
+              "sha256": "8fed6b13cc140053f58c48bd02b602dd47bc9515fcda97e1b8c5a08ddc53c7b2",
+              "bytes": 117708
+            }
+          },
+          "wall_ms": [
+            2480.48,
+            2467.288
+          ],
+          "gain_percent": 0.5318325485389928,
+          "noise_percent": 1.0794653103579863,
+          "target": false,
+          "bytes": [
+            3015552,
+            2180000
+          ],
+          "workflow": {
+            "o2": {
+              "wall_ms": {
+                "median": 29746.003,
+                "min": 29356.545,
+                "max": 31552.558
+              },
+              "cpu_ms": {
+                "median": 28918.36,
+                "min": 28537.398,
+                "max": 30704.868
+              },
+              "peak_tree_bytes": {
+                "median": 565825536,
+                "min": 565706752,
+                "max": 565878784
+              },
+              "peak_process_bytes": {
+                "median": 161419264,
+                "min": 161390592,
+                "max": 161423360
+              }
+            },
+            "instrument": {
+              "wall_ms": {
+                "median": 22347.422,
+                "min": 22143.759,
+                "max": 23924.01
+              },
+              "cpu_ms": {
+                "median": 21394.95,
+                "min": 21195.264,
+                "max": 22947.335
+              },
+              "peak_tree_bytes": {
+                "median": 592654336,
+                "min": 592490496,
+                "max": 592752640
+              },
+              "peak_process_bytes": {
+                "median": 234102784,
+                "min": 231452672,
+                "max": 235732992
+              }
+            },
+            "train": {
+              "wall_ms": {
+                "median": 1429.137,
+                "min": 1415.746,
+                "max": 1442.435
+              },
+              "cpu_ms": {
+                "median": 965.868,
+                "min": 951.92,
+                "max": 971.491
+              },
+              "peak_tree_bytes": {
+                "median": 87638016,
+                "min": 87584768,
+                "max": 90214400
+              },
+              "peak_process_bytes": {
+                "median": 73318400,
+                "min": 71237632,
+                "max": 79650816
+              }
+            },
+            "use": {
+              "wall_ms": {
+                "median": 22135.153,
+                "min": 21615.745,
+                "max": 22912.326
+              },
+              "cpu_ms": {
+                "median": 20826.892,
+                "min": 20301.193,
+                "max": 21575.086
+              },
+              "peak_tree_bytes": {
+                "median": 584884224,
+                "min": 584650752,
+                "max": 584966144
+              },
+              "peak_process_bytes": {
+                "median": 236171264,
+                "min": 227549184,
+                "max": 237309952
+              }
+            }
+          },
+          "break_even_runs": 1226,
+          "historical_same_session": {
+            "fixed": {
+              "wall_ms": 2034.653,
+              "cpu_ms": 1580.003,
+              "peak_tree_bytes": 92635136
+            },
+            "previous": {
+              "wall_ms": 2543.199,
+              "cpu_ms": 1977.837,
+              "peak_tree_bytes": 91262976
+            },
+            "o2": {
+              "wall_ms": 2542.232,
+              "cpu_ms": 1963.409,
+              "peak_tree_bytes": 91344896
+            },
+            "pgo": {
+              "wall_ms": 2509.751,
+              "cpu_ms": 1956.785,
+              "peak_tree_bytes": 90509312
+            }
+          }
+        }
+      }
+    }
+  },
+  "verification": {
+    "msvc": {
+      "workflow": {
+        "host": "msvc",
+        "checks": [
+          "O2 project output",
+          "unsupported toolchain rejects without publishing",
+          "instrument publishes once and untrained use rejects",
+          "training rejects changed flags or companion and publishes nothing on failure",
+          "one concurrent trainer publishes and a second training is rejected",
+          "PGO use and warm C cache preserve held-out output",
+          "changed payload, receipt, import and locked resource reject with old output intact",
+          "delivered executable and resource work without the profile or tools"
+        ],
+        "payload_bytes": 1134592,
+        "plan_sha256": "26f1b66b6d073875dffb3038cf8aed97ea230e299f738947885a4c7c6a5b9e45",
+        "trained_sha256": "1bc691a35d9a3fd91899ff235a96e9bd4734d1b497e38b30a0949bcd2e18009f",
+        "packaged_executable_sha256": "5ce4a01224b318439d4ad0f67c24224041f349d52f8683ac0ef12ea383156d8d"
+      },
+      "mode_gate": {
+        "host": "msvc",
+        "expected": {
+          "authored": "cd7beab8a0c14a6089edc6297c6bb49e8b241c53a1a08a01a19ee8c16d99a763",
+          "bundle": "8fdc3cd2c951afa5b4859a7bf936be4b4253ef9d0240c72bf6026c6c9e0167de",
+          "bundler": "dd263c3e9402c9c4ed9ece71019472268aaa8f0b71de9727e1407ab854b7deee"
+        },
+        "outcome": {
+          "instrument": {
+            "first_sha256": "cd7beab8a0c14a6089edc6297c6bb49e8b241c53a1a08a01a19ee8c16d99a763",
+            "second_sha256": "cd7beab8a0c14a6089edc6297c6bb49e8b241c53a1a08a01a19ee8c16d99a763",
+            "bundler_sha256": "dd263c3e9402c9c4ed9ece71019472268aaa8f0b71de9727e1407ab854b7deee",
+            "recovery_sha256": "8fdc3cd2c951afa5b4859a7bf936be4b4253ef9d0240c72bf6026c6c9e0167de",
+            "resumed": true,
+            "fixtures": [
+              "v134j_reachability",
+              "v134i_ranges",
+              "v134d_lowering"
+            ]
+          },
+          "use": {
+            "first_sha256": "cd7beab8a0c14a6089edc6297c6bb49e8b241c53a1a08a01a19ee8c16d99a763",
+            "second_sha256": "cd7beab8a0c14a6089edc6297c6bb49e8b241c53a1a08a01a19ee8c16d99a763",
+            "bundler_sha256": "dd263c3e9402c9c4ed9ece71019472268aaa8f0b71de9727e1407ab854b7deee",
+            "recovery_sha256": "8fdc3cd2c951afa5b4859a7bf936be4b4253ef9d0240c72bf6026c6c9e0167de",
+            "resumed": false,
+            "fixtures": [
+              "v134j_reachability",
+              "v134i_ranges",
+              "v134d_lowering"
+            ]
+          }
+        },
+        "ffi": {
+          "supported": true,
+          "stdout": "callbacks passed",
+          "executable_sha256": "8d69188ca16f564829bca70f95b7922693c6cadad4e84f5cbccb731bb6879290",
+          "companion_sha256": "14c3e18899c73713a56337649b7294ffb18e175352c490487fede6723103b3f1",
+          "gc_stress": true
+        }
+      },
+      "raw_mode_gate": {
+        "file": "1.3.4k-msvc-compiler.json",
+        "sha256": "a342e8fed9739953482f90c3b591ddc2fd681a4f18ce6f59c7ec00d7ff2e08cc"
+      }
+    },
+    "gcc": {
+      "workflow": {
+        "host": "gcc",
+        "checks": [
+          "O2 project output",
+          "unsupported toolchain rejects without publishing",
+          "instrument publishes once and untrained use rejects",
+          "training rejects changed flags or companion and publishes nothing on failure",
+          "one concurrent trainer publishes and a second training is rejected",
+          "PGO use and warm C cache preserve held-out output",
+          "changed payload, receipt, import and locked resource reject with old output intact",
+          "delivered executable and resource work without the profile or tools"
+        ],
+        "payload_bytes": 2352,
+        "plan_sha256": "c4e54dc1ca2bfd25c907bc31e3ca7f38a8c3d61322963f01b8c5fbe3287edb1a",
+        "trained_sha256": "ed67f2f85aa6b8b104de6bd2b5ec174569d1542f66d75be81cfd38c33c5b94c1",
+        "packaged_executable_sha256": "b5b266ff879828bf6e9ac69188a83ae3ac6724355826cca95bb0a076d9535f96"
+      },
+      "mode_gate": {
+        "host": "gcc",
+        "expected": {
+          "authored": "2e24738481220e798e1bafcd0b035c11166d66df1eada6611fd0c0d252af2bd2",
+          "bundle": "8fdc3cd2c951afa5b4859a7bf936be4b4253ef9d0240c72bf6026c6c9e0167de",
+          "bundler": "dd263c3e9402c9c4ed9ece71019472268aaa8f0b71de9727e1407ab854b7deee"
+        },
+        "outcome": {
+          "instrument": {
+            "first_sha256": "2e24738481220e798e1bafcd0b035c11166d66df1eada6611fd0c0d252af2bd2",
+            "second_sha256": "2e24738481220e798e1bafcd0b035c11166d66df1eada6611fd0c0d252af2bd2",
+            "bundler_sha256": "dd263c3e9402c9c4ed9ece71019472268aaa8f0b71de9727e1407ab854b7deee",
+            "recovery_sha256": "8fdc3cd2c951afa5b4859a7bf936be4b4253ef9d0240c72bf6026c6c9e0167de",
+            "fixtures": [
+              "v134j_reachability",
+              "v134i_ranges",
+              "v134d_lowering"
+            ]
+          },
+          "use": {
+            "first_sha256": "2e24738481220e798e1bafcd0b035c11166d66df1eada6611fd0c0d252af2bd2",
+            "second_sha256": "2e24738481220e798e1bafcd0b035c11166d66df1eada6611fd0c0d252af2bd2",
+            "bundler_sha256": "dd263c3e9402c9c4ed9ece71019472268aaa8f0b71de9727e1407ab854b7deee",
+            "recovery_sha256": "8fdc3cd2c951afa5b4859a7bf936be4b4253ef9d0240c72bf6026c6c9e0167de",
+            "fixtures": [
+              "v134j_reachability",
+              "v134i_ranges",
+              "v134d_lowering"
+            ]
+          }
+        },
+        "ffi": {
+          "supported": false
+        }
+      },
+      "raw_mode_gate": {
+        "file": "1.3.4k-gcc-compiler.json",
+        "sha256": "d70ec36ca0fddc1f4ba636d97c9147b0029eeb47263f1a7ef89aa2295ac4ae1d"
+      }
+    }
+  },
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1450,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 565762,
+    "tests_run": true
+  },
+  "mode_suites": {
+    "instrument": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 1450,
+      "failed": 0,
+      "skipped": 0,
+      "log_sha256": "db61e8a5cba2b979ffd4ba67b2d0a57d20b0b612a3fb6823a233327dcfd4a620"
+    },
+    "use": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 1450,
+      "failed": 0,
+      "skipped": 0,
+      "log_sha256": "db61e8a5cba2b979ffd4ba67b2d0a57d20b0b612a3fb6823a233327dcfd4a620"
+    }
+  },
+  "instrument_initial": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1443,
+    "failed": 7,
+    "skipped": 0
+  },
+  "supervisor_recheck": {
+    "file": "1.3.4k-instrument-deadline.json",
+    "sha256": "b4cf65f1247dda04b1558879ee34b798bc6fe9486ca176f8fcddc02f612cdee6"
+  },
+  "verified_seed": {
+    "schema_version": 1,
+    "status": "passed",
+    "bootstrap": {
+      "schema_version": 1,
+      "version": "1.2.0",
+      "orchestrator": "Vela",
+      "fixed_point": true,
+      "bundler_fixed_point": true,
+      "source_bytes": 565762,
+      "tests_run": true
+    },
+    "files": {
+      "seed.exe": {
+        "bytes": 3281408,
+        "sha256": "165807bd6314ccf5f22ce6c4ebe2adfd4ce1856f12d9863fd5f31d4b95f7dcd5"
+      },
+      "stage1.exe": {
+        "bytes": 3282944,
+        "sha256": "2038788b2d3adda2083fb523b4eb2f4cf4d381c7c06501e6c17d2086dcf30245"
+      },
+      "stage2.exe": {
+        "bytes": 3282944,
+        "sha256": "74bcc8f410aff8faa3de5509b9641918cc1b0f028569760b0af31d99c6732d26"
+      },
+      "stage3.exe": {
+        "bytes": 3282944,
+        "sha256": "262f0d77c7e1833262f515386f1c65c21514d3aa624a30bb57fb30b1cd1ec1d8"
+      },
+      "stage1.c": {
+        "bytes": 6045649,
+        "sha256": "cd7beab8a0c14a6089edc6297c6bb49e8b241c53a1a08a01a19ee8c16d99a763"
+      },
+      "stage2.c": {
+        "bytes": 6045649,
+        "sha256": "cd7beab8a0c14a6089edc6297c6bb49e8b241c53a1a08a01a19ee8c16d99a763"
+      },
+      "stage3.c": {
+        "bytes": 6045649,
+        "sha256": "cd7beab8a0c14a6089edc6297c6bb49e8b241c53a1a08a01a19ee8c16d99a763"
+      },
+      "compiler.vela": {
+        "bytes": 565762,
+        "sha256": "dd263c3e9402c9c4ed9ece71019472268aaa8f0b71de9727e1407ab854b7deee"
+      },
+      "rebundled.vela": {
+        "bytes": 565762,
+        "sha256": "dd263c3e9402c9c4ed9ece71019472268aaa8f0b71de9727e1407ab854b7deee"
+      }
+    },
+    "scope": "mandatory verify transition from installed compiler through bundle seed and authored stages; independent hash comparisons"
+  },
+  "verify_log_sha256": "89b5b9c6ca8218322abb95e3589d9e5848974ba5e3cd0e9bb28118f3f756a285",
+  "first_windows_profile": {
+    "file": "1.3.4k-msvc-first-profile.json",
+    "sha256": "d605caf04f21559bd09a6f964c73235d845b90d616dcadf078677b5ed064ae2b"
+  },
+  "aggressive_validation": {
+    "file": "1.3.4k-msvc-flag-validation.json",
+    "sha256": "e618dd12fd1135b39ac7cd3d26d671628a4919a78555a7d9ea22931fcd381b4f"
+  },
+  "mcp": {
+    "unit": 2,
+    "execution": {
+      "file": "1.3.4k-mcp.json",
+      "sha256": "ec4a5c9fe1c0f443efe3b1aa3d3f9f057bd9af3b4a07d73a0c06490a02969f44"
+    },
+    "checks": 31
+  },
+  "tooling_example": {
+    "status": "passed",
+    "commands": [
+      "pgo-instrument",
+      "pgo-train",
+      "build --pgo-profile",
+      "delivered executable"
+    ],
+    "project": "apps/build-lens/vela.project",
+    "input": "apps/build-lens/demo.jsonl",
+    "sha256": "649d18f535c716f373c904ef28b0b8a559df711467c38dad48c8bf1970abdd31",
+    "summary": {
+      "events": 15,
+      "duplicates": 1,
+      "selected": 14,
+      "tests": 11,
+      "failed": 2,
+      "flaky": 2,
+      "skipped": 1,
+      "total_ms": 18860
+    },
+    "staged_paths": true
+  },
+  "budget_decisions": {
+    "policy": "The 10% ordinary-workload and default-build budget is evaluated against the preceding stage and the fixed 1.3.4d baseline.",
+    "gcc_compiler_check": {
+      "fixed_wall_ms": 2034.653,
+      "preceding_wall_ms": 2543.199,
+      "current_o2_wall_ms": 2542.232,
+      "profile_use_wall_ms": 2509.751,
+      "decision": "Accept the opt-in stage with no additional default compiler-check regression. The cumulative fixed-baseline difference already exists in the archived 1.3.4j executable. Carry phase attribution into the 1.3.5a compiler-cost audit."
+    },
+    "msvc_buildlens_profile_link_memory": {
+      "ordinary_o2_peak_tree_bytes": 236650496,
+      "profile_use_peak_tree_bytes": 290869248,
+      "decision": "Keep the measured memory cost visible. The higher peak applies to the explicit PGO build, while default BuildLens emits identical C and uses O2."
+    },
+    "interrupted_windows_run": {
+      "scope": "The earlier 2.56% BuildLens result used only the first workload. A resumed attempt could not drain the optional MSVC telemetry process. Neither incomplete run is included in the paired final series.",
+      "final_scope": "Matched MSVC 19.44.35222 tool binaries in a private directory without vctip.exe. The installed toolchain was not changed."
+    }
+  },
+  "next": "1.3.4l"
+}

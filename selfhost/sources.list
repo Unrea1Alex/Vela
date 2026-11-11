@@ -15,8 +15,12 @@ dynamic
 callables
 suspension
 semantic
+semantic_cache
 errors
 control
+simplify
+ranges
+reachability
 emitter
 intrinsics
 formatter
@@ -24,4 +28,5 @@ query
 repairs
 help
 scaffold
+pgo
 driver

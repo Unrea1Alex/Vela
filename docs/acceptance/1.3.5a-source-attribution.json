@@ -1,0 +1,142 @@
+{
+  "artifacts.vela": {
+    "first": "f6ea9d33508b1c9d7f649e5d37c47dd411670b387bb20dcf559c9b41e1b118d6",
+    "second": "f6ea9d33508b1c9d7f649e5d37c47dd411670b387bb20dcf559c9b41e1b118d6",
+    "same": true
+  },
+  "callables.vela": {
+    "first": "2ec95c242e180bb76ae34cb4c13e24e273e23c05d881a1103fb060c124527096",
+    "second": "2ec95c242e180bb76ae34cb4c13e24e273e23c05d881a1103fb060c124527096",
+    "same": true
+  },
+  "control.vela": {
+    "first": "7bd095b636fc576774ad4de487e8eb9d7f7f70603796cde74a080450d16604c0",
+    "second": "7bd095b636fc576774ad4de487e8eb9d7f7f70603796cde74a080450d16604c0",
+    "same": true
+  },
+  "core.vela": {
+    "first": "f09a661f775f0e03f14dd4155be8b73734e82afd9b6dafd0c529909e653e7b7c",
+    "second": "f09a661f775f0e03f14dd4155be8b73734e82afd9b6dafd0c529909e653e7b7c",
+    "same": true
+  },
+  "driver.vela": {
+    "first": "4d0c2603e6fc539e3a04f1a8b808bb026d62ce496c2b1197d54ce2237f735391",
+    "second": "4d0c2603e6fc539e3a04f1a8b808bb026d62ce496c2b1197d54ce2237f735391",
+    "same": true
+  },
+  "dynamic.vela": {
+    "first": "c7c6261025e8138355e8b3dbf0ab605b2b641370a1b7af182fc1be086062dcc3",
+    "second": "c7c6261025e8138355e8b3dbf0ab605b2b641370a1b7af182fc1be086062dcc3",
+    "same": true
+  },
+  "embedded.vela": {
+    "first": "3e265c463698954ce2998b180ff60636ef2f518494ba0004585ccb342dfab596",
+    "second": "b13d787f2fdfca41aef4699ef54f3ce538ec1fadd9ab23560866f918712e34d4",
+    "same": false
+  },
+  "emitter.vela": {
+    "first": "37cfdb672a67a661b152c91b6a3abf6e0f290d416ee93f11ea4649316b56c197",
+    "second": "21d4d97cb414158128efc42a61cfbb6f0b596aa75e6024f1b352223be5ad7b86",
+    "same": false
+  },
+  "errors.vela": {
+    "first": "64e982313d5652cf929b4c9b725245e9353f1f7c803a021b2fda7995d7a5efc9",
+    "second": "64e982313d5652cf929b4c9b725245e9353f1f7c803a021b2fda7995d7a5efc9",
+    "same": true
+  },
+  "formatter.vela": {
+    "first": "9d48b89f72b414265c3b2e3ae49769ebb7074828bd56f7c53de0a196a61c7f8c",
+    "second": "9d48b89f72b414265c3b2e3ae49769ebb7074828bd56f7c53de0a196a61c7f8c",
+    "same": true
+  },
+  "generics.vela": {
+    "first": "2eb4efcd609db1fe9da8343b6735cc0340cd9e20c43acad98a10d3f7dc725a0a",
+    "second": "2eb4efcd609db1fe9da8343b6735cc0340cd9e20c43acad98a10d3f7dc725a0a",
+    "same": true
+  },
+  "help.vela": {
+    "first": "b2c19454051afddff15617fee04062a2e9414e841ced10707a34f2913a6c3bbf",
+    "second": "b2c19454051afddff15617fee04062a2e9414e841ced10707a34f2913a6c3bbf",
+    "same": true
+  },
+  "incremental.vela": {
+    "first": "461f6e09fec4660da57ab70da9d745882b5f50f7946a1fa3b3395e123774b6a7",
+    "second": "461f6e09fec4660da57ab70da9d745882b5f50f7946a1fa3b3395e123774b6a7",
+    "same": true
+  },
+  "interfaces.vela": {
+    "first": "a46edd1bb9c7e664ca59079804b17871f57ac0faa5827a7fd1130c2a42e750cc",
+    "second": "a46edd1bb9c7e664ca59079804b17871f57ac0faa5827a7fd1130c2a42e750cc",
+    "same": true
+  },
+  "intrinsics.vela": {
+    "first": "1d67c93e6ded331a72edb082694d17c5bcad2c7b66a1ba4f467475cc5316eb24",
+    "second": "5b7e264000bbef5768a957df208296f40d4dc5325e65696eeb45a6ceb0101930",
+    "same": false
+  },
+  "lexer.vela": {
+    "first": "8e69d37ee7fcde774c7cf31368f8436dcd4229a05cc12471dd6585b969ddc60e",
+    "second": "8e69d37ee7fcde774c7cf31368f8436dcd4229a05cc12471dd6585b969ddc60e",
+    "same": true
+  },
+  "model.vela": {
+    "first": "ad8b7583177e8fd0a9c51f83714d231ced78f572aa2cd4fa6beb61023820da38",
+    "second": "ad8b7583177e8fd0a9c51f83714d231ced78f572aa2cd4fa6beb61023820da38",
+    "same": true
+  },
+  "modules.vela": {
+    "first": "57ca31de84e656b9fafe65d252b8d0d6cf40e86e8361fd4daaf8ef9b258fd7e8",
+    "second": "57ca31de84e656b9fafe65d252b8d0d6cf40e86e8361fd4daaf8ef9b258fd7e8",
+    "same": true
+  },
+  "parser.vela": {
+    "first": "703767193f56e6f44b520a0355f8d58708afcc2f6b8335219ad43df30ab618d7",
+    "second": "703767193f56e6f44b520a0355f8d58708afcc2f6b8335219ad43df30ab618d7",
+    "same": true
+  },
+  "projects.vela": {
+    "first": "d8258606e2004c8669da39c4c8da8f1f3348f9bc3aa4b5060c512e7612a5f185",
+    "second": "d8258606e2004c8669da39c4c8da8f1f3348f9bc3aa4b5060c512e7612a5f185",
+    "same": true
+  },
+  "project_cli.vela": {
+    "first": "143aa80404692b709e99389ded1da9aeeca0ce10adf2e5037c68470fe4556f76",
+    "second": "143aa80404692b709e99389ded1da9aeeca0ce10adf2e5037c68470fe4556f76",
+    "same": true
+  },
+  "query.vela": {
+    "first": "749d2925efca055bb17cc25dc527069349659c5abe4a539632a9f3548d3d36cd",
+    "second": "749d2925efca055bb17cc25dc527069349659c5abe4a539632a9f3548d3d36cd",
+    "same": true
+  },
+  "repairs.vela": {
+    "first": "482f0d2c025e14fd3d3b6a3e9be7f5651a6c350c71229e4562572b31e15c3e8e",
+    "second": "482f0d2c025e14fd3d3b6a3e9be7f5651a6c350c71229e4562572b31e15c3e8e",
+    "same": true
+  },
+  "scaffold.vela": {
+    "first": "6cc565c247784bb20fbe885488055d6c94836e2edec814a311b11d3d1a6aeef4",
+    "second": "6cc565c247784bb20fbe885488055d6c94836e2edec814a311b11d3d1a6aeef4",
+    "same": true
+  },
+  "semantic.vela": {
+    "first": "3086d000413263bd7134b6b11fb6930ad4f97c5f2c4919e442651d828ac6be6f",
+    "second": "3086d000413263bd7134b6b11fb6930ad4f97c5f2c4919e442651d828ac6be6f",
+    "same": true
+  },
+  "source.vela": {
+    "first": "2274b38e20fed51d59ee2896331f0c28795d8c9549948547d34586c880a41745",
+    "second": "2274b38e20fed51d59ee2896331f0c28795d8c9549948547d34586c880a41745",
+    "same": true
+  },
+  "suspension.vela": {
+    "first": "1a4272f6828d157220008637cfc4b6cf889017d08ebc8adbdd05439868244eb2",
+    "second": "1a4272f6828d157220008637cfc4b6cf889017d08ebc8adbdd05439868244eb2",
+    "same": true
+  },
+  "types.vela": {
+    "first": "2b5b1bc21a29f67a27af80144a2fee6f454a10a80d47009d70be52863ec956c1",
+    "second": "2b5b1bc21a29f67a27af80144a2fee6f454a10a80d47009d70be52863ec956c1",
+    "same": true
+  }
+}

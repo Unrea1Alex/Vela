@@ -1,0 +1,20 @@
+fn required(value: StringResult) -> String effects { io, process } {
+    match value {
+        StringResult::Ok(text) => { return text; }
+        StringResult::Err(message) => { panic(message); }
+    }
+}
+
+fn main() -> Int effects { args, state, io, process } {
+    let compiler = env("VELA_TEST_PROFILE_COMPILER");
+    if compiler == "" { panic("missing instrumented compiler"); }
+    let counter_dir = required(temp_dir(""));
+    set_env("VCPROFILE_PATH", counter_dir);
+    let args = strings_new();
+    strings_push(args, compiler);
+    for i in 0 .. arg_count() { strings_push(args, required(arg(i))); }
+    let status = process_run(args);
+    let counter = remove_file(counter_dir + "/program!1.pgc");
+    let closed = remove_dir(counter_dir);
+    return status;
+}

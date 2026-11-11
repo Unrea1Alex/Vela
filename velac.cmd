@@ -3,6 +3,8 @@ setlocal
 if /i "%~1"=="build" goto toolchain
 if /i "%~1"=="run" goto toolchain
 if /i "%~1"=="test" goto toolchain
+if /i "%~1"=="pgo-instrument" goto toolchain
+if /i "%~1"=="pgo-train" goto toolchain
 goto ready
 :toolchain
 if defined VELA_CC goto ready

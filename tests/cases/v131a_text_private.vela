@@ -1,0 +1,3 @@
+import "../../../std/text.vela" as text;
+fn peek(value: text::CheckedText) -> String { return value.data; }
+fn main() -> Unit {}

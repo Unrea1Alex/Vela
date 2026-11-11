@@ -1,0 +1,47 @@
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+import "../../std/text.vela" as text;
+
+fn done(value: WriteResult) -> Unit {
+    match value {
+        WriteResult::Ok => {}
+        WriteResult::Err(error) => { assert_true(false, error); }
+    }
+}
+fn read(name: String) -> String effects { io } {
+    match read_file(name) {
+        StringResult::Ok(value) => { return value; }
+        StringResult::Err(error) => { assert_true(false, error); }
+    }
+    return "";
+}
+fn check(name: String, expected_commit: Bool) -> Unit effects { io } {
+    let outcome = fs::write_atomic(path::Path(value: name), text::Bytes(data: "new content"));
+    match outcome {
+        Result::Err(error) => {
+            match error {
+                fs::Error::Cleanup(directory, committed) => {
+                    assert_true(directory != "" && committed == expected_commit, "legacy cleanup and commit");
+                    return;
+                }
+                fs::Error::InvalidPath(_) => {}
+                fs::Error::Encoding(_) => {}
+                fs::Error::Limit(_) => {}
+                fs::Error::Io(_, _) => {}
+            }
+        }
+        Result::Ok(_) => {}
+    }
+    assert_true(false, "expected legacy cleanup outcome");
+}
+fn main() -> Unit effects { io } {
+    // Run in a private test directory with a test-only remove_dir failure.
+    done(write_file("output.bin", "previous"));
+    check("output.bin", true);
+    assert_true(read("output.bin") == "new content", "committed file visible");
+    done(make_dir("existing"));
+    done(write_file("existing/prior.bin", "previous"));
+    check("existing", false);
+    assert_true(read("existing/prior.bin") == "previous", "failed replacement kept directory");
+    print("legacy cleanup commit states passed");
+}

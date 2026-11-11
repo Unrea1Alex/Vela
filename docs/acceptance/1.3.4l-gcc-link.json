@@ -1,0 +1,772 @@
+{
+  "host": "gcc",
+  "c_tool": {
+    "sha256": "3790afd5098d7b7c459b3ff94f2c55a789c495532e8e0bd82ec2e44ad34c5a43",
+    "bytes": 2008352
+  },
+  "work": "G:\\Vela\\build\\stage13\\lto-gcc-L61BJK\\split-native-CsVtLJ",
+  "source": "One separate compile per mode and five isolated linker pairs after warmup.",
+  "workloads": {
+    "buildlens": {
+      "c": {
+        "bytes": 1416595,
+        "sha256": "27b4c807062cd254fa62cd308dbfaeb71805231a6013cb9249c4854f0b34bfb3"
+      },
+      "samples": [
+        {
+          "o2": {
+            "wall_ms": 368.726,
+            "cpu_ms": 52.622,
+            "peak_tree_bytes": 10387456,
+            "peak_process_bytes": 1978368
+          },
+          "lto": {
+            "wall_ms": 5030.556,
+            "cpu_ms": 4742.222,
+            "peak_tree_bytes": 82128896,
+            "peak_process_bytes": 1953792
+          },
+          "pgo": {
+            "wall_ms": 358.871,
+            "cpu_ms": 52.22,
+            "peak_tree_bytes": 10084352,
+            "peak_process_bytes": 2002944
+          },
+          "combined": {
+            "wall_ms": 4417.007,
+            "cpu_ms": 4135.963,
+            "peak_tree_bytes": 88051712,
+            "peak_process_bytes": 2007040
+          }
+        },
+        {
+          "combined": {
+            "wall_ms": 4389.169,
+            "cpu_ms": 4106.809,
+            "peak_tree_bytes": 88014848,
+            "peak_process_bytes": 1990656
+          },
+          "pgo": {
+            "wall_ms": 386.41,
+            "cpu_ms": 56.169,
+            "peak_tree_bytes": 10100736,
+            "peak_process_bytes": 2048000
+          },
+          "lto": {
+            "wall_ms": 5079.302,
+            "cpu_ms": 4789.971,
+            "peak_tree_bytes": 82128896,
+            "peak_process_bytes": 1982464
+          },
+          "o2": {
+            "wall_ms": 358.995,
+            "cpu_ms": 52.757,
+            "peak_tree_bytes": 10141696,
+            "peak_process_bytes": 1961984
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 364.152,
+            "cpu_ms": 51.866,
+            "peak_tree_bytes": 9949184,
+            "peak_process_bytes": 1933312
+          },
+          "lto": {
+            "wall_ms": 4956.829,
+            "cpu_ms": 4672.066,
+            "peak_tree_bytes": 82046976,
+            "peak_process_bytes": 1937408
+          },
+          "pgo": {
+            "wall_ms": 367.617,
+            "cpu_ms": 52.773,
+            "peak_tree_bytes": 10002432,
+            "peak_process_bytes": 2048000
+          },
+          "combined": {
+            "wall_ms": 4413.067,
+            "cpu_ms": 4128.392,
+            "peak_tree_bytes": 88186880,
+            "peak_process_bytes": 2035712
+          }
+        },
+        {
+          "combined": {
+            "wall_ms": 4359.036,
+            "cpu_ms": 4076.706,
+            "peak_tree_bytes": 88137728,
+            "peak_process_bytes": 2007040
+          },
+          "pgo": {
+            "wall_ms": 371.478,
+            "cpu_ms": 52.932,
+            "peak_tree_bytes": 9883648,
+            "peak_process_bytes": 2015232
+          },
+          "lto": {
+            "wall_ms": 5273.883,
+            "cpu_ms": 4980.889,
+            "peak_tree_bytes": 82055168,
+            "peak_process_bytes": 1970176
+          },
+          "o2": {
+            "wall_ms": 372.603,
+            "cpu_ms": 54.578,
+            "peak_tree_bytes": 9994240,
+            "peak_process_bytes": 1961984
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 442.415,
+            "cpu_ms": 64.529,
+            "peak_tree_bytes": 9924608,
+            "peak_process_bytes": 1941504
+          },
+          "lto": {
+            "wall_ms": 5159.581,
+            "cpu_ms": 4854.749,
+            "peak_tree_bytes": 82219008,
+            "peak_process_bytes": 1974272
+          },
+          "pgo": {
+            "wall_ms": 385.685,
+            "cpu_ms": 56.692,
+            "peak_tree_bytes": 10092544,
+            "peak_process_bytes": 2011136
+          },
+          "combined": {
+            "wall_ms": 4436.135,
+            "cpu_ms": 4126.186,
+            "peak_tree_bytes": 88084480,
+            "peak_process_bytes": 2019328
+          }
+        }
+      ],
+      "variants": {
+        "o2": {
+          "flags": {
+            "compile": [
+              "-std=c11",
+              "-O2",
+              "-ffp-contract=off",
+              "-c",
+              "program.c",
+              "-o",
+              "program.o"
+            ],
+            "link": [
+              "-O2",
+              "-ffp-contract=off",
+              "program.o",
+              "-o",
+              "program.exe",
+              "-lm"
+            ]
+          },
+          "compile": {
+            "wall_ms": 5473.358,
+            "cpu_ms": 5296.308,
+            "peak_tree_bytes": 250085376,
+            "peak_process_bytes": 1945600,
+            "streams": ""
+          },
+          "link": {
+            "wall_ms": 368.726,
+            "cpu_ms": 52.757,
+            "peak_tree_bytes": 9994240,
+            "peak_process_bytes": 1961984
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 225623,
+              "sha256": "d5ea4271e4a4a492457ceec072a731582bcd2d8eb857861939ae2265dce247b5"
+            },
+            "inventory": [
+              "LICENSE",
+              "README.md",
+              "buildlens",
+              "demo.jsonl"
+            ],
+            "executable": {
+              "bytes": 547640,
+              "sha256": "eabdf7afe12af17488d83b0b83fbb709abd9ebf48c5ad7f45b1f799bd9995ccb"
+            },
+            "validated": [
+              "bundled demo summary"
+            ]
+          }
+        },
+        "lto": {
+          "flags": {
+            "compile": [
+              "-std=c11",
+              "-O2",
+              "-ffp-contract=off",
+              "-flto",
+              "-fuse-linker-plugin",
+              "-c",
+              "program.c",
+              "-o",
+              "program.o"
+            ],
+            "link": [
+              "-O2",
+              "-ffp-contract=off",
+              "-flto",
+              "-fuse-linker-plugin",
+              "program.o",
+              "-o",
+              "program.exe",
+              "-lm"
+            ]
+          },
+          "compile": {
+            "wall_ms": 1013.228,
+            "cpu_ms": 896.26,
+            "peak_tree_bytes": 100462592,
+            "peak_process_bytes": 1921024,
+            "streams": ""
+          },
+          "link": {
+            "wall_ms": 5079.302,
+            "cpu_ms": 4789.971,
+            "peak_tree_bytes": 82128896,
+            "peak_process_bytes": 1970176
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 221348,
+              "sha256": "205fbf28ba1e815671674545e5bc782b9f570c6d6b5f038b700799a8986cfe15"
+            },
+            "inventory": [
+              "LICENSE",
+              "README.md",
+              "buildlens",
+              "demo.jsonl"
+            ],
+            "executable": {
+              "bytes": 529008,
+              "sha256": "7968a7da07a869be6aef65228c9c24cf452f29ecba55c523c6f04826d662f893"
+            },
+            "validated": [
+              "bundled demo summary"
+            ]
+          }
+        },
+        "pgo": {
+          "flags": {
+            "compile": [
+              "-std=c11",
+              "-O2",
+              "-ffp-contract=off",
+              "-fprofile-prefix-path=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/buildlens-pgo",
+              "-fprofile-use=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/buildlens-pgo",
+              "-Werror=missing-profile",
+              "-Werror=coverage-mismatch",
+              "-c",
+              "program.c",
+              "-o",
+              "program.o"
+            ],
+            "link": [
+              "-O2",
+              "-ffp-contract=off",
+              "-fprofile-prefix-path=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/buildlens-pgo",
+              "-fprofile-use=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/buildlens-pgo",
+              "-Werror=missing-profile",
+              "-Werror=coverage-mismatch",
+              "program.o",
+              "-o",
+              "program.exe",
+              "-lm"
+            ]
+          },
+          "compile": {
+            "wall_ms": 5030.776,
+            "cpu_ms": 4636.178,
+            "peak_tree_bytes": 223678464,
+            "peak_process_bytes": 2019328,
+            "streams": ""
+          },
+          "link": {
+            "wall_ms": 371.478,
+            "cpu_ms": 52.932,
+            "peak_tree_bytes": 10084352,
+            "peak_process_bytes": 2015232
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 204407,
+              "sha256": "c2eec318dc1ebcb8ae0015b9d9d4e4355a421a51301e3b8b1efb22858c441dce"
+            },
+            "inventory": [
+              "LICENSE",
+              "README.md",
+              "buildlens",
+              "demo.jsonl"
+            ],
+            "executable": {
+              "bytes": 470472,
+              "sha256": "2d54d66ee0d7e1848b444372ba2a82b7dcc5ff1d88cd6fbc6a56fc2bc9e8a48b"
+            },
+            "validated": [
+              "bundled demo summary"
+            ]
+          }
+        },
+        "combined": {
+          "flags": {
+            "compile": [
+              "-std=c11",
+              "-O2",
+              "-ffp-contract=off",
+              "-flto",
+              "-fuse-linker-plugin",
+              "-fprofile-prefix-path=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/buildlens-combined",
+              "-fprofile-use=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/buildlens-combined",
+              "-Werror=missing-profile",
+              "-Werror=coverage-mismatch",
+              "-c",
+              "program.c",
+              "-o",
+              "program.o"
+            ],
+            "link": [
+              "-O2",
+              "-ffp-contract=off",
+              "-flto",
+              "-fuse-linker-plugin",
+              "-fprofile-prefix-path=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/buildlens-combined",
+              "-fprofile-use=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/buildlens-combined",
+              "-Werror=missing-profile",
+              "-Werror=coverage-mismatch",
+              "program.o",
+              "-o",
+              "program.exe",
+              "-lm"
+            ]
+          },
+          "compile": {
+            "wall_ms": 1356.111,
+            "cpu_ms": 964.584,
+            "peak_tree_bytes": 97685504,
+            "peak_process_bytes": 1998848,
+            "streams": ""
+          },
+          "link": {
+            "wall_ms": 4413.067,
+            "cpu_ms": 4126.186,
+            "peak_tree_bytes": 88084480,
+            "peak_process_bytes": 2007040
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 202452,
+              "sha256": "d1b2562aadd6e3438a3b160923e9e52064cf4fb7b969058bafa6977a3ea064c7"
+            },
+            "inventory": [
+              "LICENSE",
+              "README.md",
+              "buildlens",
+              "demo.jsonl"
+            ],
+            "executable": {
+              "bytes": 468128,
+              "sha256": "da84c9c72c0bae2d7845419d6c5b42c98ef9882107467bd15ce425cb112ddd7b"
+            },
+            "validated": [
+              "bundled demo summary"
+            ]
+          }
+        }
+      }
+    },
+    "compiler": {
+      "c": {
+        "bytes": 6336041,
+        "sha256": "90ff795b70773d07f28d1361d8668819714e036e9b015ab1d3b8f8a02bb9ab41"
+      },
+      "samples": [
+        {
+          "o2": {
+            "wall_ms": 639.146,
+            "cpu_ms": 119.486,
+            "peak_tree_bytes": 14090240,
+            "peak_process_bytes": 1957888
+          },
+          "lto": {
+            "wall_ms": 25619.404,
+            "cpu_ms": 25254.834,
+            "peak_tree_bytes": 94363648,
+            "peak_process_bytes": 1982464
+          },
+          "pgo": {
+            "wall_ms": 753.637,
+            "cpu_ms": 140.042,
+            "peak_tree_bytes": 12259328,
+            "peak_process_bytes": 2048000
+          },
+          "combined": {
+            "wall_ms": 19285.716,
+            "cpu_ms": 18907.284,
+            "peak_tree_bytes": 83996672,
+            "peak_process_bytes": 2023424
+          }
+        },
+        {
+          "combined": {
+            "wall_ms": 19050.446,
+            "cpu_ms": 18700.648,
+            "peak_tree_bytes": 83972096,
+            "peak_process_bytes": 2011136
+          },
+          "pgo": {
+            "wall_ms": 720.077,
+            "cpu_ms": 135.58,
+            "peak_tree_bytes": 12263424,
+            "peak_process_bytes": 2043904
+          },
+          "lto": {
+            "wall_ms": 25266.422,
+            "cpu_ms": 24895.702,
+            "peak_tree_bytes": 94527488,
+            "peak_process_bytes": 1937408
+          },
+          "o2": {
+            "wall_ms": 644.808,
+            "cpu_ms": 120.58,
+            "peak_tree_bytes": 14041088,
+            "peak_process_bytes": 1925120
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 631.185,
+            "cpu_ms": 116.815,
+            "peak_tree_bytes": 14069760,
+            "peak_process_bytes": 1933312
+          },
+          "lto": {
+            "wall_ms": 25261.922,
+            "cpu_ms": 24934.592,
+            "peak_tree_bytes": 94457856,
+            "peak_process_bytes": 1982464
+          },
+          "pgo": {
+            "wall_ms": 669.873,
+            "cpu_ms": 128.835,
+            "peak_tree_bytes": 12152832,
+            "peak_process_bytes": 2031616
+          },
+          "combined": {
+            "wall_ms": 17738.12,
+            "cpu_ms": 17390.258,
+            "peak_tree_bytes": 83857408,
+            "peak_process_bytes": 1998848
+          }
+        },
+        {
+          "combined": {
+            "wall_ms": 17679.603,
+            "cpu_ms": 17332.78,
+            "peak_tree_bytes": 83943424,
+            "peak_process_bytes": 2027520
+          },
+          "pgo": {
+            "wall_ms": 700.688,
+            "cpu_ms": 133.066,
+            "peak_tree_bytes": 12214272,
+            "peak_process_bytes": 2027520
+          },
+          "lto": {
+            "wall_ms": 26206.402,
+            "cpu_ms": 25869.357,
+            "peak_tree_bytes": 94527488,
+            "peak_process_bytes": 1974272
+          },
+          "o2": {
+            "wall_ms": 625.934,
+            "cpu_ms": 117.434,
+            "peak_tree_bytes": 14008320,
+            "peak_process_bytes": 1937408
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 620.744,
+            "cpu_ms": 116.971,
+            "peak_tree_bytes": 14041088,
+            "peak_process_bytes": 1978368
+          },
+          "lto": {
+            "wall_ms": 28837.691,
+            "cpu_ms": 28494.304,
+            "peak_tree_bytes": 94515200,
+            "peak_process_bytes": 1990656
+          },
+          "pgo": {
+            "wall_ms": 747.751,
+            "cpu_ms": 139.297,
+            "peak_tree_bytes": 12132352,
+            "peak_process_bytes": 2002944
+          },
+          "combined": {
+            "wall_ms": 20149.953,
+            "cpu_ms": 19771.081,
+            "peak_tree_bytes": 83894272,
+            "peak_process_bytes": 2015232
+          }
+        }
+      ],
+      "variants": {
+        "o2": {
+          "flags": {
+            "compile": [
+              "-std=c11",
+              "-O2",
+              "-ffp-contract=off",
+              "-c",
+              "program.c",
+              "-o",
+              "program.o"
+            ],
+            "link": [
+              "-O2",
+              "-ffp-contract=off",
+              "program.o",
+              "-o",
+              "program.exe",
+              "-lm"
+            ]
+          },
+          "compile": {
+            "wall_ms": 29087.524,
+            "cpu_ms": 28429.528,
+            "peak_tree_bytes": 405389312,
+            "peak_process_bytes": 1904640,
+            "streams": ""
+          },
+          "link": {
+            "wall_ms": 631.185,
+            "cpu_ms": 117.434,
+            "peak_tree_bytes": 14041088,
+            "peak_process_bytes": 1937408
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 2254954,
+              "sha256": "c26191a506eea6f8caa6ef597b5c64bc357f294254ff1cd05928a9b1aaa4fb3e"
+            },
+            "inventory": [
+              "LICENSE",
+              "compiler.vela",
+              "recovery.c",
+              "std",
+              "velac"
+            ],
+            "executable": {
+              "bytes": 3040224,
+              "sha256": "79823e8a2584d44bffc8755eb2bf616066db9de85aab6fa90f300ef44e23db9b"
+            },
+            "validated": [
+              "version",
+              "check using the unpacked standard library"
+            ]
+          }
+        },
+        "lto": {
+          "flags": {
+            "compile": [
+              "-std=c11",
+              "-O2",
+              "-ffp-contract=off",
+              "-flto",
+              "-fuse-linker-plugin",
+              "-c",
+              "program.c",
+              "-o",
+              "program.o"
+            ],
+            "link": [
+              "-O2",
+              "-ffp-contract=off",
+              "-flto",
+              "-fuse-linker-plugin",
+              "program.o",
+              "-o",
+              "program.exe",
+              "-lm"
+            ]
+          },
+          "compile": {
+            "wall_ms": 4519.896,
+            "cpu_ms": 4169.966,
+            "peak_tree_bytes": 349679616,
+            "peak_process_bytes": 1921024,
+            "streams": ""
+          },
+          "link": {
+            "wall_ms": 25619.404,
+            "cpu_ms": 25254.834,
+            "peak_tree_bytes": 94515200,
+            "peak_process_bytes": 1982464
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 2189445,
+              "sha256": "012ff4407b9ca4d0ddc39c811a4f319e5852426e6e239ce122ea83f3210266be"
+            },
+            "inventory": [
+              "LICENSE",
+              "compiler.vela",
+              "recovery.c",
+              "std",
+              "velac"
+            ],
+            "executable": {
+              "bytes": 2841152,
+              "sha256": "ecc8e3f93c31fd4bc83c65ec0df99b2db687c35d34dab950d9df35e9004beb8f"
+            },
+            "validated": [
+              "version",
+              "check using the unpacked standard library"
+            ]
+          }
+        },
+        "pgo": {
+          "flags": {
+            "compile": [
+              "-std=c11",
+              "-O2",
+              "-ffp-contract=off",
+              "-fprofile-prefix-path=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/compiler-pgo",
+              "-fprofile-use=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/compiler-pgo",
+              "-Werror=missing-profile",
+              "-Werror=coverage-mismatch",
+              "-c",
+              "program.c",
+              "-o",
+              "program.o"
+            ],
+            "link": [
+              "-O2",
+              "-ffp-contract=off",
+              "-fprofile-prefix-path=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/compiler-pgo",
+              "-fprofile-use=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/compiler-pgo",
+              "-Werror=missing-profile",
+              "-Werror=coverage-mismatch",
+              "program.o",
+              "-o",
+              "program.exe",
+              "-lm"
+            ]
+          },
+          "compile": {
+            "wall_ms": 19834.192,
+            "cpu_ms": 18965.111,
+            "peak_tree_bytes": 390201344,
+            "peak_process_bytes": 2072576,
+            "streams": ""
+          },
+          "link": {
+            "wall_ms": 720.077,
+            "cpu_ms": 135.58,
+            "peak_tree_bytes": 12214272,
+            "peak_process_bytes": 2031616
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 1907235,
+              "sha256": "7d4f7d3040ad9b1977c224c0f12ddb5183e51ab2e371f4091b37aed3cfa6393f"
+            },
+            "inventory": [
+              "LICENSE",
+              "compiler.vela",
+              "recovery.c",
+              "std",
+              "velac"
+            ],
+            "executable": {
+              "bytes": 2192384,
+              "sha256": "1ff582dc600b49b457934d17f91b83f70125fcb5088c50fcf28ac20809e23a87"
+            },
+            "validated": [
+              "version",
+              "check using the unpacked standard library"
+            ]
+          }
+        },
+        "combined": {
+          "flags": {
+            "compile": [
+              "-std=c11",
+              "-O2",
+              "-ffp-contract=off",
+              "-flto",
+              "-fuse-linker-plugin",
+              "-fprofile-prefix-path=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/compiler-combined",
+              "-fprofile-use=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/compiler-combined",
+              "-Werror=missing-profile",
+              "-Werror=coverage-mismatch",
+              "-c",
+              "program.c",
+              "-o",
+              "program.o"
+            ],
+            "link": [
+              "-O2",
+              "-ffp-contract=off",
+              "-flto",
+              "-fuse-linker-plugin",
+              "-fprofile-prefix-path=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/compiler-combined",
+              "-fprofile-use=/mnt/g/Vela/build/stage13/lto-gcc-L61BJK/split-native-CsVtLJ/compiler-combined",
+              "-Werror=missing-profile",
+              "-Werror=coverage-mismatch",
+              "program.o",
+              "-o",
+              "program.exe",
+              "-lm"
+            ]
+          },
+          "compile": {
+            "wall_ms": 5350.225,
+            "cpu_ms": 4535.14,
+            "peak_tree_bytes": 329023488,
+            "peak_process_bytes": 1986560,
+            "streams": ""
+          },
+          "link": {
+            "wall_ms": 19050.446,
+            "cpu_ms": 18700.648,
+            "peak_tree_bytes": 83943424,
+            "peak_process_bytes": 2015232
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 1931576,
+              "sha256": "9210a45d7f8fbfb248275de7c669b58f7e1f52eaa1f162f59613237a9eb6923f"
+            },
+            "inventory": [
+              "LICENSE",
+              "compiler.vela",
+              "recovery.c",
+              "std",
+              "velac"
+            ],
+            "executable": {
+              "bytes": 2248112,
+              "sha256": "6f7847f1e92f9c6685ed59d5873fb60a438455647163bc923d4a7d2cb1730bf2"
+            },
+            "validated": [
+              "version",
+              "check using the unpacked standard library"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "complete": true
+}

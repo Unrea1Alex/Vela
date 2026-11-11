@@ -1,0 +1,22 @@
+{
+  "host": "msvc",
+  "lto": true,
+  "checks": [
+    "O2 project output",
+    "LTO CLI boundaries, unsupported tools and shared checked C cache",
+    "C hit revalidates native toolchain and flag overrides before publication",
+    "size preference leaves the emitted loop in the normal policy",
+    "unsupported toolchain rejects without publishing",
+    "instrument publishes once and untrained use rejects",
+    "training rejects changed toolchain, flags or companion and publishes nothing on failure",
+    "one concurrent trainer publishes and a second training is rejected",
+    "MSVC explicit LTO and PGO alone accept the same trained plan",
+    "PGO use and warm C cache preserve held-out output",
+    "changed payload, receipt, import and locked resource reject with old output intact",
+    "delivered executable and resource work without the profile or tools"
+  ],
+  "payload_bytes": 1134592,
+  "plan_sha256": "07af1b62034cf1d43b83c6ac0cfca759d6ad35b42454cedb677ed955ad70e0c4",
+  "trained_sha256": "620fafcbfdcfd8b92a7bf0dcb922a9a51b76e01e929714f9843e805eab42b048",
+  "packaged_executable_sha256": "ec978aa5cf826370d9ca2fdacb83e53dfe7b6240f0aac629bd043ddff4712315"
+}

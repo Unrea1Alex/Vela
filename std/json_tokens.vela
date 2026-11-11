@@ -1,0 +1,197 @@
+import "text.vela" as text;
+
+pub struct ScanError {
+    offset: Int,
+    consumed: Int,
+    message: String
+}
+pub struct Quoted {
+    value: String,
+    end: Int
+}
+pub struct Numeric {
+    end: Int,
+    integral: Bool
+}
+
+pub fn valid_limits(bytes: Int, depth: Int, nodes: Int, max_depth: Int, max_nodes: Int) -> Bool {
+    return bytes >= 0 && bytes <= 16777216 && depth >= 0 && depth <= max_depth
+        && nodes >= 1 && nodes <= max_nodes;
+}
+fn byte(data: String, at: Int) -> Int {
+    if at < 0 || at >= str_len(data) { return -1; }
+    return str_byte(data, at);
+}
+pub fn is_whitespace(value: Int) -> Bool {
+    return value == 32 || value == 9 || value == 10 || value == 13;
+}
+pub fn whitespace_at(data: String, start: Int) -> Int {
+    var at = start;
+    while is_whitespace(byte(data, at)) { at = at + 1; }
+    return at;
+}
+pub fn literal_end(data: String, start: Int, literal: String) -> Int {
+    var at = start;
+    for i in 0 .. str_len(literal) {
+        if byte(data, at) != str_byte(literal, i) { return at; }
+        at = at + 1;
+    }
+    return at;
+}
+fn fail<T>(offset: Int, message: String) -> Result<T, ScanError> {
+    return Result<T, ScanError>::Err(ScanError(offset: offset, consumed: offset, message: message));
+}
+fn hex(value: Int) -> Int {
+    if value >= 48 && value <= 57 { return value - 48; }
+    if value >= 65 && value <= 70 { return value - 55; }
+    if value >= 97 && value <= 102 { return value - 87; }
+    return -1;
+}
+fn hex4(data: String, start: Int) -> Result<Int, ScanError> {
+    var scalar = 0;
+    var at = start;
+    for i in 0 .. 4 {
+        let digit_value = hex(byte(data, at));
+        if digit_value < 0 { return fail<Int>(at, "expected four hex digits"); }
+        scalar = scalar * 16 + digit_value;
+        at = at + 1;
+    }
+    return Result<Int, ScanError>::Ok(scalar);
+}
+pub fn string(data: String, start: Int) -> Result<Quoted, ScanError> effects { state } {
+    if byte(data, start) != 34 { return fail<Quoted>(start, "expected string"); }
+    let content = start + 1;
+    let size = str_len(data);
+    var at = content;
+    while at < size {
+        let item = str_byte(data, at);
+        if item == 34 {
+            return Result<Quoted, ScanError>::Ok(Quoted(value: str_concat(str_slice(data, content, at), ""),
+                end: at + 1));
+        }
+        if item == 92 || item < 32 { break; }
+        at = at + 1;
+    }
+    let parts = strings_new();
+    var segment = content;
+    while at < size {
+        let item = str_byte(data, at);
+        if item == 34 {
+            strings_push(parts, str_slice(data, segment, at));
+            return Result<Quoted, ScanError>::Ok(Quoted(value: strings_join(parts, ""), end: at + 1));
+        }
+        if item < 32 { return fail<Quoted>(at, "unescaped control character"); }
+        if item != 92 { at = at + 1; continue; }
+        strings_push(parts, str_slice(data, segment, at));
+        let escape_at = at + 1;
+        let escape = byte(data, escape_at);
+        if escape < 0 { return fail<Quoted>(escape_at, "incomplete escape"); }
+        at = escape_at + 1;
+        var piece = "";
+        if escape == 34 || escape == 92 || escape == 47 {
+            piece = str_from_byte(escape);
+        } else if escape == 98 {
+            piece = str_from_byte(8);
+        } else if escape == 102 {
+            piece = str_from_byte(12);
+        } else if escape == 110 {
+            piece = "\n";
+        } else if escape == 114 {
+            piece = "\r";
+        } else if escape == 116 {
+            piece = "\t";
+        } else if escape == 117 {
+            var scalar = hex4(data, at)?;
+            at = at + 4;
+            if scalar >= 55296 && scalar <= 56319 {
+                if byte(data, at) != 92 { return fail<Quoted>(at, "missing low surrogate"); }
+                at = at + 1;
+                if byte(data, at) != 117 { return fail<Quoted>(at, "missing low surrogate"); }
+                at = at + 1;
+                let low = hex4(data, at)?;
+                at = at + 4;
+                if low < 56320 || low > 57343 {
+                    return Result<Quoted, ScanError>::Err(ScanError(offset: at - 4, consumed: at,
+                        message: "invalid low surrogate"));
+                }
+                scalar = 65536 + (scalar - 55296) * 1024 + low - 56320;
+            }
+            match text::codepoint(scalar) {
+                Result::Ok(value) => { piece = value.data; }
+                Result::Err(_) => {
+                    return Result<Quoted, ScanError>::Err(ScanError(offset: escape_at, consumed: at,
+                        message: "invalid Unicode scalar"));
+                }
+            }
+        } else {
+            return Result<Quoted, ScanError>::Err(ScanError(offset: escape_at, consumed: at,
+                message: "invalid escape"));
+        }
+        strings_push(parts, piece);
+        segment = at;
+    }
+    return fail<Quoted>(at, "unterminated string");
+}
+pub fn digit(value: Int) -> Bool {
+    return value >= 48 && value <= 57;
+}
+fn digits_end(data: String, start: Int) -> Int {
+    var at = start;
+    while digit(byte(data, at)) { at = at + 1; }
+    return at;
+}
+pub fn number(data: String, start: Int) -> Result<Numeric, ScanError> {
+    var at = start;
+    if byte(data, at) == 45 { at = at + 1; }
+    let head = byte(data, at);
+    if head == 48 {
+        at = at + 1;
+        if digit(byte(data, at)) { return fail<Numeric>(at, "leading zero"); }
+    } else {
+        if head < 49 || head > 57 { return fail<Numeric>(at, "expected number"); }
+        at = digits_end(data, at);
+    }
+    var integral = true;
+    if byte(data, at) == 46 {
+        integral = false;
+        at = at + 1;
+        let end = digits_end(data, at);
+        if end == at { return fail<Numeric>(at, "expected fraction"); }
+        at = end;
+    }
+    let exponent = byte(data, at);
+    if exponent == 101 || exponent == 69 {
+        integral = false;
+        at = at + 1;
+        let sign = byte(data, at);
+        if sign == 43 || sign == 45 { at = at + 1; }
+        let end = digits_end(data, at);
+        if end == at { return fail<Numeric>(at, "expected exponent"); }
+        at = end;
+    }
+    return Result<Numeric, ScanError>::Ok(Numeric(end: at, integral: integral));
+}
+pub fn escaped_byte(value: Int) -> String {
+    if value >= 0 && value < 32 {
+        let digits = "0123456789abcdef";
+        return "\\u00" + str_slice(digits, value / 16, value / 16 + 1)
+            + str_slice(digits, value % 16, value % 16 + 1);
+    }
+    return "\\" + str_from_byte(value);
+}
+pub fn quote(value: String) -> String effects { state } {
+    let parts = strings_new();
+    strings_push(parts, "\"");
+    var start = 0;
+    for i in 0 .. str_len(value) {
+        let item = str_byte(value, i);
+        if item == 34 || item == 92 || item < 32 {
+            strings_push(parts, str_slice(value, start, i));
+            strings_push(parts, escaped_byte(item));
+            start = i + 1;
+        }
+    }
+    strings_push(parts, str_slice(value, start, str_len(value)));
+    strings_push(parts, "\"");
+    return strings_join(parts, "");
+}

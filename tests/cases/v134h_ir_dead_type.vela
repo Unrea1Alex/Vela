@@ -1,0 +1,3 @@
+fn main() -> Unit effects { io } {
+    if false { print(1 + "invalid"); }
+}

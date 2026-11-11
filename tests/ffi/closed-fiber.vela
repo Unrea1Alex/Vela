@@ -1,0 +1,23 @@
+extern "fixture.dll" fn resource_value(value: ForeignHandle) -> Int effects { state, process };
+
+fn main() -> Unit effects { state, process, io } {
+    match fiber_open(async fn []() -> Unit effects { io, state, process } {}) {
+        SpawnResult::Ok(handle) => {
+            let alias = handle;
+            match fiber_cancel(handle) {
+                WriteResult::Ok => {}
+                WriteResult::Err(error) => { assert_true(false, error); }
+            }
+            match fiber_close(handle) {
+                WriteResult::Ok => {}
+                WriteResult::Err(error) => { assert_true(false, error); }
+            }
+            match ffi_close(alias, "release_resource") {
+                WriteResult::Ok => { print("closed fiber accepted as null by ffi_close"); }
+                WriteResult::Err(error) => { assert_true(error == "foreign handle already closed", "closed cleanup diagnostic"); }
+            }
+            print("external read " + to_string(resource_value(alias)));
+        }
+        SpawnResult::Err(error) => { assert_true(false, error); }
+    }
+}

@@ -1,0 +1,6075 @@
+{
+  "schema_version": 1,
+  "protocol": "docs/contracts/PERFORMANCE-1.3.md",
+  "stage": "1.3.1",
+  "host": {
+    "platform": "win32",
+    "arch": "x64",
+    "release": "10.0.26300",
+    "cpu": "AMD Ryzen 7 7700 8-Core Processor              ",
+    "logical_cpus": 16
+  },
+  "version": "Vela 1.2.0 (self-hosted)",
+  "revision": "606ee55cd98647dd0ef9e2fa8ae7588effbb14c2",
+  "compiler_sha256": "56b3bce46c96b86d8bcc89a0db8af4740d0b0962313a4db7028e285d8863c4ab",
+  "toolchain": "��⨬������騩 ��������� Microsoft (R) C/C++ ���ᨨ 19.44.35222 ��� x64\r\n(C) ��௮��� �������� (Microsoft Corporation).  �� �ࠢ� ���饭�.\r\n\r\n��᫮ ��室�� ���������:\r\n C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\cl.exe:        ����� 19.44.35222.0\r\n C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\c1.dll:        ����� 19.44.35222.0\r\n C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\c1xx.dll:      ����� 19.44.35222.0\r\n C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\c2.dll:        ����� 19.44.35222.0\r\n C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\c1xx.dll:      ����� 19.44.35222.0\r\n C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe:      ����� 14.44.35222.0\r\n C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\mspdb140.dll:  ����� 14.44.35222.0\r\n C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\1049\\clui.dll: ����� 19.44.35222.0\r\n\r\ncl: ��������� ��ப� error D8003: ������⢨� ��室���� ����� 䠩��",
+  "meter": {
+    "source_sha256": "50ea4f87476e27697bb88d7dc44645b9097bf47ee007de49932732a5b7b13ed7",
+    "binary_sha256": "6663e10a6a83492e2e92ca79f49cdacabcf0d48689b2240fd9ddb533f6d69124"
+  },
+  "curl": {
+    "version": "curl 8.22.0 (Windows) libcurl/8.22.0 Schannel zlib/1.3.2 WinIDN WinLDAP",
+    "bytes": 830280,
+    "sha256": "a6092ef37a7f41cc7cf1a8ff1192aa294e82c73fda0fd2143d813c46b81e55a2"
+  },
+  "sizes": {
+    "profile_exe": 739840,
+    "http_exe": 1107968,
+    "compiler_exe": 4179456,
+    "buildlens_exe": 924160
+  },
+  "package": {
+    "vela-1.2.0-windows-x64.zip": {
+      "bytes": 8432006,
+      "sha256": "932f201a2d89537ca426fe6625517520921c5a61c789d7ea789a788bfb90009f"
+    },
+    "vela-1.2.0-linux-x64-musl.tar.gz": {
+      "bytes": 5071098,
+      "sha256": "22cd32c3b122874fd7c2eda90529978dc6b74149f67f38da2d9dda1fb23f6fa6"
+    },
+    "vela-mcp-1.2.0.zip": {
+      "bytes": 175374,
+      "sha256": "d0f0331ea05f74d86641a81aff387254f0c3eca1c07ee58569d498fd766b3190"
+    }
+  },
+  "workloads": [
+    {
+      "mode": "config",
+      "label": "small",
+      "input": {
+        "bytes": 152,
+        "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296"
+      },
+      "rounds": 2000,
+      "expected": 14000,
+      "samples": [
+        {
+          "wall_ms": 27.7011,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3944448
+        },
+        {
+          "wall_ms": 28.3883,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3948544
+        },
+        {
+          "wall_ms": 30.341,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3936256
+        },
+        {
+          "wall_ms": 27.8071,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3936256
+        },
+        {
+          "wall_ms": 26.4158,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3948544
+        }
+      ],
+      "wall_ms": {
+        "min": 26.4158,
+        "median": 27.8071,
+        "max": 30.341
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 3936256,
+        "median": 3944448,
+        "max": 3948544
+      },
+      "profile": {
+        "allocations": 40098,
+        "allocated_bytes": 5342628,
+        "copies": 36221,
+        "copied_bytes": 2243056,
+        "gc_collections": 5,
+        "peak_managed_bytes": 1048860,
+        "before_teardown_bytes": 113727
+      }
+    },
+    {
+      "mode": "json-tree",
+      "label": "small",
+      "input": {
+        "bytes": 152,
+        "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296"
+      },
+      "rounds": 300,
+      "expected": 300,
+      "samples": [
+        {
+          "wall_ms": 30.0956,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3977216
+        },
+        {
+          "wall_ms": 29.4778,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3973120
+        },
+        {
+          "wall_ms": 31.3534,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3981312
+        },
+        {
+          "wall_ms": 30.7651,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3973120
+        },
+        {
+          "wall_ms": 32.1871,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3981312
+        }
+      ],
+      "wall_ms": {
+        "min": 29.4778,
+        "median": 30.7651,
+        "max": 32.1871
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 31.25,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 3973120,
+        "median": 3977216,
+        "max": 3981312
+      },
+      "profile": {
+        "allocations": 21018,
+        "allocated_bytes": 3341074,
+        "copies": 60605,
+        "copied_bytes": 624356,
+        "gc_collections": 3,
+        "peak_managed_bytes": 1048668,
+        "before_teardown_bytes": 210182
+      }
+    },
+    {
+      "mode": "json-stream",
+      "label": "small",
+      "input": {
+        "bytes": 152,
+        "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296"
+      },
+      "rounds": 300,
+      "expected": 300,
+      "samples": [
+        {
+          "wall_ms": 31.7103,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3952640
+        },
+        {
+          "wall_ms": 33.4218,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3956736
+        },
+        {
+          "wall_ms": 33.0853,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3964928
+        },
+        {
+          "wall_ms": 44.1956,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3944448
+        },
+        {
+          "wall_ms": 38.7513,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3944448
+        }
+      ],
+      "wall_ms": {
+        "min": 31.7103,
+        "median": 33.4218,
+        "max": 44.1956
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 31.25,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 3944448,
+        "median": 3952640,
+        "max": 3964928
+      },
+      "profile": {
+        "allocations": 34218,
+        "allocated_bytes": 5106876,
+        "copies": 88205,
+        "copied_bytes": 1122956,
+        "gc_collections": 4,
+        "peak_managed_bytes": 1048994,
+        "before_teardown_bytes": 931893
+      }
+    },
+    {
+      "mode": "json-typed",
+      "label": "small",
+      "input": {
+        "bytes": 152,
+        "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296"
+      },
+      "rounds": 300,
+      "expected": 2100,
+      "samples": [
+        {
+          "wall_ms": 55.2643,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4079616
+        },
+        {
+          "wall_ms": 50.112,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4075520
+        },
+        {
+          "wall_ms": 48.2178,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4083712
+        },
+        {
+          "wall_ms": 52.0705,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4079616
+        },
+        {
+          "wall_ms": 54.5834,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4087808
+        }
+      ],
+      "wall_ms": {
+        "min": 48.2178,
+        "median": 52.0705,
+        "max": 55.2643
+      },
+      "cpu_ms": {
+        "min": 46.875,
+        "median": 46.875,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 4075520,
+        "median": 4079616,
+        "max": 4087808
+      },
+      "profile": {
+        "allocations": 93918,
+        "allocated_bytes": 14025575,
+        "copies": 196805,
+        "copied_bytes": 2510756,
+        "gc_collections": 13,
+        "peak_managed_bytes": 1048816,
+        "before_teardown_bytes": 453247
+      }
+    },
+    {
+      "mode": "text",
+      "label": "small",
+      "input": {
+        "bytes": 76,
+        "sha256": "685f324475870c40e72931be67134c1d2dc3f442c89fce95af8c091f8232edaa"
+      },
+      "rounds": 2000,
+      "expected": 2000,
+      "samples": [
+        {
+          "wall_ms": 21.7474,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2674688
+        },
+        {
+          "wall_ms": 23.186,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2674688
+        },
+        {
+          "wall_ms": 24.4352,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2674688
+        },
+        {
+          "wall_ms": 24.3893,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2674688
+        },
+        {
+          "wall_ms": 25.1669,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        }
+      ],
+      "wall_ms": {
+        "min": 21.7474,
+        "median": 24.3893,
+        "max": 25.1669
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 2674688,
+        "median": 2674688,
+        "max": 2686976
+      },
+      "profile": {
+        "allocations": 9,
+        "allocated_bytes": 1175,
+        "copies": 2,
+        "copied_bytes": 152,
+        "gc_collections": 0,
+        "peak_managed_bytes": 1175,
+        "before_teardown_bytes": 1175
+      }
+    },
+    {
+      "mode": "path",
+      "label": "small",
+      "input": {
+        "bytes": 76,
+        "sha256": "685f324475870c40e72931be67134c1d2dc3f442c89fce95af8c091f8232edaa"
+      },
+      "rounds": 2000,
+      "expected": 2000,
+      "samples": [
+        {
+          "wall_ms": 25.2632,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2678784
+        },
+        {
+          "wall_ms": 29.0277,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 30.1364,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 31.8755,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2682880
+        },
+        {
+          "wall_ms": 25.7687,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2682880
+        }
+      ],
+      "wall_ms": {
+        "min": 25.2632,
+        "median": 29.0277,
+        "max": 31.8755
+      },
+      "cpu_ms": {
+        "min": 31.25,
+        "median": 31.25,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 2678784,
+        "median": 2682880,
+        "max": 2691072
+      },
+      "profile": {
+        "allocations": 9,
+        "allocated_bytes": 1175,
+        "copies": 2,
+        "copied_bytes": 152,
+        "gc_collections": 0,
+        "peak_managed_bytes": 1175,
+        "before_teardown_bytes": 1175
+      }
+    },
+    {
+      "mode": "strings",
+      "label": "small",
+      "input": {
+        "bytes": 76,
+        "sha256": "685f324475870c40e72931be67134c1d2dc3f442c89fce95af8c091f8232edaa"
+      },
+      "rounds": 4000,
+      "expected": 4000,
+      "samples": [
+        {
+          "wall_ms": 22.6705,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3346432
+        },
+        {
+          "wall_ms": 21.7893,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3338240
+        },
+        {
+          "wall_ms": 22.4962,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3330048
+        },
+        {
+          "wall_ms": 23.0615,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3334144
+        },
+        {
+          "wall_ms": 23.5993,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3338240
+        }
+      ],
+      "wall_ms": {
+        "min": 21.7893,
+        "median": 22.6705,
+        "max": 23.5993
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 3330048,
+        "median": 3338240,
+        "max": 3346432
+      },
+      "profile": {
+        "allocations": 4009,
+        "allocated_bytes": 497178,
+        "copies": 8002,
+        "copied_bytes": 304152,
+        "gc_collections": 0,
+        "peak_managed_bytes": 497178,
+        "before_teardown_bytes": 497178
+      }
+    },
+    {
+      "mode": "fold",
+      "label": "small",
+      "input": {
+        "items": 128
+      },
+      "rounds": 12,
+      "expected": 99072,
+      "samples": [
+        {
+          "wall_ms": 21.6783,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2707456
+        },
+        {
+          "wall_ms": 25.6607,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2695168
+        },
+        {
+          "wall_ms": 23.3921,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2695168
+        },
+        {
+          "wall_ms": 22.6039,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2703360
+        },
+        {
+          "wall_ms": 21.6005,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2695168
+        }
+      ],
+      "wall_ms": {
+        "min": 21.6005,
+        "median": 22.6039,
+        "max": 25.6607
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2695168,
+        "median": 2695168,
+        "max": 2707456
+      },
+      "profile": {
+        "allocations": 83,
+        "allocated_bytes": 30344,
+        "copies": 1716,
+        "copied_bytes": 25792,
+        "gc_collections": 0,
+        "peak_managed_bytes": 30344,
+        "before_teardown_bytes": 30344
+      }
+    },
+    {
+      "mode": "set",
+      "label": "small",
+      "input": {
+        "items": 128
+      },
+      "rounds": 12,
+      "expected": 1536,
+      "samples": [
+        {
+          "wall_ms": 21.8299,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3121152
+        },
+        {
+          "wall_ms": 22.4555,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3137536
+        },
+        {
+          "wall_ms": 22.4295,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3121152
+        },
+        {
+          "wall_ms": 23.9166,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3141632
+        },
+        {
+          "wall_ms": 22.9136,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3158016
+        }
+      ],
+      "wall_ms": {
+        "min": 21.8299,
+        "median": 22.4555,
+        "max": 23.9166
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 3121152,
+        "median": 3137536,
+        "max": 3158016
+      },
+      "profile": {
+        "allocations": 3251,
+        "allocated_bytes": 416743,
+        "copies": 4812,
+        "copied_bytes": 68800,
+        "gc_collections": 0,
+        "peak_managed_bytes": 416743,
+        "before_teardown_bytes": 416743
+      }
+    },
+    {
+      "mode": "cell",
+      "label": "small",
+      "input": {
+        "items": 128
+      },
+      "rounds": 12,
+      "expected": 1536,
+      "samples": [
+        {
+          "wall_ms": 22.3031,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2707456
+        },
+        {
+          "wall_ms": 22.2068,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2695168
+        },
+        {
+          "wall_ms": 22.73,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2707456
+        },
+        {
+          "wall_ms": 21.5929,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2682880
+        },
+        {
+          "wall_ms": 21.9106,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        }
+      ],
+      "wall_ms": {
+        "min": 21.5929,
+        "median": 22.2068,
+        "max": 22.73
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 2682880,
+        "median": 2695168,
+        "max": 2707456
+      },
+      "profile": {
+        "allocations": 47,
+        "allocated_bytes": 17864,
+        "copies": 1692,
+        "copied_bytes": 26656,
+        "gc_collections": 0,
+        "peak_managed_bytes": 17864,
+        "before_teardown_bytes": 17864
+      }
+    },
+    {
+      "mode": "file",
+      "label": "small",
+      "input": {
+        "bytes": 262144,
+        "sha256": "85e633900d49546fe2f524c72ca034a37ff90003888ef887e8da6f297a7bfce4"
+      },
+      "rounds": 1,
+      "expected": 262144,
+      "samples": [
+        {
+          "wall_ms": 23.5301,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2965504
+        },
+        {
+          "wall_ms": 24.3423,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2969600
+        },
+        {
+          "wall_ms": 24.1511,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2965504
+        },
+        {
+          "wall_ms": 24.8848,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2973696
+        },
+        {
+          "wall_ms": 22.0414,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2961408
+        }
+      ],
+      "wall_ms": {
+        "min": 22.0414,
+        "median": 24.1511,
+        "max": 24.8848
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2961408,
+        "median": 2965504,
+        "max": 2973696
+      },
+      "profile": {
+        "allocations": 49,
+        "allocated_bytes": 267166,
+        "copies": 168,
+        "copied_bytes": 280640,
+        "gc_collections": 0,
+        "peak_managed_bytes": 267166,
+        "before_teardown_bytes": 267166
+      }
+    },
+    {
+      "mode": "config",
+      "label": "medium",
+      "input": {
+        "bytes": 1378,
+        "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077"
+      },
+      "rounds": 2000,
+      "expected": 14000,
+      "samples": [
+        {
+          "wall_ms": 55.1001,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4284416
+        },
+        {
+          "wall_ms": 52.5639,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4284416
+        },
+        {
+          "wall_ms": 57.1338,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 4276224
+        },
+        {
+          "wall_ms": 52.827,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4280320
+        },
+        {
+          "wall_ms": 51.8581,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4280320
+        }
+      ],
+      "wall_ms": {
+        "min": 51.8581,
+        "median": 52.827,
+        "max": 57.1338
+      },
+      "cpu_ms": {
+        "min": 31.25,
+        "median": 46.875,
+        "max": 62.5
+      },
+      "peak_job_commit_bytes": {
+        "min": 4276224,
+        "median": 4280320,
+        "max": 4284416
+      },
+      "profile": {
+        "allocations": 270667,
+        "allocated_bytes": 46501861,
+        "copies": 261898,
+        "copied_bytes": 17949198,
+        "gc_collections": 45,
+        "peak_managed_bytes": 1049916,
+        "before_teardown_bytes": 312332
+      }
+    },
+    {
+      "mode": "json-tree",
+      "label": "medium",
+      "input": {
+        "bytes": 1378,
+        "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077"
+      },
+      "rounds": 300,
+      "expected": 300,
+      "samples": [
+        {
+          "wall_ms": 79.638,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 3878912
+        },
+        {
+          "wall_ms": 76.0132,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 3887104
+        },
+        {
+          "wall_ms": 81.413,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 3883008
+        },
+        {
+          "wall_ms": 84.4152,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 3874816
+        },
+        {
+          "wall_ms": 88.7492,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 3887104
+        }
+      ],
+      "wall_ms": {
+        "min": 76.0132,
+        "median": 81.413,
+        "max": 88.7492
+      },
+      "cpu_ms": {
+        "min": 62.5,
+        "median": 78.125,
+        "max": 93.75
+      },
+      "peak_job_commit_bytes": {
+        "min": 3874816,
+        "median": 3883008,
+        "max": 3887104
+      },
+      "profile": {
+        "allocations": 157218,
+        "allocated_bytes": 28359329,
+        "copies": 530105,
+        "copied_bytes": 6322608,
+        "gc_collections": 27,
+        "peak_managed_bytes": 1049393,
+        "before_teardown_bytes": 273895
+      }
+    },
+    {
+      "mode": "json-stream",
+      "label": "medium",
+      "input": {
+        "bytes": 1378,
+        "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077"
+      },
+      "rounds": 300,
+      "expected": 300,
+      "samples": [
+        {
+          "wall_ms": 99.1733,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 4030464
+        },
+        {
+          "wall_ms": 93.6737,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 4034560
+        },
+        {
+          "wall_ms": 94.6833,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 4018176
+        },
+        {
+          "wall_ms": 100.8105,
+          "cpu_ms": 109.375,
+          "peak_job_commit_bytes": 4022272
+        },
+        {
+          "wall_ms": 101.7258,
+          "cpu_ms": 109.375,
+          "peak_job_commit_bytes": 4026368
+        }
+      ],
+      "wall_ms": {
+        "min": 93.6737,
+        "median": 99.1733,
+        "max": 101.7258
+      },
+      "cpu_ms": {
+        "min": 78.125,
+        "median": 93.75,
+        "max": 109.375
+      },
+      "peak_job_commit_bytes": {
+        "min": 4018176,
+        "median": 4026368,
+        "max": 4034560
+      },
+      "profile": {
+        "allocations": 253518,
+        "allocated_bytes": 39487231,
+        "copies": 741605,
+        "copied_bytes": 9372108,
+        "gc_collections": 38,
+        "peak_managed_bytes": 1049801,
+        "before_teardown_bytes": 106886
+      }
+    },
+    {
+      "mode": "json-typed",
+      "label": "medium",
+      "input": {
+        "bytes": 1378,
+        "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077"
+      },
+      "rounds": 300,
+      "expected": 2100,
+      "samples": [
+        {
+          "wall_ms": 197.7743,
+          "cpu_ms": 187.5,
+          "peak_job_commit_bytes": 4169728
+        },
+        {
+          "wall_ms": 209.7842,
+          "cpu_ms": 187.5,
+          "peak_job_commit_bytes": 4169728
+        },
+        {
+          "wall_ms": 195.915,
+          "cpu_ms": 187.5,
+          "peak_job_commit_bytes": 4177920
+        },
+        {
+          "wall_ms": 208.5832,
+          "cpu_ms": 203.125,
+          "peak_job_commit_bytes": 4161536
+        },
+        {
+          "wall_ms": 196.7656,
+          "cpu_ms": 218.75,
+          "peak_job_commit_bytes": 4177920
+        }
+      ],
+      "wall_ms": {
+        "min": 195.915,
+        "median": 197.7743,
+        "max": 209.7842
+      },
+      "cpu_ms": {
+        "min": 187.5,
+        "median": 187.5,
+        "max": 218.75
+      },
+      "peak_job_commit_bytes": {
+        "min": 4161536,
+        "median": 4169728,
+        "max": 4177920
+      },
+      "profile": {
+        "allocations": 633318,
+        "allocated_bytes": 98944530,
+        "copies": 1604405,
+        "copied_bytes": 20517708,
+        "gc_collections": 95,
+        "peak_managed_bytes": 1050161,
+        "before_teardown_bytes": 686868
+      }
+    },
+    {
+      "mode": "text",
+      "label": "medium",
+      "input": {
+        "bytes": 1036,
+        "sha256": "e504e0362ea85f78fc3cbc67eeac90c581c5db67b08c424182443a699b3831ec"
+      },
+      "rounds": 2000,
+      "expected": 2000,
+      "samples": [
+        {
+          "wall_ms": 31.251,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2703360
+        },
+        {
+          "wall_ms": 31.1726,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 30.6947,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2695168
+        },
+        {
+          "wall_ms": 31.2468,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2674688
+        },
+        {
+          "wall_ms": 30.8971,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2691072
+        }
+      ],
+      "wall_ms": {
+        "min": 30.6947,
+        "median": 31.1726,
+        "max": 31.251
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 2674688,
+        "median": 2691072,
+        "max": 2703360
+      },
+      "profile": {
+        "allocations": 9,
+        "allocated_bytes": 3098,
+        "copies": 2,
+        "copied_bytes": 2072,
+        "gc_collections": 0,
+        "peak_managed_bytes": 3098,
+        "before_teardown_bytes": 3098
+      }
+    },
+    {
+      "mode": "path",
+      "label": "medium",
+      "input": {
+        "bytes": 1036,
+        "sha256": "e504e0362ea85f78fc3cbc67eeac90c581c5db67b08c424182443a699b3831ec"
+      },
+      "rounds": 2000,
+      "expected": 2000,
+      "samples": [
+        {
+          "wall_ms": 64.4945,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 64.5396,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 2695168
+        },
+        {
+          "wall_ms": 63.5367,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 72.7387,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 65.4566,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 2703360
+        }
+      ],
+      "wall_ms": {
+        "min": 63.5367,
+        "median": 64.5396,
+        "max": 72.7387
+      },
+      "cpu_ms": {
+        "min": 46.875,
+        "median": 62.5,
+        "max": 62.5
+      },
+      "peak_job_commit_bytes": {
+        "min": 2686976,
+        "median": 2691072,
+        "max": 2703360
+      },
+      "profile": {
+        "allocations": 9,
+        "allocated_bytes": 3098,
+        "copies": 2,
+        "copied_bytes": 2072,
+        "gc_collections": 0,
+        "peak_managed_bytes": 3098,
+        "before_teardown_bytes": 3098
+      }
+    },
+    {
+      "mode": "strings",
+      "label": "medium",
+      "input": {
+        "bytes": 1036,
+        "sha256": "e504e0362ea85f78fc3cbc67eeac90c581c5db67b08c424182443a699b3831ec"
+      },
+      "rounds": 4000,
+      "expected": 4000,
+      "samples": [
+        {
+          "wall_ms": 23.1459,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4153344
+        },
+        {
+          "wall_ms": 22.8468,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4161536
+        },
+        {
+          "wall_ms": 22.3942,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4153344
+        },
+        {
+          "wall_ms": 27.2514,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4157440
+        },
+        {
+          "wall_ms": 22.48,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4153344
+        }
+      ],
+      "wall_ms": {
+        "min": 22.3942,
+        "median": 22.8468,
+        "max": 27.2514
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 4153344,
+        "median": 4153344,
+        "max": 4161536
+      },
+      "profile": {
+        "allocations": 4009,
+        "allocated_bytes": 4339101,
+        "copies": 8002,
+        "copied_bytes": 4146072,
+        "gc_collections": 4,
+        "peak_managed_bytes": 1049464,
+        "before_teardown_bytes": 150908
+      }
+    },
+    {
+      "mode": "fold",
+      "label": "medium",
+      "input": {
+        "items": 2048
+      },
+      "rounds": 12,
+      "expected": 25178112,
+      "samples": [
+        {
+          "wall_ms": 21.5662,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3080192
+        },
+        {
+          "wall_ms": 21.6197,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3084288
+        },
+        {
+          "wall_ms": 22.7342,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3084288
+        },
+        {
+          "wall_ms": 21.2619,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3088384
+        },
+        {
+          "wall_ms": 21.4246,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3080192
+        }
+      ],
+      "wall_ms": {
+        "min": 21.2619,
+        "median": 21.5662,
+        "max": 22.7342
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 3080192,
+        "median": 3084288,
+        "max": 3088384
+      },
+      "profile": {
+        "allocations": 135,
+        "allocated_bytes": 432202,
+        "copies": 26728,
+        "copied_bytes": 425152,
+        "gc_collections": 0,
+        "peak_managed_bytes": 432202,
+        "before_teardown_bytes": 432202
+      }
+    },
+    {
+      "mode": "set",
+      "label": "medium",
+      "input": {
+        "items": 2048
+      },
+      "rounds": 12,
+      "expected": 24576,
+      "samples": [
+        {
+          "wall_ms": 24.9817,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3997696
+        },
+        {
+          "wall_ms": 25.9782,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4005888
+        },
+        {
+          "wall_ms": 26.2297,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4001792
+        },
+        {
+          "wall_ms": 26.2523,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3989504
+        },
+        {
+          "wall_ms": 26.1804,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3993600
+        }
+      ],
+      "wall_ms": {
+        "min": 24.9817,
+        "median": 26.1804,
+        "max": 26.2523
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 3989504,
+        "median": 3997696,
+        "max": 4005888
+      },
+      "profile": {
+        "allocations": 49431,
+        "allocated_bytes": 6626985,
+        "copies": 75904,
+        "copied_bytes": 1113280,
+        "gc_collections": 7,
+        "peak_managed_bytes": 1048629,
+        "before_teardown_bytes": 967969
+      }
+    },
+    {
+      "mode": "cell",
+      "label": "medium",
+      "input": {
+        "items": 2048
+      },
+      "rounds": 12,
+      "expected": 24576,
+      "samples": [
+        {
+          "wall_ms": 21.1802,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2895872
+        },
+        {
+          "wall_ms": 19.8266,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2916352
+        },
+        {
+          "wall_ms": 20.859,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2916352
+        },
+        {
+          "wall_ms": 22.21,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2920448
+        },
+        {
+          "wall_ms": 21.0567,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2908160
+        }
+      ],
+      "wall_ms": {
+        "min": 19.8266,
+        "median": 21.0567,
+        "max": 22.21
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2895872,
+        "median": 2916352,
+        "max": 2920448
+      },
+      "profile": {
+        "allocations": 51,
+        "allocated_bytes": 233098,
+        "copies": 26656,
+        "copied_bytes": 426016,
+        "gc_collections": 0,
+        "peak_managed_bytes": 233098,
+        "before_teardown_bytes": 233098
+      }
+    },
+    {
+      "mode": "file",
+      "label": "medium",
+      "input": {
+        "bytes": 2097152,
+        "sha256": "51da329c207e4946b3c6fc2fbfa070966f4800b0ee531e556d2d7e9cddd2d9b3"
+      },
+      "rounds": 1,
+      "expected": 2097152,
+      "samples": [
+        {
+          "wall_ms": 27.4258,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4079616
+        },
+        {
+          "wall_ms": 25.6923,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4075520
+        },
+        {
+          "wall_ms": 24.5848,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4083712
+        },
+        {
+          "wall_ms": 24.0128,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4075520
+        },
+        {
+          "wall_ms": 23.7682,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4079616
+        }
+      ],
+      "wall_ms": {
+        "min": 23.7682,
+        "median": 24.5848,
+        "max": 27.4258
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 4075520,
+        "median": 4079616,
+        "max": 4083712
+      },
+      "profile": {
+        "allocations": 273,
+        "allocated_bytes": 2112929,
+        "copies": 1288,
+        "copied_bytes": 2237504,
+        "gc_collections": 2,
+        "peak_managed_bytes": 1049889,
+        "before_teardown_bytes": 36021
+      }
+    },
+    {
+      "mode": "config",
+      "label": "large",
+      "input": {
+        "bytes": 5912,
+        "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a"
+      },
+      "rounds": 2000,
+      "expected": 14000,
+      "samples": [
+        {
+          "wall_ms": 134.8017,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 3997696
+        },
+        {
+          "wall_ms": 122.807,
+          "cpu_ms": 109.375,
+          "peak_job_commit_bytes": 4014080
+        },
+        {
+          "wall_ms": 132.4139,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 4014080
+        },
+        {
+          "wall_ms": 124.9606,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 3997696
+        },
+        {
+          "wall_ms": 123.1428,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 4005888
+        }
+      ],
+      "wall_ms": {
+        "min": 122.807,
+        "median": 124.9606,
+        "max": 134.8017
+      },
+      "cpu_ms": {
+        "min": 109.375,
+        "median": 125,
+        "max": 125
+      },
+      "peak_job_commit_bytes": {
+        "min": 3997696,
+        "median": 4005888,
+        "max": 4014080
+      },
+      "profile": {
+        "allocations": 1044593,
+        "allocated_bytes": 186823588,
+        "copies": 1035970,
+        "copied_bytes": 71802464,
+        "gc_collections": 190,
+        "peak_managed_bytes": 1064007,
+        "before_teardown_bytes": 965215
+      }
+    },
+    {
+      "mode": "json-tree",
+      "label": "large",
+      "input": {
+        "bytes": 5912,
+        "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a"
+      },
+      "rounds": 300,
+      "expected": 300,
+      "samples": [
+        {
+          "wall_ms": 253.0543,
+          "cpu_ms": 250,
+          "peak_job_commit_bytes": 3948544
+        },
+        {
+          "wall_ms": 254.1624,
+          "cpu_ms": 234.375,
+          "peak_job_commit_bytes": 3944448
+        },
+        {
+          "wall_ms": 254.3563,
+          "cpu_ms": 250,
+          "peak_job_commit_bytes": 3952640
+        },
+        {
+          "wall_ms": 289.7028,
+          "cpu_ms": 281.25,
+          "peak_job_commit_bytes": 3928064
+        },
+        {
+          "wall_ms": 277.1457,
+          "cpu_ms": 265.625,
+          "peak_job_commit_bytes": 3952640
+        }
+      ],
+      "wall_ms": {
+        "min": 253.0543,
+        "median": 254.3563,
+        "max": 289.7028
+      },
+      "cpu_ms": {
+        "min": 234.375,
+        "median": 250,
+        "max": 281.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 3928064,
+        "median": 3948544,
+        "max": 3952640
+      },
+      "profile": {
+        "allocations": 619218,
+        "allocated_bytes": 113997394,
+        "copies": 2236505,
+        "copied_bytes": 26752676,
+        "gc_collections": 114,
+        "peak_managed_bytes": 1054027,
+        "before_teardown_bytes": 736630
+      }
+    },
+    {
+      "mode": "json-stream",
+      "label": "large",
+      "input": {
+        "bytes": 5912,
+        "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a"
+      },
+      "rounds": 300,
+      "expected": 300,
+      "samples": [
+        {
+          "wall_ms": 344.4852,
+          "cpu_ms": 343.75,
+          "peak_job_commit_bytes": 4243456
+        },
+        {
+          "wall_ms": 321.7004,
+          "cpu_ms": 312.5,
+          "peak_job_commit_bytes": 4227072
+        },
+        {
+          "wall_ms": 327.7375,
+          "cpu_ms": 312.5,
+          "peak_job_commit_bytes": 4239360
+        },
+        {
+          "wall_ms": 339.4232,
+          "cpu_ms": 343.75,
+          "peak_job_commit_bytes": 4227072
+        },
+        {
+          "wall_ms": 323.8773,
+          "cpu_ms": 328.125,
+          "peak_job_commit_bytes": 4231168
+        }
+      ],
+      "wall_ms": {
+        "min": 321.7004,
+        "median": 327.7375,
+        "max": 344.4852
+      },
+      "cpu_ms": {
+        "min": 312.5,
+        "median": 328.125,
+        "max": 343.75
+      },
+      "peak_job_commit_bytes": {
+        "min": 4227072,
+        "median": 4231168,
+        "max": 4243456
+      },
+      "profile": {
+        "allocations": 1002918,
+        "allocated_bytes": 157491996,
+        "copies": 3081005,
+        "copied_bytes": 38696876,
+        "gc_collections": 154,
+        "peak_managed_bytes": 1049535,
+        "before_teardown_bytes": 1046530
+      }
+    },
+    {
+      "mode": "json-typed",
+      "label": "large",
+      "input": {
+        "bytes": 5912,
+        "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a"
+      },
+      "rounds": 300,
+      "expected": 2100,
+      "samples": [
+        {
+          "wall_ms": 755.8667,
+          "cpu_ms": 750,
+          "peak_job_commit_bytes": 4222976
+        },
+        {
+          "wall_ms": 744.304,
+          "cpu_ms": 734.375,
+          "peak_job_commit_bytes": 4218880
+        },
+        {
+          "wall_ms": 731.0279,
+          "cpu_ms": 703.125,
+          "peak_job_commit_bytes": 4218880
+        },
+        {
+          "wall_ms": 729.491,
+          "cpu_ms": 718.75,
+          "peak_job_commit_bytes": 4214784
+        },
+        {
+          "wall_ms": 718.7242,
+          "cpu_ms": 703.125,
+          "peak_job_commit_bytes": 4214784
+        }
+      ],
+      "wall_ms": {
+        "min": 718.7242,
+        "median": 731.0279,
+        "max": 755.8667
+      },
+      "cpu_ms": {
+        "min": 703.125,
+        "median": 718.75,
+        "max": 750
+      },
+      "peak_job_commit_bytes": {
+        "min": 4214784,
+        "median": 4218880,
+        "max": 4222976
+      },
+      "profile": {
+        "allocations": 2477718,
+        "allocated_bytes": 390402695,
+        "copies": 6628805,
+        "copied_bytes": 84388676,
+        "gc_collections": 388,
+        "peak_managed_bytes": 1049653,
+        "before_teardown_bytes": 251921
+      }
+    },
+    {
+      "mode": "text",
+      "label": "large",
+      "input": {
+        "bytes": 8204,
+        "sha256": "2a07b733b181d9ceca45ae1f1f3e05187f92688e61c4324ee651d00536ea3781"
+      },
+      "rounds": 2000,
+      "expected": 2000,
+      "samples": [
+        {
+          "wall_ms": 101.6536,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 101.8372,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 102.3109,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 2674688
+        },
+        {
+          "wall_ms": 104.2153,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 2682880
+        },
+        {
+          "wall_ms": 141.2279,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 2691072
+        }
+      ],
+      "wall_ms": {
+        "min": 101.6536,
+        "median": 102.3109,
+        "max": 141.2279
+      },
+      "cpu_ms": {
+        "min": 93.75,
+        "median": 93.75,
+        "max": 125
+      },
+      "peak_job_commit_bytes": {
+        "min": 2674688,
+        "median": 2691072,
+        "max": 2691072
+      },
+      "profile": {
+        "allocations": 10,
+        "allocated_bytes": 17479,
+        "copies": 5,
+        "copied_bytes": 16408,
+        "gc_collections": 0,
+        "peak_managed_bytes": 17479,
+        "before_teardown_bytes": 17479
+      }
+    },
+    {
+      "mode": "path",
+      "label": "large",
+      "input": {
+        "bytes": 8204,
+        "sha256": "2a07b733b181d9ceca45ae1f1f3e05187f92688e61c4324ee651d00536ea3781"
+      },
+      "rounds": 2000,
+      "expected": 2000,
+      "samples": [
+        {
+          "wall_ms": 360.9152,
+          "cpu_ms": 343.75,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 362.6183,
+          "cpu_ms": 359.375,
+          "peak_job_commit_bytes": 2695168
+        },
+        {
+          "wall_ms": 367.201,
+          "cpu_ms": 406.25,
+          "peak_job_commit_bytes": 2695168
+        },
+        {
+          "wall_ms": 356.337,
+          "cpu_ms": 343.75,
+          "peak_job_commit_bytes": 2699264
+        },
+        {
+          "wall_ms": 365.5189,
+          "cpu_ms": 359.375,
+          "peak_job_commit_bytes": 2682880
+        }
+      ],
+      "wall_ms": {
+        "min": 356.337,
+        "median": 362.6183,
+        "max": 367.201
+      },
+      "cpu_ms": {
+        "min": 343.75,
+        "median": 359.375,
+        "max": 406.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 2682880,
+        "median": 2695168,
+        "max": 2699264
+      },
+      "profile": {
+        "allocations": 10,
+        "allocated_bytes": 17479,
+        "copies": 5,
+        "copied_bytes": 16408,
+        "gc_collections": 0,
+        "peak_managed_bytes": 17479,
+        "before_teardown_bytes": 17479
+      }
+    },
+    {
+      "mode": "strings",
+      "label": "large",
+      "input": {
+        "bytes": 8204,
+        "sha256": "2a07b733b181d9ceca45ae1f1f3e05187f92688e61c4324ee651d00536ea3781"
+      },
+      "rounds": 4000,
+      "expected": 4000,
+      "samples": [
+        {
+          "wall_ms": 26.0521,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4173824
+        },
+        {
+          "wall_ms": 27.4347,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4177920
+        },
+        {
+          "wall_ms": 28.2153,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4182016
+        },
+        {
+          "wall_ms": 27.2357,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4182016
+        },
+        {
+          "wall_ms": 27.0248,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4177920
+        }
+      ],
+      "wall_ms": {
+        "min": 26.0521,
+        "median": 27.2357,
+        "max": 28.2153
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 4173824,
+        "median": 4177920,
+        "max": 4182016
+      },
+      "profile": {
+        "allocations": 4010,
+        "allocated_bytes": 33025482,
+        "copies": 8005,
+        "copied_bytes": 32832408,
+        "gc_collections": 31,
+        "peak_managed_bytes": 1056407,
+        "before_teardown_bytes": 800675
+      }
+    },
+    {
+      "mode": "fold",
+      "label": "large",
+      "input": {
+        "items": 16384
+      },
+      "rounds": 12,
+      "expected": 1610711040,
+      "samples": [
+        {
+          "wall_ms": 23.7177,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3739648
+        },
+        {
+          "wall_ms": 24.0938,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3747840
+        },
+        {
+          "wall_ms": 23.8484,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3743744
+        },
+        {
+          "wall_ms": 23.9586,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3747840
+        },
+        {
+          "wall_ms": 23.6842,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3743744
+        }
+      ],
+      "wall_ms": {
+        "min": 23.6842,
+        "median": 23.8484,
+        "max": 24.0938
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 3739648,
+        "median": 3743744,
+        "max": 3747840
+      },
+      "profile": {
+        "allocations": 174,
+        "allocated_bytes": 3415964,
+        "copies": 213135,
+        "copied_bytes": 3407040,
+        "gc_collections": 4,
+        "peak_managed_bytes": 1051188,
+        "before_teardown_bytes": 262603
+      }
+    },
+    {
+      "mode": "set",
+      "label": "large",
+      "input": {
+        "items": 16384
+      },
+      "rounds": 12,
+      "expected": 196608,
+      "samples": [
+        {
+          "wall_ms": 89.7486,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 9351168
+        },
+        {
+          "wall_ms": 67.5704,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 9363456
+        },
+        {
+          "wall_ms": 70.2782,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 9359360
+        },
+        {
+          "wall_ms": 59.2212,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 9383936
+        },
+        {
+          "wall_ms": 60.9775,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 9359360
+        }
+      ],
+      "wall_ms": {
+        "min": 59.2212,
+        "median": 67.5704,
+        "max": 89.7486
+      },
+      "cpu_ms": {
+        "min": 46.875,
+        "median": 62.5,
+        "max": 78.125
+      },
+      "peak_job_commit_bytes": {
+        "min": 9351168,
+        "median": 9359360,
+        "max": 9383936
+      },
+      "profile": {
+        "allocations": 393570,
+        "allocated_bytes": 52964539,
+        "copies": 606375,
+        "copied_bytes": 8912064,
+        "gc_collections": 25,
+        "peak_managed_bytes": 5244438,
+        "before_teardown_bytes": 3343058
+      }
+    },
+    {
+      "mode": "cell",
+      "label": "large",
+      "input": {
+        "items": 16384
+      },
+      "rounds": 12,
+      "expected": 196608,
+      "samples": [
+        {
+          "wall_ms": 23.6749,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3903488
+        },
+        {
+          "wall_ms": 23.3952,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3903488
+        },
+        {
+          "wall_ms": 23.9766,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3899392
+        },
+        {
+          "wall_ms": 23.6158,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3907584
+        },
+        {
+          "wall_ms": 24.7602,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3895296
+        }
+      ],
+      "wall_ms": {
+        "min": 23.3952,
+        "median": 23.6749,
+        "max": 24.7602
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 3895296,
+        "median": 3903488,
+        "max": 3907584
+      },
+      "profile": {
+        "allocations": 54,
+        "allocated_bytes": 1838876,
+        "copies": 213027,
+        "copied_bytes": 3407904,
+        "gc_collections": 2,
+        "peak_managed_bytes": 1050876,
+        "before_teardown_bytes": 262715
+      }
+    },
+    {
+      "mode": "file",
+      "label": "large",
+      "input": {
+        "bytes": 16777216,
+        "sha256": "055e435c7784b6bf969fcf0d0c7225acde453d7ebd0023469e192ae75af6accb"
+      },
+      "rounds": 1,
+      "expected": 16777216,
+      "samples": [
+        {
+          "wall_ms": 37.8916,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4222976
+        },
+        {
+          "wall_ms": 39.2795,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4222976
+        },
+        {
+          "wall_ms": 38.5751,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4218880
+        },
+        {
+          "wall_ms": 38.4129,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4222976
+        },
+        {
+          "wall_ms": 38.5977,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4231168
+        }
+      ],
+      "wall_ms": {
+        "min": 37.8916,
+        "median": 38.5751,
+        "max": 39.2795
+      },
+      "cpu_ms": {
+        "min": 31.25,
+        "median": 31.25,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 4218880,
+        "median": 4222976,
+        "max": 4231168
+      },
+      "profile": {
+        "allocations": 2065,
+        "allocated_bytes": 16879006,
+        "copies": 10248,
+        "copied_bytes": 17892416,
+        "gc_collections": 16,
+        "peak_managed_bytes": 1049886,
+        "before_teardown_bytes": 266740
+      }
+    },
+    {
+      "mode": "http",
+      "requests": 1,
+      "samples": [
+        {
+          "wall_ms": 82.9578,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 6176768
+        },
+        {
+          "wall_ms": 86.0005,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 6131712
+        },
+        {
+          "wall_ms": 84.8079,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 6148096
+        },
+        {
+          "wall_ms": 86.5943,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 6135808
+        },
+        {
+          "wall_ms": 84.5838,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 6135808
+        }
+      ],
+      "wall_ms": {
+        "min": 82.9578,
+        "median": 84.8079,
+        "max": 86.5943
+      },
+      "cpu_ms": {
+        "min": 31.25,
+        "median": 31.25,
+        "max": 62.5
+      },
+      "peak_job_commit_bytes": {
+        "min": 6131712,
+        "median": 6135808,
+        "max": 6176768
+      },
+      "server_connections": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "mode": "http",
+      "requests": 4,
+      "samples": [
+        {
+          "wall_ms": 316.5406,
+          "cpu_ms": 109.375,
+          "peak_job_commit_bytes": 6254592
+        },
+        {
+          "wall_ms": 303.0449,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 6254592
+        },
+        {
+          "wall_ms": 319.5721,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 6258688
+        },
+        {
+          "wall_ms": 332.519,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 6262784
+        },
+        {
+          "wall_ms": 320.1569,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 6262784
+        }
+      ],
+      "wall_ms": {
+        "min": 303.0449,
+        "median": 319.5721,
+        "max": 332.519
+      },
+      "cpu_ms": {
+        "min": 78.125,
+        "median": 93.75,
+        "max": 109.375
+      },
+      "peak_job_commit_bytes": {
+        "min": 6254592,
+        "median": 6258688,
+        "max": 6262784
+      },
+      "server_connections": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "mode": "http",
+      "requests": 10,
+      "samples": [
+        {
+          "wall_ms": 789.5274,
+          "cpu_ms": 250,
+          "peak_job_commit_bytes": 6500352
+        },
+        {
+          "wall_ms": 778.8473,
+          "cpu_ms": 187.5,
+          "peak_job_commit_bytes": 6455296
+        },
+        {
+          "wall_ms": 802.1785,
+          "cpu_ms": 187.5,
+          "peak_job_commit_bytes": 6459392
+        },
+        {
+          "wall_ms": 805.2333,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 6475776
+        },
+        {
+          "wall_ms": 784.6552,
+          "cpu_ms": 187.5,
+          "peak_job_commit_bytes": 6479872
+        }
+      ],
+      "wall_ms": {
+        "min": 778.8473,
+        "median": 789.5274,
+        "max": 805.2333
+      },
+      "cpu_ms": {
+        "min": 125,
+        "median": 187.5,
+        "max": 250
+      },
+      "peak_job_commit_bytes": {
+        "min": 6455296,
+        "median": 6475776,
+        "max": 6500352
+      },
+      "server_connections": [
+        10,
+        10,
+        10,
+        10,
+        10
+      ]
+    }
+  ],
+  "compiler": [
+    {
+      "round": 1,
+      "phase": "cold",
+      "wall_ms": 1815.1668,
+      "cpu_ms": 1796.875,
+      "peak_job_commit_bytes": 96858112,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "phase": "warm",
+      "wall_ms": 247.0333,
+      "cpu_ms": 234.375,
+      "peak_job_commit_bytes": 5521408,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "hit",
+          "reason": "reused"
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "phase": "edit",
+      "wall_ms": 1738.0375,
+      "cpu_ms": 1718.75,
+      "peak_job_commit_bytes": 96555008,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "phase": "cold",
+      "wall_ms": 1780.328,
+      "cpu_ms": 1781.25,
+      "peak_job_commit_bytes": 96862208,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "phase": "warm",
+      "wall_ms": 246.5844,
+      "cpu_ms": 234.375,
+      "peak_job_commit_bytes": 5505024,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "hit",
+          "reason": "reused"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "phase": "edit",
+      "wall_ms": 1743.1084,
+      "cpu_ms": 1718.75,
+      "peak_job_commit_bytes": 96538624,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "phase": "cold",
+      "wall_ms": 1768.4497,
+      "cpu_ms": 1734.375,
+      "peak_job_commit_bytes": 96862208,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "phase": "warm",
+      "wall_ms": 249.4623,
+      "cpu_ms": 218.75,
+      "peak_job_commit_bytes": 5509120,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "hit",
+          "reason": "reused"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "phase": "edit",
+      "wall_ms": 1698.8071,
+      "cpu_ms": 1687.5,
+      "peak_job_commit_bytes": 96550912,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "phase": "cold",
+      "wall_ms": 1825.0908,
+      "cpu_ms": 1812.5,
+      "peak_job_commit_bytes": 96866304,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "phase": "warm",
+      "wall_ms": 249.3178,
+      "cpu_ms": 234.375,
+      "peak_job_commit_bytes": 5509120,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "hit",
+          "reason": "reused"
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "phase": "edit",
+      "wall_ms": 1702.467,
+      "cpu_ms": 1671.875,
+      "peak_job_commit_bytes": 96546816,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "phase": "cold",
+      "wall_ms": 1782.5769,
+      "cpu_ms": 1750,
+      "peak_job_commit_bytes": 96854016,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "phase": "warm",
+      "wall_ms": 249.8988,
+      "cpu_ms": 218.75,
+      "peak_job_commit_bytes": 5513216,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "hit",
+          "reason": "reused"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "phase": "edit",
+      "wall_ms": 1706.3014,
+      "cpu_ms": 1687.5,
+      "peak_job_commit_bytes": 96546816,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    }
+  ],
+  "build": {
+    "samples": [
+      {
+        "wall_ms": 3013.4019,
+        "cpu_ms": 9828.125,
+        "peak_job_commit_bytes": 321044480
+      },
+      {
+        "wall_ms": 3039.1274,
+        "cpu_ms": 9828.125,
+        "peak_job_commit_bytes": 318107648
+      },
+      {
+        "wall_ms": 3237.2929,
+        "cpu_ms": 10671.875,
+        "peak_job_commit_bytes": 318947328
+      },
+      {
+        "wall_ms": 3511.4078,
+        "cpu_ms": 12093.75,
+        "peak_job_commit_bytes": 333877248
+      },
+      {
+        "wall_ms": 3337.1598,
+        "cpu_ms": 10531.25,
+        "peak_job_commit_bytes": 319852544
+      }
+    ],
+    "wall_ms": {
+      "min": 3013.4019,
+      "median": 3237.2929,
+      "max": 3511.4078
+    },
+    "cpu_ms": {
+      "min": 9828.125,
+      "median": 10531.25,
+      "max": 12093.75
+    },
+    "peak_job_commit_bytes": {
+      "min": 318107648,
+      "median": 319852544,
+      "max": 333877248
+    }
+  },
+  "compiler_ranges": {
+    "cold": {
+      "wall_ms": {
+        "min": 1768.4497,
+        "median": 1782.5769,
+        "max": 1825.0908
+      },
+      "cpu_ms": {
+        "min": 1734.375,
+        "median": 1781.25,
+        "max": 1812.5
+      },
+      "peak_job_commit_bytes": {
+        "min": 96854016,
+        "median": 96862208,
+        "max": 96866304
+      }
+    },
+    "warm": {
+      "wall_ms": {
+        "min": 246.5844,
+        "median": 249.3178,
+        "max": 249.8988
+      },
+      "cpu_ms": {
+        "min": 218.75,
+        "median": 234.375,
+        "max": 234.375
+      },
+      "peak_job_commit_bytes": {
+        "min": 5505024,
+        "median": 5509120,
+        "max": 5521408
+      }
+    },
+    "edit": {
+      "wall_ms": {
+        "min": 1698.8071,
+        "median": 1706.3014,
+        "max": 1743.1084
+      },
+      "cpu_ms": {
+        "min": 1671.875,
+        "median": 1687.5,
+        "max": 1718.75
+      },
+      "peak_job_commit_bytes": {
+        "min": 96538624,
+        "median": 96546816,
+        "max": 96555008
+      }
+    }
+  },
+  "completed": true
+}

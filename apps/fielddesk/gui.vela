@@ -265,6 +265,14 @@ fn drain(scheduler: loop::Loop<process::Completed>, active: List<Transfer>) -> R
         while http::pending(exchange) {
             let turn = result::explain(loop::tick(scheduler, network::clock()?),
                 "Cannot drain HTTP loop")?;
+            match http::poll(exchange) {
+                Result::Ok(_) => {}
+                Result::Err(error) => {
+                    if http::pending(exchange) {
+                        return Result<Bool, String>::Err(network::error(error));
+                    }
+                }
+            }
         }
         let released = result::map_error(http::release(exchange), network::error)?;
     }

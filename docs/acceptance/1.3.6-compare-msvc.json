@@ -1,0 +1,4130 @@
+{
+  "host": "msvc",
+  "workloads": {
+    "numeric/small": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 20.099,
+          "previous": 25.9332,
+          "candidate": 24.0527,
+          "previous_percent": -7.25132262890811,
+          "fixed_percent": 19.671127916811788
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6643712,
+          "previous": 6619136,
+          "candidate": 6606848,
+          "previous_percent": -0.18564356435643564,
+          "fixed_percent": -0.5548705302096177
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2678784,
+          "previous": 2605056,
+          "candidate": 2596864,
+          "previous_percent": -0.31446540880503143,
+          "fixed_percent": -3.058103975535168
+        }
+      },
+      "fixed_wall_noise_percent": 4.082222741609408,
+      "counters": {
+        "allocations": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 54,
+          "previous": 54,
+          "candidate": 54,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 220171,
+          "previous": 220171,
+          "candidate": 20045,
+          "previous_percent": -90.89571287771777,
+          "fixed_percent": -90.89571287771777
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 54,
+          "previous": 54,
+          "candidate": 54,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 54,
+          "previous": 54,
+          "candidate": 54,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "numeric/medium": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 21.3504,
+          "previous": 27.5349,
+          "candidate": 24.7002,
+          "previous_percent": -10.29493479184599,
+          "fixed_percent": 15.689635791366898
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 31.25,
+          "candidate": 15.625,
+          "previous_percent": -50,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6643712,
+          "previous": 6619136,
+          "candidate": 6606848,
+          "previous_percent": -0.18564356435643564,
+          "fixed_percent": -0.5548705302096177
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2682880,
+          "previous": 2596864,
+          "candidate": 2592768,
+          "previous_percent": -0.15772870662460567,
+          "fixed_percent": -3.3587786259541983
+        }
+      },
+      "fixed_wall_noise_percent": 2.5009835975049897,
+      "counters": {
+        "allocations": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 55,
+          "previous": 55,
+          "candidate": 55,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 2201431,
+          "previous": 2201431,
+          "candidate": 200405,
+          "previous_percent": -90.89660316403285,
+          "fixed_percent": -90.89660316403285
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 55,
+          "previous": 55,
+          "candidate": 55,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 55,
+          "previous": 55,
+          "candidate": 55,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "numeric/large": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 25.529,
+          "previous": 30.6239,
+          "candidate": 25.1539,
+          "previous_percent": -17.861866058862518,
+          "fixed_percent": -1.46930941282463
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6643712,
+          "previous": 6623232,
+          "candidate": 6606848,
+          "previous_percent": -0.24737167594310452,
+          "fixed_percent": -0.5548705302096177
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2686976,
+          "previous": 2605056,
+          "candidate": 2596864,
+          "previous_percent": -0.31446540880503143,
+          "fixed_percent": -3.3536585365853657
+        }
+      },
+      "fixed_wall_noise_percent": 5.920478752472012,
+      "counters": {
+        "allocations": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 56,
+          "previous": 56,
+          "candidate": 56,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 11007031,
+          "previous": 11007031,
+          "candidate": 1002005,
+          "previous_percent": -90.89668231151525,
+          "fixed_percent": -90.89668231151525
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 56,
+          "previous": 56,
+          "candidate": 56,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 56,
+          "previous": 56,
+          "candidate": 56,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "aggregate/small": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 20.8806,
+          "previous": 30.6925,
+          "candidate": 30.8347,
+          "previous_percent": 0.46330536776086195,
+          "fixed_percent": 47.67152284896028
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 31.25,
+          "previous_percent": 100,
+          "fixed_percent": 100
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6643712,
+          "previous": 6615040,
+          "candidate": 6610944,
+          "previous_percent": -0.06191950464396285,
+          "fixed_percent": -0.4932182490752158
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2678784,
+          "previous": 2592768,
+          "candidate": 2592768,
+          "previous_percent": 0,
+          "fixed_percent": -3.2110091743119265
+        }
+      },
+      "fixed_wall_noise_percent": 3.8857276768386884,
+      "counters": {
+        "allocations": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 54,
+          "previous": 54,
+          "candidate": 54,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 560020,
+          "previous": 560020,
+          "candidate": 60004,
+          "previous_percent": -89.28538266490483,
+          "fixed_percent": -89.28538266490483
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 54,
+          "previous": 54,
+          "candidate": 54,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 54,
+          "previous": 54,
+          "candidate": 54,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "aggregate/medium": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 28.1035,
+          "previous": 30.5419,
+          "candidate": 22.719,
+          "previous_percent": -25.613665161630408,
+          "fixed_percent": -19.159535289198853
+        },
+        "cpu_ms": {
+          "fixed": 31.25,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": -50
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6643712,
+          "previous": 6619136,
+          "candidate": 6610944,
+          "previous_percent": -0.12376237623762376,
+          "fixed_percent": -0.4932182490752158
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2682880,
+          "previous": 2596864,
+          "candidate": 2592768,
+          "previous_percent": -0.15772870662460567,
+          "fixed_percent": -3.3587786259541983
+        }
+      },
+      "fixed_wall_noise_percent": 6.221462339001266,
+      "counters": {
+        "allocations": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 55,
+          "previous": 55,
+          "candidate": 55,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 5600020,
+          "previous": 5600020,
+          "candidate": 600004,
+          "previous_percent": -89.28568112256742,
+          "fixed_percent": -89.28568112256742
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 55,
+          "previous": 55,
+          "candidate": 55,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 55,
+          "previous": 55,
+          "candidate": 55,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "aggregate/large": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 51.8424,
+          "previous": 60.7459,
+          "candidate": 27.4291,
+          "previous_percent": -54.846170688062905,
+          "fixed_percent": -47.091376942425505
+        },
+        "cpu_ms": {
+          "fixed": 46.875,
+          "previous": 46.875,
+          "candidate": 31.25,
+          "previous_percent": -33.333333333333336,
+          "fixed_percent": -33.333333333333336
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6643712,
+          "previous": 6615040,
+          "candidate": 6610944,
+          "previous_percent": -0.06191950464396285,
+          "fixed_percent": -0.4932182490752158
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2678784,
+          "previous": 2584576,
+          "candidate": 2592768,
+          "previous_percent": 0.31695721077654515,
+          "fixed_percent": -3.2110091743119265
+        }
+      },
+      "fixed_wall_noise_percent": 2.6192477301217325,
+      "counters": {
+        "allocations": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 56,
+          "previous": 56,
+          "candidate": 56,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 28000020,
+          "previous": 28000020,
+          "candidate": 3000004,
+          "previous_percent": -89.28570765306596,
+          "fixed_percent": -89.28570765306596
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 56,
+          "previous": 56,
+          "candidate": 56,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 56,
+          "previous": 56,
+          "candidate": 56,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "mixed/small": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 24.1467,
+          "previous": 29.1961,
+          "candidate": 27.4211,
+          "previous_percent": -6.079579121869024,
+          "fixed_percent": 13.560445112582672
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 7614464,
+          "previous": 7589888,
+          "candidate": 7585792,
+          "previous_percent": -0.053966540744738264,
+          "fixed_percent": -0.37654653039268426
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 4272128,
+          "previous": 4173824,
+          "candidate": 4173824,
+          "previous_percent": 0,
+          "fixed_percent": -2.3010546500479387
+        }
+      },
+      "fixed_wall_noise_percent": 2.170038040674591,
+      "counters": {
+        "allocations": {
+          "fixed": 40003,
+          "previous": 40003,
+          "candidate": 40003,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 2769144,
+          "previous": 2769144,
+          "candidate": 2769144,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 680024,
+          "previous": 680024,
+          "candidate": 160006,
+          "previous_percent": -76.47053633401174,
+          "fixed_percent": -76.47053633401174
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 1160700,
+          "candidate": 880300,
+          "previous_percent": -24.15783578874817,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 614300,
+          "candidate": 534700,
+          "previous_percent": -12.95783818980954,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 2,
+          "previous": 2,
+          "candidate": 2,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1048585,
+          "previous": 1048585,
+          "candidate": 1048585,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 672543,
+          "previous": 672543,
+          "candidate": 672543,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "mixed/medium": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 55.9979,
+          "previous": 68.444,
+          "candidate": 64.6672,
+          "previous_percent": -5.518087779790791,
+          "fixed_percent": 15.48147341239581
+        },
+        "cpu_ms": {
+          "fixed": 62.5,
+          "previous": 62.5,
+          "candidate": 62.5,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 7610368,
+          "previous": 7589888,
+          "candidate": 7585792,
+          "previous_percent": -0.053966540744738264,
+          "fixed_percent": -0.32292787944025836
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 4382720,
+          "previous": 4317184,
+          "candidate": 4308992,
+          "previous_percent": -0.18975332068311196,
+          "fixed_percent": -1.6822429906542056
+        }
+      },
+      "fixed_wall_noise_percent": 1.4580967803982121,
+      "counters": {
+        "allocations": {
+          "fixed": 400003,
+          "previous": 400003,
+          "candidate": 400003,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 27889145,
+          "previous": 27889145,
+          "candidate": 27889145,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 6800024,
+          "previous": 6800024,
+          "candidate": 1600006,
+          "previous_percent": -76.47058304500102,
+          "fixed_percent": -76.47058304500102
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 7403100,
+          "candidate": 11907800,
+          "previous_percent": 60.848833596736505,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 452000,
+          "candidate": 809300,
+          "previous_percent": 79.04867256637168,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 26,
+          "previous": 26,
+          "candidate": 26,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1048618,
+          "previous": 1048618,
+          "candidate": 1048618,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 632640,
+          "previous": 632640,
+          "candidate": 632640,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "mixed/large": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 192.8117,
+          "previous": 238.7482,
+          "candidate": 224.8398,
+          "previous_percent": -5.825551773793478,
+          "fixed_percent": 16.611077024890083
+        },
+        "cpu_ms": {
+          "fixed": 171.875,
+          "previous": 234.375,
+          "candidate": 218.75,
+          "previous_percent": -6.666666666666667,
+          "fixed_percent": 27.272727272727273
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 7614464,
+          "previous": 7589888,
+          "candidate": 7581696,
+          "previous_percent": -0.10793308148947653,
+          "fixed_percent": -0.4303388918773534
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 4390912,
+          "previous": 4317184,
+          "candidate": 4308992,
+          "previous_percent": -0.18975332068311196,
+          "fixed_percent": -1.8656716417910448
+        }
+      },
+      "fixed_wall_noise_percent": 1.2907585984139174,
+      "counters": {
+        "allocations": {
+          "fixed": 2000003,
+          "previous": 2000003,
+          "candidate": 2000003,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 139889146,
+          "previous": 139889146,
+          "candidate": 139889146,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 34000024,
+          "previous": 34000024,
+          "candidate": 8000006,
+          "previous_percent": -76.47058719723256,
+          "fixed_percent": -76.47058719723256
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 45963200,
+          "candidate": 75422300,
+          "previous_percent": 64.09279597591116,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 795300,
+          "candidate": 3307900,
+          "previous_percent": 315.9310951842072,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 133,
+          "previous": 133,
+          "candidate": 133,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1048618,
+          "previous": 1048618,
+          "candidate": 1048618,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 462400,
+          "previous": 462400,
+          "candidate": 462400,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "dispatch/small": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 20.4225,
+          "previous": 24.582,
+          "candidate": 26.142,
+          "previous_percent": 6.346106907493283,
+          "fixed_percent": 28.005875872199784
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6639616,
+          "previous": 6615040,
+          "candidate": 6610944,
+          "previous_percent": -0.06191950464396285,
+          "fixed_percent": -0.431832202344232
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2682880,
+          "previous": 2592768,
+          "candidate": 2600960,
+          "previous_percent": 0.315955766192733,
+          "fixed_percent": -3.053435114503817
+        }
+      },
+      "fixed_wall_noise_percent": 6.022944782010045,
+      "counters": {
+        "allocations": {
+          "fixed": 4,
+          "previous": 4,
+          "candidate": 4,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 259,
+          "previous": 259,
+          "candidate": 259,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 420029,
+          "previous": 420029,
+          "candidate": 100007,
+          "previous_percent": -76.19045351630483,
+          "fixed_percent": -76.19045351630483
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 259,
+          "previous": 259,
+          "candidate": 259,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 259,
+          "previous": 259,
+          "candidate": 259,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "dispatch/medium": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 25.0294,
+          "previous": 28.8849,
+          "candidate": 26.3766,
+          "previous_percent": -8.68377595214108,
+          "fixed_percent": 5.382470215027132
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 31.25,
+          "candidate": 15.625,
+          "previous_percent": -50,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6639616,
+          "previous": 6610944,
+          "candidate": 6610944,
+          "previous_percent": 0,
+          "fixed_percent": -0.431832202344232
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2682880,
+          "previous": 2588672,
+          "candidate": 2588672,
+          "previous_percent": 0,
+          "fixed_percent": -3.5114503816793894
+        }
+      },
+      "fixed_wall_noise_percent": 7.142147775423725,
+      "counters": {
+        "allocations": {
+          "fixed": 4,
+          "previous": 4,
+          "candidate": 4,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 260,
+          "previous": 260,
+          "candidate": 260,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 4200029,
+          "previous": 4200029,
+          "candidate": 1000007,
+          "previous_percent": -76.19047392291814,
+          "fixed_percent": -76.19047392291814
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 260,
+          "previous": 260,
+          "candidate": 260,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 260,
+          "previous": 260,
+          "candidate": 260,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "dispatch/large": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 35.6577,
+          "previous": 39.1404,
+          "candidate": 35.1864,
+          "previous_percent": -10.10209400006132,
+          "fixed_percent": -1.3217341555961248
+        },
+        "cpu_ms": {
+          "fixed": 31.25,
+          "previous": 31.25,
+          "candidate": 31.25,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6639616,
+          "previous": 6610944,
+          "candidate": 6610944,
+          "previous_percent": 0,
+          "fixed_percent": -0.431832202344232
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2686976,
+          "previous": 2588672,
+          "candidate": 2596864,
+          "previous_percent": 0.31645569620253167,
+          "fixed_percent": -3.3536585365853657
+        }
+      },
+      "fixed_wall_noise_percent": 2.925710513436296,
+      "counters": {
+        "allocations": {
+          "fixed": 4,
+          "previous": 4,
+          "candidate": 4,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 261,
+          "previous": 261,
+          "candidate": 261,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 21000029,
+          "previous": 21000029,
+          "candidate": 5000007,
+          "previous_percent": -76.19047573696207,
+          "fixed_percent": -76.19047573696207
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 261,
+          "previous": 261,
+          "candidate": 261,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 261,
+          "previous": 261,
+          "candidate": 261,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "constant/small": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 20.6847,
+          "previous": 34.6592,
+          "candidate": 32.9737,
+          "previous_percent": -4.863066660511488,
+          "fixed_percent": 59.41106228275006
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6643712,
+          "previous": 6615040,
+          "candidate": 6610944,
+          "previous_percent": -0.06191950464396285,
+          "fixed_percent": -0.4932182490752158
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2678784,
+          "previous": 2580480,
+          "candidate": 2584576,
+          "previous_percent": 0.15873015873015872,
+          "fixed_percent": -3.5168195718654434
+        }
+      },
+      "fixed_wall_noise_percent": 6.3987158577990355,
+      "counters": {
+        "allocations": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 54,
+          "previous": 54,
+          "candidate": 54,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 980020,
+          "previous": 980020,
+          "candidate": 40004,
+          "previous_percent": -95.91804248892879,
+          "fixed_percent": -95.91804248892879
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 54,
+          "previous": 54,
+          "candidate": 54,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 54,
+          "previous": 54,
+          "candidate": 54,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "constant/medium": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 22.8151,
+          "previous": 27.3759,
+          "candidate": 23.1794,
+          "previous_percent": -15.329176392374315,
+          "fixed_percent": 1.5967495211504663
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6639616,
+          "previous": 6619136,
+          "candidate": 6610944,
+          "previous_percent": -0.12376237623762376,
+          "fixed_percent": -0.431832202344232
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2678784,
+          "previous": 2596864,
+          "candidate": 2592768,
+          "previous_percent": -0.15772870662460567,
+          "fixed_percent": -3.2110091743119265
+        }
+      },
+      "fixed_wall_noise_percent": 3.5018969326104394,
+      "counters": {
+        "allocations": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 55,
+          "previous": 55,
+          "candidate": 55,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 9800020,
+          "previous": 9800020,
+          "candidate": 400004,
+          "previous_percent": -95.9183348605411,
+          "fixed_percent": -95.9183348605411
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 55,
+          "previous": 55,
+          "candidate": 55,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 55,
+          "previous": 55,
+          "candidate": 55,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "constant/large": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 35.7445,
+          "previous": 41.5043,
+          "candidate": 25.6711,
+          "previous_percent": -38.14833643742938,
+          "fixed_percent": -28.181678300158072
+        },
+        "cpu_ms": {
+          "fixed": 31.25,
+          "previous": 31.25,
+          "candidate": 31.25,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6643712,
+          "previous": 6619136,
+          "candidate": 6610944,
+          "previous_percent": -0.12376237623762376,
+          "fixed_percent": -0.4932182490752158
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2682880,
+          "previous": 2588672,
+          "candidate": 2596864,
+          "previous_percent": 0.31645569620253167,
+          "fixed_percent": -3.2061068702290076
+        }
+      },
+      "fixed_wall_noise_percent": 1.5120786868132277,
+      "counters": {
+        "allocations": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 56,
+          "previous": 56,
+          "candidate": 56,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 49000020,
+          "previous": 49000020,
+          "candidate": 2000004,
+          "previous_percent": -95.91836084964864,
+          "fixed_percent": -95.91836084964864
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 56,
+          "previous": 56,
+          "candidate": 56,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 56,
+          "previous": 56,
+          "candidate": 56,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/small/typed-json": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 27.9496,
+          "previous": 31.8621,
+          "candidate": 30.3883,
+          "previous_percent": -4.625558265148877,
+          "fixed_percent": 8.725348484414805
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 31.25,
+          "previous_percent": 100,
+          "fixed_percent": 100
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 7774208,
+          "previous": 7761920,
+          "candidate": 7659520,
+          "previous_percent": -1.3192612137203166,
+          "fixed_percent": -1.4752370916754478
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 4030464,
+          "previous": 3936256,
+          "candidate": 3940352,
+          "previous_percent": 0.1040582726326743,
+          "fixed_percent": -2.2357723577235773
+        }
+      },
+      "fixed_wall_noise_percent": 2.259719126958859,
+      "counters": {
+        "allocations": {
+          "fixed": 36618,
+          "previous": 36618,
+          "candidate": 36618,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 4150499,
+          "previous": 4150499,
+          "candidate": 4150499,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 5196524,
+          "previous": 5196524,
+          "candidate": 905150,
+          "previous_percent": -82.58162571749885,
+          "fixed_percent": -82.58162571749885
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 1102400,
+          "candidate": 1286600,
+          "previous_percent": 16.70899854862119,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 444700,
+          "candidate": 515200,
+          "previous_percent": 15.853384304025186,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 3,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1049059,
+          "previous": 1049059,
+          "candidate": 1049059,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 1016645,
+          "previous": 1016645,
+          "candidate": 1016645,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/small/strings": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 20.0993,
+          "previous": 23.7123,
+          "candidate": 24.9073,
+          "previous_percent": 5.03957861531779,
+          "fixed_percent": 23.92123108764982
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6852608,
+          "previous": 6893568,
+          "candidate": 6868992,
+          "previous_percent": -0.35650623885918004,
+          "fixed_percent": 0.2390914524805738
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 3276800,
+          "previous": 3252224,
+          "candidate": 3239936,
+          "previous_percent": -0.3778337531486146,
+          "fixed_percent": -1.125
+        }
+      },
+      "fixed_wall_noise_percent": 3.825228456899987,
+      "counters": {
+        "allocations": {
+          "fixed": 4009,
+          "previous": 4009,
+          "candidate": 4009,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 497202,
+          "previous": 497202,
+          "candidate": 497202,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 104094,
+          "previous": 104094,
+          "candidate": 32013,
+          "previous_percent": -69.24606605568044,
+          "fixed_percent": -69.24606605568044
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 497202,
+          "previous": 497202,
+          "candidate": 497202,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 497202,
+          "previous": 497202,
+          "candidate": 497202,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/small/fold": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 20.3913,
+          "previous": 22.4073,
+          "candidate": 22.172,
+          "previous_percent": -1.0501042071110698,
+          "fixed_percent": 8.732645785212318
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6774784,
+          "previous": 6750208,
+          "candidate": 6721536,
+          "previous_percent": -0.42475728155339804,
+          "fixed_percent": -0.7859733978234583
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2699264,
+          "previous": 2617344,
+          "candidate": 2600960,
+          "previous_percent": -0.6259780907668232,
+          "fixed_percent": -3.6418816388467374
+        }
+      },
+      "fixed_wall_noise_percent": 2.9537259768197606,
+      "counters": {
+        "allocations": {
+          "fixed": 83,
+          "previous": 83,
+          "candidate": 83,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 30344,
+          "previous": 30344,
+          "candidate": 30344,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 22261,
+          "previous": 22261,
+          "candidate": 9560,
+          "previous_percent": -57.05493913121603,
+          "fixed_percent": -57.05493913121603
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 30344,
+          "previous": 30344,
+          "candidate": 30344,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 30344,
+          "previous": 30344,
+          "candidate": 30344,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/medium/typed-json": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 67.1753,
+          "previous": 77.3503,
+          "candidate": 66.2837,
+          "previous_percent": -14.30711968796502,
+          "fixed_percent": -1.3272735663257134
+        },
+        "cpu_ms": {
+          "fixed": 62.5,
+          "previous": 78.125,
+          "candidate": 62.5,
+          "previous_percent": -20,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 7827456,
+          "previous": 7819264,
+          "candidate": 7716864,
+          "previous_percent": -1.3095861707700367,
+          "fixed_percent": -1.41287284144427
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 4112384,
+          "previous": 4001792,
+          "candidate": 3997696,
+          "previous_percent": -0.1023541453428864,
+          "fixed_percent": -2.7888446215139444
+        }
+      },
+      "fixed_wall_noise_percent": 3.6142697577705714,
+      "counters": {
+        "allocations": {
+          "fixed": 205518,
+          "previous": 205518,
+          "candidate": 205518,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 22485954,
+          "previous": 22485954,
+          "candidate": 22485954,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 40725824,
+          "previous": 40725824,
+          "candidate": 7005050,
+          "previous_percent": -82.7994885996659,
+          "fixed_percent": -82.7994885996659
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 7233400,
+          "candidate": 4738900,
+          "previous_percent": -34.48585727320486,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 666700,
+          "candidate": 359200,
+          "previous_percent": -46.122693865306736,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 21,
+          "previous": 21,
+          "candidate": 21,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1052743,
+          "previous": 1052743,
+          "candidate": 1052743,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 677298,
+          "previous": 677298,
+          "candidate": 677298,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/medium/strings": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 21.3971,
+          "previous": 25.4812,
+          "candidate": 26.2452,
+          "previous_percent": 2.9982889345870656,
+          "fixed_percent": 22.657743339050633
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 7553024,
+          "previous": 7532544,
+          "candidate": 7507968,
+          "previous_percent": -0.3262642740619902,
+          "fixed_percent": -0.596529284164859
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 4157440,
+          "previous": 4214784,
+          "candidate": 4206592,
+          "previous_percent": -0.19436345966958213,
+          "fixed_percent": 1.1822660098522169
+        }
+      },
+      "fixed_wall_noise_percent": 1.1692190086735952,
+      "counters": {
+        "allocations": {
+          "fixed": 4009,
+          "previous": 4009,
+          "candidate": 4009,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 4339125,
+          "previous": 4339125,
+          "candidate": 4339125,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 104094,
+          "previous": 104094,
+          "candidate": 32013,
+          "previous_percent": -69.24606605568044,
+          "fixed_percent": -69.24606605568044
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 324200,
+          "candidate": 315700,
+          "previous_percent": -2.621838371375694,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 114600,
+          "candidate": 124100,
+          "previous_percent": 8.289703315881326,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 4,
+          "previous": 4,
+          "candidate": 4,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1049472,
+          "previous": 1049472,
+          "candidate": 1049472,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 150916,
+          "previous": 150916,
+          "candidate": 150916,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/medium/fold": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 21.7278,
+          "previous": 23.178,
+          "candidate": 24.8729,
+          "previous_percent": 7.312537751315905,
+          "fixed_percent": 14.475004372278846
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6787072,
+          "previous": 6750208,
+          "candidate": 6721536,
+          "previous_percent": -0.42475728155339804,
+          "fixed_percent": -0.9656004828002414
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 3084288,
+          "previous": 2998272,
+          "candidate": 2994176,
+          "previous_percent": -0.1366120218579235,
+          "fixed_percent": -2.9216467463479416
+        }
+      },
+      "fixed_wall_noise_percent": 4.012112391727883,
+      "counters": {
+        "allocations": {
+          "fixed": 135,
+          "previous": 135,
+          "candidate": 135,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 432202,
+          "previous": 432202,
+          "candidate": 432202,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 350581,
+          "previous": 350581,
+          "candidate": 151640,
+          "previous_percent": -56.74608720951792,
+          "fixed_percent": -56.74608720951792
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 432202,
+          "previous": 432202,
+          "candidate": 432202,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 432202,
+          "previous": 432202,
+          "candidate": 432202,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/large/typed-json": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 198.9688,
+          "previous": 229.1963,
+          "candidate": 172.9212,
+          "previous_percent": -24.55323231657754,
+          "fixed_percent": -13.091298736284276
+        },
+        "cpu_ms": {
+          "fixed": 203.125,
+          "previous": 218.75,
+          "candidate": 156.25,
+          "previous_percent": -28.571428571428573,
+          "fixed_percent": -23.076923076923077
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 7802880,
+          "previous": 7766016,
+          "candidate": 7671808,
+          "previous_percent": -1.2130801687763713,
+          "fixed_percent": -1.6797900262467191
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 4071424,
+          "previous": 4046848,
+          "candidate": 4042752,
+          "previous_percent": -0.10121457489878542,
+          "fixed_percent": -0.704225352112676
+        }
+      },
+      "fixed_wall_noise_percent": 0.42946864071199614,
+      "counters": {
+        "allocations": {
+          "fixed": 782118,
+          "previous": 782118,
+          "candidate": 782118,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 85529219,
+          "previous": 85529219,
+          "candidate": 85529219,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 168242924,
+          "previous": 168242924,
+          "candidate": 28761950,
+          "previous_percent": -82.90451133623903,
+          "fixed_percent": -82.90451133623903
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 24624600,
+          "candidate": 26823100,
+          "previous_percent": 8.928063806112586,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 668300,
+          "candidate": 771400,
+          "previous_percent": 15.427203351788119,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 85,
+          "previous": 85,
+          "candidate": 85,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1060115,
+          "previous": 1060115,
+          "candidate": 1060115,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 666986,
+          "previous": 666986,
+          "candidate": 666986,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/large/strings": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 25.3696,
+          "previous": 31.2105,
+          "candidate": 29.745,
+          "previous_percent": -4.6955351564377334,
+          "fixed_percent": 17.246625882946528
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 31.25,
+          "candidate": 31.25,
+          "previous_percent": 0,
+          "fixed_percent": 100
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 7675904,
+          "previous": 7905280,
+          "candidate": 7888896,
+          "previous_percent": -0.20725388601036268,
+          "fixed_percent": 2.774813233724653
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 4194304,
+          "previous": 4386816,
+          "candidate": 4382720,
+          "previous_percent": -0.09337068160597572,
+          "fixed_percent": 4.4921875
+        }
+      },
+      "fixed_wall_noise_percent": 1.6367723181424385,
+      "counters": {
+        "allocations": {
+          "fixed": 4010,
+          "previous": 4010,
+          "candidate": 4010,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 33025506,
+          "previous": 33025506,
+          "candidate": 33025506,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 104094,
+          "previous": 104094,
+          "candidate": 32013,
+          "previous_percent": -69.24606605568044,
+          "fixed_percent": -69.24606605568044
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 749100,
+          "candidate": 739500,
+          "previous_percent": -1.2815378454144974,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 56700,
+          "candidate": 55000,
+          "previous_percent": -2.998236331569665,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 31,
+          "previous": 31,
+          "candidate": 31,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1056415,
+          "previous": 1056415,
+          "candidate": 1056415,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 800683,
+          "previous": 800683,
+          "candidate": 800683,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "data/large/fold": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 23.5182,
+          "previous": 26.2237,
+          "candidate": 26.0557,
+          "previous_percent": -0.6406418621323431,
+          "fixed_percent": 10.789516204471436
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 7172096,
+          "previous": 7151616,
+          "candidate": 7135232,
+          "previous_percent": -0.2290950744558992,
+          "fixed_percent": -0.5139920045688178
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 3743744,
+          "previous": 3629056,
+          "candidate": 3620864,
+          "previous_percent": -0.22573363431151242,
+          "fixed_percent": -3.2822757111597376
+        }
+      },
+      "fixed_wall_noise_percent": 4.309356633900253,
+      "counters": {
+        "allocations": {
+          "fixed": 174,
+          "previous": 174,
+          "candidate": 174,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 3415964,
+          "previous": 3415964,
+          "candidate": 3415964,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 2802037,
+          "previous": 2802037,
+          "candidate": 1212504,
+          "previous_percent": -56.727766264328416,
+          "fixed_percent": -56.727766264328416
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 234300,
+          "candidate": 256800,
+          "previous_percent": 9.603072983354673,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 65500,
+          "candidate": 84600,
+          "previous_percent": 29.16030534351145,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 4,
+          "previous": 4,
+          "candidate": 4,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1051188,
+          "previous": 1051188,
+          "candidate": 1051188,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 262603,
+          "previous": 262603,
+          "candidate": 262603,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "buildlens/small": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 24.6344,
+          "previous": 28.2729,
+          "candidate": 27.2549,
+          "previous_percent": -3.6006210894531536,
+          "fixed_percent": 10.637563732017016
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 31.25,
+          "candidate": 15.625,
+          "previous_percent": -50,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 8163328,
+          "previous": 8126464,
+          "candidate": 7913472,
+          "previous_percent": -2.620967741935484,
+          "fixed_percent": -3.0607124937280483
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 4096000,
+          "previous": 3997696,
+          "candidate": 3985408,
+          "previous_percent": -0.3073770491803279,
+          "fixed_percent": -2.7
+        }
+      },
+      "fixed_wall_noise_percent": 3.6540289365297363,
+      "counters": {
+        "allocations": {
+          "fixed": 20816,
+          "previous": 20816,
+          "candidate": 20816,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 2557469,
+          "previous": 2557469,
+          "candidate": 2557469,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 1866724,
+          "previous": 1866724,
+          "candidate": 343391,
+          "previous_percent": -81.60461857242956,
+          "fixed_percent": -81.60461857242956
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 464400,
+          "candidate": 424400,
+          "previous_percent": -8.613264427217915,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 265700,
+          "candidate": 243500,
+          "previous_percent": -8.355287918705306,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 2,
+          "previous": 2,
+          "candidate": 2,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1048702,
+          "previous": 1048702,
+          "candidate": 1048702,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 609227,
+          "previous": 609227,
+          "candidate": 609227,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "buildlens/medium": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 52.8891,
+          "previous": 61.3339,
+          "candidate": 52.1534,
+          "previous_percent": -14.968068229804402,
+          "fixed_percent": -1.391023859358547
+        },
+        "cpu_ms": {
+          "fixed": 46.875,
+          "previous": 62.5,
+          "candidate": 46.875,
+          "previous_percent": -25,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 8273920,
+          "previous": 8241152,
+          "candidate": 8028160,
+          "previous_percent": -2.584493041749503,
+          "fixed_percent": -2.9702970297029703
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 4202496,
+          "previous": 4141056,
+          "candidate": 4132864,
+          "previous_percent": -0.19782393669634027,
+          "fixed_percent": -1.6569200779727096
+        }
+      },
+      "fixed_wall_noise_percent": 1.8953551722924902,
+      "counters": {
+        "allocations": {
+          "fixed": 203531,
+          "previous": 203531,
+          "candidate": 203531,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 23717850,
+          "previous": 23717850,
+          "candidate": 23717850,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 17539820,
+          "previous": 17539820,
+          "candidate": 3200240,
+          "previous_percent": -81.7544307752303,
+          "fixed_percent": -81.7544307752303
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 4767200,
+          "candidate": 5339300,
+          "previous_percent": 12.00075516026179,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 267600,
+          "candidate": 353900,
+          "previous_percent": 32.24962630792227,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 28,
+          "previous": 28,
+          "candidate": 28,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1049072,
+          "previous": 1049072,
+          "candidate": 1049072,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 794408,
+          "previous": 794408,
+          "candidate": 794408,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "buildlens/large": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 341.2431,
+          "previous": 401.677,
+          "candidate": 323.7464,
+          "previous_percent": -19.401310007792336,
+          "fixed_percent": -5.127341768961784
+        },
+        "cpu_ms": {
+          "fixed": 328.125,
+          "previous": 406.25,
+          "candidate": 312.5,
+          "previous_percent": -23.076923076923077,
+          "fixed_percent": -4.761904761904762
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 13336576,
+          "previous": 13336576,
+          "candidate": 13107200,
+          "previous_percent": -1.71990171990172,
+          "fixed_percent": -1.71990171990172
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 9519104,
+          "previous": 9457664,
+          "candidate": 9457664,
+          "previous_percent": 0,
+          "fixed_percent": -0.6454388984509466
+        }
+      },
+      "fixed_wall_noise_percent": 1.3483867515650854,
+      "counters": {
+        "allocations": {
+          "fixed": 2030634,
+          "previous": 2030634,
+          "candidate": 2030634,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 235433091,
+          "previous": 235433091,
+          "candidate": 235433091,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 175270042,
+          "previous": 175270042,
+          "candidate": 31939722,
+          "previous_percent": -81.77685037583319,
+          "fixed_percent": -81.77685037583319
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 77242000,
+          "candidate": 73010700,
+          "previous_percent": -5.477978301960073,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 1270100,
+          "candidate": 1646500,
+          "previous_percent": 29.635461774663412,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 194,
+          "previous": 194,
+          "candidate": 194,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 5551927,
+          "previous": 5551927,
+          "candidate": 5551927,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 58480,
+          "previous": 58480,
+          "candidate": 58480,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "fielddesk/demo": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 40.587,
+          "previous": 58.824,
+          "candidate": 51.1836,
+          "previous_percent": -12.988576091391268,
+          "fixed_percent": 26.10835981964667
+        },
+        "cpu_ms": {
+          "fixed": 31.25,
+          "previous": 31.25,
+          "candidate": 31.25,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 8212480,
+          "previous": 8216576,
+          "candidate": 7966720,
+          "previous_percent": -3.0408773678963112,
+          "fixed_percent": -2.9925187032418954
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 4390912,
+          "previous": 4272128,
+          "candidate": 4206592,
+          "previous_percent": -1.5340364333652925,
+          "fixed_percent": -4.197761194029851
+        }
+      },
+      "fixed_wall_noise_percent": 2.068590365462651,
+      "counters": {
+        "allocations": {
+          "fixed": 2212,
+          "previous": 2212,
+          "candidate": 2212,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 296446,
+          "previous": 296438,
+          "candidate": 296434,
+          "previous_percent": -0.0013493546711285328,
+          "fixed_percent": -0.004047954770852027
+        },
+        "executed_polls": {
+          "fixed": 605193,
+          "previous": 605205,
+          "candidate": 100734,
+          "previous_percent": -83.35539197462018,
+          "fixed_percent": -83.35506193891865
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 296446,
+          "previous": 296438,
+          "candidate": 296434,
+          "previous_percent": -0.0013493546711285328,
+          "fixed_percent": -0.004047954770852027
+        },
+        "before_teardown_bytes": {
+          "fixed": 296446,
+          "previous": 296438,
+          "candidate": 296434,
+          "previous_percent": -0.0013493546711285328,
+          "fixed_percent": -0.004047954770852027
+        }
+      }
+    },
+    "callbacks/native": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 20.5299,
+          "previous": 24.4354,
+          "candidate": 24.5483,
+          "previous_percent": 0.4620345891616252,
+          "fixed_percent": 19.57340269558059
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6787072,
+          "previous": 6754304,
+          "candidate": 6742016,
+          "previous_percent": -0.18192844147968465,
+          "fixed_percent": -0.663850331925166
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2834432,
+          "previous": 2723840,
+          "candidate": 2727936,
+          "previous_percent": 0.15037593984962405,
+          "fixed_percent": -3.7572254335260116
+        }
+      },
+      "fixed_wall_noise_percent": 2.3515339991627227,
+      "counters": {
+        "allocations": {
+          "fixed": 8,
+          "previous": 8,
+          "candidate": 8,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 809,
+          "previous": 809,
+          "candidate": 809,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 491,
+          "previous": 491,
+          "candidate": 71,
+          "previous_percent": -85.5397148676171,
+          "fixed_percent": -85.5397148676171
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 0,
+          "previous": 0,
+          "candidate": 0,
+          "previous_percent": null,
+          "fixed_percent": null
+        },
+        "peak_managed_bytes": {
+          "fixed": 809,
+          "previous": 809,
+          "candidate": 809,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 809,
+          "previous": 809,
+          "candidate": 809,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    },
+    "async/typed-values": {
+      "timing": {
+        "wall_ms": {
+          "fixed": 21.4206,
+          "previous": 21.7027,
+          "candidate": 23.743,
+          "previous_percent": 9.40113442106281,
+          "fixed_percent": 10.841899853412128
+        },
+        "cpu_ms": {
+          "fixed": 15.625,
+          "previous": 15.625,
+          "candidate": 15.625,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 7417856,
+          "previous": 7380992,
+          "candidate": 7282688,
+          "previous_percent": -1.3318534961154274,
+          "fixed_percent": -1.8221976808393152
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 4272128,
+          "previous": 4730880,
+          "candidate": 4718592,
+          "previous_percent": -0.2597402597402597,
+          "fixed_percent": 10.450623202301054
+        }
+      },
+      "fixed_wall_noise_percent": 4.100612978228698,
+      "counters": {
+        "allocations": {
+          "fixed": 256,
+          "previous": 256,
+          "candidate": 256,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "allocated_bytes": {
+          "fixed": 2129390,
+          "previous": 2129390,
+          "candidate": 2129390,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "executed_polls": {
+          "fixed": 594902,
+          "previous": 594902,
+          "candidate": 132051,
+          "previous_percent": -77.8028986286817,
+          "fixed_percent": -77.8028986286817
+        },
+        "gc_pause_total_ns": {
+          "fixed": null,
+          "previous": 38000,
+          "candidate": 34300,
+          "previous_percent": -9.736842105263158,
+          "fixed_percent": null
+        },
+        "gc_pause_max_ns": {
+          "fixed": null,
+          "previous": 37600,
+          "candidate": 33800,
+          "previous_percent": -10.106382978723405,
+          "fixed_percent": null
+        },
+        "gc_collections": {
+          "fixed": 2,
+          "previous": 2,
+          "candidate": 2,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "peak_managed_bytes": {
+          "fixed": 1573136,
+          "previous": 1573136,
+          "candidate": 1573136,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "before_teardown_bytes": {
+          "fixed": 1080128,
+          "previous": 1080128,
+          "candidate": 1080128,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      }
+    }
+  },
+  "code": {
+    "numeric": {
+      "emitted": {
+        "roots": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 5,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 62,
+          "previous": 62,
+          "candidate": 10,
+          "previous_percent": -83.87096774193549,
+          "fixed_percent": -83.87096774193549
+        },
+        "arithmetic_guards": {
+          "fixed": 13,
+          "previous": 13,
+          "candidate": 8,
+          "previous_percent": -38.46153846153846,
+          "fixed_percent": -38.46153846153846
+        },
+        "temporaries": {
+          "fixed": 102,
+          "previous": 102,
+          "candidate": 102,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 26,
+          "previous": 26,
+          "candidate": 26,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 12,
+          "previous": 12,
+          "candidate": 12,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 10,
+          "previous": 10,
+          "candidate": 10,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "c_bytes": {
+        "fixed": 137356,
+        "previous": 137356,
+        "candidate": 136007,
+        "previous_percent": -0.9821194560121145,
+        "fixed_percent": -0.9821194560121145
+      },
+      "executable_bytes": {
+        "fixed": 152576,
+        "previous": 152576,
+        "candidate": 150016,
+        "previous_percent": -1.6778523489932886,
+        "fixed_percent": -1.6778523489932886
+      }
+    },
+    "aggregate": {
+      "emitted": {
+        "roots": {
+          "fixed": 21,
+          "previous": 21,
+          "candidate": 5,
+          "previous_percent": -76.19047619047619,
+          "fixed_percent": -76.19047619047619
+        },
+        "polls": {
+          "fixed": 51,
+          "previous": 51,
+          "candidate": 8,
+          "previous_percent": -84.31372549019608,
+          "fixed_percent": -84.31372549019608
+        },
+        "arithmetic_guards": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 4,
+          "previous_percent": -20,
+          "fixed_percent": -20
+        },
+        "temporaries": {
+          "fixed": 81,
+          "previous": 81,
+          "candidate": 81,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 30,
+          "previous": 30,
+          "candidate": 26,
+          "previous_percent": -13.333333333333334,
+          "fixed_percent": -13.333333333333334
+        },
+        "types": {
+          "fixed": 16,
+          "previous": 16,
+          "candidate": 16,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 14,
+          "previous": 14,
+          "candidate": 10,
+          "previous_percent": -28.571428571428573,
+          "fixed_percent": -28.571428571428573
+        }
+      },
+      "c_bytes": {
+        "fixed": 136886,
+        "previous": 136886,
+        "candidate": 134544,
+        "previous_percent": -1.7109127303011264,
+        "fixed_percent": -1.7109127303011264
+      },
+      "executable_bytes": {
+        "fixed": 152576,
+        "previous": 152576,
+        "candidate": 149504,
+        "previous_percent": -2.0134228187919465,
+        "fixed_percent": -2.0134228187919465
+      }
+    },
+    "mixed": {
+      "emitted": {
+        "roots": {
+          "fixed": 33,
+          "previous": 33,
+          "candidate": 33,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 61,
+          "previous": 61,
+          "candidate": 15,
+          "previous_percent": -75.40983606557377,
+          "fixed_percent": -75.40983606557377
+        },
+        "arithmetic_guards": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 4,
+          "previous_percent": -20,
+          "fixed_percent": -20
+        },
+        "temporaries": {
+          "fixed": 94,
+          "previous": 94,
+          "candidate": 94,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 29,
+          "previous": 29,
+          "candidate": 29,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 15,
+          "previous": 15,
+          "candidate": 15,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 13,
+          "previous": 13,
+          "candidate": 13,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "c_bytes": {
+        "fixed": 139655,
+        "previous": 139655,
+        "candidate": 139244,
+        "previous_percent": -0.2942966596255057,
+        "fixed_percent": -0.2942966596255057
+      },
+      "executable_bytes": {
+        "fixed": 158720,
+        "previous": 158720,
+        "candidate": 156672,
+        "previous_percent": -1.2903225806451613,
+        "fixed_percent": -1.2903225806451613
+      }
+    },
+    "dispatch": {
+      "emitted": {
+        "roots": {
+          "fixed": 24,
+          "previous": 24,
+          "candidate": 24,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 52,
+          "previous": 52,
+          "candidate": 13,
+          "previous_percent": -75,
+          "fixed_percent": -75
+        },
+        "arithmetic_guards": {
+          "fixed": 6,
+          "previous": 6,
+          "candidate": 5,
+          "previous_percent": -16.666666666666668,
+          "fixed_percent": -16.666666666666668
+        },
+        "temporaries": {
+          "fixed": 85,
+          "previous": 85,
+          "candidate": 85,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 3,
+          "candidate": 3,
+          "previous_percent": 0,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 29,
+          "previous": 29,
+          "candidate": 29,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 14,
+          "previous": 14,
+          "candidate": 14,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 11,
+          "previous": 11,
+          "candidate": 11,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "c_bytes": {
+        "fixed": 138129,
+        "previous": 138129,
+        "candidate": 137797,
+        "previous_percent": -0.24035503044255732,
+        "fixed_percent": -0.24035503044255732
+      },
+      "executable_bytes": {
+        "fixed": 153088,
+        "previous": 153088,
+        "candidate": 151552,
+        "previous_percent": -1.0033444816053512,
+        "fixed_percent": -1.0033444816053512
+      }
+    },
+    "constant": {
+      "emitted": {
+        "roots": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 5,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 89,
+          "previous": 89,
+          "candidate": 7,
+          "previous_percent": -92.13483146067416,
+          "fixed_percent": -92.13483146067416
+        },
+        "arithmetic_guards": {
+          "fixed": 22,
+          "previous": 22,
+          "candidate": 5,
+          "previous_percent": -77.27272727272727,
+          "fixed_percent": -77.27272727272727
+        },
+        "temporaries": {
+          "fixed": 130,
+          "previous": 130,
+          "candidate": 73,
+          "previous_percent": -43.84615384615385,
+          "fixed_percent": -43.84615384615385
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 9,
+          "candidate": 3,
+          "previous_percent": -66.66666666666667,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 25,
+          "previous": 25,
+          "candidate": 25,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 12,
+          "previous": 12,
+          "candidate": 12,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 10,
+          "previous": 10,
+          "candidate": 10,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "c_bytes": {
+        "fixed": 139459,
+        "previous": 139459,
+        "candidate": 133208,
+        "previous_percent": -4.482320968886913,
+        "fixed_percent": -4.482320968886913
+      },
+      "executable_bytes": {
+        "fixed": 152576,
+        "previous": 152576,
+        "candidate": 149504,
+        "previous_percent": -2.0134228187919465,
+        "fixed_percent": -2.0134228187919465
+      }
+    },
+    "data": {
+      "emitted": {
+        "roots": {
+          "fixed": 4624,
+          "previous": 4624,
+          "candidate": 3102,
+          "previous_percent": -32.91522491349481,
+          "fixed_percent": -32.91522491349481
+        },
+        "polls": {
+          "fixed": 6129,
+          "previous": 6129,
+          "candidate": 856,
+          "previous_percent": -86.03361070321422,
+          "fixed_percent": -86.03361070321422
+        },
+        "arithmetic_guards": {
+          "fixed": 214,
+          "previous": 214,
+          "candidate": 154,
+          "previous_percent": -28.037383177570092,
+          "fixed_percent": -28.037383177570092
+        },
+        "temporaries": {
+          "fixed": 9148,
+          "previous": 9148,
+          "candidate": 6873,
+          "previous_percent": -24.868823786620027,
+          "fixed_percent": -24.868823786620027
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 503,
+          "candidate": 387,
+          "previous_percent": -23.061630218687874,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 446,
+          "previous": 446,
+          "candidate": 313,
+          "previous_percent": -29.820627802690584,
+          "fixed_percent": -29.820627802690584
+        },
+        "types": {
+          "fixed": 162,
+          "previous": 162,
+          "candidate": 128,
+          "previous_percent": -20.987654320987655,
+          "fixed_percent": -20.987654320987655
+        },
+        "traces": {
+          "fixed": 145,
+          "previous": 145,
+          "candidate": 101,
+          "previous_percent": -30.344827586206897,
+          "fixed_percent": -30.344827586206897
+        }
+      },
+      "c_bytes": {
+        "fixed": 1432999,
+        "previous": 1432999,
+        "candidate": 1015600,
+        "previous_percent": -29.127654659912533,
+        "fixed_percent": -29.127654659912533
+      },
+      "executable_bytes": {
+        "fixed": 724480,
+        "previous": 724480,
+        "candidate": 514048,
+        "previous_percent": -29.045936395759718,
+        "fixed_percent": -29.045936395759718
+      }
+    },
+    "buildlens": {
+      "emitted": {
+        "roots": {
+          "fixed": 6482,
+          "previous": 6482,
+          "candidate": 4263,
+          "previous_percent": -34.23326133909287,
+          "fixed_percent": -34.23326133909287
+        },
+        "polls": {
+          "fixed": 8503,
+          "previous": 8503,
+          "candidate": 1161,
+          "previous_percent": -86.34599553098906,
+          "fixed_percent": -86.34599553098906
+        },
+        "arithmetic_guards": {
+          "fixed": 250,
+          "previous": 250,
+          "candidate": 185,
+          "previous_percent": -26,
+          "fixed_percent": -26
+        },
+        "temporaries": {
+          "fixed": 12246,
+          "previous": 12246,
+          "candidate": 8901,
+          "previous_percent": -27.31504164625184,
+          "fixed_percent": -27.31504164625184
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 659,
+          "candidate": 514,
+          "previous_percent": -22.003034901365705,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 524,
+          "previous": 524,
+          "candidate": 331,
+          "previous_percent": -36.83206106870229,
+          "fixed_percent": -36.83206106870229
+        },
+        "types": {
+          "fixed": 204,
+          "previous": 204,
+          "candidate": 142,
+          "previous_percent": -30.392156862745097,
+          "fixed_percent": -30.392156862745097
+        },
+        "traces": {
+          "fixed": 186,
+          "previous": 186,
+          "candidate": 118,
+          "previous_percent": -36.55913978494624,
+          "fixed_percent": -36.55913978494624
+        }
+      },
+      "c_bytes": {
+        "fixed": 1908870,
+        "previous": 1908870,
+        "candidate": 1305871,
+        "previous_percent": -31.58931724004254,
+        "fixed_percent": -31.58931724004254
+      },
+      "executable_bytes": {
+        "fixed": 920064,
+        "previous": 920064,
+        "candidate": 638976,
+        "previous_percent": -30.550918196994992,
+        "fixed_percent": -30.550918196994992
+      }
+    },
+    "fielddesk": {
+      "emitted": {
+        "roots": {
+          "fixed": 9338,
+          "previous": 9338,
+          "candidate": 7108,
+          "previous_percent": -23.880916684514887,
+          "fixed_percent": -23.880916684514887
+        },
+        "polls": {
+          "fixed": 11990,
+          "previous": 11990,
+          "candidate": 1822,
+          "previous_percent": -84.80400333611342,
+          "fixed_percent": -84.80400333611342
+        },
+        "arithmetic_guards": {
+          "fixed": 332,
+          "previous": 332,
+          "candidate": 182,
+          "previous_percent": -45.18072289156626,
+          "fixed_percent": -45.18072289156626
+        },
+        "temporaries": {
+          "fixed": 17550,
+          "previous": 17550,
+          "candidate": 13866,
+          "previous_percent": -20.99145299145299,
+          "fixed_percent": -20.99145299145299
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 1100,
+          "candidate": 917,
+          "previous_percent": -16.636363636363637,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 766,
+          "previous": 766,
+          "candidate": 569,
+          "previous_percent": -25.718015665796344,
+          "fixed_percent": -25.718015665796344
+        },
+        "types": {
+          "fixed": 286,
+          "previous": 286,
+          "candidate": 230,
+          "previous_percent": -19.58041958041958,
+          "fixed_percent": -19.58041958041958
+        },
+        "traces": {
+          "fixed": 254,
+          "previous": 254,
+          "candidate": 178,
+          "previous_percent": -29.921259842519685,
+          "fixed_percent": -29.921259842519685
+        }
+      },
+      "c_bytes": {
+        "fixed": 2748960,
+        "previous": 2748960,
+        "candidate": 2080426,
+        "previous_percent": -24.319524474710438,
+        "fixed_percent": -24.319524474710438
+      },
+      "executable_bytes": {
+        "fixed": 1261056,
+        "previous": 1261056,
+        "candidate": 870912,
+        "previous_percent": -30.937880633373933,
+        "fixed_percent": -30.937880633373933
+      }
+    },
+    "callbacks": {
+      "emitted": {
+        "roots": {
+          "fixed": 55,
+          "previous": 55,
+          "candidate": 55,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 115,
+          "previous": 115,
+          "candidate": 41,
+          "previous_percent": -64.34782608695652,
+          "fixed_percent": -64.34782608695652
+        },
+        "arithmetic_guards": {
+          "fixed": 2,
+          "previous": 2,
+          "candidate": 2,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "temporaries": {
+          "fixed": 220,
+          "previous": 220,
+          "candidate": 220,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 23,
+          "candidate": 23,
+          "previous_percent": 0,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 29,
+          "previous": 29,
+          "candidate": 29,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 14,
+          "previous": 14,
+          "candidate": 14,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 11,
+          "previous": 11,
+          "candidate": 11,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "c_bytes": {
+        "fixed": 159331,
+        "previous": 159331,
+        "candidate": 158832,
+        "previous_percent": -0.31318450270192244,
+        "fixed_percent": -0.31318450270192244
+      },
+      "executable_bytes": {
+        "fixed": 166912,
+        "previous": 166912,
+        "candidate": 164352,
+        "previous_percent": -1.5337423312883436,
+        "fixed_percent": -1.5337423312883436
+      }
+    },
+    "async": {
+      "emitted": {
+        "roots": {
+          "fixed": 1679,
+          "previous": 1679,
+          "candidate": 1279,
+          "previous_percent": -23.823704586063133,
+          "fixed_percent": -23.823704586063133
+        },
+        "polls": {
+          "fixed": 2417,
+          "previous": 2417,
+          "candidate": 449,
+          "previous_percent": -81.42325196524617,
+          "fixed_percent": -81.42325196524617
+        },
+        "arithmetic_guards": {
+          "fixed": 51,
+          "previous": 51,
+          "candidate": 40,
+          "previous_percent": -21.568627450980394,
+          "fixed_percent": -21.568627450980394
+        },
+        "temporaries": {
+          "fixed": 3500,
+          "previous": 3500,
+          "candidate": 3480,
+          "previous_percent": -0.5714285714285714,
+          "fixed_percent": -0.5714285714285714
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 155,
+          "candidate": 155,
+          "previous_percent": 0,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 155,
+          "previous": 155,
+          "candidate": 135,
+          "previous_percent": -12.903225806451612,
+          "fixed_percent": -12.903225806451612
+        },
+        "types": {
+          "fixed": 82,
+          "previous": 82,
+          "candidate": 82,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 72,
+          "previous": 72,
+          "candidate": 54,
+          "previous_percent": -25,
+          "fixed_percent": -25
+        }
+      },
+      "c_bytes": {
+        "fixed": 602240,
+        "previous": 602240,
+        "candidate": 539546,
+        "previous_percent": -10.410135494155154,
+        "fixed_percent": -10.410135494155154
+      },
+      "executable_bytes": {
+        "fixed": 403968,
+        "previous": 403968,
+        "candidate": 292864,
+        "previous_percent": -27.50316856780735,
+        "fixed_percent": -27.50316856780735
+      }
+    }
+  },
+  "builds": {
+    "buildlens": {
+      "phases": {
+        "frontend": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 219.3166,
+              "previous": 251.1294,
+              "candidate": 172.9027,
+              "previous_percent": -31.149956954462517,
+              "fixed_percent": -21.162967144301884
+            },
+            "cpu_ms": {
+              "fixed": 203.125,
+              "previous": 250,
+              "candidate": 156.25,
+              "previous_percent": -37.5,
+              "fixed_percent": -23.076923076923077
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 35971072,
+              "previous": 35917824,
+              "candidate": 35594240,
+              "previous_percent": -0.9009009009009009,
+              "fixed_percent": -1.047597358232749
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 34312192,
+              "previous": 33820672,
+              "candidate": 34648064,
+              "previous_percent": 2.446409107424004,
+              "fixed_percent": 0.9788707174406112
+            }
+          },
+          "fixed_wall_noise_percent": 1.976106693111041
+        },
+        "emit_c_total": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 322.7478,
+              "previous": 389.7556,
+              "candidate": 271.2326,
+              "previous_percent": -30.409569484056167,
+              "fixed_percent": -15.961441100450568
+            },
+            "cpu_ms": {
+              "fixed": 312.5,
+              "previous": 375,
+              "candidate": 265.625,
+              "previous_percent": -29.166666666666668,
+              "fixed_percent": -15
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 58540032,
+              "previous": 58564608,
+              "candidate": 54722560,
+              "previous_percent": -6.560358092040845,
+              "fixed_percent": -6.521130702490904
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 56098816,
+              "previous": 56025088,
+              "candidate": 52420608,
+              "previous_percent": -6.433689135838573,
+              "fixed_percent": -6.556658878504673
+            }
+          },
+          "fixed_wall_noise_percent": 0.29783929967713274
+        },
+        "c_compile_link": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 2409.7776,
+              "previous": 2725.6423,
+              "candidate": 1855.9988,
+              "previous_percent": -31.90600248609291,
+              "fixed_percent": -22.98049413356651
+            },
+            "cpu_ms": {
+              "fixed": 8171.875,
+              "previous": 9562.5,
+              "candidate": 5359.375,
+              "previous_percent": -43.95424836601307,
+              "fixed_percent": -34.41682600382409
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 263135232,
+              "previous": 270528512,
+              "candidate": 168570880,
+              "previous_percent": -37.68831286810907,
+              "fixed_percent": -35.93754864418916
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 271998976,
+              "previous": 279420928,
+              "candidate": 188796928,
+              "previous_percent": -32.43278899997068,
+              "fixed_percent": -30.589103394271604
+            }
+          },
+          "fixed_wall_noise_percent": 1.680501379857074
+        },
+        "build_total": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 2731.82,
+              "previous": 3187.7337,
+              "candidate": 2277.8923,
+              "previous_percent": -28.541951292857373,
+              "fixed_percent": -16.616310737896352
+            },
+            "cpu_ms": {
+              "fixed": 8468.75,
+              "previous": 10171.875,
+              "candidate": 5921.875,
+              "previous_percent": -41.78187403993856,
+              "fixed_percent": -30.07380073800738
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 58613760,
+              "previous": 58634240,
+              "candidate": 55123968,
+              "previous_percent": -5.986727209221097,
+              "fixed_percent": -5.953878406708595
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 325603328,
+              "previous": 325386240,
+              "candidate": 239673344,
+              "previous_percent": -26.341893252769385,
+              "fixed_percent": -26.39100298139459
+            }
+          },
+          "fixed_wall_noise_percent": 0.911690147387405
+        }
+      },
+      "emitted": {
+        "roots": {
+          "fixed": 6482,
+          "previous": 6482,
+          "candidate": 4263,
+          "previous_percent": -34.23326133909287,
+          "fixed_percent": -34.23326133909287
+        },
+        "polls": {
+          "fixed": 8503,
+          "previous": 8503,
+          "candidate": 1161,
+          "previous_percent": -86.34599553098906,
+          "fixed_percent": -86.34599553098906
+        },
+        "arithmetic_guards": {
+          "fixed": 250,
+          "previous": 250,
+          "candidate": 185,
+          "previous_percent": -26,
+          "fixed_percent": -26
+        },
+        "temporaries": {
+          "fixed": 12246,
+          "previous": 12246,
+          "candidate": 8901,
+          "previous_percent": -27.31504164625184,
+          "fixed_percent": -27.31504164625184
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 659,
+          "candidate": 514,
+          "previous_percent": -22.003034901365705,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 524,
+          "previous": 524,
+          "candidate": 331,
+          "previous_percent": -36.83206106870229,
+          "fixed_percent": -36.83206106870229
+        },
+        "types": {
+          "fixed": 204,
+          "previous": 204,
+          "candidate": 142,
+          "previous_percent": -30.392156862745097,
+          "fixed_percent": -30.392156862745097
+        },
+        "traces": {
+          "fixed": 186,
+          "previous": 186,
+          "candidate": 118,
+          "previous_percent": -36.55913978494624,
+          "fixed_percent": -36.55913978494624
+        }
+      },
+      "sizes": {
+        "package": {
+          "fixed": 436130,
+          "previous": 436131,
+          "candidate": 314480,
+          "previous_percent": -27.893224742107304,
+          "fixed_percent": -27.893059408891844
+        },
+        "c": {
+          "fixed": 1908870,
+          "previous": 1908870,
+          "candidate": 1305871,
+          "previous_percent": -31.58931724004254,
+          "fixed_percent": -31.58931724004254
+        },
+        "exe": {
+          "fixed": 920064,
+          "previous": 920064,
+          "candidate": 638976,
+          "previous_percent": -30.550918196994992,
+          "fixed_percent": -30.550918196994992
+        }
+      }
+    },
+    "fielddesk": {
+      "phases": {
+        "frontend": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 378.4819,
+              "previous": 428.1743,
+              "candidate": 300.5154,
+              "previous_percent": -29.814703965184275,
+              "fixed_percent": -20.59979618576212
+            },
+            "cpu_ms": {
+              "fixed": 359.375,
+              "previous": 421.875,
+              "candidate": 296.875,
+              "previous_percent": -29.62962962962963,
+              "fixed_percent": -17.391304347826086
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 46628864,
+              "previous": 46563328,
+              "candidate": 47005696,
+              "previous_percent": 0.9500351864883885,
+              "fixed_percent": 0.8081517919887562
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 45277184,
+              "previous": 44859392,
+              "candidate": 45281280,
+              "previous_percent": 0.9404674945215485,
+              "fixed_percent": 0.00904649900488511
+            }
+          },
+          "fixed_wall_noise_percent": 1.912256526719039
+        },
+        "emit_c_total": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 530.7462,
+              "previous": 645.0698,
+              "candidate": 435.1066,
+              "previous_percent": -32.548911761176846,
+              "fixed_percent": -18.019836976694325
+            },
+            "cpu_ms": {
+              "fixed": 531.25,
+              "previous": 625,
+              "candidate": 437.5,
+              "previous_percent": -30,
+              "fixed_percent": -17.647058823529413
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 73551872,
+              "previous": 73515008,
+              "candidate": 68898816,
+              "previous_percent": -6.279251170046802,
+              "fixed_percent": -6.326223756752241
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 72421376,
+              "previous": 72151040,
+              "candidate": 67227648,
+              "previous_percent": -6.823729775759296,
+              "fixed_percent": -7.171540071262938
+            }
+          },
+          "fixed_wall_noise_percent": 0.4554410615213033
+        },
+        "c_compile_link": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 8617.2041,
+              "previous": 9934.4223,
+              "candidate": 8598.9972,
+              "previous_percent": -13.442403188356513,
+              "fixed_percent": -0.21128546787003732
+            },
+            "cpu_ms": {
+              "fixed": 15375,
+              "previous": 18406.25,
+              "candidate": 13328.125,
+              "previous_percent": -27.589134125636672,
+              "fixed_percent": -13.3130081300813
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 221515776,
+              "previous": 221835264,
+              "candidate": 163495936,
+              "previous_percent": -26.29849147879392,
+              "fixed_percent": -26.192193191693942
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 246751232,
+              "previous": 244092928,
+              "candidate": 180666368,
+              "previous_percent": -25.984595506183613,
+              "fixed_percent": -26.78197934995518
+            }
+          },
+          "fixed_wall_noise_percent": 0.3732551787385277
+        },
+        "build_total": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 9087.0508,
+              "previous": 9760.634,
+              "candidate": 8181.9632,
+              "previous_percent": -16.17385509998633,
+              "fixed_percent": -9.960190824508217
+            },
+            "cpu_ms": {
+              "fixed": 15875,
+              "previous": 17375,
+              "candidate": 12375,
+              "previous_percent": -28.776978417266186,
+              "fixed_percent": -22.04724409448819
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 73732096,
+              "previous": 73490432,
+              "candidate": 69300224,
+              "previous_percent": -5.701705495485453,
+              "fixed_percent": -6.010777179045609
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 312811520,
+              "previous": 315412480,
+              "candidate": 245149696,
+              "previous_percent": -22.276475553535484,
+              "fixed_percent": -21.630221291082886
+            }
+          },
+          "fixed_wall_noise_percent": 0.2678111000906754
+        }
+      },
+      "emitted": {
+        "roots": {
+          "fixed": 9338,
+          "previous": 9338,
+          "candidate": 7108,
+          "previous_percent": -23.880916684514887,
+          "fixed_percent": -23.880916684514887
+        },
+        "polls": {
+          "fixed": 11990,
+          "previous": 11990,
+          "candidate": 1822,
+          "previous_percent": -84.80400333611342,
+          "fixed_percent": -84.80400333611342
+        },
+        "arithmetic_guards": {
+          "fixed": 332,
+          "previous": 332,
+          "candidate": 182,
+          "previous_percent": -45.18072289156626,
+          "fixed_percent": -45.18072289156626
+        },
+        "temporaries": {
+          "fixed": 17550,
+          "previous": 17550,
+          "candidate": 13866,
+          "previous_percent": -20.99145299145299,
+          "fixed_percent": -20.99145299145299
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 1100,
+          "candidate": 917,
+          "previous_percent": -16.636363636363637,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 766,
+          "previous": 766,
+          "candidate": 569,
+          "previous_percent": -25.718015665796344,
+          "fixed_percent": -25.718015665796344
+        },
+        "types": {
+          "fixed": 286,
+          "previous": 286,
+          "candidate": 230,
+          "previous_percent": -19.58041958041958,
+          "fixed_percent": -19.58041958041958
+        },
+        "traces": {
+          "fixed": 254,
+          "previous": 254,
+          "candidate": 178,
+          "previous_percent": -29.921259842519685,
+          "fixed_percent": -29.921259842519685
+        }
+      },
+      "sizes": {
+        "package": {
+          "fixed": 2587997,
+          "previous": 2587997,
+          "candidate": 2407282,
+          "previous_percent": -6.982813349474516,
+          "fixed_percent": -6.982813349474516
+        },
+        "c": {
+          "fixed": 2748960,
+          "previous": 2748960,
+          "candidate": 2080426,
+          "previous_percent": -24.319524474710438,
+          "fixed_percent": -24.319524474710438
+        },
+        "exe": {
+          "fixed": 1261056,
+          "previous": 1261056,
+          "candidate": 870912,
+          "previous_percent": -30.937880633373933,
+          "fixed_percent": -30.937880633373933
+        }
+      }
+    },
+    "compiler": {
+      "phases": {
+        "frontend": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 1295.1257,
+              "previous": 1391.933,
+              "candidate": 538.8,
+              "previous_percent": -61.29124031113567,
+              "fixed_percent": -58.39786053199315
+            },
+            "cpu_ms": {
+              "fixed": 1281.25,
+              "previous": 1390.625,
+              "candidate": 531.25,
+              "previous_percent": -61.79775280898876,
+              "fixed_percent": -58.53658536585366
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 92622848,
+              "previous": 93024256,
+              "candidate": 93413376,
+              "previous_percent": 0.41829950244374975,
+              "fixed_percent": 0.8534913545305798
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 96395264,
+              "previous": 97009664,
+              "candidate": 97669120,
+              "previous_percent": 0.6797838203006249,
+              "fixed_percent": 1.321492308999745
+            }
+          },
+          "fixed_wall_noise_percent": 0.6123829283201944
+        },
+        "emit_c_total": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 1762.2903,
+              "previous": 2088.4603,
+              "candidate": 1154.0832,
+              "previous_percent": -44.739998169943675,
+              "fixed_percent": -34.512310485962495
+            },
+            "cpu_ms": {
+              "fixed": 1750,
+              "previous": 2078.125,
+              "candidate": 1140.625,
+              "previous_percent": -45.11278195488722,
+              "fixed_percent": -34.82142857142857
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 149168128,
+              "previous": 156418048,
+              "candidate": 152993792,
+              "previous_percent": -2.189169372577773,
+              "fixed_percent": 2.5646658245922347
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 154165248,
+              "previous": 163622912,
+              "candidate": 157437952,
+              "previous_percent": -3.7800085112774426,
+              "fixed_percent": 2.122854561878952
+            }
+          },
+          "fixed_wall_noise_percent": 1.0255283613290553
+        },
+        "c_compile_link": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 38163.974,
+              "previous": 38754.648,
+              "candidate": 23629.5632,
+              "previous_percent": -39.02779558209379,
+              "fixed_percent": -38.08411251930944
+            },
+            "cpu_ms": {
+              "fixed": 142046.875,
+              "previous": 136921.875,
+              "candidate": 80750,
+              "previous_percent": -41.02476320894671,
+              "fixed_percent": -43.15256847431526
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 652800000,
+              "previous": 636637184,
+              "candidate": 405524480,
+              "previous_percent": -36.30210578463478,
+              "fixed_percent": -37.87921568627451
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 659189760,
+              "previous": 644562944,
+              "candidate": 418807808,
+              "previous_percent": -35.024529117205965,
+              "fixed_percent": -36.46627520427502
+            }
+          },
+          "fixed_wall_noise_percent": 0.3449174853185191
+        },
+        "build_total": {
+          "timing": {
+            "wall_ms": {
+              "fixed": 40441.4847,
+              "previous": 38135.1468,
+              "candidate": 23363.7688,
+              "previous_percent": -38.734289073196905,
+              "fixed_percent": -42.22821201220636
+            },
+            "cpu_ms": {
+              "fixed": 144046.875,
+              "previous": 133109.375,
+              "candidate": 77843.75,
+              "previous_percent": -41.51895762413429,
+              "fixed_percent": -45.95943160863434
+            },
+            "peak_process_working_set_bytes": {
+              "fixed": 149155840,
+              "previous": 156381184,
+              "candidate": 153169920,
+              "previous_percent": -2.053484900075958,
+              "fixed_percent": 2.69119868186187
+            },
+            "peak_tree_commit_bytes": {
+              "fixed": 786239488,
+              "previous": 815902720,
+              "candidate": 577937408,
+              "previous_percent": -29.16589271819072,
+              "fixed_percent": -26.49346454600866
+            }
+          },
+          "fixed_wall_noise_percent": 1.0319318983530714
+        }
+      },
+      "emitted": {
+        "roots": {
+          "fixed": 21920,
+          "previous": 21920,
+          "candidate": 19051,
+          "previous_percent": -13.088503649635037,
+          "fixed_percent": -13.088503649635037
+        },
+        "polls": {
+          "fixed": 29961,
+          "previous": 29961,
+          "candidate": 7370,
+          "previous_percent": -75.40135509495677,
+          "fixed_percent": -75.40135509495677
+        },
+        "arithmetic_guards": {
+          "fixed": 716,
+          "previous": 716,
+          "candidate": 472,
+          "previous_percent": -34.07821229050279,
+          "fixed_percent": -34.07821229050279
+        },
+        "temporaries": {
+          "fixed": 39698,
+          "previous": 39698,
+          "candidate": 39669,
+          "previous_percent": -0.07305153912035871,
+          "fixed_percent": -0.07305153912035871
+        },
+        "branches": {
+          "fixed": null,
+          "previous": 2222,
+          "candidate": 2222,
+          "previous_percent": 0,
+          "fixed_percent": null
+        },
+        "functions": {
+          "fixed": 517,
+          "previous": 517,
+          "candidate": 504,
+          "previous_percent": -2.514506769825919,
+          "fixed_percent": -2.514506769825919
+        },
+        "types": {
+          "fixed": 68,
+          "previous": 68,
+          "candidate": 68,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 63,
+          "previous": 63,
+          "candidate": 55,
+          "previous_percent": -12.698412698412698,
+          "fixed_percent": -12.698412698412698
+        }
+      },
+      "sizes": {
+        "package": {
+          "fixed": 2649314,
+          "previous": 2654785,
+          "candidate": 2087394,
+          "previous_percent": -21.37238985454566,
+          "fixed_percent": -21.210018895457466
+        },
+        "c": {
+          "fixed": 6067085,
+          "previous": 6624365,
+          "candidate": 6039352,
+          "previous_percent": -8.831231370855923,
+          "fixed_percent": -0.4571058424267997
+        },
+        "exe": {
+          "fixed": 4188160,
+          "previous": 4188672,
+          "candidate": 3038720,
+          "previous_percent": -27.453856496760785,
+          "fixed_percent": -27.444987775061126
+        }
+      }
+    }
+  }
+}

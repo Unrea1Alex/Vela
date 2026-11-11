@@ -1,3 +1,4 @@
+import "json_tokens.vela" as tokens;
 import "text.vela" as text;
 pub enum Value {
     Null,
@@ -39,8 +40,7 @@ struct Reader {
     exhausted: List<ParseError>
 }
 struct Writer {
-    parts: StringList,
-    size: List<Int>,
+    output: text::Builder,
     nodes: List<Int>
 }
 fn position(r: Reader) -> Int effects { state } {
@@ -58,10 +58,9 @@ fn peek(r: Reader) -> Int effects { state } {
     }
     return str_byte(r.data, position(r));
 }
+
 fn skip(r: Reader) -> Unit effects { state } {
-    while peek(r) == 32 || peek(r) == 9 || peek(r) == 10 || peek(r) == 13 {
-        move(r, position(r) + 1);
-    }
+    move(r, tokens::whitespace_at(r.data, position(r)));
 }
 fn take_byte(r: Reader, expected: Int) -> Bool effects { state } {
     if peek(r) != expected {
@@ -70,158 +69,35 @@ fn take_byte(r: Reader, expected: Int) -> Bool effects { state } {
     move(r, position(r) + 1);
     return true;
 }
-fn hex(b: Int) -> Int {
-    if b >= 48 && b <= 57 {
-        return b - 48;
-    }
-    if b >= 65 && b <= 70 {
-        return b - 65 + 10;
-    }
-    if b >= 97 && b <= 102 {
-        return b - 97 + 10;
-    }
-    return -1;
-}
-fn hex4(r: Reader) -> Result<Int, Error> effects { state } {
-    var n = 0;
-    for unused in 0 .. 4 {
-        let digit = hex(peek(r));
-        if digit < 0 {
-            return failure<Int>(r, "expected four hex digits");
-        }
-        n = n * 16 + digit;
-        move(r, position(r) + 1);
-    }
-    return Result<Int, Error>::Ok(n);
+
+fn scanned<T>(result_value: Result<T, tokens::ScanError>) -> Result<T, Error> {
+    return match result_value {
+        Result::Ok(value) => Result<T, Error>::Ok(value),
+        Result::Err(error) => Result<T, Error>::Err(Error::Syntax(error.consumed, error.message))
+    };
 }
 fn string_value(r: Reader) -> Result<String, Error> effects { state } {
-    if !take_byte(r, 34) {
-        return failure<String>(r, "expected string");
-    }
-    let parts = strings_new();
-    var start = position(r);
-    while peek(r) >= 0 {
-        let b = peek(r);
-        if b == 34 {
-            strings_push(parts, str_slice(r.data, start, position(r)));
-            move(r, position(r) + 1);
-            return Result<String, Error>::Ok(strings_join(parts, ""));
-        }
-        if b < 32 {
-            return failure<String>(r, "unescaped control character");
-        }
-        if b != 92 {
-            move(r, position(r) + 1);
-            continue;
-        }
-        strings_push(parts, str_slice(r.data, start, position(r)));
-        move(r, position(r) + 1);
-        let escape = peek(r);
-        if escape < 0 {
-            return failure<String>(r, "incomplete escape");
-        }
-        move(r, position(r) + 1);
-        var piece = "";
-        if escape == 34 || escape == 92 || escape == 47 {
-            piece = str_from_byte(escape);
-        } else if escape == 98 {
-            piece = str_from_byte(8);
-        } else if escape == 102 {
-            piece = str_from_byte(12);
-        } else if escape == 110 {
-            piece = "\n";
-        } else if escape == 114 {
-            piece = "\r";
-        } else if escape == 116 {
-            piece = "\t";
-        } else if escape == 117 {
-            var cp = hex4(r)?;
-            if cp >= 55296 && cp <= 56319 {
-                if !take_byte(r, 92) || !take_byte(r, 117) {
-                    return failure<String>(r, "missing low surrogate");
-                }
-                let low = hex4(r)?;
-                if low < 56320 || low > 57343 {
-                    return failure<String>(r, "invalid low surrogate");
-                }
-                cp = 65536 + (cp - 55296) * 1024 + low - 56320;
-            }
-            match text::codepoint(cp) {
-                Result::Ok(t) => {
-                    piece = t.data;
-                }
-                Result::Err(_) => {
-                    return failure<String>(r, "invalid Unicode scalar");
-                }
-            }
-        } else {
-            return failure<String>(r, "invalid escape");
-        }
-        strings_push(parts, piece);
-        start = position(r);
-    }
-    return failure<String>(r, "unterminated string");
-}
-fn digit(b: Int) -> Bool {
-    return b >= 48 && b <= 57;
+    let parsed = scanned(tokens::string(r.data, position(r)))?;
+    move(r, parsed.end);
+    return Result<String, Error>::Ok(parsed.value);
 }
 fn number(r: Reader) -> Result<Value, Error> effects { state } {
     let start = position(r);
-    let negative = take_byte(r, 45);
-    if take_byte(r, 48) {
-        if digit(peek(r)) {
-            return failure<Value>(r, "leading zero");
-        }
-    } else {
-        if peek(r) < 49 || peek(r) > 57 {
-            return failure<Value>(r, "expected number");
-        }
-        while digit(peek(r)) {
-            move(r, position(r) + 1);
-        }
-    }
-    var integral = true;
-    if take_byte(r, 46) {
-        integral = false;
-        if !digit(peek(r)) {
-            return failure<Value>(r, "expected fraction");
-        }
-        while digit(peek(r)) {
-            move(r, position(r) + 1);
-        }
-    }
-    if peek(r) == 101 || peek(r) == 69 {
-        integral = false;
-        move(r, position(r) + 1);
-        if peek(r) == 43 || peek(r) == 45 {
-            move(r, position(r) + 1);
-        }
-        if !digit(peek(r)) {
-            return failure<Value>(r, "expected exponent");
-        }
-        while digit(peek(r)) {
-            move(r, position(r) + 1);
-        }
-    }
-    if position(r) - start > 4096 {
+    let parsed = scanned(tokens::number(r.data, start))?;
+    move(r, parsed.end);
+    if parsed.end - start > 4096 {
         return Result<Value, Error>::Err(Error::Limit);
     }
-    let token = str_slice(r.data, start, position(r));
-    if integral {
+    let token = str_slice(r.data, start, parsed.end);
+    if parsed.integral {
         match parse_int(token) {
-            IntResult::Ok(n) => {
-                return Result<Value, Error>::Ok(Value::Integer(n));
-            }
+            IntResult::Ok(n) => { return Result<Value, Error>::Ok(Value::Integer(n)); }
             IntResult::Err(_) => {}
         }
     }
     match parse_float(token) {
-        FloatResult::Ok(n) => {
-            return Result<Value, Error>::Ok(Value::Number(n));
-        }
-        FloatResult::Err(_) => {
-            return failure<Value>(r, "number outside Float64 range");
-        }
+        FloatResult::Ok(n) => { return Result<Value, Error>::Ok(Value::Number(n)); }
+        FloatResult::Err(_) => { return failure<Value>(r, "number outside Float64 range"); }
     }
 }
 fn keyword_value(r: Reader, word: String, value: Value) -> Result<Value, Error> effects { state } {
@@ -229,7 +105,7 @@ fn keyword_value(r: Reader, word: String, value: Value) -> Result<Value, Error> 
     if start + str_len(word) > str_len(r.data) {
         return failure<Value>(r, "incomplete keyword");
     }
-    if str_slice(r.data, start, start + str_len(word)) != word {
+    if tokens::literal_end(r.data, start, word) != start + str_len(word) {
         return failure<Value>(r, "invalid keyword");
     }
     move(r, start + str_len(word));
@@ -259,7 +135,7 @@ fn read_value(r: Reader, depth: Int) -> Result<Value, Error> effects { state } {
     if b == 102 {
         return keyword_value(r, "false", Value::Boolean(false));
     }
-    if b == 45 || digit(b) {
+    if b == 45 || tokens::digit(b) {
         return number(r);
     }
     if take_byte(r, 91) {
@@ -333,8 +209,7 @@ pub fn default_limits() -> Limits {
 }
 pub fn parse_with_limits(data: String, limits: Limits) -> Result<Value,
     ParseError> effects { state } {
-    if limits.bytes < 0 || limits.bytes > 16777216 || limits.depth < 0 || limits.depth > 128
-        || limits.nodes < 1 || limits.nodes > 131072 {
+    if !tokens::valid_limits(limits.bytes, limits.depth, limits.nodes, 128, 131072) {
         return Result<Value, ParseError>::Err(ParseError::InvalidLimits);
     }
     if str_len(data) > limits.bytes {
@@ -373,12 +248,10 @@ pub fn parse(data: String) -> Result<Value, Error> effects { state } {
     }
 }
 fn put(w: Writer, data: String) -> Result<Bool, Error> effects { state } {
-    if str_len(data) > 16777216 - list_get(w.size, 0) {
-        return Result<Bool, Error>::Err(Error::Limit);
-    }
-    list_set(w.size, 0, list_get(w.size, 0) + str_len(data));
-    strings_push(w.parts, data);
-    return Result<Bool, Error>::Ok(true);
+    return match text::append(w.output, text::Bytes(data: data)) {
+        Result::Ok(value) => Result<Bool, Error>::Ok(value),
+        Result::Err(_) => Result<Bool, Error>::Err(Error::Limit)
+    };
 }
 fn quoted(w: Writer, data: String) -> Result<Bool, Error> effects { state } {
     let invalid = text::invalid_offset(data);
@@ -391,13 +264,8 @@ fn quoted(w: Writer, data: String) -> Result<Bool, Error> effects { state } {
         let b = str_byte(data, i);
         if b < 32 || b == 34 || b == 92 {
             let chunk = put(w, str_slice(data, start, i))?;
-            var escape = "\\" + str_from_byte(b);
-            if b < 32 {
-                let digits = "0123456789abcdef";
-                escape = "\\u00" + str_slice(digits, b / 16, b / 16 + 1) + str_slice(digits, b % 16,
-                    b % 16 + 1);
-            }
-            let escaped = put(w, escape)?;
+
+            let escaped = put(w, tokens::escaped_byte(b))?;
             start = i + 1;
         }
     }
@@ -473,13 +341,16 @@ fn emit_value(w: Writer, value: Value, depth: Int) -> Result<Bool, Error> effect
     }
 }
 pub fn stringify(value: Value) -> Result<String, Error> effects { state } {
-    let size = list_new<Int>();
-    list_push(size, 0);
-    let nodes = list_new<Int>();
-    list_push(nodes, 0);
-    let writer = Writer(parts: strings_new(), size: size, nodes: nodes);
-    let success = emit_value(writer, value, 0)?;
-    return Result<String, Error>::Ok(strings_join(writer.parts, ""));
+    match text::builder(16777216) {
+        Result::Ok(output) => {
+            let nodes = list_new<Int>();
+            list_push(nodes, 0);
+            let writer = Writer(output: output, nodes: nodes);
+            let success = emit_value(writer, value, 0)?;
+            return Result<String, Error>::Ok(text::finish_bytes(output).data);
+        }
+        Result::Err(_) => { return Result<String, Error>::Err(Error::Limit); }
+    }
 }
 pub struct At<E> {
     path: String,

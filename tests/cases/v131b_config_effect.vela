@@ -1,0 +1,5 @@
+import "../../../std/config_snapshot.vela" as config;
+fn missing_effect(value: config::Snapshot) -> Result<Int, config::Error> {
+    return config::integer(value, "port");
+}
+fn main() -> Unit {}

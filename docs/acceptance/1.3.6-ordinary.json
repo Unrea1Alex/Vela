@@ -1,0 +1,6889 @@
+{
+  "schema_version": 1,
+  "protocol": "docs/contracts/PERFORMANCE-1.3.md",
+  "stage": "1.3.6",
+  "host": {
+    "platform": "win32",
+    "arch": "x64",
+    "release": "10.0.26300",
+    "cpu": "AMD Ryzen 7 7700 8-Core Processor              ",
+    "logical_cpus": 16
+  },
+  "version": "Vela 1.3.0 (self-hosted)",
+  "revision": "606ee55cd98647dd0ef9e2fa8ae7588effbb14c2",
+  "compiler_sha256": "56e30f5a787560ba30117b72587ec125297963d7057e4b4c7c27bc103a6d3a49",
+  "toolchain": "��⨬������騩 ��������� Microsoft (R) C/C++ ���ᨨ 19.44.35222 ��� x64\r\n(C) ��௮��� �������� (Microsoft Corporation).  �� �ࠢ� ���饭�.\r\n\r\n��᫮ ��室�� ���������:\r\n G:\\Vela\\build\\stage13\\msvc-pgo-tools\\bin\\Hostx64\\x64\\cl.exe:        ����� 19.44.35222.0\r\n G:\\Vela\\build\\stage13\\msvc-pgo-tools\\bin\\Hostx64\\x64\\c1.dll:        ����� 19.44.35222.0\r\n G:\\Vela\\build\\stage13\\msvc-pgo-tools\\bin\\Hostx64\\x64\\c1xx.dll:      ����� 19.44.35222.0\r\n G:\\Vela\\build\\stage13\\msvc-pgo-tools\\bin\\Hostx64\\x64\\c2.dll:        ����� 19.44.35222.0\r\n G:\\Vela\\build\\stage13\\msvc-pgo-tools\\bin\\Hostx64\\x64\\c1xx.dll:      ����� 19.44.35222.0\r\n G:\\Vela\\build\\stage13\\msvc-pgo-tools\\bin\\Hostx64\\x64\\link.exe:      ����� 14.44.35222.0\r\n G:\\Vela\\build\\stage13\\msvc-pgo-tools\\bin\\Hostx64\\x64\\mspdb140.dll:  ����� 14.44.35222.0\r\n G:\\Vela\\build\\stage13\\msvc-pgo-tools\\bin\\Hostx64\\x64\\1049\\clui.dll: ����� 19.44.35222.0\r\n\r\ncl: ��������� ��ப� error D8003: ������⢨� ��室���� ����� 䠩��",
+  "meter": {
+    "source_sha256": "50ea4f87476e27697bb88d7dc44645b9097bf47ee007de49932732a5b7b13ed7",
+    "binary_sha256": "6663e10a6a83492e2e92ca79f49cdacabcf0d48689b2240fd9ddb533f6d69124"
+  },
+  "curl": {
+    "version": "curl 8.22.0 (Windows) libcurl/8.22.0 Schannel zlib/1.3.2 WinIDN WinLDAP",
+    "bytes": 830280,
+    "sha256": "a6092ef37a7f41cc7cf1a8ff1192aa294e82c73fda0fd2143d813c46b81e55a2"
+  },
+  "sizes": {
+    "profile_exe": 514048,
+    "http_exe": 794112,
+    "compiler_exe": 3419648,
+    "buildlens_exe": 638976
+  },
+  "package": {
+    "vela-1.3.0-windows-x64.zip": {
+      "bytes": 14685069,
+      "sha256": "ab8a425473355e7579bf12891497ee7441bf5b2dea2872669fa39d81f9ad5045"
+    },
+    "vela-1.3.0-linux-x64-musl.tar.gz": {
+      "bytes": 4868425,
+      "sha256": "4090a906df265115b2b28e3e7bc770929a8d90f757569d013dc011d3d5108048"
+    },
+    "vela-mcp-1.3.0.zip": {
+      "bytes": 189242,
+      "sha256": "55f72c6491cde86195c0c285988314606c75451e188293b81ccfda624fed6131"
+    }
+  },
+  "workloads": [
+    {
+      "mode": "config",
+      "label": "small",
+      "input": {
+        "bytes": 152,
+        "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296"
+      },
+      "rounds": 2000,
+      "expected": 14000,
+      "samples": [
+        {
+          "wall_ms": 29.8869,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3776512
+        },
+        {
+          "wall_ms": 27.4836,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3788800
+        },
+        {
+          "wall_ms": 35.3371,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3780608
+        },
+        {
+          "wall_ms": 31.3746,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3780608
+        },
+        {
+          "wall_ms": 26.9612,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3772416
+        }
+      ],
+      "wall_ms": {
+        "min": 26.9612,
+        "median": 29.8869,
+        "max": 35.3371
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 31.25,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 3772416,
+        "median": 3780608,
+        "max": 3788800
+      },
+      "profile": {
+        "allocations": 40068,
+        "allocated_bytes": 5335068,
+        "copies": 36152,
+        "copied_bytes": 2242384,
+        "gc_collections": 5,
+        "peak_managed_bytes": 1048711,
+        "before_teardown_bytes": 106231
+      }
+    },
+    {
+      "mode": "json-tree",
+      "label": "small",
+      "input": {
+        "bytes": 152,
+        "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296"
+      },
+      "rounds": 300,
+      "expected": 300,
+      "samples": [
+        {
+          "wall_ms": 25.1855,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3874816
+        },
+        {
+          "wall_ms": 28.6885,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3866624
+        },
+        {
+          "wall_ms": 31.4184,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3874816
+        },
+        {
+          "wall_ms": 24.2604,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3870720
+        },
+        {
+          "wall_ms": 25.4936,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3878912
+        }
+      ],
+      "wall_ms": {
+        "min": 24.2604,
+        "median": 25.4936,
+        "max": 31.4184
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 3866624,
+        "median": 3874816,
+        "max": 3878912
+      },
+      "profile": {
+        "allocations": 12018,
+        "allocated_bytes": 1073074,
+        "copies": 39905,
+        "copied_bytes": 422756,
+        "gc_collections": 1,
+        "peak_managed_bytes": 1048594,
+        "before_teardown_bytes": 26750
+      }
+    },
+    {
+      "mode": "json-stream",
+      "label": "small",
+      "input": {
+        "bytes": 152,
+        "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296"
+      },
+      "rounds": 300,
+      "expected": 300,
+      "samples": [
+        {
+          "wall_ms": 30.4731,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3870720
+        },
+        {
+          "wall_ms": 30.3621,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3874816
+        },
+        {
+          "wall_ms": 27.3222,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 3878912
+        },
+        {
+          "wall_ms": 25.8255,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3887104
+        },
+        {
+          "wall_ms": 39.2849,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3891200
+        }
+      ],
+      "wall_ms": {
+        "min": 25.8255,
+        "median": 30.3621,
+        "max": 39.2849
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 78.125
+      },
+      "peak_job_commit_bytes": {
+        "min": 3870720,
+        "median": 3878912,
+        "max": 3891200
+      },
+      "profile": {
+        "allocations": 25218,
+        "allocated_bytes": 2838876,
+        "copies": 69905,
+        "copied_bytes": 940556,
+        "gc_collections": 2,
+        "peak_managed_bytes": 1048984,
+        "before_teardown_bytes": 748642
+      }
+    },
+    {
+      "mode": "json-typed",
+      "label": "small",
+      "input": {
+        "bytes": 152,
+        "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296"
+      },
+      "rounds": 300,
+      "expected": 2100,
+      "samples": [
+        {
+          "wall_ms": 53.5207,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3936256
+        },
+        {
+          "wall_ms": 62.9945,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3928064
+        },
+        {
+          "wall_ms": 54.5437,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3944448
+        },
+        {
+          "wall_ms": 38.5674,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3932160
+        },
+        {
+          "wall_ms": 31.401,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3940352
+        }
+      ],
+      "wall_ms": {
+        "min": 31.401,
+        "median": 53.5207,
+        "max": 62.9945
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 46.875,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 3928064,
+        "median": 3936256,
+        "max": 3944448
+      },
+      "profile": {
+        "allocations": 36618,
+        "allocated_bytes": 4150475,
+        "copies": 82205,
+        "copied_bytes": 1014656,
+        "gc_collections": 3,
+        "peak_managed_bytes": 1049051,
+        "before_teardown_bytes": 1016637
+      }
+    },
+    {
+      "mode": "text",
+      "label": "small",
+      "input": {
+        "bytes": 76,
+        "sha256": "685f324475870c40e72931be67134c1d2dc3f442c89fce95af8c091f8232edaa"
+      },
+      "rounds": 2000,
+      "expected": 2000,
+      "samples": [
+        {
+          "wall_ms": 24.5873,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2592768
+        },
+        {
+          "wall_ms": 25.108,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2580480
+        },
+        {
+          "wall_ms": 23.0584,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2588672
+        },
+        {
+          "wall_ms": 23.0758,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2592768
+        },
+        {
+          "wall_ms": 22.3223,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2588672
+        }
+      ],
+      "wall_ms": {
+        "min": 22.3223,
+        "median": 23.0758,
+        "max": 25.108
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2580480,
+        "median": 2588672,
+        "max": 2592768
+      },
+      "profile": {
+        "allocations": 9,
+        "allocated_bytes": 1175,
+        "copies": 2,
+        "copied_bytes": 152,
+        "gc_collections": 0,
+        "peak_managed_bytes": 1175,
+        "before_teardown_bytes": 1175
+      }
+    },
+    {
+      "mode": "path",
+      "label": "small",
+      "input": {
+        "bytes": 76,
+        "sha256": "685f324475870c40e72931be67134c1d2dc3f442c89fce95af8c091f8232edaa"
+      },
+      "rounds": 2000,
+      "expected": 2000,
+      "samples": [
+        {
+          "wall_ms": 25.0303,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2588672
+        },
+        {
+          "wall_ms": 24.0366,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2592768
+        },
+        {
+          "wall_ms": 29.105,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2588672
+        },
+        {
+          "wall_ms": 26.0498,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 2596864
+        },
+        {
+          "wall_ms": 27.1938,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2596864
+        }
+      ],
+      "wall_ms": {
+        "min": 24.0366,
+        "median": 26.0498,
+        "max": 29.105
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 62.5
+      },
+      "peak_job_commit_bytes": {
+        "min": 2588672,
+        "median": 2592768,
+        "max": 2596864
+      },
+      "profile": {
+        "allocations": 9,
+        "allocated_bytes": 1175,
+        "copies": 2,
+        "copied_bytes": 152,
+        "gc_collections": 0,
+        "peak_managed_bytes": 1175,
+        "before_teardown_bytes": 1175
+      }
+    },
+    {
+      "mode": "strings",
+      "label": "small",
+      "input": {
+        "bytes": 76,
+        "sha256": "685f324475870c40e72931be67134c1d2dc3f442c89fce95af8c091f8232edaa"
+      },
+      "rounds": 4000,
+      "expected": 4000,
+      "samples": [
+        {
+          "wall_ms": 26.4742,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3235840
+        },
+        {
+          "wall_ms": 24.6795,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3244032
+        },
+        {
+          "wall_ms": 26.2814,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3244032
+        },
+        {
+          "wall_ms": 26.4553,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3264512
+        },
+        {
+          "wall_ms": 26.58,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3256320
+        }
+      ],
+      "wall_ms": {
+        "min": 24.6795,
+        "median": 26.4553,
+        "max": 26.58
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 3235840,
+        "median": 3244032,
+        "max": 3264512
+      },
+      "profile": {
+        "allocations": 4009,
+        "allocated_bytes": 497178,
+        "copies": 8002,
+        "copied_bytes": 304152,
+        "gc_collections": 0,
+        "peak_managed_bytes": 497178,
+        "before_teardown_bytes": 497178
+      }
+    },
+    {
+      "mode": "fold",
+      "label": "small",
+      "input": {
+        "items": 128
+      },
+      "rounds": 12,
+      "expected": 99072,
+      "samples": [
+        {
+          "wall_ms": 27.5486,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2605056
+        },
+        {
+          "wall_ms": 24.8339,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2617344
+        },
+        {
+          "wall_ms": 27.1199,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2621440
+        },
+        {
+          "wall_ms": 23.959,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2605056
+        },
+        {
+          "wall_ms": 32.5587,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2617344
+        }
+      ],
+      "wall_ms": {
+        "min": 23.959,
+        "median": 27.1199,
+        "max": 32.5587
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 2605056,
+        "median": 2617344,
+        "max": 2621440
+      },
+      "profile": {
+        "allocations": 83,
+        "allocated_bytes": 30344,
+        "copies": 1716,
+        "copied_bytes": 25792,
+        "gc_collections": 0,
+        "peak_managed_bytes": 30344,
+        "before_teardown_bytes": 30344
+      }
+    },
+    {
+      "mode": "set",
+      "label": "small",
+      "input": {
+        "items": 128
+      },
+      "rounds": 12,
+      "expected": 1536,
+      "samples": [
+        {
+          "wall_ms": 24.3097,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3039232
+        },
+        {
+          "wall_ms": 26.3618,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3043328
+        },
+        {
+          "wall_ms": 26.4393,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3035136
+        },
+        {
+          "wall_ms": 24.349,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3035136
+        },
+        {
+          "wall_ms": 25.4289,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3039232
+        }
+      ],
+      "wall_ms": {
+        "min": 24.3097,
+        "median": 25.4289,
+        "max": 26.4393
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 3035136,
+        "median": 3039232,
+        "max": 3043328
+      },
+      "profile": {
+        "allocations": 3251,
+        "allocated_bytes": 416743,
+        "copies": 4812,
+        "copied_bytes": 68800,
+        "gc_collections": 0,
+        "peak_managed_bytes": 416743,
+        "before_teardown_bytes": 416743
+      }
+    },
+    {
+      "mode": "cell",
+      "label": "small",
+      "input": {
+        "items": 128
+      },
+      "rounds": 12,
+      "expected": 1536,
+      "samples": [
+        {
+          "wall_ms": 24.2331,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2592768
+        },
+        {
+          "wall_ms": 24.375,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2592768
+        },
+        {
+          "wall_ms": 29.8101,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2605056
+        },
+        {
+          "wall_ms": 30.0227,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2605056
+        },
+        {
+          "wall_ms": 27.8961,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2596864
+        }
+      ],
+      "wall_ms": {
+        "min": 24.2331,
+        "median": 27.8961,
+        "max": 30.0227
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2592768,
+        "median": 2596864,
+        "max": 2605056
+      },
+      "profile": {
+        "allocations": 47,
+        "allocated_bytes": 17864,
+        "copies": 1692,
+        "copied_bytes": 26656,
+        "gc_collections": 0,
+        "peak_managed_bytes": 17864,
+        "before_teardown_bytes": 17864
+      }
+    },
+    {
+      "mode": "file",
+      "label": "small",
+      "input": {
+        "bytes": 262144,
+        "sha256": "85e633900d49546fe2f524c72ca034a37ff90003888ef887e8da6f297a7bfce4"
+      },
+      "rounds": 1,
+      "expected": 262144,
+      "samples": [
+        {
+          "wall_ms": 29.2397,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2891776
+        },
+        {
+          "wall_ms": 30.5927,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2887680
+        },
+        {
+          "wall_ms": 33.5948,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2895872
+        },
+        {
+          "wall_ms": 26.6281,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2891776
+        },
+        {
+          "wall_ms": 24.218,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2904064
+        }
+      ],
+      "wall_ms": {
+        "min": 24.218,
+        "median": 29.2397,
+        "max": 33.5948
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2887680,
+        "median": 2891776,
+        "max": 2904064
+      },
+      "profile": {
+        "allocations": 49,
+        "allocated_bytes": 267166,
+        "copies": 168,
+        "copied_bytes": 280640,
+        "gc_collections": 0,
+        "peak_managed_bytes": 267166,
+        "before_teardown_bytes": 267166
+      }
+    },
+    {
+      "mode": "config",
+      "label": "medium",
+      "input": {
+        "bytes": 1378,
+        "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077"
+      },
+      "rounds": 2000,
+      "expected": 14000,
+      "samples": [
+        {
+          "wall_ms": 81.0749,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 4079616
+        },
+        {
+          "wall_ms": 60.0316,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 4116480
+        },
+        {
+          "wall_ms": 65.4455,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 4100096
+        },
+        {
+          "wall_ms": 64.8511,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4116480
+        },
+        {
+          "wall_ms": 71.8862,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 4112384
+        }
+      ],
+      "wall_ms": {
+        "min": 60.0316,
+        "median": 65.4455,
+        "max": 81.0749
+      },
+      "cpu_ms": {
+        "min": 46.875,
+        "median": 62.5,
+        "max": 78.125
+      },
+      "peak_job_commit_bytes": {
+        "min": 4079616,
+        "median": 4112384,
+        "max": 4116480
+      },
+      "profile": {
+        "allocations": 270413,
+        "allocated_bytes": 46437853,
+        "copies": 261163,
+        "copied_bytes": 17942302,
+        "gc_collections": 45,
+        "peak_managed_bytes": 1051029,
+        "before_teardown_bytes": 495772
+      }
+    },
+    {
+      "mode": "json-tree",
+      "label": "medium",
+      "input": {
+        "bytes": 1378,
+        "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077"
+      },
+      "rounds": 300,
+      "expected": 300,
+      "samples": [
+        {
+          "wall_ms": 41.0676,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4182016
+        },
+        {
+          "wall_ms": 45.5792,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4190208
+        },
+        {
+          "wall_ms": 44.1348,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4182016
+        },
+        {
+          "wall_ms": 40.1308,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4190208
+        },
+        {
+          "wall_ms": 47.633,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4177920
+        }
+      ],
+      "wall_ms": {
+        "min": 40.1308,
+        "median": 44.1348,
+        "max": 47.633
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 46.875,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 4177920,
+        "median": 4182016,
+        "max": 4190208
+      },
+      "profile": {
+        "allocations": 81018,
+        "allocated_bytes": 9156929,
+        "copies": 309605,
+        "copied_bytes": 4253808,
+        "gc_collections": 8,
+        "peak_managed_bytes": 1048774,
+        "before_teardown_bytes": 855169
+      }
+    },
+    {
+      "mode": "json-stream",
+      "label": "medium",
+      "input": {
+        "bytes": 1378,
+        "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077"
+      },
+      "rounds": 300,
+      "expected": 300,
+      "samples": [
+        {
+          "wall_ms": 61.7425,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 3985408
+        },
+        {
+          "wall_ms": 58.7631,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3977216
+        },
+        {
+          "wall_ms": 57.2397,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3981312
+        },
+        {
+          "wall_ms": 60.9216,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3973120
+        },
+        {
+          "wall_ms": 61.1024,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3985408
+        }
+      ],
+      "wall_ms": {
+        "min": 57.2397,
+        "median": 60.9216,
+        "max": 61.7425
+      },
+      "cpu_ms": {
+        "min": 46.875,
+        "median": 46.875,
+        "max": 62.5
+      },
+      "peak_job_commit_bytes": {
+        "min": 3973120,
+        "median": 3981312,
+        "max": 3985408
+      },
+      "profile": {
+        "allocations": 177318,
+        "allocated_bytes": 20284831,
+        "copies": 540305,
+        "copied_bytes": 7456908,
+        "gc_collections": 19,
+        "peak_managed_bytes": 1048968,
+        "before_teardown_bytes": 587929
+      }
+    },
+    {
+      "mode": "json-typed",
+      "label": "medium",
+      "input": {
+        "bytes": 1378,
+        "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077"
+      },
+      "rounds": 300,
+      "expected": 2100,
+      "samples": [
+        {
+          "wall_ms": 67.3,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 4014080
+        },
+        {
+          "wall_ms": 74.0239,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 3997696
+        },
+        {
+          "wall_ms": 69.5648,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 4009984
+        },
+        {
+          "wall_ms": 65.2778,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 3985408
+        },
+        {
+          "wall_ms": 61.8104,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3993600
+        }
+      ],
+      "wall_ms": {
+        "min": 61.8104,
+        "median": 67.3,
+        "max": 74.0239
+      },
+      "cpu_ms": {
+        "min": 46.875,
+        "median": 62.5,
+        "max": 93.75
+      },
+      "peak_job_commit_bytes": {
+        "min": 3985408,
+        "median": 3997696,
+        "max": 4014080
+      },
+      "profile": {
+        "allocations": 205518,
+        "allocated_bytes": 22485930,
+        "copies": 586205,
+        "copied_bytes": 7614108,
+        "gc_collections": 21,
+        "peak_managed_bytes": 1052735,
+        "before_teardown_bytes": 677290
+      }
+    },
+    {
+      "mode": "text",
+      "label": "medium",
+      "input": {
+        "bytes": 1036,
+        "sha256": "e504e0362ea85f78fc3cbc67eeac90c581c5db67b08c424182443a699b3831ec"
+      },
+      "rounds": 2000,
+      "expected": 2000,
+      "samples": [
+        {
+          "wall_ms": 29.3913,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2580480
+        },
+        {
+          "wall_ms": 28.5671,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2592768
+        },
+        {
+          "wall_ms": 27.9557,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2592768
+        },
+        {
+          "wall_ms": 30.2281,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2592768
+        },
+        {
+          "wall_ms": 29.5188,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2580480
+        }
+      ],
+      "wall_ms": {
+        "min": 27.9557,
+        "median": 29.3913,
+        "max": 30.2281
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 31.25,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 2580480,
+        "median": 2592768,
+        "max": 2592768
+      },
+      "profile": {
+        "allocations": 9,
+        "allocated_bytes": 3098,
+        "copies": 2,
+        "copied_bytes": 2072,
+        "gc_collections": 0,
+        "peak_managed_bytes": 3098,
+        "before_teardown_bytes": 3098
+      }
+    },
+    {
+      "mode": "path",
+      "label": "medium",
+      "input": {
+        "bytes": 1036,
+        "sha256": "e504e0362ea85f78fc3cbc67eeac90c581c5db67b08c424182443a699b3831ec"
+      },
+      "rounds": 2000,
+      "expected": 2000,
+      "samples": [
+        {
+          "wall_ms": 41.0892,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2588672
+        },
+        {
+          "wall_ms": 43.3508,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2600960
+        },
+        {
+          "wall_ms": 43.9635,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 2588672
+        },
+        {
+          "wall_ms": 55.0011,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2588672
+        },
+        {
+          "wall_ms": 42.0315,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2584576
+        }
+      ],
+      "wall_ms": {
+        "min": 41.0892,
+        "median": 43.3508,
+        "max": 55.0011
+      },
+      "cpu_ms": {
+        "min": 31.25,
+        "median": 31.25,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 2584576,
+        "median": 2588672,
+        "max": 2600960
+      },
+      "profile": {
+        "allocations": 9,
+        "allocated_bytes": 3098,
+        "copies": 2,
+        "copied_bytes": 2072,
+        "gc_collections": 0,
+        "peak_managed_bytes": 3098,
+        "before_teardown_bytes": 3098
+      }
+    },
+    {
+      "mode": "strings",
+      "label": "medium",
+      "input": {
+        "bytes": 1036,
+        "sha256": "e504e0362ea85f78fc3cbc67eeac90c581c5db67b08c424182443a699b3831ec"
+      },
+      "rounds": 4000,
+      "expected": 4000,
+      "samples": [
+        {
+          "wall_ms": 25.2673,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4096000
+        },
+        {
+          "wall_ms": 26.5467,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4087808
+        },
+        {
+          "wall_ms": 29.2201,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 4100096
+        },
+        {
+          "wall_ms": 27.3465,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4104192
+        },
+        {
+          "wall_ms": 30.7035,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4096000
+        }
+      ],
+      "wall_ms": {
+        "min": 25.2673,
+        "median": 27.3465,
+        "max": 30.7035
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 4087808,
+        "median": 4096000,
+        "max": 4104192
+      },
+      "profile": {
+        "allocations": 4009,
+        "allocated_bytes": 4339101,
+        "copies": 8002,
+        "copied_bytes": 4146072,
+        "gc_collections": 4,
+        "peak_managed_bytes": 1049464,
+        "before_teardown_bytes": 150908
+      }
+    },
+    {
+      "mode": "fold",
+      "label": "medium",
+      "input": {
+        "items": 2048
+      },
+      "rounds": 12,
+      "expected": 25178112,
+      "samples": [
+        {
+          "wall_ms": 27.5311,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2994176
+        },
+        {
+          "wall_ms": 23.6859,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2994176
+        },
+        {
+          "wall_ms": 34.5235,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2990080
+        },
+        {
+          "wall_ms": 26.6286,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2998272
+        },
+        {
+          "wall_ms": 23.8473,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2977792
+        }
+      ],
+      "wall_ms": {
+        "min": 23.6859,
+        "median": 26.6286,
+        "max": 34.5235
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 2977792,
+        "median": 2994176,
+        "max": 2998272
+      },
+      "profile": {
+        "allocations": 135,
+        "allocated_bytes": 432202,
+        "copies": 26728,
+        "copied_bytes": 425152,
+        "gc_collections": 0,
+        "peak_managed_bytes": 432202,
+        "before_teardown_bytes": 432202
+      }
+    },
+    {
+      "mode": "set",
+      "label": "medium",
+      "input": {
+        "items": 2048
+      },
+      "rounds": 12,
+      "expected": 24576,
+      "samples": [
+        {
+          "wall_ms": 33.4057,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3915776
+        },
+        {
+          "wall_ms": 33.57,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3907584
+        },
+        {
+          "wall_ms": 29.7086,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3891200
+        },
+        {
+          "wall_ms": 27.5335,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3899392
+        },
+        {
+          "wall_ms": 28.627,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3895296
+        }
+      ],
+      "wall_ms": {
+        "min": 27.5335,
+        "median": 29.7086,
+        "max": 33.57
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 3891200,
+        "median": 3899392,
+        "max": 3915776
+      },
+      "profile": {
+        "allocations": 49431,
+        "allocated_bytes": 6626985,
+        "copies": 75904,
+        "copied_bytes": 1113280,
+        "gc_collections": 7,
+        "peak_managed_bytes": 1048629,
+        "before_teardown_bytes": 967969
+      }
+    },
+    {
+      "mode": "cell",
+      "label": "medium",
+      "input": {
+        "items": 2048
+      },
+      "rounds": 12,
+      "expected": 24576,
+      "samples": [
+        {
+          "wall_ms": 23.1201,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2809856
+        },
+        {
+          "wall_ms": 21.048,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2785280
+        },
+        {
+          "wall_ms": 21.0144,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2797568
+        },
+        {
+          "wall_ms": 21.5522,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2793472
+        },
+        {
+          "wall_ms": 21.0026,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2793472
+        }
+      ],
+      "wall_ms": {
+        "min": 21.0026,
+        "median": 21.048,
+        "max": 23.1201
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 2785280,
+        "median": 2793472,
+        "max": 2809856
+      },
+      "profile": {
+        "allocations": 51,
+        "allocated_bytes": 233098,
+        "copies": 26656,
+        "copied_bytes": 426016,
+        "gc_collections": 0,
+        "peak_managed_bytes": 233098,
+        "before_teardown_bytes": 233098
+      }
+    },
+    {
+      "mode": "file",
+      "label": "medium",
+      "input": {
+        "bytes": 2097152,
+        "sha256": "51da329c207e4946b3c6fc2fbfa070966f4800b0ee531e556d2d7e9cddd2d9b3"
+      },
+      "rounds": 1,
+      "expected": 2097152,
+      "samples": [
+        {
+          "wall_ms": 27.6126,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4005888
+        },
+        {
+          "wall_ms": 25.0985,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3997696
+        },
+        {
+          "wall_ms": 25.7636,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 4001792
+        },
+        {
+          "wall_ms": 27.9762,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4009984
+        },
+        {
+          "wall_ms": 26.1562,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3993600
+        }
+      ],
+      "wall_ms": {
+        "min": 25.0985,
+        "median": 26.1562,
+        "max": 27.9762
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 3993600,
+        "median": 4001792,
+        "max": 4009984
+      },
+      "profile": {
+        "allocations": 273,
+        "allocated_bytes": 2112929,
+        "copies": 1288,
+        "copied_bytes": 2237504,
+        "gc_collections": 2,
+        "peak_managed_bytes": 1049889,
+        "before_teardown_bytes": 36021
+      }
+    },
+    {
+      "mode": "config",
+      "label": "large",
+      "input": {
+        "bytes": 5912,
+        "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a"
+      },
+      "rounds": 2000,
+      "expected": 14000,
+      "samples": [
+        {
+          "wall_ms": 132.6927,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 3825664
+        },
+        {
+          "wall_ms": 138.3833,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 3825664
+        },
+        {
+          "wall_ms": 140.7122,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 3821568
+        },
+        {
+          "wall_ms": 145.6345,
+          "cpu_ms": 140.625,
+          "peak_job_commit_bytes": 3813376
+        },
+        {
+          "wall_ms": 135.5345,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 3829760
+        }
+      ],
+      "wall_ms": {
+        "min": 132.6927,
+        "median": 138.3833,
+        "max": 145.6345
+      },
+      "cpu_ms": {
+        "min": 125,
+        "median": 125,
+        "max": 140.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 3813376,
+        "median": 3825664,
+        "max": 3829760
+      },
+      "profile": {
+        "allocations": 1043571,
+        "allocated_bytes": 186566044,
+        "copies": 1032621,
+        "copied_bytes": 71771584,
+        "gc_collections": 190,
+        "peak_managed_bytes": 1064007,
+        "before_teardown_bytes": 685687
+      }
+    },
+    {
+      "mode": "json-tree",
+      "label": "large",
+      "input": {
+        "bytes": 5912,
+        "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a"
+      },
+      "rounds": 300,
+      "expected": 300,
+      "samples": [
+        {
+          "wall_ms": 95.1519,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 3817472
+        },
+        {
+          "wall_ms": 89.7587,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 3817472
+        },
+        {
+          "wall_ms": 90.9104,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 3833856
+        },
+        {
+          "wall_ms": 94.3023,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 3813376
+        },
+        {
+          "wall_ms": 91.7415,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 3825664
+        }
+      ],
+      "wall_ms": {
+        "min": 89.7587,
+        "median": 91.7415,
+        "max": 95.1519
+      },
+      "cpu_ms": {
+        "min": 78.125,
+        "median": 78.125,
+        "max": 93.75
+      },
+      "peak_job_commit_bytes": {
+        "min": 3813376,
+        "median": 3817472,
+        "max": 3833856
+      },
+      "profile": {
+        "allocations": 312618,
+        "allocated_bytes": 36734194,
+        "copies": 1231805,
+        "copied_bytes": 17488676,
+        "gc_collections": 37,
+        "peak_managed_bytes": 1048624,
+        "before_teardown_bytes": 475134
+      }
+    },
+    {
+      "mode": "json-stream",
+      "label": "large",
+      "input": {
+        "bytes": 5912,
+        "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a"
+      },
+      "rounds": 300,
+      "expected": 300,
+      "samples": [
+        {
+          "wall_ms": 154.308,
+          "cpu_ms": 156.25,
+          "peak_job_commit_bytes": 3923968
+        },
+        {
+          "wall_ms": 168.8892,
+          "cpu_ms": 140.625,
+          "peak_job_commit_bytes": 3936256
+        },
+        {
+          "wall_ms": 151.9048,
+          "cpu_ms": 156.25,
+          "peak_job_commit_bytes": 3928064
+        },
+        {
+          "wall_ms": 164.8382,
+          "cpu_ms": 156.25,
+          "peak_job_commit_bytes": 3919872
+        },
+        {
+          "wall_ms": 160.6963,
+          "cpu_ms": 156.25,
+          "peak_job_commit_bytes": 3923968
+        }
+      ],
+      "wall_ms": {
+        "min": 151.9048,
+        "median": 160.6963,
+        "max": 168.8892
+      },
+      "cpu_ms": {
+        "min": 140.625,
+        "median": 156.25,
+        "max": 156.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 3919872,
+        "median": 3923968,
+        "max": 3936256
+      },
+      "profile": {
+        "allocations": 696318,
+        "allocated_bytes": 80228796,
+        "copies": 2153105,
+        "copied_bytes": 30047276,
+        "gc_collections": 79,
+        "peak_managed_bytes": 1064635,
+        "before_teardown_bytes": 266974
+      }
+    },
+    {
+      "mode": "json-typed",
+      "label": "large",
+      "input": {
+        "bytes": 5912,
+        "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a"
+      },
+      "rounds": 300,
+      "expected": 2100,
+      "samples": [
+        {
+          "wall_ms": 178.3905,
+          "cpu_ms": 171.875,
+          "peak_job_commit_bytes": 3960832
+        },
+        {
+          "wall_ms": 205.7864,
+          "cpu_ms": 187.5,
+          "peak_job_commit_bytes": 3964928
+        },
+        {
+          "wall_ms": 212.0641,
+          "cpu_ms": 203.125,
+          "peak_job_commit_bytes": 3989504
+        },
+        {
+          "wall_ms": 173.8071,
+          "cpu_ms": 171.875,
+          "peak_job_commit_bytes": 3973120
+        },
+        {
+          "wall_ms": 169.5632,
+          "cpu_ms": 156.25,
+          "peak_job_commit_bytes": 3969024
+        }
+      ],
+      "wall_ms": {
+        "min": 169.5632,
+        "median": 178.3905,
+        "max": 212.0641
+      },
+      "cpu_ms": {
+        "min": 156.25,
+        "median": 171.875,
+        "max": 203.125
+      },
+      "peak_job_commit_bytes": {
+        "min": 3960832,
+        "median": 3969024,
+        "max": 3989504
+      },
+      "profile": {
+        "allocations": 782118,
+        "allocated_bytes": 85529195,
+        "copies": 2314205,
+        "copied_bytes": 30538976,
+        "gc_collections": 85,
+        "peak_managed_bytes": 1060091,
+        "before_teardown_bytes": 666978
+      }
+    },
+    {
+      "mode": "text",
+      "label": "large",
+      "input": {
+        "bytes": 8204,
+        "sha256": "2a07b733b181d9ceca45ae1f1f3e05187f92688e61c4324ee651d00536ea3781"
+      },
+      "rounds": 2000,
+      "expected": 2000,
+      "samples": [
+        {
+          "wall_ms": 75.3702,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 2600960
+        },
+        {
+          "wall_ms": 75.7336,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 2596864
+        },
+        {
+          "wall_ms": 72.9488,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 2588672
+        },
+        {
+          "wall_ms": 73.8013,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 2588672
+        },
+        {
+          "wall_ms": 71.4782,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 2592768
+        }
+      ],
+      "wall_ms": {
+        "min": 71.4782,
+        "median": 73.8013,
+        "max": 75.7336
+      },
+      "cpu_ms": {
+        "min": 62.5,
+        "median": 62.5,
+        "max": 78.125
+      },
+      "peak_job_commit_bytes": {
+        "min": 2588672,
+        "median": 2592768,
+        "max": 2600960
+      },
+      "profile": {
+        "allocations": 10,
+        "allocated_bytes": 17479,
+        "copies": 5,
+        "copied_bytes": 16408,
+        "gc_collections": 0,
+        "peak_managed_bytes": 17479,
+        "before_teardown_bytes": 17479
+      }
+    },
+    {
+      "mode": "path",
+      "label": "large",
+      "input": {
+        "bytes": 8204,
+        "sha256": "2a07b733b181d9ceca45ae1f1f3e05187f92688e61c4324ee651d00536ea3781"
+      },
+      "rounds": 2000,
+      "expected": 2000,
+      "samples": [
+        {
+          "wall_ms": 145.3906,
+          "cpu_ms": 140.625,
+          "peak_job_commit_bytes": 2596864
+        },
+        {
+          "wall_ms": 139.7863,
+          "cpu_ms": 140.625,
+          "peak_job_commit_bytes": 2588672
+        },
+        {
+          "wall_ms": 139.3436,
+          "cpu_ms": 140.625,
+          "peak_job_commit_bytes": 2596864
+        },
+        {
+          "wall_ms": 151.0654,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 2592768
+        },
+        {
+          "wall_ms": 139.2708,
+          "cpu_ms": 140.625,
+          "peak_job_commit_bytes": 2592768
+        }
+      ],
+      "wall_ms": {
+        "min": 139.2708,
+        "median": 139.7863,
+        "max": 151.0654
+      },
+      "cpu_ms": {
+        "min": 125,
+        "median": 140.625,
+        "max": 140.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2588672,
+        "median": 2592768,
+        "max": 2596864
+      },
+      "profile": {
+        "allocations": 10,
+        "allocated_bytes": 17479,
+        "copies": 5,
+        "copied_bytes": 16408,
+        "gc_collections": 0,
+        "peak_managed_bytes": 17479,
+        "before_teardown_bytes": 17479
+      }
+    },
+    {
+      "mode": "strings",
+      "label": "large",
+      "input": {
+        "bytes": 8204,
+        "sha256": "2a07b733b181d9ceca45ae1f1f3e05187f92688e61c4324ee651d00536ea3781"
+      },
+      "rounds": 4000,
+      "expected": 4000,
+      "samples": [
+        {
+          "wall_ms": 24.4588,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4509696
+        },
+        {
+          "wall_ms": 24.7727,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4509696
+        },
+        {
+          "wall_ms": 24.3153,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4501504
+        },
+        {
+          "wall_ms": 29.6194,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4505600
+        },
+        {
+          "wall_ms": 28.4872,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4501504
+        }
+      ],
+      "wall_ms": {
+        "min": 24.3153,
+        "median": 24.7727,
+        "max": 29.6194
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 4501504,
+        "median": 4505600,
+        "max": 4509696
+      },
+      "profile": {
+        "allocations": 4010,
+        "allocated_bytes": 33025482,
+        "copies": 8005,
+        "copied_bytes": 32832408,
+        "gc_collections": 31,
+        "peak_managed_bytes": 1056407,
+        "before_teardown_bytes": 800675
+      }
+    },
+    {
+      "mode": "fold",
+      "label": "large",
+      "input": {
+        "items": 16384
+      },
+      "rounds": 12,
+      "expected": 1610711040,
+      "samples": [
+        {
+          "wall_ms": 25.9403,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3620864
+        },
+        {
+          "wall_ms": 24.7786,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3612672
+        },
+        {
+          "wall_ms": 24.4607,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3616768
+        },
+        {
+          "wall_ms": 29.7649,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3616768
+        },
+        {
+          "wall_ms": 25.9477,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3633152
+        }
+      ],
+      "wall_ms": {
+        "min": 24.4607,
+        "median": 25.9403,
+        "max": 29.7649
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 31.25,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 3612672,
+        "median": 3616768,
+        "max": 3633152
+      },
+      "profile": {
+        "allocations": 174,
+        "allocated_bytes": 3415964,
+        "copies": 213135,
+        "copied_bytes": 3407040,
+        "gc_collections": 4,
+        "peak_managed_bytes": 1051188,
+        "before_teardown_bytes": 262603
+      }
+    },
+    {
+      "mode": "set",
+      "label": "large",
+      "input": {
+        "items": 16384
+      },
+      "rounds": 12,
+      "expected": 196608,
+      "samples": [
+        {
+          "wall_ms": 114.9182,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 9367552
+        },
+        {
+          "wall_ms": 95.0587,
+          "cpu_ms": 93.75,
+          "peak_job_commit_bytes": 9367552
+        },
+        {
+          "wall_ms": 70.5395,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 9342976
+        },
+        {
+          "wall_ms": 77.2355,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 9371648
+        },
+        {
+          "wall_ms": 62.2576,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 9351168
+        }
+      ],
+      "wall_ms": {
+        "min": 62.2576,
+        "median": 77.2355,
+        "max": 114.9182
+      },
+      "cpu_ms": {
+        "min": 62.5,
+        "median": 62.5,
+        "max": 125
+      },
+      "peak_job_commit_bytes": {
+        "min": 9342976,
+        "median": 9367552,
+        "max": 9371648
+      },
+      "profile": {
+        "allocations": 393570,
+        "allocated_bytes": 52964539,
+        "copies": 606375,
+        "copied_bytes": 8912064,
+        "gc_collections": 25,
+        "peak_managed_bytes": 5244438,
+        "before_teardown_bytes": 3343058
+      }
+    },
+    {
+      "mode": "cell",
+      "label": "large",
+      "input": {
+        "items": 16384
+      },
+      "rounds": 12,
+      "expected": 196608,
+      "samples": [
+        {
+          "wall_ms": 25.9612,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3796992
+        },
+        {
+          "wall_ms": 27.6753,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3809280
+        },
+        {
+          "wall_ms": 25.7905,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3801088
+        },
+        {
+          "wall_ms": 25.4814,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3809280
+        },
+        {
+          "wall_ms": 25.6236,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3788800
+        }
+      ],
+      "wall_ms": {
+        "min": 25.4814,
+        "median": 25.7905,
+        "max": 27.6753
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 3788800,
+        "median": 3801088,
+        "max": 3809280
+      },
+      "profile": {
+        "allocations": 54,
+        "allocated_bytes": 1838876,
+        "copies": 213027,
+        "copied_bytes": 3407904,
+        "gc_collections": 2,
+        "peak_managed_bytes": 1050876,
+        "before_teardown_bytes": 262715
+      }
+    },
+    {
+      "mode": "file",
+      "label": "large",
+      "input": {
+        "bytes": 16777216,
+        "sha256": "055e435c7784b6bf969fcf0d0c7225acde453d7ebd0023469e192ae75af6accb"
+      },
+      "rounds": 1,
+      "expected": 16777216,
+      "samples": [
+        {
+          "wall_ms": 39.6958,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4268032
+        },
+        {
+          "wall_ms": 44.7077,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4247552
+        },
+        {
+          "wall_ms": 40.803,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4259840
+        },
+        {
+          "wall_ms": 45.3707,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4259840
+        },
+        {
+          "wall_ms": 42.1674,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4145152
+        }
+      ],
+      "wall_ms": {
+        "min": 39.6958,
+        "median": 42.1674,
+        "max": 45.3707
+      },
+      "cpu_ms": {
+        "min": 31.25,
+        "median": 31.25,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 4145152,
+        "median": 4259840,
+        "max": 4268032
+      },
+      "profile": {
+        "allocations": 2065,
+        "allocated_bytes": 16879006,
+        "copies": 10248,
+        "copied_bytes": 17892416,
+        "gc_collections": 16,
+        "peak_managed_bytes": 1049886,
+        "before_teardown_bytes": 266740
+      }
+    },
+    {
+      "mode": "http",
+      "requests": 1,
+      "samples": [
+        {
+          "wall_ms": 78.6559,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3997696
+        },
+        {
+          "wall_ms": 78.9493,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3997696
+        },
+        {
+          "wall_ms": 70.3718,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4001792
+        },
+        {
+          "wall_ms": 73.0492,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3993600
+        },
+        {
+          "wall_ms": 80.0064,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3997696
+        }
+      ],
+      "wall_ms": {
+        "min": 70.3718,
+        "median": 78.6559,
+        "max": 80.0064
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 31.25,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 3993600,
+        "median": 3997696,
+        "max": 4001792
+      },
+      "server_connections": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "mode": "http",
+      "requests": 4,
+      "samples": [
+        {
+          "wall_ms": 252.0705,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4063232
+        },
+        {
+          "wall_ms": 249.7344,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4067328
+        },
+        {
+          "wall_ms": 257.3546,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4071424
+        },
+        {
+          "wall_ms": 258.0401,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4096000
+        },
+        {
+          "wall_ms": 253.8225,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 4071424
+        }
+      ],
+      "wall_ms": {
+        "min": 249.7344,
+        "median": 253.8225,
+        "max": 258.0401
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 62.5
+      },
+      "peak_job_commit_bytes": {
+        "min": 4063232,
+        "median": 4071424,
+        "max": 4096000
+      },
+      "server_connections": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "mode": "http",
+      "requests": 10,
+      "samples": [
+        {
+          "wall_ms": 622.7435,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4263936
+        },
+        {
+          "wall_ms": 624.0833,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4263936
+        },
+        {
+          "wall_ms": 625.616,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 4259840
+        },
+        {
+          "wall_ms": 645.4058,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 4280320
+        },
+        {
+          "wall_ms": 629.1648,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 4263936
+        }
+      ],
+      "wall_ms": {
+        "min": 622.7435,
+        "median": 625.616,
+        "max": 645.4058
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 31.25,
+        "max": 62.5
+      },
+      "peak_job_commit_bytes": {
+        "min": 4259840,
+        "median": 4263936,
+        "max": 4280320
+      },
+      "server_connections": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "compiler": [
+    {
+      "round": 1,
+      "phase": "cold",
+      "wall_ms": 766.3016,
+      "cpu_ms": 765.625,
+      "peak_job_commit_bytes": 110784512,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "read",
+          "layer": "semantic-modules-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "semantic-modules-v1",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "full"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "phase": "warm",
+      "wall_ms": 111.0824,
+      "cpu_ms": 93.75,
+      "peak_job_commit_bytes": 5722112,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "exact"
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "phase": "edit",
+      "wall_ms": 114.9795,
+      "cpu_ms": 93.75,
+      "peak_job_commit_bytes": 7294976,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "read",
+          "layer": "semantic-modules-v1",
+          "status": "hit",
+          "reason": "equivalent_tokens"
+        },
+        {
+          "phase": "write",
+          "layer": "semantic-modules-v1",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "token_equivalent"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "phase": "cold",
+      "wall_ms": 740.9736,
+      "cpu_ms": 718.75,
+      "peak_job_commit_bytes": 110759936,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "read",
+          "layer": "semantic-modules-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "semantic-modules-v1",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "full"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "phase": "warm",
+      "wall_ms": 113.0896,
+      "cpu_ms": 109.375,
+      "peak_job_commit_bytes": 5730304,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "exact"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "phase": "edit",
+      "wall_ms": 130.8796,
+      "cpu_ms": 109.375,
+      "peak_job_commit_bytes": 7307264,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "read",
+          "layer": "semantic-modules-v1",
+          "status": "hit",
+          "reason": "equivalent_tokens"
+        },
+        {
+          "phase": "write",
+          "layer": "semantic-modules-v1",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "token_equivalent"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "phase": "cold",
+      "wall_ms": 763.5692,
+      "cpu_ms": 734.375,
+      "peak_job_commit_bytes": 110796800,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "read",
+          "layer": "semantic-modules-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "semantic-modules-v1",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "full"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "phase": "warm",
+      "wall_ms": 113.1412,
+      "cpu_ms": 93.75,
+      "peak_job_commit_bytes": 5738496,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "exact"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "phase": "edit",
+      "wall_ms": 115.4858,
+      "cpu_ms": 109.375,
+      "peak_job_commit_bytes": 7294976,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "read",
+          "layer": "semantic-modules-v1",
+          "status": "hit",
+          "reason": "equivalent_tokens"
+        },
+        {
+          "phase": "write",
+          "layer": "semantic-modules-v1",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "token_equivalent"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "phase": "cold",
+      "wall_ms": 825.3615,
+      "cpu_ms": 796.875,
+      "peak_job_commit_bytes": 110776320,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "read",
+          "layer": "semantic-modules-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "semantic-modules-v1",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "full"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "phase": "warm",
+      "wall_ms": 113.5416,
+      "cpu_ms": 93.75,
+      "peak_job_commit_bytes": 5738496,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "exact"
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "phase": "edit",
+      "wall_ms": 123.8405,
+      "cpu_ms": 109.375,
+      "peak_job_commit_bytes": 7311360,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "read",
+          "layer": "semantic-modules-v1",
+          "status": "hit",
+          "reason": "equivalent_tokens"
+        },
+        {
+          "phase": "write",
+          "layer": "semantic-modules-v1",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "token_equivalent"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "phase": "cold",
+      "wall_ms": 809.9145,
+      "cpu_ms": 781.25,
+      "peak_job_commit_bytes": 110800896,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "read",
+          "layer": "semantic-modules-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "semantic-modules-v1",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "full"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "phase": "warm",
+      "wall_ms": 110.7118,
+      "cpu_ms": 93.75,
+      "peak_job_commit_bytes": 5730304,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "exact"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "phase": "edit",
+      "wall_ms": 121.0472,
+      "cpu_ms": 109.375,
+      "peak_job_commit_bytes": 7294976,
+      "cache_events": [
+        {
+          "phase": "directory",
+          "layer": "all",
+          "status": "ready",
+          "reason": "available"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "write",
+          "layer": "imports",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "imports",
+          "status": "hit",
+          "reason": "reused"
+        },
+        {
+          "phase": "read",
+          "layer": "check-v1",
+          "status": "miss",
+          "reason": "read_error"
+        },
+        {
+          "phase": "read",
+          "layer": "semantic-modules-v1",
+          "status": "hit",
+          "reason": "equivalent_tokens"
+        },
+        {
+          "phase": "write",
+          "layer": "semantic-modules-v1",
+          "status": "stored",
+          "reason": "published"
+        },
+        {
+          "phase": "analysis",
+          "layer": "semantic-modules-v1",
+          "status": "complete",
+          "reason": "token_equivalent"
+        },
+        {
+          "phase": "write",
+          "layer": "check-v1",
+          "status": "stored",
+          "reason": "published"
+        }
+      ]
+    }
+  ],
+  "build": {
+    "samples": [
+      {
+        "wall_ms": 2229.6335,
+        "cpu_ms": 5750,
+        "peak_job_commit_bytes": 213991424
+      },
+      {
+        "wall_ms": 2131.3444,
+        "cpu_ms": 5703.125,
+        "peak_job_commit_bytes": 231964672
+      },
+      {
+        "wall_ms": 2268.4616,
+        "cpu_ms": 6031.25,
+        "peak_job_commit_bytes": 218742784
+      },
+      {
+        "wall_ms": 2587.7356,
+        "cpu_ms": 6609.375,
+        "peak_job_commit_bytes": 235433984
+      },
+      {
+        "wall_ms": 2181.5183,
+        "cpu_ms": 5734.375,
+        "peak_job_commit_bytes": 237359104
+      }
+    ],
+    "wall_ms": {
+      "min": 2131.3444,
+      "median": 2229.6335,
+      "max": 2587.7356
+    },
+    "cpu_ms": {
+      "min": 5703.125,
+      "median": 5750,
+      "max": 6609.375
+    },
+    "peak_job_commit_bytes": {
+      "min": 213991424,
+      "median": 231964672,
+      "max": 237359104
+    }
+  },
+  "http_adapter": {
+    "bytes": 4363776,
+    "sha256": "c119f0fc2c3dc6035ef69fc087c1d67ddf229ac4d35abe719e38f3bfef93d39b"
+  },
+  "compiler_ranges": {
+    "cold": {
+      "wall_ms": {
+        "min": 740.9736,
+        "median": 766.3016,
+        "max": 825.3615
+      },
+      "cpu_ms": {
+        "min": 718.75,
+        "median": 765.625,
+        "max": 796.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 110759936,
+        "median": 110784512,
+        "max": 110800896
+      }
+    },
+    "warm": {
+      "wall_ms": {
+        "min": 110.7118,
+        "median": 113.0896,
+        "max": 113.5416
+      },
+      "cpu_ms": {
+        "min": 93.75,
+        "median": 93.75,
+        "max": 109.375
+      },
+      "peak_job_commit_bytes": {
+        "min": 5722112,
+        "median": 5730304,
+        "max": 5738496
+      }
+    },
+    "edit": {
+      "wall_ms": {
+        "min": 114.9795,
+        "median": 121.0472,
+        "max": 130.8796
+      },
+      "cpu_ms": {
+        "min": 93.75,
+        "median": 109.375,
+        "max": 109.375
+      },
+      "peak_job_commit_bytes": {
+        "min": 7294976,
+        "median": 7294976,
+        "max": 7311360
+      }
+    }
+  },
+  "completed": true
+}

@@ -1,0 +1,31 @@
+import "../../../std/http.vela" as http;
+import "../../../std/path.vela" as path;
+
+fn main() -> Unit effects { io, state, process } {
+    let limits = http::MultiLimits(connections: 0, per_origin: 1, queue: 0, idle_seconds: 30, connect_ms: 500);
+    match http::curl_multi(limits, Option<path::Path>::None) {
+        Result::Ok(_) => { panic("invalid limits acquired a pool"); }
+        Result::Err(error) => {
+            match error {
+                http::MultiOpenError::Limits => { assert_true(platform() == "windows", "windows limits"); }
+                http::MultiOpenError::Unsupported => { assert_true(platform() != "windows", "unsupported platform"); }
+                http::MultiOpenError::Trust(_) => { panic("unexpected trust error"); }
+                http::MultiOpenError::Dependency(_) => { panic("limits checked before load"); }
+            }
+        }
+    }
+    match http::curl_multi(http::multi_limits(), Option<path::Path>::None) {
+        Result::Ok(_) => { panic("fixture executable must have no HTTP adapter sibling"); }
+        Result::Err(error) => {
+            match error {
+                http::MultiOpenError::Limits => { panic("unexpected limit"); }
+                http::MultiOpenError::Unsupported => { assert_true(platform() != "windows", "unsupported platform"); }
+                http::MultiOpenError::Trust(_) => { panic("unexpected trust error"); }
+                http::MultiOpenError::Dependency(message) => {
+                    assert_true(platform() == "windows" && str_len(message) > 0, "explicit dependency error");
+                }
+            }
+        }
+    }
+    print("HTTP multi unavailable as expected");
+}

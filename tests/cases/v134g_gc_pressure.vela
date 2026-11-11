@@ -1,0 +1,26 @@
+fn main() -> Unit effects { state, io } {
+    let saved = "keep:" + to_string(42);
+    let events = list_new<String>();
+    var input = "ab";
+    for doubling in 0 .. 12 { input = input + input; }
+    var total = 0;
+    scope {
+        defer { list_push(events, "done"); }
+        for n in 0 .. 300 {
+            let temporary = input + to_string(n);
+            total = total + str_len(temporary);
+            if n % 2 == 0 { continue; }
+            assert_true(str_byte(temporary, 0) == 97, "value live across the builtin poll");
+        }
+    }
+    var sum = 0;
+    var i = 0;
+    while i < 4000 {
+        sum = sum + i;
+        i = i + 1;
+    }
+    assert_true(sum == 7998000 && total == 2458390, "all iterations completed");
+    assert_true(saved == "keep:42", "value survived repeated collection");
+    assert_true(list_len(events) == 1 && list_get(events, 0) == "done", "scope defer ran once");
+    print("poll checkpoints passed");
+}

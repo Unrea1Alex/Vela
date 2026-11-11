@@ -1,0 +1,329 @@
+{
+  "stage": "1.3.1a",
+  "schema_version": 1,
+  "groups": [
+    {
+      "mode": "text",
+      "label": "small",
+      "sha256": "685f324475870c40e72931be67134c1d2dc3f442c89fce95af8c091f8232edaa",
+      "samples": [
+        {
+          "wall_ms": 26.5023,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2699264
+        },
+        {
+          "wall_ms": 24.5896,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 26.1858,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 25.8739,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2695168
+        },
+        {
+          "wall_ms": 26.9396,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2682880
+        }
+      ],
+      "wall_ms": {
+        "min": 24.5896,
+        "median": 26.1858,
+        "max": 26.9396
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2682880,
+        "median": 2691072,
+        "max": 2699264
+      },
+      "baseline_wall_ms": 24.3893,
+      "baseline_peak_commit_bytes": 2674688,
+      "wall_reduction": -0.07365935061686901,
+      "commit_increase": 0.006125574272588086,
+      "invalid_offset_calls": 1,
+      "checked_operations": 2000
+    },
+    {
+      "mode": "path",
+      "label": "small",
+      "sha256": "685f324475870c40e72931be67134c1d2dc3f442c89fce95af8c091f8232edaa",
+      "samples": [
+        {
+          "wall_ms": 31.0156,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 28.3458,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2682880
+        },
+        {
+          "wall_ms": 30.2358,
+          "cpu_ms": 78.125,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 31.1209,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2682880
+        },
+        {
+          "wall_ms": 29.6339,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2691072
+        }
+      ],
+      "wall_ms": {
+        "min": 28.3458,
+        "median": 30.2358,
+        "max": 31.1209
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 78.125
+      },
+      "peak_job_commit_bytes": {
+        "min": 2682880,
+        "median": 2686976,
+        "max": 2691072
+      },
+      "baseline_wall_ms": 29.0277,
+      "baseline_peak_commit_bytes": 2682880,
+      "wall_reduction": -0.04161886749553023,
+      "commit_increase": 0.0015267175572519776,
+      "invalid_offset_calls": 1,
+      "checked_operations": 2000
+    },
+    {
+      "mode": "text",
+      "label": "medium",
+      "sha256": "e504e0362ea85f78fc3cbc67eeac90c581c5db67b08c424182443a699b3831ec",
+      "samples": [
+        {
+          "wall_ms": 26.9054,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 28.2704,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2707456
+        },
+        {
+          "wall_ms": 27.8979,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2682880
+        },
+        {
+          "wall_ms": 26.6349,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2695168
+        },
+        {
+          "wall_ms": 26.6238,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        }
+      ],
+      "wall_ms": {
+        "min": 26.6238,
+        "median": 26.9054,
+        "max": 28.2704
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2682880,
+        "median": 2686976,
+        "max": 2707456
+      },
+      "baseline_wall_ms": 31.1726,
+      "baseline_peak_commit_bytes": 2691072,
+      "wall_reduction": 0.13688944778427203,
+      "commit_increase": -0.0015220700152207556,
+      "invalid_offset_calls": 1,
+      "checked_operations": 2000
+    },
+    {
+      "mode": "path",
+      "label": "medium",
+      "sha256": "e504e0362ea85f78fc3cbc67eeac90c581c5db67b08c424182443a699b3831ec",
+      "samples": [
+        {
+          "wall_ms": 52.587,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 51.2374,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 2670592
+        },
+        {
+          "wall_ms": 51.8987,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 52.223,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2699264
+        },
+        {
+          "wall_ms": 53.7878,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 2695168
+        }
+      ],
+      "wall_ms": {
+        "min": 51.2374,
+        "median": 52.223,
+        "max": 53.7878
+      },
+      "cpu_ms": {
+        "min": 31.25,
+        "median": 46.875,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 2670592,
+        "median": 2691072,
+        "max": 2699264
+      },
+      "baseline_wall_ms": 64.5396,
+      "baseline_peak_commit_bytes": 2691072,
+      "wall_reduction": 0.1908378731817364,
+      "commit_increase": 0,
+      "invalid_offset_calls": 1,
+      "checked_operations": 2000
+    },
+    {
+      "mode": "text",
+      "label": "large",
+      "sha256": "2a07b733b181d9ceca45ae1f1f3e05187f92688e61c4324ee651d00536ea3781",
+      "samples": [
+        {
+          "wall_ms": 26.5964,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 27.2975,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 26.4218,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 25.3398,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 26.6724,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2699264
+        }
+      ],
+      "wall_ms": {
+        "min": 25.3398,
+        "median": 26.5964,
+        "max": 27.2975
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 31.25,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 2686976,
+        "median": 2691072,
+        "max": 2699264
+      },
+      "baseline_wall_ms": 102.3109,
+      "baseline_peak_commit_bytes": 2691072,
+      "wall_reduction": 0.7400433384908158,
+      "commit_increase": 0,
+      "invalid_offset_calls": 1,
+      "checked_operations": 2000
+    },
+    {
+      "mode": "path",
+      "label": "large",
+      "sha256": "2a07b733b181d9ceca45ae1f1f3e05187f92688e61c4324ee651d00536ea3781",
+      "samples": [
+        {
+          "wall_ms": 236.979,
+          "cpu_ms": 218.75,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 235.226,
+          "cpu_ms": 218.75,
+          "peak_job_commit_bytes": 2682880
+        },
+        {
+          "wall_ms": 239.909,
+          "cpu_ms": 234.375,
+          "peak_job_commit_bytes": 2682880
+        },
+        {
+          "wall_ms": 230.3993,
+          "cpu_ms": 203.125,
+          "peak_job_commit_bytes": 2699264
+        },
+        {
+          "wall_ms": 227.0414,
+          "cpu_ms": 203.125,
+          "peak_job_commit_bytes": 2686976
+        }
+      ],
+      "wall_ms": {
+        "min": 227.0414,
+        "median": 235.226,
+        "max": 239.909
+      },
+      "cpu_ms": {
+        "min": 203.125,
+        "median": 218.75,
+        "max": 234.375
+      },
+      "peak_job_commit_bytes": {
+        "min": 2682880,
+        "median": 2686976,
+        "max": 2699264
+      },
+      "baseline_wall_ms": 362.6183,
+      "baseline_peak_commit_bytes": 2695168,
+      "wall_reduction": 0.3513123855028828,
+      "commit_increase": -0.003039513677811523,
+      "invalid_offset_calls": 1,
+      "checked_operations": 2000
+    }
+  ],
+  "targets": {
+    "medium_wall_reduction": 0.2,
+    "peak_commit_increase": 0.1
+  },
+  "passed": false
+}

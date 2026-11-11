@@ -1,0 +1,1 @@
+{"schema_version":1,"status":"passed","checks":12,"version":"1.2.0","scope":"real framed LSP: native version, diagnostics/details/UTF16, checked versioned code action, range filter, type explanation, multifile CLI parity, known-type import refused, no writes"}

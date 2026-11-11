@@ -5,6 +5,7 @@ import "types.vela";
 import "intrinsics.vela";
 import "driver.vela";
 import "embedded.vela";
+import "reachability.vela";
 // Backend APIs accept checked IDs/records, never syntax IDs.
 pub fn emit(c: Context, line: String) -> Unit effects { state } {
     strings_push(c.output, line + "\n");
@@ -104,8 +105,31 @@ pub fn gc_visitor(c: Context, t: TypeId) -> String effects { state, io, process 
         if list_len(info.arguments) == 1 { return "v_gc_list_value"; }
         return "v_gc_dict_value";
     }
-    if info.kind != 0 { return "v_trace_" + num(type_number(t)); }
+    if info.kind != 0 && !dict_has(c.untraced_types, t) { return "v_trace_" + num(type_number(t)); }
     return "NULL";
+}
+fn fields_need_trace(c: Context, fields: List<SymbolId>) -> Bool effects { state, io, process } {
+    for i in 0 .. list_len(fields) {
+        if gc_visitor(c, symbol_info(c, list_get(fields, i)).type_id) != "NULL" { return true; }
+    }
+    return false;
+}
+fn layout_needs_trace(c: Context, info: TypeInfo) -> Bool effects { state, io, process } {
+    if info.kind == 76 || info.kind == 77 { return fields_need_trace(c, info.fields); }
+    if info.kind == 70 {
+        for i in 0 .. list_len(info.variants) {
+            if fields_need_trace(c, symbol_info(c, list_get(info.variants, i)).parameters) { return true; }
+        }
+        return false;
+    }
+    return true;
+}
+fn classify_trace_layouts(c: Context, layouts: List<TypeId>) -> Unit effects { state, io, process } {
+    // By-value field layouts appear before their parent in the checked order.
+    for i in 0 .. list_len(layouts) {
+        let id = list_get(layouts, i);
+        if !layout_needs_trace(c, type_info(c, id)) { dict_set(c.untraced_types, id, true); }
+    }
 }
 pub fn gc_root(c: Context, name: String, visit: String) -> Unit effects { state } {
     if visit != "NULL" {
@@ -128,6 +152,9 @@ pub fn gc_restore(c: Context, mark: String) -> Unit effects { state } {
 }
 pub fn temp(c: Context, t: TypeId, value: String) -> String effects { state, io, process } {
     emit(c, "v_gc_poll();");
+    return rooted_temp(c, t, value);
+}
+fn rooted_temp(c: Context, t: TypeId, value: String) -> String effects { state, io, process } {
     let name = raw_temp(c, ctype(c, t), value);
     gc_root(c, name, gc_visitor(c, t));
     return name;
@@ -174,6 +201,7 @@ pub fn emit_expr(c: Context, id: ExprId) -> String effects { state, io, process 
     if k == 123 || k == 124 {
         let operand = emit_expr(c, n.left);
         if k == 124 {
+            emit(c, "v_gc_poll();");
             emit(c, "v_fiber_suspend(" + operand + ", " + location(c, n.span) + ");");
         }
         emit(c, "if (v_fiber_cancelled()) {");
@@ -187,36 +215,36 @@ pub fn emit_expr(c: Context, id: ExprId) -> String effects { state, io, process 
         return operand;
     }
     if k == 117 {
-        return temp(c, t, value);
+        return rooted_temp(c, t, value);
     }
     if k == 101 {
         if value == "-9223372036854775808" {
-            return temp(c, t, "INT64_MIN");
+            return rooted_temp(c, t, "INT64_MIN");
         }
         if str_byte(value, 0) == 45 {
-            return temp(c, t, "(-INT64_C(" + str_slice(value, 1, str_len(value)) + "))");
+            return rooted_temp(c, t, "(-INT64_C(" + str_slice(value, 1, str_len(value)) + "))");
         }
-        return temp(c, t, "INT64_C(" + value +")");
+        return rooted_temp(c, t, "INT64_C(" + value +")");
     }
     if k == 102 {
         if value == "true" {
-            return temp(c, t, "1");
+            return rooted_temp(c, t, "1");
         }
-        return temp(c, t, "0");
+        return rooted_temp(c, t, "0");
     }
     if k == 103 {
-        return temp(c, t, "v_text(" + cquote(value) + ", " + num(str_len(value)) +")");
+        return rooted_temp(c, t, "v_text(" + cquote(value) + ", " + num(str_len(value)) +")");
     }
     if k == 109 {
-        return temp(c, t, "0");
+        return rooted_temp(c, t, "0");
     }
     if k == 104 {
-        return temp(c, t, local_name(n.symbol));
+        return rooted_temp(c, t, local_name(n.symbol));
     }
     if k == 118 || k == 119 || k == 120 { return emit_callable(c, n); }
     if k == 121 || k == 122 { return emit_dynamic(c, n); }
     if k == 110 {
-        return temp(c, t, emit_expr(c, n.left) + ".v_m_" + symbol_info(c, n.symbol).name);
+        return rooted_temp(c, t, emit_expr(c, n.left) + ".v_m_" + symbol_info(c, n.symbol).name);
     }
     if k == 115 {
         return emit_interpolation(c, n);
@@ -232,7 +260,7 @@ pub fn emit_expr(c: Context, id: ExprId) -> String effects { state, io, process 
     }
     if k == 112 {
         let args = emit_arguments(c, n.arguments);
-        let r = temp(c, t, "{0}");
+        let r = rooted_temp(c, t, "{0}");
         var i = 0;
         while i < list_len(n.arguments) {
             emit(c, r + ".v_m_" + symbol_info(c, list_get(n.fields, i)).name + " = " + strings_get(args, i) +";");
@@ -243,17 +271,17 @@ pub fn emit_expr(c: Context, id: ExprId) -> String effects { state, io, process 
     if k == 105 {
         let arg = emit_expr(c, n.left);
         if value == "-" {
-            if t == float_type() {
-                return temp(c, t, "(-" + arg +")");
+            if t == float_type() || n.safe_arithmetic {
+                return rooted_temp(c, t, "(-" + arg +")");
             }
-            return temp(c, t, "v_neg(" + arg + ", " + location(c, n.span) +")");
+            return rooted_temp(c, t, "v_neg(" + arg + ", " + location(c, n.span) +")");
         }
-        return temp(c, t, "(!" + arg +")");
+        return rooted_temp(c, t, "(!" + arg +")");
     }
     if k == 106 {
         var left = emit_expr(c, n.left);
         if value == "&&" || value == "||" {
-            let r = temp(c, t, left);
+            let r = rooted_temp(c, t, left);
             var test = r;
             if value == "||" {
                 test = "!"+ r;
@@ -270,10 +298,10 @@ pub fn emit_expr(c: Context, id: ExprId) -> String effects { state, io, process 
         var arithmetic = "";
         let operand_type = checked_expr(c, n.left).type_id;
         if type_kind(c, operand_type) == 70 {
-            return temp(c, t, "(" + left + ".tag " + value + " " + right + ".tag)");
+            return rooted_temp(c, t, "(" + left + ".tag " + value + " " + right + ".tag)");
         }
         if operand_type == float_type() {
-            return temp(c, t,"("+ left + " " + value + " " + right +")");
+            return rooted_temp(c, t,"("+ left + " " + value + " " + right +")");
         }
         if type_kind(c, operand_type) == 77 {
             left = left + ".v_m_value";
@@ -294,16 +322,17 @@ pub fn emit_expr(c: Context, id: ExprId) -> String effects { state, io, process 
             arithmetic = "rem";
         }
         if arithmetic != "" {
-            return temp(c, t, "v_" + arithmetic + "("+ left + ", " + right + ", " + location(c, n.span) +")");
+            if n.safe_arithmetic { return rooted_temp(c, t, "(" + left + " " + value + " " + right + ")"); }
+            return rooted_temp(c, t, "v_" + arithmetic + "("+ left + ", " + right + ", " + location(c, n.span) +")");
         }
         if scalar_type(c, operand_type) == string_type() {
             var code = "v_string_eq(" + left + ", " + right +")";
             if value == "!=" {
                 code = "!"+ code;
             }
-            return temp(c, t, code);
+            return rooted_temp(c, t, code);
         }
-        return temp(c, t,"("+ left + " " + value + " " + right +")");
+        return rooted_temp(c, t,"("+ left + " " + value + " " + right +")");
     }
     if k == 107 {
         let args = emit_arguments(c, n.arguments);
@@ -320,7 +349,7 @@ pub fn emit_expr(c: Context, id: ExprId) -> String effects { state, io, process 
     if k == 108 {
         let args = emit_arguments(c, n.arguments);
         let tag = symbol_info(c, n.symbol).tag;
-        let r = temp(c, t, "{0}");
+        let r = rooted_temp(c, t, "{0}");
         emit(c, r + ".tag = " + num(tag) +";");
         var i = 0;
         while i < strings_len(args) {
@@ -337,16 +366,21 @@ fn emit_callable(c: Context, n: CheckedExpr) -> String effects { state, io, proc
     let k = n.kind;
     let t = n.type_id;
     if k == 118 {
-        return temp(c, t, "{(void (*)(void))" + function_name(c, n.symbol) + ", NULL}");
+        return rooted_temp(c, t, "{(void (*)(void))" + function_name(c, n.symbol) + ", NULL}");
     }
     if k == 120 {
         let args = emit_arguments(c, n.arguments);
         let code = "(void (*)(void))" + function_name(c, n.symbol);
-        if strings_len(args) == 0 { return temp(c, t, "{" + code + ", NULL}"); }
+        if strings_len(args) == 0 { return rooted_temp(c, t, "{" + code + ", NULL}"); }
         let environment = closure_environment(n.symbol);
         emit(c, "v_gc_poll();");
         let payload = raw_temp(c, environment + "*", "(" + environment + "*)v_allocate(sizeof(" + environment + "), " + location(c, n.span) + ")");
-        emit(c, "v_gc_describe(" + payload + ", v_trace_" + environment + ");");
+        for i in 0 .. list_len(n.arguments) {
+            if gc_visitor(c, checked_expr(c, list_get(n.arguments, i)).type_id) != "NULL" {
+                emit(c, "v_gc_describe(" + payload + ", v_trace_" + environment + ");");
+                break;
+            }
+        }
         for i in 0 .. strings_len(args) {
             emit(c, payload + "->v_capture_" + num(i) + " = " + strings_get(args, i) + ";");
         }
@@ -397,10 +431,10 @@ fn emit_dynamic(c: Context, n: CheckedExpr) -> String effects { state, io, proce
     let code = "((" + ctype(c, n.type_id) + " (*)(" + strings_join(types, ", ") + "))" + receiver + ".operations[" + num(signature.tag) + "])";
     return temp(c, n.type_id, cc_call(code, operands));
 }
-fn emit_dynamic_tables(c: Context) -> Unit effects { state, io, process } {
+fn emit_dynamic_tables(c: Context, boxes: List<ExprId>) -> Unit effects { state, io, process } {
     let seen = dict_new<String, Bool>();
-    for n in c.expressions {
-        if n.kind != 121 { continue; }
+    for box in boxes {
+        let n = checked_expr(c, box);
         let concrete = checked_expr(c, n.left).type_id;
         let table = dynamic_table_name(n.type_id, concrete);
         if dict_has(seen, table) { continue; }
@@ -510,6 +544,7 @@ pub fn emit_statement_inner(c: Context, n: CheckedStmt) -> Unit effects { state,
         emit_block(c, n.yes);
         emit(c, label + "_continue:;");
         gc_restore(c, label + "_roots");
+        emit(c, "v_gc_poll();");
         emit(c, "}");
         leave_emitted_loop(c, label);
     } else if k == 139 || k == 140 {
@@ -546,10 +581,10 @@ pub fn emit_statement_inner(c: Context, n: CheckedStmt) -> Unit effects { state,
         exit(70);
     }
 }
-pub fn emit_types(c: Context) -> Unit effects { state, io, process } {
+fn emit_types(c: Context, layouts: List<TypeId>) -> Unit effects { state, io, process } {
     var i = 0;
-    while i < list_len(c.type_order) {
-        let id = list_get(c.type_order, i);
+    while i < list_len(layouts) {
+        let id = list_get(layouts, i);
         let t = type_info(c, id);
         if t.kind == 76 || t.kind == 77 {
             emit(c, "typedef struct {");
@@ -589,16 +624,19 @@ pub fn emit_gc_field(c: Context, t: TypeId, field: String) -> Unit effects { sta
     let visit = gc_visitor(c, t);
     if visit != "NULL" { emit(c, visit + "(&value->" + field + ");"); }
 }
-pub fn emit_gc_types(c: Context) -> Unit effects { state, io, process } {
-    for i in 0 .. list_len(c.type_order) {
-        let id = list_get(c.type_order, i);
-        emit(c, "static void " + gc_visitor(c, id) + "(const void *slot);");
+fn emit_gc_types(c: Context, layouts: List<TypeId>) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(layouts) {
+        let id = list_get(layouts, i);
+        let visit = gc_visitor(c, id);
+        if visit != "NULL" { emit(c, "static void " + visit + "(const void *slot);"); }
     }
-    for i in 0 .. list_len(c.type_order) {
-        let id = list_get(c.type_order, i);
+    for i in 0 .. list_len(layouts) {
+        let id = list_get(layouts, i);
+        let visit = gc_visitor(c, id);
+        if visit == "NULL" { continue; }
         let t = type_info(c, id);
         let name = ctype(c, id);
-        emit(c, "static void " + gc_visitor(c, id) + "(const void *slot) {");
+        emit(c, "static void " + visit + "(const void *slot) {");
         emit(c, "const " + name + " *value = (const " + name + "*)slot; (void)value;");
         if t.kind == 76 || t.kind == 77 {
             for j in 0 .. list_len(t.fields) {
@@ -632,9 +670,10 @@ pub fn generate(c: Context) -> String effects { state, io, process } {
 pub fn closure_environment(symbol: SymbolId) -> String {
     return "v_env_" + num(symbol_number(symbol));
 }
-pub fn emit_closure_environments(c: Context) -> Unit effects { state, io, process } {
-    for f in c.functions {
-        if list_len(f.captures) == 0 { continue; }
+fn emit_closure_environments(c: Context, functions: Dict<SymbolId, Bool>) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(c.functions) {
+        let f = list_get(c.functions, i);
+        if list_len(f.captures) == 0 || !dict_has(functions, f.symbol) { continue; }
         let name = closure_environment(f.symbol);
         emit(c, "typedef struct {");
         for i in 0 .. list_len(f.captures) {
@@ -642,6 +681,7 @@ pub fn emit_closure_environments(c: Context) -> Unit effects { state, io, proces
             emit(c, ctype(c, captured.type_id) + " v_capture_" + num(i) + ";");
         }
         emit(c, "} " + name + ";");
+        if !fields_need_trace(c, f.captures) { continue; }
         emit(c, "static void v_trace_" + name + "(const void *slot) {");
         emit(c, "const " + name + " *value = (const " + name + "*)slot; (void)value;");
         for i in 0 .. list_len(f.captures) {
@@ -652,6 +692,8 @@ pub fn emit_closure_environments(c: Context) -> Unit effects { state, io, proces
 }
 pub fn generate_entry(c: Context, entry: SymbolId) -> String effects { state, io, process } {
     strings_truncate(c.output, 0);
+    let reach = reachable_code(c, entry);
+    classify_trace_layouts(c, reach.layouts);
     var initial = list_get(c.control, 0);
     initial.temporary = 0;
     list_set(c.control, 0, initial);
@@ -662,13 +704,20 @@ pub fn generate_entry(c: Context, entry: SymbolId) -> String effects { state, io
     emit(c, "#if !defined(VELA_RUNTIME_ABI) || VELA_RUNTIME_ABI != 2");
     emit(c, "#error incompatible Vela internal runtime ABI");
     emit(c, "#endif");
+    emit(c, "#if defined(_MSC_VER) && defined(VELA_LTO_COMPACT)");
+    emit(c, "#define VELA_LTO_COMPACT_BEGIN __pragma(optimize(\"s\", on))");
+    emit(c, "#define VELA_LTO_COMPACT_END __pragma(optimize(\"\", on))");
+    emit(c, "#else");
+    emit(c, "#define VELA_LTO_COMPACT_BEGIN");
+    emit(c, "#define VELA_LTO_COMPACT_END");
+    emit(c, "#endif");
     emit(c, "typedef struct { void (*code)(void); void *environment; } v_callable;");
     emit(c, "static void v_gc_callable(const void *slot) { v_gc_mark(((const v_callable *)slot)->environment); }");
     emit(c, "typedef struct { void *payload; void (*const *operations)(void); } v_dynamic;");
     emit(c, "static void v_gc_dynamic(const void *slot) { v_gc_mark(((const v_dynamic *)slot)->payload); }");
-    emit_types(c);
-    emit_gc_types(c);
-    emit_closure_environments(c);
+    emit_types(c, reach.layouts);
+    emit_gc_types(c, reach.layouts);
+    emit_closure_environments(c, reach.functions);
     emit(c, "static v_e_IntResult v_result(v_parse_result p) { v_e_IntResult r = {0}; r.tag = p.ok ? 0 : 1; if (p.ok) r.data.k0.f0 = p.value; else r.data.k1.f0 = p.error; return r; }");
     emit(c, "static v_e_Int32Result v_int32_result(v_parse_result p) { v_e_Int32Result r = {0}; r.tag = p.ok ? 0 : 1; if (p.ok) r.data.k0.f0 = (int32_t)p.value; else r.data.k1.f0 = p.error; return r; }");
     emit(c, "static v_e_FloatResult v_float_result(v_float_parse p) { v_e_FloatResult r = {0}; r.tag = p.ok ? 0 : 1; if (p.ok) r.data.k0.f0 = p.value; else r.data.k1.f0 = p.error; return r; }");
@@ -679,23 +728,20 @@ pub fn generate_entry(c: Context, entry: SymbolId) -> String effects { state, io
     emit(c, "static v_e_ProcessResult v_process_result_value(v_process_result p) { v_e_ProcessResult r = {0}; r.tag = p.kind; if (p.kind == 0) r.data.k0.f0 = p.code; else if (p.kind == 2) r.data.k2.f0 = p.message; return r; }");
     emit(c, "static v_e_StringResult v_string_result(v_io_result p) { v_e_StringResult r = {0}; r.tag = p.ok ? 0 : 1; if (p.ok) r.data.k0.f0 = p.value; else r.data.k1.f0 = p.value; return r; }");
     emit(c, "static v_e_WriteResult v_write_result(v_io_result p) { v_e_WriteResult r = {0}; r.tag = p.ok ? 0 : 1; if (!p.ok) r.data.k1.f0 = p.value; return r; }");
-    var i = 0;
-    var main_index = 0;
-    while i < list_len(c.functions) {
-        emit(c, signature(c, list_get(c.functions, i)) +";");
-        i = i + 1;
-    }
-    emit_dynamic_tables(c);
-    i = 0;
-    while i < list_len(c.functions) {
+    for i in 0 .. list_len(c.functions) {
         let f = list_get(c.functions, i);
+        if dict_has(reach.functions, f.symbol) { emit(c, signature(c, f) +";"); }
+    }
+    emit_dynamic_tables(c, reach.dynamic_boxes);
+    for i in 0 .. list_len(c.functions) {
+        let f = list_get(c.functions, i);
+        if !dict_has(reach.functions, f.symbol) { continue; }
         let sig = symbol_info(c, f.symbol);
-        if f.symbol == entry {
-            main_index = i;
-        }
         var ctl = list_get(c.control, 0);
         ctl.function_index = i;
+        ctl.emitted_loop = false;
         list_set(c.control, 0, ctl);
+        let first_line = strings_len(c.output);
         emit_debug_line(c, f.span);
         emit(c, signature(c, f) + " {");
         emit(c, "(void)v_environment;");
@@ -720,10 +766,14 @@ pub fn generate_entry(c: Context, entry: SymbolId) -> String effects { state, io
         emit(c, "v_panic(" + location(c, f.span) + ", \"unreachable function end\");");
         emit(c, "return " + zero_value(c, sig.type_id) +";");
         emit(c, "}");
-        i = i + 1;
+        if !list_get(c.control, 0).emitted_loop && strings_len(c.output) - first_line < 250 {
+            strings_set(c.output, first_line, "VELA_LTO_COMPACT_BEGIN\n" + strings_get(c.output,
+                first_line));
+            emit(c, "VELA_LTO_COMPACT_END");
+        }
     }
     if c.debug_codegen { emit(c, "#line 1 \"<vela-generated>\""); }
-    let main_func = list_get(c.functions, main_index);
+    let main_func = list_get(c.functions, reach.entry_index);
     emit(c, "int main(int argc, char **argv) { v_argc = argc; v_argv = argv; v_runtime_init(); v_gc_enable(); int code = 0;");
     if symbol_info(c, main_func.symbol).type_id == int_type() {
         emit(c, "code = v_exit_code(" + function_name(c, entry) + "(NULL), " + location(c, main_func.span) + ");");
@@ -772,7 +822,7 @@ pub fn emit_arm_bindings(c: Context, arm: CheckedArm, value: String) -> Unit eff
 }
 pub fn emit_match_expression(c: Context, n: CheckedExpr) -> String effects { state, io, process } {
     let value = emit_expr(c, n.left);
-    let result_value = temp(c, n.type_id, zero_value(c, n.type_id));
+    let result_value = rooted_temp(c, n.type_id, zero_value(c, n.type_id));
     emit(c, "switch (" + value + ".tag) {");
     var i = 0;
     while i < list_len(n.arms) {
@@ -793,18 +843,19 @@ pub fn emit_propagation(c: Context, n: CheckedExpr) -> String effects { state, i
     let value = emit_expr(c, n.left);
     let failure = symbol_info(c, n.symbol);
     emit(c, "if (" + value + ".tag == 1) {");
-    let propagated = temp(c, failure.owner, "{0}");
+    let propagated = rooted_temp(c, failure.owner, "{0}");
     emit(c, propagated + ".tag = 1;");
     if list_len(failure.parameters) == 1 {
         emit(c, propagated + ".data.k1.f0 = " + value + ".data.k1.f0;");
     }
     emit_return_value(c, propagated);
     emit(c, "}");
-    return temp(c, n.type_id, value + ".data.k0.f0");
+    return rooted_temp(c, n.type_id, value + ".data.k0.f0");
 }
 pub fn enter_emitted_loop(c: Context) -> String effects { state } {
     var ctl = list_get(c.control, 0);
     ctl.temporary = ctl.temporary + 1;
+    ctl.emitted_loop = true;
     list_set(c.control, 0, ctl);
     let label = "v_loop_" + num(ctl.temporary);
     list_push(c.loop_labels, label);
@@ -829,20 +880,21 @@ pub fn emit_for(c: Context, n: CheckedStmt) -> Unit effects { state, io, process
     var item = "";
     if n.mode != 0 {
         end_value = emit_expr(c, n.target);
-        counter = temp(c, int_type(), value);
+        counter = rooted_temp(c, int_type(), value);
         condition_text = counter + " < " + end_value;
         if n.mode == 2 {
             condition_text = counter + " <= " + end_value;
         }
         item = counter;
     } else {
-        end_value = temp(c, int_type(), value + "->length");
+        end_value = rooted_temp(c, int_type(), value + "->length");
         let snapshot = label + "_items";
+        emit(c, "v_gc_poll();");
         emit(c, element + " *" + snapshot + " = (" + element + "*)v_copy_items(" + value + "->data, " + end_value + ", sizeof(" + element + "), " + loc + ");");
         let root = label + "_snapshot";
         emit(c, "v_gc_snapshot " + root + " = {" + snapshot + ", (size_t)" + end_value + ", sizeof(" + element + "), " + gc_visitor(c, element_type) + "};");
         gc_root(c, root, "v_gc_snapshot_value");
-        counter = temp(c, int_type(), "0");
+        counter = rooted_temp(c, int_type(), "0");
         condition_text = counter + " < " + end_value;
         item = snapshot + "[" + counter + "]";
     }
@@ -856,7 +908,9 @@ pub fn emit_for(c: Context, n: CheckedStmt) -> Unit effects { state, io, process
     if n.mode == 2 {
         emit(c, "if (" + counter + " == " + end_value + ") break;");
     }
-    emit(c, counter + " = v_add(" + counter + ", 1, " + loc + "); }");
+    emit(c, "v_gc_poll();");
+    // The loop guard and inclusive end check prove counter < INT64_MAX here.
+    emit(c, counter + " += INT64_C(1); }");
     leave_emitted_loop(c, label);
 }
 pub fn emit_formatted_value(c: Context, n: CheckedExpr) -> String effects { state, io, process } {

@@ -1,0 +1,261 @@
+import "model.vela";
+import "core.vela";
+import "embedded.vela";
+import "incremental.vela";
+import "modules.vela";
+import "projects.vela";
+import "semantic.vela";
+
+struct ModuleProof {
+    source: String,
+    tokens: String,
+    api: String
+}
+struct SemanticProof {
+    scalar: Bool,
+    modules: List<ModuleProof>
+}
+
+fn semantic_key(c: Context, p: Project, lock: String) -> String effects { state } {
+    let parts = strings_new();
+    strings_push(parts, "semantic-modules-v1");
+    strings_push(parts, compiler_fingerprint());
+    strings_push(parts, sha256(p.manifest) + sha256(p.text) + sha256(lock));
+    for unit in c.source_units {
+        strings_push(parts, sha256(unit.path) + sha256(unit.name));
+    }
+    for edge in c.imports {
+        strings_push(parts, f"{edge.owner:d}:{edge.target:d}:" + sha256(edge.alias));
+    }
+    return sha256(strings_join(parts, "\n"));
+}
+fn valid_digest(value: String) -> Bool {
+    if str_len(value) != 64 { return false; }
+    for i in 0 .. str_len(value) {
+        let b = str_byte(value, i);
+        if (b < 48 || b > 57) && (b < 97 || b > 102) { return false; }
+    }
+    return true;
+}
+fn decode_semantic_proof(value: String, count: Int) -> Option<SemanticProof> effects { state } {
+    if str_len(value) > 65536 { return Option<SemanticProof>::None; }
+    let rows = project_split(value, 10);
+    if list_len(rows) != 3 + count * 3 || list_get(rows, 0) != "VSM1"
+        || list_get(rows, list_len(rows) - 1) != "" {
+        return Option<SemanticProof>::None;
+    }
+    let mode = list_get(rows, 1);
+    if mode != "scalar" && mode != "whole" { return Option<SemanticProof>::None; }
+    let scalar = mode == "scalar";
+    let modules = list_new<ModuleProof>();
+    for i in 0 .. count {
+        let row = 2 + i * 3;
+        let source = list_get(rows, row);
+        let tokens = list_get(rows, row + 1);
+        let api = list_get(rows, row + 2);
+        if !valid_digest(source) || !valid_digest(tokens) || scalar && !valid_digest(api)
+            || !scalar && api != "-" {
+            return Option<SemanticProof>::None;
+        }
+        list_push(modules, ModuleProof(source: source, tokens: tokens, api: api));
+    }
+    return Option<SemanticProof>::Some(SemanticProof(scalar: scalar, modules: modules));
+}
+fn read_semantic_proof(cache: Cache, key: String, count: Int) -> Option<SemanticProof> effects { state,
+    io } {
+    match cache_read(cache, key, "semantic-modules-v1") {
+        Option::Some(saved) => {
+            let proof = decode_semantic_proof(saved, count);
+            match proof {
+                Option::Some(_) => { return proof; }
+                Option::None => {
+                    cache_event(cache, "read", "semantic-modules-v1", "miss", "invalid_modules", key,
+                        "", false);
+                }
+            }
+        }
+        Option::None => {}
+    }
+    return Option<SemanticProof>::None;
+}
+fn store_semantic_proof(cache: Cache, key: String, sources: List<String>, tokens: List<String>,
+    apis: List<String>) -> Unit effects { state, io } {
+    let parts = strings_new();
+    let scalar = list_len(apis) != 0;
+    strings_push(parts, "VSM1\n");
+    if scalar { strings_push(parts, "scalar\n"); }
+    else { strings_push(parts, "whole\n"); }
+    for i in 0 .. list_len(sources) {
+        strings_push(parts, list_get(sources, i) + "\n" + list_get(tokens, i) + "\n");
+        if scalar { strings_push(parts, list_get(apis, i) + "\n"); }
+        else { strings_push(parts, "-\n"); }
+    }
+    cache_store(cache, key, strings_join(parts, ""), "semantic-modules-v1");
+}
+
+fn primitive_annotation(name: String) -> Bool {
+    return name == "Unit" || name == "Bool" || name == "Int" || name == "Int32"
+        || name == "Float64" || name == "String";
+}
+fn direct_scalar_call(c: Context, callee: SyntaxExpr) -> Bool effects { state } {
+    if callee.qualifier != "" { return module_alias(c, callee.qualifier, callee.span) >= 0; }
+    if callee.text == "print" { return true; }
+    let owner = source_unit_at(c, callee.span.start);
+    if module_declaration(c, owner, callee.text) >= 0 { return true; }
+    for edge in c.imports {
+        if edge.owner == owner && edge.alias == "" {
+            let member = module_declaration(c, edge.target, callee.text);
+            if member >= 0 && list_get(c.declarations, member).exported { return true; }
+        }
+    }
+    return false;
+}
+// Mixed reuse must leave no unchecked body-created type or instance behind.
+fn scalar_graph(c: Context) -> Bool effects { state, io, process } {
+    if list_len(c.syntax_types) != 0 || list_len(c.syntax_impls) != 0
+        || list_len(c.syntax_interfaces) != 0 || list_len(c.syntax_closures) != 0 { return false; }
+    let callable = dict_new<String, Bool>();
+    for id in c.signatures { dict_set(callable, symbol_info(c, id).name, true); }
+    for decl in c.declarations { dict_set(callable, decl.name, true); }
+    for fn_syntax in c.syntax_functions {
+        if fn_syntax.suspending || fn_syntax.foreign_library != "" || fn_syntax.test_name != ""
+            || list_len(fn_syntax.type_parameters) != 0 || !primitive_annotation(fn_syntax.return_name) {
+            return false;
+        }
+        for field in fn_syntax.parameters {
+            if !primitive_annotation(field.annotation) { return false; }
+        }
+    }
+    for stmt in c.syntax_stmts {
+        if stmt.kind < 30 || stmt.kind > 43 || stmt.kind >= 36 && stmt.kind <= 38
+            || stmt.kind == 41 && stmt.mode == 0
+            || stmt.annotation != "" && !primitive_annotation(stmt.annotation) { return false; }
+    }
+    let call_targets = dict_new<AstExprId, Bool>();
+    for expr in c.syntax_exprs {
+        if list_len(expr.type_arguments) != 0 || (expr.kind < 1 || expr.kind > 7) && expr.kind != 12 {
+            return false;
+        }
+        if expr.kind == 7 {
+            if !direct_scalar_call(c, ast_expr(c, expr.left)) { return false; }
+            dict_set(call_targets, expr.left, true);
+        }
+    }
+    for i in 0 .. list_len(c.syntax_exprs) {
+        let expr = list_get(c.syntax_exprs, i);
+        if expr.kind == 4 && !dict_has(call_targets, AstExprId(i + 1))
+            && (expr.qualifier != "" || dict_has(callable, expr.text)) { return false; }
+    }
+    return true;
+}
+fn module_apis(c: Context) -> List<String> effects { state } {
+    let modules = list_new<StringList>();
+    for unit in c.source_units { list_push(modules, strings_new()); }
+    for syntax in c.syntax_functions {
+        let owner = source_unit_at(c, syntax.span.start);
+        let declaration = list_get(c.declarations, module_declaration(c, owner, syntax.name));
+        if declaration.exported {
+            let parts = list_get(modules, owner);
+            strings_push(parts, syntax.name + " " + syntax.return_name + " " + syntax.effect_pattern);
+            for field in syntax.parameters { strings_push(parts, " " + field.name + ":" + field.annotation); }
+            strings_push(parts, "\n");
+        }
+    }
+    let digests = list_new<String>();
+    for parts in modules { list_push(digests, sha256(strings_join(parts, ""))); }
+    return digests;
+}
+fn reusable_modules(c: Context, old: SemanticProof, tokens: List<String>, apis: List<String>) -> List<Bool> effects { state } {
+    let changed_api = list_new<Bool>();
+    let pending = list_new<Int>();
+    for i in 0 .. list_len(apis) {
+        let changed = list_get(old.modules, i).api != list_get(apis, i);
+        list_push(changed_api, changed);
+        if changed { list_push(pending, i); }
+    }
+    var cursor = 0;
+    while cursor < list_len(pending) {
+        let changed = list_get(pending, cursor);
+        for edge in c.imports {
+            if edge.target == changed && !list_get(changed_api, edge.owner) {
+                list_set(changed_api, edge.owner, true);
+                list_push(pending, edge.owner);
+            }
+        }
+        cursor = cursor + 1;
+    }
+    let reused = list_new<Bool>();
+    for i in 0 .. list_len(tokens) {
+        list_push(reused, !list_get(changed_api, i) && list_get(tokens, i) == list_get(old.modules, i).tokens);
+    }
+    return reused;
+}
+
+pub fn semantic_report(cache: Cache, key: String, modules: Int, declarations: Int, bodies: Int,
+    reused: Int, reason: String) -> Unit effects { state, io } {
+    if !cache.report { return; }
+    eprint(f"{{\"schema_version\":1,\"kind\":\"cache\",\"phase\":\"analysis\",\"layer\":\"semantic-modules-v1\",\"status\":\"complete\",\"reason\":\"{reason:s}\",\"directory\":{json_string(cache.directory):s},\"key\":\"{key:s}\",\"message\":\"\",\"modules\":{modules:d},\"declarations_checked\":{declarations:d},\"bodies_checked\":{bodies:d},\"reused_modules\":{reused:d}}}");
+}
+pub fn check_incrementally(c: Context, p: Project, lock: String, cache: Cache) -> Unit effects { state,
+    io, process } {
+    let key = semantic_key(c, p, lock);
+    let count = list_len(c.source_units);
+    let sources = list_new<String>();
+    for unit in c.source_units { list_push(sources, sha256(unit.code)); }
+    let tokens = list_new<String>();
+    let previous = read_semantic_proof(cache, key, count);
+    match previous {
+        Option::Some(old) => {
+            let apis = list_new<String>();
+            var equivalent = true;
+            for i in 0 .. count {
+                let prior = list_get(old.modules, i);
+                var digest = prior.tokens;
+                if list_get(sources, i) != prior.source {
+                    digest = token_fingerprint(lex_module(c, list_get(c.source_units, i)));
+                }
+                equivalent = equivalent && digest == prior.tokens;
+                list_push(tokens, digest);
+                if old.scalar { list_push(apis, prior.api); }
+            }
+            if equivalent {
+                cache_event(cache, "read", "semantic-modules-v1", "hit", "equivalent_tokens", key, "", false);
+                store_semantic_proof(cache, key, sources, tokens, apis);
+                semantic_report(cache, key, count, 0, 0, count, "token_equivalent");
+                return;
+            }
+            parse_program(c);
+        }
+        Option::None => { parse_program_tokens(c, Option<List<String>>::Some(tokens)); }
+    }
+    analyze_declarations(c, true);
+    var apis = list_new<String>();
+    var selected = Option<List<Bool>>::None;
+    var reused = 0;
+    if scalar_graph(c) {
+        apis = module_apis(c);
+        match previous {
+            Option::Some(old) => {
+                if old.scalar {
+                    let modules = reusable_modules(c, old, tokens, apis);
+                    for skip in modules { if skip { reused = reused + 1; } }
+                    if reused != 0 { selected = Option<List<Bool>>::Some(modules); }
+                }
+            }
+            Option::None => {}
+        }
+    }
+    check_selected_functions(c, selected);
+    finish_analysis(c);
+    if reused != 0 {
+        cache_event(cache, "read", "semantic-modules-v1", "hit", "reused_bodies", key, "", false);
+    }
+    store_semantic_proof(cache, key, sources, tokens, apis);
+    if cache.report {
+        let bodies = dict_new<Int, Bool>();
+        for body in c.functions { dict_set(bodies, source_unit_at(c, body.span.start), true); }
+        var reason = "full";
+        if reused != 0 { reason = "mixed"; }
+        semantic_report(cache, key, count, count, dict_len(bodies), reused, reason);
+    }
+}

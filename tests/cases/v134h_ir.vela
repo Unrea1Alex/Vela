@@ -1,0 +1,45 @@
+enum Choice { One(Int), Other }
+
+fn mark(log: List<String>, label: String, value: Int) -> Int effects { state } {
+    list_push(log, label);
+    return value;
+}
+
+fn unknown_branch(log: List<String>, take: Bool) -> Int effects { state } {
+    if take { return mark(log, "yes", 5); }
+    return mark(log, "no", 7);
+}
+
+fn combine(a: Int, b: Int) -> Int { return a * 10 + b; }
+
+fn main() -> Unit effects { state, io } {
+    let log = list_new<String>();
+    let immutable = 2 * 3 + 3;
+    let selected = immutable == 9;
+    var mutable = 1;
+    if selected {
+        defer { list_push(log, "defer"); }
+        mutable = combine(mark(log, "first", immutable), mark(log, "second", 2));
+    } else {
+        let unexpected = 9223372036854775807 + 1;
+        list_push(log, "unexpected if");
+    }
+    while !selected {
+        let unexpected = 1 / 0;
+        list_push(log, "unexpected while");
+    }
+    assert_true(true || mark(log, "unexpected rhs", 0) == 0, "short circuit");
+    assert_true(!(false && 1 % 0 == 0), "trapping rhs skipped");
+    assert_true(mutable == 92, "mutable value is read after assignment");
+    let one = match Choice::One(mutable) {
+        Choice::One(value) => mark(log, "match", value),
+        Choice::Other => mark(log, "unexpected match", -1)
+    };
+    assert_true(one + unknown_branch(log, true) + unknown_branch(log, false) == 104, "unknown branches still run");
+    assert_true(-9223372036854775808 % -1 == 0, "minimum remainder");
+    assert_true(float_to_string(-0.0) == "-0", "Float64 remains strict");
+    var sequence = "";
+    for event in log { sequence = sequence + event + " "; }
+    assert_true(sequence == "first second defer match yes no ", "observable order and scope");
+    print("checked simplification passed");
+}

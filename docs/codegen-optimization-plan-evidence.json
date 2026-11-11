@@ -1,0 +1,570 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-09",
+  "scope": "Plan-only addition of eight C code generation optimization stages after 1.3.4d; AGENTS synchronization.",
+  "status": "documentation-verified",
+  "implementation_started": false,
+  "optimization_measurements_run": false,
+  "compiler_verify_run": false,
+  "reason_no_compiler_verify": "Editing the plan does not execute a roadmap stage; documentation-only checks required by AGENTS.md.",
+  "changed_files": [
+    "docs/ROADMAP.md",
+    "AGENTS.md",
+    "docs/codegen-optimization-plan-evidence.json"
+  ],
+  "compared_against": "Pre-edit working-tree snapshot; pre-existing uncommitted roadmap implementation progress preserved.",
+  "preserved_existing_stage_count": 81,
+  "new_stages": [
+    {
+      "id": "1.3.4e",
+      "title": "контракт оптимизаций и исходные замеры C backend.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.4d"
+      ],
+      "measurements_required": true,
+      "focused_checks_required": true,
+      "full_compiler_gate": ".\\vela-dev.cmd verify",
+      "c_recovery_required": true
+    },
+    {
+      "id": "1.3.4f",
+      "title": "исключение корней GC для типов без управляемых ссылок.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.4e"
+      ],
+      "measurements_required": true,
+      "focused_checks_required": true,
+      "full_compiler_gate": ".\\vela-dev.cmd verify",
+      "c_recovery_required": true
+    },
+    {
+      "id": "1.3.4g",
+      "title": "сокращение избыточных точек проверки GC.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.4f"
+      ],
+      "measurements_required": true,
+      "focused_checks_required": true,
+      "full_compiler_gate": ".\\vela-dev.cmd verify",
+      "c_recovery_required": true
+    },
+    {
+      "id": "1.3.4h",
+      "title": "упрощение проверенного промежуточного представления.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.4g"
+      ],
+      "measurements_required": true,
+      "focused_checks_required": true,
+      "full_compiler_gate": ".\\vela-dev.cmd verify",
+      "c_recovery_required": true
+    },
+    {
+      "id": "1.3.4i",
+      "title": "доказанные диапазоны и устранение лишних проверок арифметики.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.4h"
+      ],
+      "measurements_required": true,
+      "focused_checks_required": true,
+      "full_compiler_gate": ".\\vela-dev.cmd verify",
+      "c_recovery_required": true
+    },
+    {
+      "id": "1.3.4j",
+      "title": "генерация только достижимых функций и зависимых типов.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.4i"
+      ],
+      "measurements_required": true,
+      "focused_checks_required": true,
+      "full_compiler_gate": ".\\vela-dev.cmd verify",
+      "c_recovery_required": true
+    },
+    {
+      "id": "1.3.4k",
+      "title": "opt-in сборка с оптимизацией по профилю (PGO).",
+      "status": "planned",
+      "dependencies": [
+        "1.3.4j"
+      ],
+      "measurements_required": true,
+      "focused_checks_required": true,
+      "full_compiler_gate": ".\\vela-dev.cmd verify",
+      "c_recovery_required": true
+    },
+    {
+      "id": "1.3.4l",
+      "title": "opt-in оптимизация при линковке (LTO) и совместимость с PGO.",
+      "status": "planned",
+      "dependencies": [
+        "1.3.4k"
+      ],
+      "measurements_required": true,
+      "focused_checks_required": true,
+      "full_compiler_gate": ".\\vela-dev.cmd verify",
+      "c_recovery_required": true
+    }
+  ],
+  "validation": {
+    "check_count": 84,
+    "passed": 84,
+    "failed": 0,
+    "local_link_occurrences_checked": 275,
+    "broken_local_links": [],
+    "checks": [
+      {
+        "name": "exactly-eight-new-ids",
+        "passed": true,
+        "detail": [
+          "1.3.4e",
+          "1.3.4f",
+          "1.3.4g",
+          "1.3.4h",
+          "1.3.4i",
+          "1.3.4j",
+          "1.3.4k",
+          "1.3.4l"
+        ]
+      },
+      {
+        "name": "old-id-order-preserved",
+        "passed": true,
+        "detail": 81
+      },
+      {
+        "name": "unique-stage-ids",
+        "passed": true,
+        "detail": 89
+      },
+      {
+        "name": "old-stage-titles-and-checkbox-statuses-preserved",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "contiguous-d-through-l-then-1.3.5",
+        "passed": true,
+        "detail": [
+          "1.3.4d",
+          "1.3.4e",
+          "1.3.4f",
+          "1.3.4g",
+          "1.3.4h",
+          "1.3.4i",
+          "1.3.4j",
+          "1.3.4k",
+          "1.3.4l",
+          "1.3.5"
+        ]
+      },
+      {
+        "name": "1.3.4e:planned",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4e:dependency",
+        "passed": true,
+        "detail": "1.3.4d"
+      },
+      {
+        "name": "1.3.4e:measurements",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4e:acceptance",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4e:explicit-full-verify",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4e:focused-checks",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4e:windows-linux-c-recovery",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4f:planned",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4f:dependency",
+        "passed": true,
+        "detail": "1.3.4e"
+      },
+      {
+        "name": "1.3.4f:measurements",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4f:acceptance",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4f:explicit-full-verify",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4f:focused-checks",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4f:windows-linux-c-recovery",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4g:planned",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4g:dependency",
+        "passed": true,
+        "detail": "1.3.4f"
+      },
+      {
+        "name": "1.3.4g:measurements",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4g:acceptance",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4g:explicit-full-verify",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4g:focused-checks",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4g:windows-linux-c-recovery",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4h:planned",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4h:dependency",
+        "passed": true,
+        "detail": "1.3.4g"
+      },
+      {
+        "name": "1.3.4h:measurements",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4h:acceptance",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4h:explicit-full-verify",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4h:focused-checks",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4h:windows-linux-c-recovery",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4i:planned",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4i:dependency",
+        "passed": true,
+        "detail": "1.3.4h"
+      },
+      {
+        "name": "1.3.4i:measurements",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4i:acceptance",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4i:explicit-full-verify",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4i:focused-checks",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4i:windows-linux-c-recovery",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4j:planned",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4j:dependency",
+        "passed": true,
+        "detail": "1.3.4i"
+      },
+      {
+        "name": "1.3.4j:measurements",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4j:acceptance",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4j:explicit-full-verify",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4j:focused-checks",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4j:windows-linux-c-recovery",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4k:planned",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4k:dependency",
+        "passed": true,
+        "detail": "1.3.4j"
+      },
+      {
+        "name": "1.3.4k:measurements",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4k:acceptance",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4k:explicit-full-verify",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4k:focused-checks",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4k:windows-linux-c-recovery",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4l:planned",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4l:dependency",
+        "passed": true,
+        "detail": "1.3.4k"
+      },
+      {
+        "name": "1.3.4l:measurements",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4l:acceptance",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4l:explicit-full-verify",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4l:focused-checks",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.4l:windows-linux-c-recovery",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "1.3.5-depends-on-1.3.4l",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "version-1.3-has-15-letter-stages",
+        "passed": true,
+        "detail": 15
+      },
+      {
+        "name": "cache-audit-covers-optimization-modes-and-profiles",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "release-gate-includes-all-new-stages",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "bootstrap-audit-rechecks-optimizations",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "independent-VelaBench-and-all-later-application-commitments-unchanged",
+        "passed": true,
+        "detail": "Includes 1.4.6, 1.5–1.10, DocBase/JobQueue/DataPipe and handoff protocol."
+      },
+      {
+        "name": "fixed-and-preceding-baselines",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "paired-repeated-measurements",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "uninstrumented-timings",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "metrics-build-runtime-memory-size",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "predeclared-targets-and-regression-budgets",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "full-gate-contract-stage-too",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "per-stage-evidence-and-blocking-order",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "semantics-and-memory-preserved",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "docs-follow-implementation",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "AGENTS-sequence-all-suffixes",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "AGENTS-specific-new-stage-contract",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "PGO-independent-evaluation",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "LTO-single-translation-unit-caveat",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "no-reuse-of-one-gate-for-group",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "no-new-broken-local-links",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "all-current-local-file-links-resolve",
+        "passed": true,
+        "detail": []
+      },
+      {
+        "name": "git-diff-whitespace-check",
+        "passed": true,
+        "detail": []
+      }
+    ]
+  },
+  "not_performed": [
+    "Compiler implementation",
+    "Optimization benchmarks",
+    "Compiler rebuild/native verify",
+    "Windows/Linux runtime, C recovery and PGO/LTO execution gates; required when executing each new stage"
+  ]
+}

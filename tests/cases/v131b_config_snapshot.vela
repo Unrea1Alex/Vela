@@ -1,0 +1,147 @@
+import "../../../std/config_snapshot.vela" as config;
+import "../../../std/json.vela" as json;
+
+fn must<T>(outcome: Result<T, config::Error>) -> T effects { process } {
+    match outcome {
+        Result::Ok(value) => { return value; }
+        Result::Err(_) => { panic("snapshot fixture: expected Ok"); }
+    }
+}
+fn cause<T>(outcome: Result<T, config::Error>) -> String {
+    match outcome {
+        Result::Ok(_) => { return "ok"; }
+        Result::Err(error) => {
+            return match error {
+                config::Error::Json(_) => "json",
+                config::Error::RootType => "root",
+                config::Error::Duplicate(key) => "duplicate:" + key,
+                config::Error::InvalidText(key, at) => "encoding:" + key + ":" + to_string(at),
+                config::Error::NonFinite => "nonfinite",
+                config::Error::DepthLimit => "depth",
+                config::Error::NodeLimit => "nodes",
+                config::Error::TextLimit => "text",
+                config::Error::Missing(key) => "missing:" + key,
+                config::Error::WrongType(key) => "type:" + key,
+                config::Error::Unknown(key) => "unknown:" + key
+            };
+        }
+    }
+}
+fn entry(name: String, value: json::Value) -> json::Member {
+    return json::Member(name: name, value: value);
+}
+fn contents(value: json::Value) -> List<json::Member> effects { process } {
+    match value {
+        json::Value::Object(members) => { return members; }
+        json::Value::Array(_) => {}
+        json::Value::StringValue(_) => {}
+        json::Value::Number(_) => {}
+        json::Value::Null => {}
+        json::Value::Boolean(_) => {}
+        json::Value::Integer(_) => {}
+    }
+    panic("fixture expected object");
+}
+fn elements(value: json::Value) -> List<json::Value> effects { process } {
+    match value {
+        json::Value::Array(items) => { return items; }
+        json::Value::Object(_) => {}
+        json::Value::StringValue(_) => {}
+        json::Value::Number(_) => {}
+        json::Value::Null => {}
+        json::Value::Boolean(_) => {}
+        json::Value::Integer(_) => {}
+    }
+    panic("fixture expected array");
+}
+fn wrapped(value: json::Value) -> json::Value effects { state } {
+    let fields = list_new<json::Member>();
+    list_push(fields, entry("root", value));
+    return json::Value::Object(fields);
+}
+fn owned_snapshot() -> config::Snapshot effects { state, process } {
+    let mutable_items = list_new<json::Value>();
+    list_push(mutable_items, json::Value::Integer(7));
+    let nested = list_new<json::Member>();
+    list_push(nested, entry("array", json::Value::Array(mutable_items)));
+    let fields = list_new<json::Member>();
+    list_push(fields, entry("nested", json::Value::Object(nested)));
+    list_push(fields, entry("shared", json::Value::Object(nested)));
+    list_push(fields, entry("ключ", json::Value::StringValue("owned:" + to_string(42))));
+    let value = must(config::from_value(json::Value::Object(fields)));
+    list_truncate(fields, 0);
+    list_truncate(nested, 0);
+    list_set(mutable_items, 0, json::Value::Integer(99));
+    return value;
+}
+fn reject_bad_trees() -> Unit effects { state } {
+    assert_true(cause(config::from_value(json::Value::Null)) == "root", "root must be an object");
+    let duplicate = list_new<json::Member>();
+    list_push(duplicate, entry("a", json::Value::Null));
+    list_push(duplicate, entry("a", json::Value::Integer(1)));
+    assert_true(cause(config::from_value(wrapped(json::Value::Object(duplicate)))) == "duplicate:a", "nested duplicate");
+    assert_true(cause(config::parse("{\"a\":1,\"a\":2}")) == "json", "parsed duplicate cause");
+    let bad = "a" + str_from_byte(255);
+    assert_true(cause(config::from_value(wrapped(json::Value::StringValue(bad)))) == "encoding:value:1", "bad value UTF-8");
+    let bad_name = list_new<json::Member>();
+    list_push(bad_name, entry(bad, json::Value::Null));
+    assert_true(cause(config::from_value(json::Value::Object(bad_name))) == "encoding:" + bad + ":1", "bad key UTF-8");
+    assert_true(cause(config::parse("{\"a\":\"" + str_from_byte(255) + "\"}")) == "json", "bad raw UTF-8");
+    assert_true(cause(config::from_value(wrapped(json::Value::Number(0.0 / 0.0)))) == "nonfinite", "NaN rejected");
+    assert_true(cause(config::from_value(wrapped(json::Value::Number(1.0 / 0.0)))) == "nonfinite", "infinity rejected");
+    let cycle = list_new<json::Value>();
+    list_push(cycle, json::Value::Array(cycle));
+    assert_true(cause(config::from_value(wrapped(json::Value::Array(cycle)))) == "depth", "cyclic tree bounded");
+    var deep = json::Value::Null;
+    for i in 0 .. 64 { deep = wrapped(deep); }
+    assert_true(cause(config::from_value(deep)) == "ok", "max depth included");
+    assert_true(cause(config::from_value(wrapped(deep))) == "depth", "next depth rejected");
+}
+fn main() -> Unit effects { state, process, io } {
+    reject_bad_trees();
+    let value = owned_snapshot();
+    let alias = value;
+    let order = config::keys(alias);
+    assert_true(list_len(order) == 3 && list_get(order, 0) == "nested" && list_get(order, 1) == "shared" && list_get(order, 2) == "ключ", "order retained");
+    list_set(order, 0, "changed");
+    assert_true(list_get(config::keys(value), 0) == "nested", "returned key list independent");
+    let before = contents(must(config::required(value, "nested")));
+    let before_array = elements(list_get(before, 0).value);
+    list_set(before_array, 0, json::Value::Integer(100));
+    list_truncate(before, 0);
+    for i in 0 .. 16 { let garbage = owned_snapshot(); }
+    for key in config::keys(alias) {
+        if key != "ключ" {
+            let object = contents(must(config::required(alias, key)));
+            let array = elements(list_get(object, 0).value);
+            match list_get(array, 0) {
+                json::Value::Integer(n) => { assert_true(n == 7, "nested alias isolated"); }
+                json::Value::Null => { assert_true(false, "expected integer"); }
+                json::Value::Boolean(_) => { assert_true(false, "expected integer"); }
+                json::Value::Number(_) => { assert_true(false, "expected integer"); }
+                json::Value::StringValue(_) => { assert_true(false, "expected integer"); }
+                json::Value::Array(_) => { assert_true(false, "expected integer"); }
+                json::Value::Object(_) => { assert_true(false, "expected integer"); }
+            }
+        }
+    }
+    assert_true(must(config::string(alias, "ключ")) == "owned:42", "traced managed String retained");
+    let parsed = must(config::parse("{\"flag\":true,\"port\":7,\"ratio\":1.5,\"empty\":null}"));
+    assert_true(must(config::boolean(parsed, "flag")), "Bool lookup");
+    assert_true(must(config::integer(parsed, "port")) == 7 && must(config::number(parsed, "ratio")) == 1.5, "numeric lookup");
+    assert_true(cause(config::number(parsed, "port")) == "type:port", "no integer coercion");
+    assert_true(cause(config::integer(parsed, "missing")) == "missing:missing", "typed missing");
+    match config::find(parsed, "missing") {
+        Option::None => {}
+        Option::Some(_) => { assert_true(false, "absent field has no value"); }
+    }
+    match config::find(parsed, "empty") {
+        Option::None => { assert_true(false, "explicit null is present"); }
+        Option::Some(item) => { assert_true(cause(config::integer(parsed, "empty")) == "type:empty", "null does not coerce"); }
+    }
+    let allowed = list_new<String>();
+    list_push(allowed, "flag");
+    assert_true(cause(config::allow_only(parsed, allowed)) == "unknown:port", "first unknown in source order");
+    assert_true(must(config::allow_only(parsed, config::keys(parsed))), "known keys accepted");
+    print("config snapshot passed");
+}

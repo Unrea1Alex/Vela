@@ -1,0 +1,131 @@
+{
+  "stage": "1.3.4d",
+  "status": "verified",
+  "contract": "contracts/C-LOWERING-1.3.md",
+  "inventory": "COMPILER-AUDIT-1.3.md",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1430,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 520139,
+    "tests_run": true
+  },
+  "verify_log_sha256": "2d9824f202cc900c575151c5f9f067b81d6478606923253962a7bc7863f3e9dd",
+  "inspected_backend_calls": "No syntax readers or semantic entry points in emitter.vela or intrinsics.vela",
+  "checked_c_changed": false,
+  "shift_rejection": {
+    "exit": 1,
+    "code": "E100",
+    "line": 1,
+    "column": 30,
+    "c_output": false
+  },
+  "numeric_and_order": {
+    "source": "tests/cases/v134d_lowering.vela",
+    "expected": "lowering boundaries passed",
+    "windows_gc": 345,
+    "linux_gc": 345,
+    "linux_warnings": [
+      "GCC diagnoses decimal constants that correctly round to zero"
+    ]
+  },
+  "windows_and_linux_traps": [
+    "pass overflow overflow.vela:1:42: runtime error: integer overflow in addition",
+    "pass overflow_2 overflow_2.vela:1:42: runtime error: integer overflow in addition",
+    "pass overflow_3 overflow_3.vela:1:42: runtime error: integer overflow in subtraction",
+    "pass overflow_4 overflow_4.vela:1:42: runtime error: integer overflow in subtraction",
+    "pass overflow_5 overflow_5.vela:1:42: runtime error: integer overflow in multiplication",
+    "pass overflow_6 overflow_6.vela:1:42: runtime error: integer overflow in multiplication",
+    "pass overflow_7 overflow_7.vela:1:42: runtime error: integer overflow in multiplication",
+    "pass overflow_8 overflow_8.vela:1:42: runtime error: integer overflow in negation",
+    "pass overflow_9 overflow_9.vela:1:42: runtime error: integer overflow in division",
+    "pass overflow_10 overflow_10.vela:1:42: runtime error: division by zero",
+    "pass overflow_11 overflow_11.vela:1:42: runtime error: remainder by zero",
+    "pass imported runtime location and trace"
+  ],
+  "windows_debug": [
+    "MSVC PDB Vela source path and profiled normal cleanup",
+    "generic panic, source location and nested stack",
+    "regular C export omits instrumentation",
+    "fiber isolation, cancellation cleanup and frame completion",
+    "panic through a native callback terminates with Vela frames"
+  ],
+  "linux_console": [
+    "pass evaluation_order vela gc: collections=30 peak=0 bytes=0",
+    "pass short_circuit vela gc: collections=7 peak=0 bytes=0",
+    "pass v05c_range vela gc: collections=21 peak=0 bytes=0",
+    "pass v05e_match vela gc: collections=15 peak=0 bytes=0",
+    "pass v07_float vela gc: collections=472 peak=1621 bytes=1008",
+    "pass v08_defer vela gc: collections=89 peak=139 bytes=0",
+    "pass v103_methods vela gc: collections=111 peak=997 bytes=254",
+    "pass v105_callables vela gc: collections=200 peak=632 bytes=632",
+    "pass v106_dynamic vela gc: collections=142 peak=336 bytes=264",
+    "pass v134d_lowering vela gc: collections=345 peak=1041 bytes=666"
+  ],
+  "focused_logs_sha256": {
+    "windows": "4c188870b9493513ee58d9f3745effccc5af9102b322478116dc3d32dead8181",
+    "linux": "463437f05b265a9245e2e2d10ac0ed5bc2fe8f16d0afe0bec01a2b920cdaa95d",
+    "windows_debug": "c320bc9a5349c54d5e10601f86c6c27615612ee66ecb45f7278c52eb3271b7d3",
+    "linux_recovery_and_console": "196d10688da584c5d69669a5f0211340b0ef74dfd22320228b5421d955f16c18"
+  },
+  "recovery": {
+    "bundle_c_sha256": "e1e3670499c7b281e88ebba819e8d62b359df8412343e3220af7d60188f59d9e",
+    "authored_c_sha256": {
+      "windows": "f7fcc25e09a29d211f1fde73f62e6c9529844527ed85f33a505c7f4b908ebc30",
+      "linux": "b576ed974e228505a8d39a7a40ad0841c6c40d446a63ba0c851f5b749eb9c75e"
+    },
+    "windows_flags": "/std:c11 /utf-8 /O2 /fp:strict /MT",
+    "linux_flags": "GCC 14.2.0 -std=c11 -O2 -ffp-contract=off -lm",
+    "linux_focus_flags": "-fsanitize=undefined,float-cast-overflow -fsanitize-undefined-trap-on-error",
+    "method": "Compile emitted autonomous compiler C with both hosts and compare canonical source-name re-emission. Then emit the authored compiler project and compare same-host bytes and Windows native verify output.",
+    "seed_transition": {
+      "seed.exe": {
+        "bytes": 4187136,
+        "sha256": "a275ea731291f56a462a156ac32018c4d17efabe70c9a33f54b2f7a2b1a7182b"
+      },
+      "stage1.exe": {
+        "bytes": 4188160,
+        "sha256": "0990ed5901b89f2049a904b0763261dfa4e912ac52355ee9e8d1c67c031b705a"
+      },
+      "stage2.exe": {
+        "bytes": 4188160,
+        "sha256": "ad4d7fbb2760abc4b79fec2bd6bd2bda6cd42f97333da0305477e1051bbecde5"
+      },
+      "stage3.exe": {
+        "bytes": 4188160,
+        "sha256": "b104376ab47887dcf9b64597b858cacfd0c072be9c393a40f4e2d543341e97d7"
+      },
+      "stage1.c": {
+        "bytes": 6067085,
+        "sha256": "f7fcc25e09a29d211f1fde73f62e6c9529844527ed85f33a505c7f4b908ebc30"
+      },
+      "stage2.c": {
+        "bytes": 6067085,
+        "sha256": "f7fcc25e09a29d211f1fde73f62e6c9529844527ed85f33a505c7f4b908ebc30"
+      },
+      "stage3.c": {
+        "bytes": 6067085,
+        "sha256": "f7fcc25e09a29d211f1fde73f62e6c9529844527ed85f33a505c7f4b908ebc30"
+      },
+      "compiler.vela": {
+        "bytes": 520139,
+        "sha256": "c1690c7a14ad10c298e5520b870bb883d468f7e91565c7e2d5bc546c95a87ad3"
+      },
+      "rebundled.vela": {
+        "bytes": 520139,
+        "sha256": "c1690c7a14ad10c298e5520b870bb883d468f7e91565c7e2d5bc546c95a87ad3"
+      }
+    }
+  },
+  "mcp": { "passed": 1, "test": "native API lookup" },
+  "next": "1.3.4e"
+}

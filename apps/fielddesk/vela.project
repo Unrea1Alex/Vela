@@ -3,4 +3,5 @@ name|fielddesk
 entry|main.vela
 test|tests.vela
 native|vela-gui.dll|bin/vela-gui.dll|windows-x64|1|shared
+native|vela-http.dll|bin/vela-http.dll|windows-x64|1|shared
 resource|assets/settings.json|demo.json

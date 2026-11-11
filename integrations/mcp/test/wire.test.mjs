@@ -16,26 +16,43 @@ await fs.writeFile(main,'fn main()->Unit{}\n'+Array.from({length:5000},(_,i)=>'f
 const params={command:process.execPath,args:[path.join(pkg,'dist/index.js'),'--config',configPath],stderr:'pipe'};
 const evidence={schema_version:1,checks:[],wire:[]};
 const ok=name=>evidence.checks.push(name);
+class CancellableTransport extends StdioClientTransport {
+ send(message,options){
+  const pending=super.send(message,options);
+  if(message.method==='tools/call'&&message.params.name==='vela_check'){
+   const cancel=this.cancelCheck;
+   this.cancelCheck=undefined;
+   cancel?.();
+  }
+  return pending;
+ }
+}
 test('modern protocol, cancellation, reconnect and malformed wire', {timeout:60000},async()=>{
  for(const modern of [false,true]){
   const client=new Client({name:'vela-wire',version:'1'},modern?{versionNegotiation:{mode:{pin:'2026-07-28'}}}:{});
-  const transport=new StdioClientTransport(params);transport.stderr.on('data',()=>{});
-  await client.connect(transport);
-  assert.equal((await client.listTools()).tools.length,7);
-  assert.equal((await client.callTool({name:'vela_get_context',arguments:{}})).structuredContent.status,'ok');
-  evidence.wire.push(modern?'2026-07-28':'2025-11-25');
-  for(let i=0;i<3;i++){
-   const controller=new AbortController();
-   const request=client.callTool({name:'vela_check',arguments:{path:'main.vela'}},{signal:controller.signal});
-   setTimeout(()=>controller.abort(),20);
-   await assert.rejects(request);
+  const transport=new CancellableTransport(params);transport.stderr.on('data',()=>{});
+  try{
+   await client.connect(transport);
+   assert.equal((await client.listTools()).tools.length,7);
+   assert.equal((await client.callTool({name:'vela_get_context',arguments:{}})).structuredContent.status,'ok');
+   evidence.wire.push(modern?'2026-07-28':'2025-11-25');
+   for(let i=0;i<3;i++){
+    const controller=new AbortController();
+    transport.cancelCheck=()=>controller.abort();
+    await assert.rejects(client.callTool({name:'vela_check',arguments:{path:'main.vela'}},{signal:controller.signal}));
+    assert.equal(controller.signal.aborted,true);
+   }
+   assert.equal((await client.callTool({name:'vela_get_context',arguments:{}})).structuredContent.status,'ok');
+   // Close after submitting analysis so disconnect must drain owned work.
+   let submitted;
+   const sent=new Promise(resolve=>{submitted=resolve;});
+   transport.cancelCheck=submitted;
+   const pending=client.callTool({name:'vela_check',arguments:{path:'main.vela'}}).catch(()=>{});
+   await sent;await client.close();await pending;
+   ok((modern?'modern':'legacy')+' cancellation/reconnect/disconnect');
+  }finally{
+   await client.close();await transport.close();
   }
-  await new Promise(r=>setTimeout(r,70));
-  assert.equal((await client.callTool({name:'vela_get_context',arguments:{}})).structuredContent.status,'ok');
-  // Close while an analysis is in flight: SDK abort must release owned child.
-  const pending=client.callTool({name:'vela_check',arguments:{path:'main.vela'}}).catch(()=>{});
-  await new Promise(r=>setTimeout(r,20));await client.close();await pending;
-  ok((modern?'modern':'legacy')+' cancellation/reconnect/disconnect');
  }
  const raw=async(payload)=>{
   const child=spawn(process.execPath,params.args,{windowsHide:true,stdio:['pipe','pipe','pipe']});

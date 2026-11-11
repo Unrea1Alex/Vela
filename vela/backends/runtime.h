@@ -1394,6 +1394,8 @@ static int v_directory_dispose(v_directory *directory) {
 }
 static v_foreign_library v_process_owner;
 static v_foreign_library v_fiber_owner;
+static v_foreign_library v_http_pool_owner, v_http_request_owner;
+static void v_http_shutdown(void *pool);
 #ifdef _WIN32
 typedef struct v_fiber {
     void *stack, *environment;
@@ -1505,7 +1507,7 @@ static v_callback_result v_ffi_callback_register(v_foreign_handle *owner, void (
     (void)f; (void)l; (void)c;
 #if defined(_WIN32) && defined(_M_X64)
     v_callback_entry *entry;
-    if (!owner || !owner->pointer || owner->closed || owner->owner == &v_stream_owner || owner->owner == &v_writer_owner || owner->owner == &v_directory_owner || owner->owner == &v_process_owner || owner->owner == &v_fiber_owner) {
+    if (!owner || !owner->pointer || owner->closed || owner->owner == &v_stream_owner || owner->owner == &v_writer_owner || owner->owner == &v_directory_owner || owner->owner == &v_process_owner || owner->owner == &v_fiber_owner || owner->owner == &v_http_pool_owner || owner->owner == &v_http_request_owner) {
         result.error = v_text("callback requires a live DLL resource", 37);
         return result;
     }
@@ -1558,6 +1560,7 @@ static void v_foreign_shutdown(void) {
     for (handle = v_foreign_roots; handle; handle = handle->retained_next) {
         if (handle->owner == &v_stream_owner || handle->owner == &v_writer_owner) fclose((FILE *)handle->pointer);
         else if (handle->owner == &v_directory_owner) v_directory_dispose((v_directory *)handle->pointer);
+        else if (handle->owner == &v_http_pool_owner) v_http_shutdown(handle->pointer);
 #ifdef _WIN32
         else if (handle->owner == &v_process_owner) v_process_shutdown((v_child_process *)handle->pointer);
         else if (handle->owner == &v_fiber_owner && handle->pointer != v_active_fiber)
@@ -1636,7 +1639,7 @@ static v_foreign_handle *v_foreign_wrap(void *pointer, v_foreign_library *librar
 }
 static void *v_foreign_unwrap(v_foreign_handle *h, v_foreign_library *library, const char *f, int l, int c) {
     if (!h) v_panic(f,l,c,"invalid foreign handle");
-    if (h->pointer && h->closed) v_panic(f,l,c,"foreign handle is closed");
+    if (h->closed) v_panic(f,l,c,"foreign handle is closed");
     if (h->pointer && h->owner != library) v_panic(f,l,c,"foreign handle belongs to another library");
     return h->pointer;
 }
@@ -1660,6 +1663,7 @@ static v_io_result v_ffi_retain(v_foreign_handle *h, const char *f, int l, int c
     if (h->owner == &v_writer_owner) return v_io_error("writer handles have explicit stream ownership");
     if (h->owner == &v_process_owner) return v_io_error("process handles have explicit process ownership");
     if (h->owner == &v_fiber_owner) return v_io_error("fiber handles have explicit task ownership");
+    if (h->owner == &v_http_pool_owner || h->owner == &v_http_request_owner) return v_io_error("HTTP handles have explicit ownership");
     if (*v_foreign_root_slot(h)) return v_io_error("foreign handle already retained");
     h->retained_next = v_foreign_roots; v_foreign_roots = h;
     return v_io(1, v_text("", 0));
@@ -1672,19 +1676,21 @@ static v_io_result v_ffi_release(v_foreign_handle *h, const char *f, int l, int 
     if (h->owner == &v_writer_owner) return v_io_error("writer handles have explicit stream ownership");
     if (h->owner == &v_process_owner) return v_io_error("process handles have explicit process ownership");
     if (h->owner == &v_fiber_owner) return v_io_error("fiber handles have explicit task ownership");
+    if (h->owner == &v_http_pool_owner || h->owner == &v_http_request_owner) return v_io_error("HTTP handles have explicit ownership");
     if (!v_foreign_unroot(h)) return v_io_error("foreign handle is not retained");
     return v_io(1, v_text("", 0));
 }
 static v_io_result v_ffi_close(v_foreign_handle *h, v_string name, const char *f, int l, int c) {
     v_foreign_proc destructor; fenv_t environment;
     size_t i;
+    if (h && h->closed) return v_io_error("foreign handle already closed");
     if (!h || !h->pointer) return v_io(1,v_text("",0));
-    if (h->closed) return v_io_error("foreign handle already closed");
     if (h->owner == &v_directory_owner) return v_io_error("directory handles require directory_close");
     if (h->owner == &v_stream_owner) return v_io_error("stream handles require stream_close");
     if (h->owner == &v_writer_owner) return v_io_error("writer handles require stream_write_close");
     if (h->owner == &v_process_owner) return v_io_error("process handles require process_close");
     if (h->owner == &v_fiber_owner) return v_io_error("fiber handles require fiber_close");
+    if (h->owner == &v_http_pool_owner || h->owner == &v_http_request_owner) return v_io_error("HTTP handles require HTTP cleanup");
     for (i = 0; i < v_callback_count; ++i)
         if (v_callbacks[i].owner == h) return v_io_error("cancel owner callbacks before closing");
     if (!v_foreign_name(name,0)) return v_io_error("invalid foreign destructor name");
@@ -1927,6 +1933,162 @@ static v_io_result v_stream_close(v_foreign_handle *h, const char *f, int l, int
     return status ? v_io_error("cannot close stream") : v_io(1, v_text("", 0));
 }
 typedef struct { v_foreign_handle *handle; v_string error; } v_spawn_result;
+
+#if defined(_WIN32) && defined(_M_X64)
+/* Narrow, versioned HTTP adapter boundary. Mirrors VelaBytes in ffi.h. */
+typedef struct { const char *data; uint64_t length; } v_http_bytes;
+typedef struct {
+    void *(*pool)(int64_t, int64_t, int64_t, v_http_bytes);
+    void *(*request)(void *, v_http_bytes, v_http_bytes, v_http_bytes, int64_t, int64_t, int64_t, int64_t, int64_t *);
+    int64_t (*manage)(void *, int64_t);
+    v_http_bytes (*view)(void *, int64_t);
+} v_http_api;
+static v_http_api v_http;
+static v_http_bytes v_http_borrow(v_string value) {
+    v_http_bytes bytes = { value.data, value.length };
+    return bytes;
+}
+static const char *v_http_load(const char *f, int l, int c) {
+    const char *error = NULL;
+    v_foreign_library *library;
+    int32_t (*version)(void);
+    int32_t reported;
+    v_http_api api;
+    fenv_t environment;
+    if (v_http.pool) return NULL;
+    library = v_foreign_open(v_text("vela-http.dll", sizeof("vela-http.dll") - 1), &error, f, l, c);
+    if (!library) return error;
+    version = (int32_t (*)(void))v_foreign_find(library, "vela_http_adapter_version");
+    api.pool = (void *(*)(int64_t, int64_t, int64_t, v_http_bytes))v_foreign_find(library, "vela_http_pool");
+    api.request = (void *(*)(void *, v_http_bytes, v_http_bytes, v_http_bytes, int64_t, int64_t, int64_t, int64_t, int64_t *))v_foreign_find(library, "vela_http_request");
+    api.manage = (int64_t (*)(void *, int64_t))v_foreign_find(library, "vela_http_manage");
+    api.view = (v_http_bytes (*)(void *, int64_t))v_foreign_find(library, "vela_http_view");
+    if (!version || !api.pool || !api.request || !api.manage || !api.view) return "missing HTTP adapter symbols";
+    if (fegetenv(&environment)) return "cannot save floating-point environment";
+    reported = version();
+    if (fesetenv(&environment)) v_panic(f, l, c, "cannot restore floating-point environment");
+    if (reported != 1) return "unsupported HTTP adapter version";
+    v_http = api;
+    return NULL;
+}
+static v_foreign_handle *v_http_root(void *value, v_foreign_library *owner, const char *f, int l, int c) {
+    v_foreign_handle *h = v_foreign_wrap(value, owner, f, l, c);
+    h->retained_next = v_foreign_roots;
+    v_foreign_roots = h;
+    return h;
+}
+#endif
+static void v_http_shutdown(void *pool) {
+#if defined(_WIN32) && defined(_M_X64)
+    if (v_http.manage && pool) (void)v_http.manage(pool, 7);
+#else
+    (void)pool;
+#endif
+}
+static v_spawn_result v_http_native_open(int64_t connections, int64_t origin, int64_t idle,
+        v_string ca, const char *f, int l, int c) {
+    v_spawn_result result = {0};
+    const char *error = "unsupported platform";
+#if defined(_WIN32) && defined(_M_X64)
+    void *owner;
+    fenv_t environment;
+    error = v_http_load(f, l, c);
+    if (!error) {
+        if (fegetenv(&environment)) error = "cannot save floating-point environment";
+        else {
+            owner = v_http.pool(connections, origin, idle, v_http_borrow(ca));
+            if (fesetenv(&environment)) v_panic(f, l, c, "cannot restore floating-point environment");
+            if (owner) {
+                result.handle = v_http_root(owner, &v_http_pool_owner, f, l, c);
+                return result;
+            }
+            error = "cannot create native HTTP pool";
+        }
+    }
+#else
+    (void)connections; (void)origin; (void)idle; (void)ca; (void)f; (void)l; (void)c;
+#endif
+    result.error = v_text(error, strlen(error));
+    return result;
+}
+static v_spawn_result v_http_native_start(v_foreign_handle *h, v_string url, v_string headers,
+        v_string upload, int64_t method, int64_t limit, int64_t deadline, int64_t connect,
+        const char *f, int l, int c) {
+    v_spawn_result result = {0};
+    const char *error = "unsupported platform";
+#if defined(_WIN32) && defined(_M_X64)
+    if (h && h->owner == &v_http_pool_owner && !h->closed && h->pointer) {
+        fenv_t environment;
+        int64_t code = 0;
+        void *request;
+        if (fegetenv(&environment)) error = "cannot save floating-point environment";
+        else {
+            request = v_http.request(h->pointer, v_http_borrow(url), v_http_borrow(headers),
+                v_http_borrow(upload), method, limit, deadline, connect, &code);
+            if (fesetenv(&environment)) v_panic(f, l, c, "cannot restore floating-point environment");
+            if (request) {
+                result.handle = v_http_root(request, &v_http_request_owner, f, l, c);
+                return result;
+            }
+            error = code == 3 ? "timeout" : code == 5 ? "limit" : "cannot start native HTTP request";
+        }
+    } else error = "closed HTTP pool";
+#else
+    (void)h; (void)url; (void)headers; (void)upload; (void)method; (void)limit; (void)deadline;
+    (void)connect; (void)f; (void)l; (void)c;
+#endif
+    result.error = v_text(error, strlen(error));
+    return result;
+}
+static int64_t v_http_manage(v_foreign_handle *h, int64_t operation, const char *f, int l, int c) {
+#if defined(_WIN32) && defined(_M_X64)
+    fenv_t environment;
+    int64_t result;
+    if (!h || h->closed || !h->pointer
+        || h->owner != (operation <= 1 || operation >= 8 ? &v_http_pool_owner : &v_http_request_owner)) return -1;
+    if (fegetenv(&environment)) return -1;
+    result = v_http.manage(h->pointer, operation);
+    if (fesetenv(&environment)) v_panic(f, l, c, "cannot restore floating-point environment");
+    if ((operation == 1 || operation == 3) && result == 1) {
+        h->pointer = NULL;
+        h->closed = 1;
+        (void)v_foreign_unroot(h);
+    }
+    return result;
+#else
+    (void)h; (void)operation; (void)f; (void)l; (void)c;
+    return -1;
+#endif
+}
+static int64_t v_http_native_call(v_foreign_handle *h, int64_t operation, const char *f, int l, int c) {
+    if (operation < 0 || operation > 6) return -1;
+    return v_http_manage(h, operation, f, l, c);
+}
+static int64_t v_http_native_wait(v_foreign_handle *h, int64_t milliseconds, const char *f, int l, int c) {
+    if (milliseconds < 1 || milliseconds > 10) return -1;
+    return v_http_manage(h, milliseconds + 7, f, l, c);
+}
+static v_io_result v_http_native_read(v_foreign_handle *h, int64_t part, const char *f, int l, int c) {
+#if defined(_WIN32) && defined(_M_X64)
+    fenv_t environment;
+    v_http_bytes value;
+    char *copy;
+    if (!h || h->owner != &v_http_request_owner || h->closed || !h->pointer || part < 0 || part > 2)
+        return v_io_error("invalid HTTP request view");
+    if (fegetenv(&environment)) return v_io_error("cannot save floating-point environment");
+    value = v_http.view(h->pointer, part);
+    if (fesetenv(&environment)) v_panic(f, l, c, "cannot restore floating-point environment");
+    if (value.length > (part == 0 ? 65536U : part == 1 ? 16777216U : 256U) || (value.length && !value.data))
+        return v_io_error("invalid HTTP response extent");
+    if (!value.length) return v_io(1, v_text("", 0));
+    copy = (char *)v_allocate((size_t)value.length, f, l, c);
+    memcpy(copy, value.data, (size_t)value.length);
+    return v_io(1, v_owned_text(copy, (size_t)value.length));
+#else
+    (void)h; (void)part; (void)f; (void)l; (void)c;
+    return v_io_error("unsupported platform");
+#endif
+}
 #ifdef _WIN32
 static void v_fiber_leave(v_fiber *fiber) {
     fiber->roots = v_gc_roots;

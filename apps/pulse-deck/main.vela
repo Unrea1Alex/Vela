@@ -222,7 +222,6 @@ fn application(options: Options) -> Result<Int, String> effects { io, process, s
     if config.ca != "" {
         ca = Option<path::Path>::Some(path::Path(value: config.ca));
     }
-    let transport = result::map_error(http::curl(path::Path(value: curl), ca), model::http_error)?;
     let base = string_result(absolute_path(options.output))?;
     let directory = string_result(temp_dir(base))?;
     let listeners = list_new<server::Server>();
@@ -243,6 +242,13 @@ fn application(options: Options) -> Result<Int, String> effects { io, process, s
         list_push(listeners, listener);
         port = server::port(listener);
     }
+    if curl == "multi" {
+        let pool = result::map_error(http::curl_multi(http::multi_limits(), ca), http::describe_multi_open)?;
+        let finished = execute(config, dyn http::Transport(pool), directory, port, listeners, options);
+        let closed = result::map_error(http::close_multi(pool), model::http_error)?;
+        return finished;
+    }
+    let transport = result::map_error(http::curl(path::Path(value: curl), ca), model::http_error)?;
     return execute(config, dyn http::Transport(transport), directory, port, listeners, options);
 }
 fn main() -> Int effects { args, io, process, state } {
@@ -251,7 +257,7 @@ fn main() -> Int effects { args, io, process, state } {
             StringResult::Ok(flag) => {
                 if flag == "--help" {
                     print("PulseDeck 1.0 / Vela " + model::language_version()
-                        + "\nNo arguments: interactive local demo.\n--headless --config FILE --output EXISTING_DIRECTORY --cancel-after MS\nEach launch creates a unique report directory. Windows x64; curl >= 8.4.\nExit: 0 healthy, 1 failed probes, 2 application error, 3 cancelled.");
+                        + "\nNo arguments: interactive local demo.\n--headless --config FILE --output EXISTING_DIRECTORY --cancel-after MS\nEach launch creates a unique report directory. Windows x64; native HTTP adapter.\nExit: 0 healthy, 1 failed probes, 2 application error, 3 cancelled.");
                     return 0;
                 }
             }

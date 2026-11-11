@@ -1,10 +1,12 @@
 # SDK capabilities
 
-The actual compiler version and SHA-256 come from context. Working-tree 1.2
+The actual compiler version and SHA-256 come from context. Working-tree 1.3
 features are accepted stage by stage in the [roadmap](ROADMAP.md).
 
 | Need | API ID / recipe | Limits and ownership |
 |---|---|---|
+| Reuse validated UTF-8 and paths | std/text:validate, std/path:validate; checked-values recipe | opaque immutable values; byte boundaries and lexical path rules |
+| Repeated checked configuration lookup | std/config_snapshot:parse, std/config_snapshot:integer; config-snapshot recipe | indexed scalar lookup; bounded deep copy and detached aggregate reads |
 | Explain diagnostics / checked source corrections | native plan diagnose; MCP vela_plan kind=diagnose; LSP code actions | exact revision/snapshot; no source writes; validated edits only; type choices and unsafe effects require explicit edits |
 | Ordered bounded async map / cancel and drain | std/parallel:create, std/parallel:outcome; parallel recipe | Windows fibers; input snapshot, per-item Scope, Collect/FailFast, queue-inclusive deadline; host ticks/pumps until drained |
 | Bounded synchronous memory/file streams | std/io:copy_owned, std/stream_lines:reader; streams recipe | shared explicit close; short I/O and typed errors; buffer/record/Int64 total separate; opt-in files >256 MiB |
@@ -18,7 +20,9 @@ features are accepted stage by stage in the [roadmap](ROADMAP.md).
 | Directory metadata and traversal | std/directory:entries_bounded, std/directory:walk; directory recipe | Windows/Linux; explicit budgets; no link descent; scans close on early exit |
 | Selective JSON / ignored huge numbers | std/json_stream:skip_value; json recipe | bounded UTF-8 buffer, no DOM; aliases share cursor; unknown data validated |
 | Binary file input / atomic output | std/fs:read_bytes, std/fs:write_atomic; bytes recipe | byte limit; text validation opt-in; atomic publication only after success |
-| HTTP response-body deadline | std/http:curl_transfer; http recipe | Windows trusted curl 8.4+; exact transfer timeout, bounded helper overhead; cancel/drain/release |
+| Atomic publication with cleanup detail | std/fs:write_atomic_detailed, std/fs:copy_atomic, std/io:copy_detailed; file-publish recipe | bounded buffers, typed operation and cleanup errors, explicit commit flag |
+| HTTP/HTTPS client and connection reuse | std/http:curl_multi, std/http:close_multi; http-multi recipe | Windows x64 sibling DLL; bounded active/queued requests and bytes, queue-inclusive deadline, explicit drain/release/close |
+| Compatibility curl response-body deadline | std/http:curl_transfer; HTTP compatibility contract | Windows trusted curl 8.4+; exact transfer timeout, bounded helper overhead; cancel/drain/release |
 | Typed errors / callbacks / defaults | std/result:map_error, std/result_ops:with_context, std/option:unwrap_or_else; result/callable recipes | effects propagate; eager/lazy defaults differ; explicit captures; exhaustive variants |
 | GUI / tasks / public FFI | std/gui:open, std/task_group:create | Windows only; ABI 1 adapters; task ownership and shutdown required |
 | Compiler / console | native check/build/test/run, api | Windows MSVC and Linux GCC/musl; native algorithms require neither Node nor Python |

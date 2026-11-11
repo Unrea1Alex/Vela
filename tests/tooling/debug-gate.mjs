@@ -3,8 +3,10 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-const [compiler, base] = process.argv.slice(2).map(value => path.resolve(value));
-assert.ok(compiler && base, 'pass compiler and output directory');
+const [compilerArg, baseArg, optimization] = process.argv.slice(2);
+assert.ok(compilerArg && baseArg && (optimization === undefined || optimization === '--lto'), 'pass compiler and output directory');
+const compiler = path.resolve(compilerArg), base = path.resolve(baseArg);
+const lto = optimization === '--lto';
 const cc = process.env.VELA_CC || 'cl.exe';
 const checks = [];
 function run(executable, args = [], options = {}) {
@@ -31,8 +33,10 @@ async function build(source, tag, instrumented = true) {
   } else {
     assert.doesNotMatch(text, /^#define VELA_DEBUG_INSTRUMENTED 1$/m);
   }
-  ok(cc, ['/nologo', '/std:c11', '/TC', '/utf-8', '/MT', '/Od', '/Z7',
-    '/Fo' + path.join(base, tag + '.obj'), '/Fe' + exe, c, '/link', '/DEBUG:FULL', '/PDB:' + pdb]);
+  const optimizationFlags = lto ? ['/O2', '/fp:strict', '/GL', '/DVELA_LTO_COMPACT'] : ['/Od'];
+  const linkFlags = lto ? ['/LTCG', '/INCREMENTAL:NO'] : [];
+  ok(cc, ['/nologo', '/std:c11', '/TC', '/utf-8', '/MT', ...optimizationFlags, '/Z7',
+    '/Fo' + path.join(base, tag + '.obj'), '/Fe' + exe, c, '/link', ...linkFlags, '/DEBUG:FULL', '/PDB:' + pdb]);
   assert.ok((await fs.stat(pdb)).size > 0);
   return { exe, pdb };
 }

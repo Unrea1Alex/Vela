@@ -1,10 +1,11 @@
 # HTTP collector (library acceptance, Windows)
 
 Build: `powershell -NoProfile -ExecutionPolicy Bypass -File build.ps1 -OutDir bin`.
+Build the [native HTTP adapter](../../docs/contracts/HTTP-MULTI-1.3.md) first.
 Run: `bin/app.exe CONFIG.json OUTPUT.json [--fail-on-error] [--repeat N]`.
-Runtime: trusted Windows system curl 8.4+ (`SystemRoot/System32/curl.exe`), owned
-and supervised by the version-matched standard HTTP API. No application process/HTTP
-wrapper, SDK fork or additional language runtime. Linux HTTP is not claimed.
+Runtime: Windows x64 with the version-matched `vela-http.dll` beside `app.exe`.
+The adapter supplies libcurl, OpenSSL and c-ares. A missing adapter returns
+an explicit dependency error. Linux returns unsupported.
 cli_schema handles required positionals, fail flag and bounded repeat/defaults.
 `--help` prints help/exit 0; CLI errors use stderr/exit 2. Repeated/unknown
 options reject; `--` ends option recognition.
@@ -16,16 +17,17 @@ builder replaces manual event/field conversion. Extra fields are validated and
 skipped. Decoder errors carry the exact JSON path and original config byte offset.
 Config <=1 MiB, depth <=4096, values <=1000000; each body <=1 MiB.
 
-Uses the opt-in `http::curl_transfer` factory: original curl --max-time covers the
-whole response body; bounded helper startup/drain gets a separate budget.
+Uses `http::curl_multi` with a queue-inclusive request deadline. One owner
+reuses compatible connections across requests and repetitions.
 `parallel` admits bounded per-item tasks; `async_io::fetch` owns each exchange
 through its task Scope. The host only ticks the job and time; application
 slots/poll/release loops are gone. Results preserve input order and count
 body bytes; 4xx/5xx remain completed responses, timeouts/network errors get zero
-status/bytes. No retries. Every exchange drains and releases its files.
+status/bytes. No application retries. Exchanges drain and release bounded buffers.
 
 Repeat 1..1000 re-reads/revalidates config and performs fresh GETs in the same
-process. Output is written once atomically, after all iterations succeed.
+process. Output is published atomically after all iterations and pool close.
+If cleanup fails after replacement, the diagnostic says the output was published.
 --fail-on-error writes the final report then exits 1 if any iteration had an HTTP
 error status or request error; otherwise a completed collection exits 0. Invalid
 arguments/config/I/O exit nonzero and preserve prior output. Validation uses the

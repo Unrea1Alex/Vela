@@ -1,0 +1,25 @@
+import "../std/fs.vela" as fs;
+import "../std/path.vela" as path;
+
+pub fn stage(root: String, output: String) -> Bool effects { io, process } {
+    var source = env("VELA_HTTP_ADAPTER");
+    if source == "" {
+        source = root + "/build/stage13/transport-probe/Release/vela-http.dll";
+    }
+    let destination = output + "/vela-http.dll";
+    let input = fs::read_bytes(path::Path(value: source), 33554432);
+    match input {
+        Result::Ok(bytes) => {
+            if source == destination { return true; }
+            match fs::write_atomic(path::Path(value: destination), bytes) {
+                Result::Ok(_) => { return true; }
+                Result::Err(_) => { eprint("Cannot stage HTTP adapter at " + destination); }
+            }
+        }
+        Result::Err(_) => {
+            eprint("Missing or unreadable HTTP adapter at " + source
+                + ". Build the pinned native adapter or set VELA_HTTP_ADAPTER.");
+        }
+    }
+    return false;
+}

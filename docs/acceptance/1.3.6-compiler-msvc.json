@@ -1,0 +1,54 @@
+{
+  "host": "msvc",
+  "expected": {
+    "authored": "676a8991f0f8bebfa80ff267a8fee621396249a27bf6a09938cb623e087f6830",
+    "bundle": "31b4949d4a633ab78147ccb1aa4fb164da8042190b77c2dbf48944a35e019d21",
+    "bundler": "73b3f7a848453ddba5b5f3ff49ce7fca7710d0ee727eb756b12a9ac75d9db782"
+  },
+  "outcome": {
+    "lto": {
+      "first_sha256": "676a8991f0f8bebfa80ff267a8fee621396249a27bf6a09938cb623e087f6830",
+      "second_sha256": "676a8991f0f8bebfa80ff267a8fee621396249a27bf6a09938cb623e087f6830",
+      "bundler_sha256": "73b3f7a848453ddba5b5f3ff49ce7fca7710d0ee727eb756b12a9ac75d9db782",
+      "recovery_sha256": "31b4949d4a633ab78147ccb1aa4fb164da8042190b77c2dbf48944a35e019d21",
+      "resumed": false,
+      "fixtures": [
+        "v134j_reachability",
+        "v134i_ranges",
+        "v134d_lowering"
+      ]
+    },
+    "combined-instrument": {
+      "first_sha256": "676a8991f0f8bebfa80ff267a8fee621396249a27bf6a09938cb623e087f6830",
+      "second_sha256": "676a8991f0f8bebfa80ff267a8fee621396249a27bf6a09938cb623e087f6830",
+      "bundler_sha256": "73b3f7a848453ddba5b5f3ff49ce7fca7710d0ee727eb756b12a9ac75d9db782",
+      "recovery_sha256": "31b4949d4a633ab78147ccb1aa4fb164da8042190b77c2dbf48944a35e019d21",
+      "resumed": false,
+      "fixtures": [
+        "v134j_reachability",
+        "v134i_ranges",
+        "v134d_lowering"
+      ]
+    },
+    "combined": {
+      "first_sha256": "676a8991f0f8bebfa80ff267a8fee621396249a27bf6a09938cb623e087f6830",
+      "second_sha256": "676a8991f0f8bebfa80ff267a8fee621396249a27bf6a09938cb623e087f6830",
+      "bundler_sha256": "73b3f7a848453ddba5b5f3ff49ce7fca7710d0ee727eb756b12a9ac75d9db782",
+      "recovery_sha256": "31b4949d4a633ab78147ccb1aa4fb164da8042190b77c2dbf48944a35e019d21",
+      "resumed": false,
+      "fixtures": [
+        "v134j_reachability",
+        "v134i_ranges",
+        "v134d_lowering"
+      ]
+    }
+  },
+  "ffi": {
+    "supported": true,
+    "stdout": "callbacks passed",
+    "executable_sha256": "2ddc4da4bd7ab7bbc18a9d7cb9cdbfc8aec04abe0ca669dc96e120903dcc1a53",
+    "companion_sha256": "ddaf23b2995f3844e5897db4454ca8a06a58f26ae28c82c2207d0b00ab44ec13",
+    "gc_stress": true,
+    "lto_sha256": "2e6883d3e479b78e5672a2588797e651701a73651bcf4a0ab34b58eb0f727f0f"
+  }
+}

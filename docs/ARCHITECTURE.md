@@ -26,6 +26,9 @@ UTF-8 + source spans + modules.vela: source graph
   -> parser.vela: AST
   -> modules.vela: bound declarations (syntax remains immutable)
   -> types.vela + generics.vela + semantic.vela: resolved types, signatures, effects, checked HIR
+  -> simplify.vela: checked scalar simplification before C generation
+  -> ranges.vela: conservative checked Int intervals and operation proofs
+  -> reachability.vela: entry-specific checked function and layout selection
   -> emitter.vela + intrinsics.vela: standalone C11
   -> driver.vela: C toolchain invocation, atomic publication
 ~~~
@@ -34,12 +37,49 @@ UTF-8 + source spans + modules.vela: source graph
 следующий файл. SourceUnit сохраняет путь, файловую идентичность и границы;
 диагностика и runtime используют координаты исходного файла. Bound declarations
 отделены от AST; backend получает разрешённые символы, а не import или syntax nodes.
+Сборщик графа хранит длину локальной таблицы строк и вычисляет смещение
+следующего модуля от предыдущего. Индекс имён ссылается на первые объявления
+в упорядоченном списке. Эта структура нужна связыванию и диагностике дубликатов.
 Контракт: [MODULES](contracts/MODULES.md).
+
+`simplify.vela` обрабатывает завершённый HIR после проверки всех тел. Он
+сохраняет позиции операций и выбирает ветвь только по доказанно константному
+условию. Для сравнения `emit-c` и `build` принимают `--no-ir-simplify`.
+[Контракт прохода](contracts/IR-SIMPLIFICATION-1.3.md).
+
+`ranges.vela` строит интервалы из литералов, неизменяемых bindings, объединения
+ветвей match и границ range loops. Backend получает доказательство для
+конкретной Int-операции. Контракты продолжают проверяться во время выполнения.
+[Контракт диапазонов](contracts/INT-RANGES-1.3.md).
+
+`reachability.vela` собирает зависимости от выбранной точки входа после полной
+семантической проверки. В C попадают достижимые функции, включая адресуемые
+callables и операции dynamic boxes, и зависимые layouts с их GC visitors.
+Каждая тестовая точка входа получает собственный набор.
+[Контракт достижимости](contracts/C-REACHABILITY-1.3.md).
+
+`pgo.vela` управляет опциональным обучением C toolchain после генерации C.
+Перед профильной сборкой драйвер сверяет снимок исходников, флаги, версию
+toolchain и хеш обученных данных. Компиляция и публикация результата идут
+через частный рабочий каталог.
+[Контракт PGO](contracts/NATIVE-PGO-1.3.md).
+
+LTO выбирается после генерации C. Нативный драйвер включает согласованные
+флаги компиляции и линковки и проверяет поддержанный набор инструментов.
+Кэш сгенерированного C и упаковка DLL используют прежние границы.
+[Контракт LTO](contracts/NATIVE-LTO-1.3.md).
 
 При `--cache` сборщик графа может повторно использовать список импортов
 проверенного модуля. Драйвер проверяет разрешённый граф и безопасность
 выходного пути перед повторным использованием успешной проверки или C.
-Границы AST и checked HIR остаются прежними. [Контракт кэша](contracts/INCREMENTAL-BUILD.md).
+`semantic_cache.vela` сохраняет успешную проверку по отпечаткам токенов и
+публичных сигнатур. В подходящих графах `check` связывает все текущие
+объявления и проверяет тела только в затронутых модулях. Проверка типов,
+generic-инстансов и графа приостановки при полном проходе сохраняет прежний
+порядок. Драйвер использует частичную проверку только для статуса `check`.
+Для генерации C после промаха кэша строится полный checked HIR.
+[Контракт кэша](contracts/INCREMENTAL-BUILD.md) ·
+[Границы переиспользования](contracts/SEMANTIC-CACHE-1.3.md).
 
 В 0.11.0-dev.2 семантика различает синхронные и приостанавливаемые
 callable. Проверка графа разрешённых вызовов работает по checked IR.
@@ -195,11 +235,15 @@ or signature inference. Native companions are staged by the Vela project driver.
 
 ## Managed heap lowering
 
-The 0.8 C backend derives trace visitors from checked type and layout records.
-It registers typed root slots for parameters, temporaries, locals and iteration
-snapshots, and restores the root chain on every structured exit. Native runtime
-code traces storage using those visitors. It never resolves Vela types or reads
-syntax or HIR. See [memory](MEMORY.md) and [runtime ABI](contracts/GC-RUNTIME-ABI.md).
+The C backend derives trace visitors from checked type and layout records.
+It registers typed root slots for managed parameters, temporaries, locals and
+iteration snapshots, and restores the root chain on every structured exit.
+An emission prepass classifies by-value layouts in checked dependency order.
+Proved scalar-only layouts need no visitor or root slot. Nonallocating values
+can use a rooted temporary without a poll. Allocations, call boundaries and
+loop back edges retain checkpoints. The runtime traces storage through the
+visitors. See [memory](MEMORY.md) and the
+[runtime ABI](contracts/GC-RUNTIME-ABI.md).
 
 Task groups (1.0.1a) compose checked async callables and host-operation closures
 in Vela's standard library. The checker still rejects blocking async call graphs;

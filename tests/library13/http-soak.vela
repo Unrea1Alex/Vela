@@ -1,0 +1,100 @@
+import "../../std/event_loop.vela" as loop;
+import "../../std/http.vela" as http;
+import "../../std/path.vela" as path;
+import "../../std/process.vela" as child;
+
+fn must<T, E>(value: Result<T, E>) -> T effects { process } {
+    match value {
+        Result::Ok(result_value) => { return result_value; }
+        Result::Err(_) => { panic("HTTP soak: expected Ok"); }
+    }
+}
+fn clock() -> Int effects { io, process } {
+    match monotonic_millis() {
+        IntResult::Ok(value) => { return value; }
+        IntResult::Err(message) => { panic(message); }
+    }
+}
+fn argument(index: Int) -> String effects { args, process } {
+    match arg(index) {
+        StringResult::Ok(value) => { return value; }
+        StringResult::Err(message) => { panic(message); }
+    }
+}
+fn start(transport: dyn http::Transport, scheduler: loop::Loop<child::Completed>, url: String)
+    -> http::Exchange effects { state, io, process } {
+    return must(transport.start(scheduler, must(http::from_url(url, 1500, 1024)),
+        path::Path(value: ".")));
+}
+fn cancelled(exchange: http::Exchange) -> Unit effects { io, state, process } {
+    assert_true(http::cancel(exchange) && !http::cancel(exchange), "cancel exactly once");
+    match http::poll(exchange) {
+        Result::Err(error) => {
+            match error {
+                http::Error::Cancelled => {}
+                http::Error::InvalidEndpoint => { panic("endpoint"); }
+                http::Error::InvalidLimit => { panic("range"); }
+                http::Error::InvalidTransport => { panic("transport"); }
+                http::Error::InvalidHeaders => { panic("headers"); }
+                http::Error::InvalidBody => { panic("body"); }
+                http::Error::Schedule(_) => { panic("schedule"); }
+                http::Error::Connect(_) => { panic("connect"); }
+                http::Error::Tls(_) => { panic("tls"); }
+                http::Error::Transfer(_) => { panic("transfer"); }
+                http::Error::Protocol => { panic("protocol"); }
+                http::Error::Limit => { panic("limit"); }
+                http::Error::TimedOut => { panic("timeout"); }
+                http::Error::Pending => { panic("pending"); }
+                http::Error::Closed => { panic("closed"); }
+                http::Error::Storage(message) => { panic(message); }
+            }
+        }
+        Result::Ok(_) => { panic("HTTP soak: unexpected response"); }
+    }
+    assert_true(must(http::release(exchange)), "release cancelled exchange");
+}
+fn main() -> Unit effects { args, io, state, process } {
+    let base = argument(0);
+    var duration = 0;
+    match parse_int(argument(1)) {
+        IntResult::Ok(value) => { duration = value; }
+        IntResult::Err(message) => { panic(message); }
+    }
+    let limits = http::MultiLimits(connections: 1, per_origin: 1, queue: 1,
+        idle_seconds: 30, connect_ms: 500);
+    let pool = must(http::curl_multi(limits, Option<path::Path>::None));
+    let transport = dyn http::Transport(pool);
+    let scheduler = must(loop::create<child::Completed>(0));
+    let beginning = clock();
+    var rounds = 0;
+    while clock() - beginning < duration {
+        let success = start(transport, scheduler, base + "/ok");
+        while http::pending(success) {
+            let progressed = must(http::multi_tick(pool));
+            let slept = host_sleep(1);
+        }
+        match must(http::poll(success)) {
+            Option::Some(response) => {
+                assert_true(response.status == 200 && str_len(response.body.data) == 64,
+                    "HTTP soak: body and status");
+            }
+            Option::None => { panic("HTTP soak: missing response"); }
+        }
+        assert_true(must(http::release(success)), "release response");
+        let held = start(transport, scheduler, base + "/hold");
+        let queued = start(transport, scheduler, base + "/never");
+        let delivered = http::multi_stats(pool);
+        assert_true(delivered.active == 1 && delivered.queued == 1, "one active and one queued");
+        let waited = host_sleep(15);
+        cancelled(queued);
+        cancelled(held);
+        assert_true(http::multi_stats(pool).slots == 0, "no retained slots after each round");
+        let pause = host_sleep(15);
+        rounds = rounds + 1;
+    }
+    assert_true(must(http::close_multi(pool)) && must(http::close_multi(pool)), "close idempotent");
+    let closed = http::multi_stats(pool);
+    assert_true(closed.active == 0 && closed.queued == 0 && closed.slots == 0, "drained owner");
+    let stopped = must(loop::shutdown(scheduler));
+    print(f"soak rounds={rounds:d} elapsed_ms={clock() - beginning:d} slots={closed.slots:d}");
+}

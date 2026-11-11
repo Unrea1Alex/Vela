@@ -6,6 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {spawn} from 'node:child_process';
 import assert from 'node:assert/strict';
 const app=path.dirname(fileURLToPath(import.meta.url));
+const exe=path.resolve(process.argv[3]??path.join(app,'bin/fielddesk.exe'));
 const out=path.resolve(app,'../../build/fielddesk-validation/network');
 await fs.mkdir(out,{recursive:true});
 const demo=await fs.readFile(path.join(app,'demo.ndjson'));
@@ -25,7 +26,7 @@ async function run(name,endpoint,expected,pattern,extra=[],targetPort=port){
   const file=path.join(out,`${name}.html`);
   await fs.writeFile(file,'sentinel');
   const args=['--demo',file,'--local-port',String(targetPort),'--http-path',endpoint,...extra];
-  const child=spawn(path.join(app,'bin/fielddesk.exe'),args,{windowsHide:true,stdio:['ignore','pipe','pipe']});
+  const child=spawn(exe,args,{windowsHide:true,stdio:['ignore','pipe','pipe']});
   let stdout='',stderr='';
   child.stdout.on('data',bytes=>stdout+=bytes);child.stderr.on('data',bytes=>stderr+=bytes);
   const timer=setTimeout(()=>child.kill(),10000);
@@ -47,5 +48,6 @@ try{
   await run('invalid-port','/measurements',2,/Invalid HTTP endpoint/,[],0);
 }finally{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 await run('refused','/measurements',2,/HTTP connection failed/);
-await fs.writeFile(path.join(app,'network-validation.json'),JSON.stringify({schema_version:1,transport:'Vela http with supervised curl',checks,public_network:false,tls:false,replay_http_fetches:1},null,2)+'\n');
+const evidence=path.resolve(process.argv[2]??path.join(out,'network-validation.json'));
+await fs.writeFile(evidence,JSON.stringify({schema_version:1,transport:'Vela libcurl multi',checks,public_network:false,tls:false,replay_http_fetches:1},null,2)+'\n');
 console.log(`${checks.length} loopback HTTP scenarios passed`);

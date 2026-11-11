@@ -1,4 +1,5 @@
 vela-lock|1
-manifest|f57880aa2236de739b0b3b7aeec155bddedb920ab5459abc86c4865292669c8c
-native|vela-gui.dll|bin/vela-gui.dll|windows-x64|1|shared|2bc8a1c8d1d5b8ffaf26f2708912d6c071bc86889c7e9f3e53ee4c22f54d7484
+manifest|3cb050602a3e13dee90b5e52f74b5f7ea0cbce20aa8f2adc08f3be04e1947a3d
+native|vela-gui.dll|bin/vela-gui.dll|windows-x64|1|shared|04ab951fd9641108219fcc3f4531b26b91332711648bcd0dc6cf2af2d0533b24
+native|vela-http.dll|bin/vela-http.dll|windows-x64|1|shared|006e35d8098542657ca90dc5d309f8a7752d05440a3bc2f7c86070add315a627
 resource|assets/settings.json|demo.json|29077c861a19aa35718e725e174c29e6ec0b9ffabb0538c44ba6b136ed39dc03

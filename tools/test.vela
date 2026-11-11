@@ -109,7 +109,13 @@ pub fn command(exe: String) -> StringList effects { state } {
 pub fn invoke(s: Suite, args: StringList, timeout: Int) -> Outcome effects { state, io, process } {
     let out_path = s.dir + "/child.out";
     let err_path = s.dir + "/child.err";
-    let code = process_run_files(args, out_path, err_path, timeout);
+    var deadline = timeout;
+    if env("VELA_TEST_INSTRUMENTED_COMPILER") == "1" && strings_len(args) > 1
+        && strings_get(args, 0) == s.compiler && strings_get(args, 1) == "check" {
+        // Counter collection slows compiler analysis. Fixture and timeout tests retain their original deadlines.
+        deadline = 180000;
+    }
+    let code = process_run_files(args, out_path, err_path, deadline);
     return Outcome(code: code, out: replace(value(read_file(out_path)), "\r\n", "\n"), err: replace(value(read_file(err_path)), "\r\n", "\n"));
 }
 pub fn compiler_command(s: Suite, operation: String, input: String) -> StringList effects { state } {

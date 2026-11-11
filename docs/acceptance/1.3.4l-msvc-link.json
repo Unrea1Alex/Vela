@@ -1,0 +1,770 @@
+{
+  "host": "msvc",
+  "c_tool": {
+    "bytes": 678008,
+    "sha256": "4304307e1f0d0528ac13c513183e5cbfa20a7f8de6f0c8e5bc4293661e6d23a4"
+  },
+  "work": "G:\\Vela\\build\\stage13\\lto-msvc-G7YCGe\\split-native-1DhslD",
+  "source": "One separate compile per mode and five isolated linker pairs after warmup.",
+  "workloads": {
+    "buildlens": {
+      "c": {
+        "bytes": 1305871,
+        "sha256": "75b99f7608c2c0021281f3482ab836acdc8df87dc67e7738233c7558671a3fd0"
+      },
+      "samples": [
+        {
+          "o2": {
+            "wall_ms": 106.7525,
+            "cpu_ms": 62.5,
+            "peak_tree_bytes": 28663808,
+            "peak_process_bytes": 30527488
+          },
+          "lto": {
+            "wall_ms": 1693.1495,
+            "cpu_ms": 6875,
+            "peak_tree_bytes": 262475776,
+            "peak_process_bytes": 262332416
+          },
+          "pgo": {
+            "wall_ms": 1732.7517,
+            "cpu_ms": 5265.625,
+            "peak_tree_bytes": 199557120,
+            "peak_process_bytes": 205754368
+          },
+          "combined": {
+            "wall_ms": 1769.1135,
+            "cpu_ms": 5406.25,
+            "peak_tree_bytes": 202780672,
+            "peak_process_bytes": 207802368
+          }
+        },
+        {
+          "combined": {
+            "wall_ms": 1725.6661,
+            "cpu_ms": 5171.875,
+            "peak_tree_bytes": 198496256,
+            "peak_process_bytes": 203476992
+          },
+          "pgo": {
+            "wall_ms": 1649.1504,
+            "cpu_ms": 5171.875,
+            "peak_tree_bytes": 199553024,
+            "peak_process_bytes": 208035840
+          },
+          "lto": {
+            "wall_ms": 1603.336,
+            "cpu_ms": 6609.375,
+            "peak_tree_bytes": 268824576,
+            "peak_process_bytes": 262332416
+          },
+          "o2": {
+            "wall_ms": 107.3502,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 28651520,
+            "peak_process_bytes": 30531584
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 92.8702,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 28655616,
+            "peak_process_bytes": 30535680
+          },
+          "lto": {
+            "wall_ms": 1548.117,
+            "cpu_ms": 6421.875,
+            "peak_tree_bytes": 266883072,
+            "peak_process_bytes": 265646080
+          },
+          "pgo": {
+            "wall_ms": 1570.481,
+            "cpu_ms": 4875,
+            "peak_tree_bytes": 199540736,
+            "peak_process_bytes": 207474688
+          },
+          "combined": {
+            "wall_ms": 1613.4737,
+            "cpu_ms": 5062.5,
+            "peak_tree_bytes": 201633792,
+            "peak_process_bytes": 209367040
+          }
+        },
+        {
+          "combined": {
+            "wall_ms": 1573.6246,
+            "cpu_ms": 4812.5,
+            "peak_tree_bytes": 204865536,
+            "peak_process_bytes": 211701760
+          },
+          "pgo": {
+            "wall_ms": 1522.8832,
+            "cpu_ms": 4953.125,
+            "peak_tree_bytes": 201654272,
+            "peak_process_bytes": 208015360
+          },
+          "lto": {
+            "wall_ms": 1546.7035,
+            "cpu_ms": 6593.75,
+            "peak_tree_bytes": 296398848,
+            "peak_process_bytes": 268283904
+          },
+          "o2": {
+            "wall_ms": 100.8112,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 28643328,
+            "peak_process_bytes": 30523392
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 117.094,
+            "cpu_ms": 62.5,
+            "peak_tree_bytes": 28659712,
+            "peak_process_bytes": 30535680
+          },
+          "lto": {
+            "wall_ms": 1600.2631,
+            "cpu_ms": 6921.875,
+            "peak_tree_bytes": 270958592,
+            "peak_process_bytes": 259473408
+          },
+          "pgo": {
+            "wall_ms": 1628.1398,
+            "cpu_ms": 5187.5,
+            "peak_tree_bytes": 200589312,
+            "peak_process_bytes": 207958016
+          },
+          "combined": {
+            "wall_ms": 1620.7473,
+            "cpu_ms": 5125,
+            "peak_tree_bytes": 200613888,
+            "peak_process_bytes": 213262336
+          }
+        }
+      ],
+      "variants": {
+        "o2": {
+          "flags": {
+            "compile": [
+              "/nologo",
+              "/TC",
+              "/std:c11",
+              "/utf-8",
+              "/O2",
+              "/fp:strict",
+              "/W3",
+              "/wd4102",
+              "/MT",
+              "/c",
+              "program.c",
+              "/Foprogram.obj"
+            ],
+            "link": [
+              "/nologo",
+              "/OUT:program.exe",
+              "/INCREMENTAL:NO",
+              "program.obj"
+            ]
+          },
+          "compile": {
+            "wall_ms": 1800.4178,
+            "cpu_ms": 5531.25,
+            "peak_tree_bytes": 166199296,
+            "peak_process_bytes": 168189952,
+            "streams": "program.c\r\n"
+          },
+          "link": {
+            "wall_ms": 106.7525,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 28655616,
+            "peak_process_bytes": 30531584
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 314480,
+              "sha256": "fc1555e5f95c979211c24ada919a09b65fed224939753fadca673bd2164d2345"
+            },
+            "inventory": [
+              "LICENSE",
+              "README.md",
+              "buildlens.exe",
+              "demo.jsonl"
+            ],
+            "executable": {
+              "bytes": 638976,
+              "sha256": "47c2fd787787bd5887b463f86dd39a3f2683c9ee67cea5ac9c033449c6b95965"
+            },
+            "validated": [
+              "bundled demo summary"
+            ]
+          }
+        },
+        "lto": {
+          "flags": {
+            "compile": [
+              "/nologo",
+              "/TC",
+              "/std:c11",
+              "/utf-8",
+              "/O2",
+              "/fp:strict",
+              "/W3",
+              "/wd4102",
+              "/MT",
+              "/GL",
+              "/DVELA_LTO_COMPACT",
+              "/c",
+              "program.c",
+              "/Foprogram.obj"
+            ],
+            "link": [
+              "/nologo",
+              "/OUT:program.exe",
+              "/INCREMENTAL:NO",
+              "program.obj",
+              "/LTCG"
+            ]
+          },
+          "compile": {
+            "wall_ms": 265.6994,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 31813632,
+            "peak_process_bytes": 36278272,
+            "streams": "program.c\r\n"
+          },
+          "link": {
+            "wall_ms": 1600.2631,
+            "cpu_ms": 6609.375,
+            "peak_tree_bytes": 268824576,
+            "peak_process_bytes": 262332416
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 301485,
+              "sha256": "b8724d3877599f68d76c9d9516c0bbf6b945a69c3a2669d54f8f8d71b4eb95e9"
+            },
+            "inventory": [
+              "LICENSE",
+              "README.md",
+              "buildlens.exe",
+              "demo.jsonl"
+            ],
+            "executable": {
+              "bytes": 620032,
+              "sha256": "87e9f939dbf0b35877190c747c7b40ce0351fb0012cf6c3b628b870d3c7825b2"
+            },
+            "validated": [
+              "bundled demo summary"
+            ]
+          }
+        },
+        "pgo": {
+          "flags": {
+            "compile": [
+              "/nologo",
+              "/TC",
+              "/std:c11",
+              "/utf-8",
+              "/O2",
+              "/fp:strict",
+              "/W3",
+              "/wd4102",
+              "/MT",
+              "/GL",
+              "/c",
+              "program.c",
+              "/Foprogram.obj"
+            ],
+            "link": [
+              "/nologo",
+              "/OUT:program.exe",
+              "/INCREMENTAL:NO",
+              "program.obj",
+              "/LTCG",
+              "/USEPROFILE:AGGRESSIVE",
+              "/WX"
+            ]
+          },
+          "compile": {
+            "wall_ms": 263.4894,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 31928320,
+            "peak_process_bytes": 36503552,
+            "streams": "program.c\r\n"
+          },
+          "link": {
+            "wall_ms": 1628.1398,
+            "cpu_ms": 5171.875,
+            "peak_tree_bytes": 199557120,
+            "peak_process_bytes": 207958016
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 313772,
+              "sha256": "5ba902d104ee2507871ce70f71bc33243c12f56fae34b46ae744389eb4eca3a8"
+            },
+            "inventory": [
+              "LICENSE",
+              "README.md",
+              "buildlens.exe",
+              "demo.jsonl"
+            ],
+            "executable": {
+              "bytes": 641536,
+              "sha256": "99df9bd72709f2ad670cab97168c878476fec323d2d27162f93c018ee07a1199"
+            },
+            "validated": [
+              "bundled demo summary"
+            ]
+          }
+        },
+        "combined": {
+          "flags": {
+            "compile": [
+              "/nologo",
+              "/TC",
+              "/std:c11",
+              "/utf-8",
+              "/O2",
+              "/fp:strict",
+              "/W3",
+              "/wd4102",
+              "/MT",
+              "/GL",
+              "/c",
+              "program.c",
+              "/Foprogram.obj"
+            ],
+            "link": [
+              "/nologo",
+              "/OUT:program.exe",
+              "/INCREMENTAL:NO",
+              "program.obj",
+              "/LTCG",
+              "/USEPROFILE:AGGRESSIVE",
+              "/WX"
+            ]
+          },
+          "compile": {
+            "wall_ms": 278.241,
+            "cpu_ms": 250,
+            "peak_tree_bytes": 31768576,
+            "peak_process_bytes": 36257792,
+            "streams": "program.c\r\n"
+          },
+          "link": {
+            "wall_ms": 1620.7473,
+            "cpu_ms": 5125,
+            "peak_tree_bytes": 201633792,
+            "peak_process_bytes": 209367040
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 313771,
+              "sha256": "360f6578b7660293965e23d78f0a0f04c4474fee702b3c8f96b9634b5e2283cb"
+            },
+            "inventory": [
+              "LICENSE",
+              "README.md",
+              "buildlens.exe",
+              "demo.jsonl"
+            ],
+            "executable": {
+              "bytes": 641536,
+              "sha256": "2367b795c079b5e990aac4a0cc59eb007220038acf90a8c6273b433e2c8b5d2e"
+            },
+            "validated": [
+              "bundled demo summary"
+            ]
+          }
+        }
+      }
+    },
+    "compiler": {
+      "c": {
+        "bytes": 6098393,
+        "sha256": "2d7d304d85b16b5ea0617e09f5ae0a76322d6220396e551755a3f89d0c9f6239"
+      },
+      "samples": [
+        {
+          "o2": {
+            "wall_ms": 112.799,
+            "cpu_ms": 62.5,
+            "peak_tree_bytes": 29069312,
+            "peak_process_bytes": 36085760
+          },
+          "lto": {
+            "wall_ms": 12147.29,
+            "cpu_ms": 113875,
+            "peak_tree_bytes": 698085376,
+            "peak_process_bytes": 692355072
+          },
+          "pgo": {
+            "wall_ms": 9551.3846,
+            "cpu_ms": 57906.25,
+            "peak_tree_bytes": 415928320,
+            "peak_process_bytes": 413474816
+          },
+          "combined": {
+            "wall_ms": 9780.8945,
+            "cpu_ms": 58609.375,
+            "peak_tree_bytes": 417046528,
+            "peak_process_bytes": 416509952
+          }
+        },
+        {
+          "combined": {
+            "wall_ms": 9507.5595,
+            "cpu_ms": 58406.25,
+            "peak_tree_bytes": 421253120,
+            "peak_process_bytes": 416874496
+          },
+          "pgo": {
+            "wall_ms": 9601.0679,
+            "cpu_ms": 57562.5,
+            "peak_tree_bytes": 423829504,
+            "peak_process_bytes": 422027264
+          },
+          "lto": {
+            "wall_ms": 12793.9891,
+            "cpu_ms": 118218.75,
+            "peak_tree_bytes": 685719552,
+            "peak_process_bytes": 682926080
+          },
+          "o2": {
+            "wall_ms": 126.0032,
+            "cpu_ms": 78.125,
+            "peak_tree_bytes": 29061120,
+            "peak_process_bytes": 36143104
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 113.553,
+            "cpu_ms": 78.125,
+            "peak_tree_bytes": 29073408,
+            "peak_process_bytes": 36147200
+          },
+          "lto": {
+            "wall_ms": 12530.31,
+            "cpu_ms": 114625,
+            "peak_tree_bytes": 706924544,
+            "peak_process_bytes": 698486784
+          },
+          "pgo": {
+            "wall_ms": 10365.4451,
+            "cpu_ms": 58781.25,
+            "peak_tree_bytes": 424259584,
+            "peak_process_bytes": 424087552
+          },
+          "combined": {
+            "wall_ms": 9704.5431,
+            "cpu_ms": 57578.125,
+            "peak_tree_bytes": 415977472,
+            "peak_process_bytes": 415772672
+          }
+        },
+        {
+          "combined": {
+            "wall_ms": 9480.2957,
+            "cpu_ms": 57156.25,
+            "peak_tree_bytes": 410382336,
+            "peak_process_bytes": 409137152
+          },
+          "pgo": {
+            "wall_ms": 9478.7572,
+            "cpu_ms": 57859.375,
+            "peak_tree_bytes": 414736384,
+            "peak_process_bytes": 417300480
+          },
+          "lto": {
+            "wall_ms": 12167.375,
+            "cpu_ms": 114031.25,
+            "peak_tree_bytes": 688873472,
+            "peak_process_bytes": 680878080
+          },
+          "o2": {
+            "wall_ms": 120.7208,
+            "cpu_ms": 78.125,
+            "peak_tree_bytes": 29089792,
+            "peak_process_bytes": 36155392
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 98.8464,
+            "cpu_ms": 62.5,
+            "peak_tree_bytes": 29069312,
+            "peak_process_bytes": 36143104
+          },
+          "lto": {
+            "wall_ms": 12799.3627,
+            "cpu_ms": 118109.375,
+            "peak_tree_bytes": 707411968,
+            "peak_process_bytes": 699539456
+          },
+          "pgo": {
+            "wall_ms": 9682.2846,
+            "cpu_ms": 57953.125,
+            "peak_tree_bytes": 420265984,
+            "peak_process_bytes": 418664448
+          },
+          "combined": {
+            "wall_ms": 10617.6651,
+            "cpu_ms": 59203.125,
+            "peak_tree_bytes": 426614784,
+            "peak_process_bytes": 424964096
+          }
+        }
+      ],
+      "variants": {
+        "o2": {
+          "flags": {
+            "compile": [
+              "/nologo",
+              "/TC",
+              "/std:c11",
+              "/utf-8",
+              "/O2",
+              "/fp:strict",
+              "/W3",
+              "/wd4102",
+              "/MT",
+              "/c",
+              "program.c",
+              "/Foprogram.obj"
+            ],
+            "link": [
+              "/nologo",
+              "/OUT:program.exe",
+              "/INCREMENTAL:NO",
+              "program.obj"
+            ]
+          },
+          "compile": {
+            "wall_ms": 22640.9472,
+            "cpu_ms": 81703.125,
+            "peak_tree_bytes": 392757248,
+            "peak_process_bytes": 391680000,
+            "streams": "program.c\r\n"
+          },
+          "link": {
+            "wall_ms": 113.553,
+            "cpu_ms": 78.125,
+            "peak_tree_bytes": 29069312,
+            "peak_process_bytes": 36143104
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 2296371,
+              "sha256": "5c12ca720c2e61400a438dbca574e38b4a240a412e1f561f63928cd5cf5f6ae1"
+            },
+            "inventory": [
+              "LICENSE",
+              "compiler.vela",
+              "recovery.c",
+              "std",
+              "velac.exe"
+            ],
+            "executable": {
+              "bytes": 3292160,
+              "sha256": "2a6843177781798b4d1e0398cce90cdcbda7b693d7be90fefd1dc274ff6492a8"
+            },
+            "validated": [
+              "version",
+              "check using the unpacked standard library"
+            ]
+          }
+        },
+        "lto": {
+          "flags": {
+            "compile": [
+              "/nologo",
+              "/TC",
+              "/std:c11",
+              "/utf-8",
+              "/O2",
+              "/fp:strict",
+              "/W3",
+              "/wd4102",
+              "/MT",
+              "/GL",
+              "/DVELA_LTO_COMPACT",
+              "/c",
+              "program.c",
+              "/Foprogram.obj"
+            ],
+            "link": [
+              "/nologo",
+              "/OUT:program.exe",
+              "/INCREMENTAL:NO",
+              "program.obj",
+              "/LTCG"
+            ]
+          },
+          "compile": {
+            "wall_ms": 498.4075,
+            "cpu_ms": 468.75,
+            "peak_tree_bytes": 51412992,
+            "peak_process_bytes": 55734272,
+            "streams": "program.c\r\n"
+          },
+          "link": {
+            "wall_ms": 12530.31,
+            "cpu_ms": 114625,
+            "peak_tree_bytes": 698085376,
+            "peak_process_bytes": 692355072
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 2241590,
+              "sha256": "bce70c3d8e6de12f6eb9e631c040d7edda748c3405c8393991529752e63a1e72"
+            },
+            "inventory": [
+              "LICENSE",
+              "compiler.vela",
+              "recovery.c",
+              "std",
+              "velac.exe"
+            ],
+            "executable": {
+              "bytes": 3195904,
+              "sha256": "c6a407613e1c02930af69f3d43cba7612612efee87e4eeaaaf5d27bfada8e500"
+            },
+            "validated": [
+              "version",
+              "check using the unpacked standard library"
+            ]
+          }
+        },
+        "pgo": {
+          "flags": {
+            "compile": [
+              "/nologo",
+              "/TC",
+              "/std:c11",
+              "/utf-8",
+              "/O2",
+              "/fp:strict",
+              "/W3",
+              "/wd4102",
+              "/MT",
+              "/GL",
+              "/c",
+              "program.c",
+              "/Foprogram.obj"
+            ],
+            "link": [
+              "/nologo",
+              "/OUT:program.exe",
+              "/INCREMENTAL:NO",
+              "program.obj",
+              "/LTCG",
+              "/USEPROFILE:AGGRESSIVE",
+              "/WX"
+            ]
+          },
+          "compile": {
+            "wall_ms": 485.8364,
+            "cpu_ms": 421.875,
+            "peak_tree_bytes": 51306496,
+            "peak_process_bytes": 55595008,
+            "streams": "program.c\r\n"
+          },
+          "link": {
+            "wall_ms": 9601.0679,
+            "cpu_ms": 57906.25,
+            "peak_tree_bytes": 420265984,
+            "peak_process_bytes": 418664448
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 2063632,
+              "sha256": "7d99e91d4b38366e320b4d25ded8cd2f3598e138176b19aa3768cf74757d055e"
+            },
+            "inventory": [
+              "LICENSE",
+              "compiler.vela",
+              "recovery.c",
+              "std",
+              "velac.exe"
+            ],
+            "executable": {
+              "bytes": 2875392,
+              "sha256": "2be3febe52f3ddb3771ffd44b19fc52749117de6215f1e9e21e45505e1704ad9"
+            },
+            "validated": [
+              "version",
+              "check using the unpacked standard library"
+            ]
+          }
+        },
+        "combined": {
+          "flags": {
+            "compile": [
+              "/nologo",
+              "/TC",
+              "/std:c11",
+              "/utf-8",
+              "/O2",
+              "/fp:strict",
+              "/W3",
+              "/wd4102",
+              "/MT",
+              "/GL",
+              "/c",
+              "program.c",
+              "/Foprogram.obj"
+            ],
+            "link": [
+              "/nologo",
+              "/OUT:program.exe",
+              "/INCREMENTAL:NO",
+              "program.obj",
+              "/LTCG",
+              "/USEPROFILE:AGGRESSIVE",
+              "/WX"
+            ]
+          },
+          "compile": {
+            "wall_ms": 520.5251,
+            "cpu_ms": 484.375,
+            "peak_tree_bytes": 51376128,
+            "peak_process_bytes": 55738368,
+            "streams": "program.c\r\n"
+          },
+          "link": {
+            "wall_ms": 9704.5431,
+            "cpu_ms": 58406.25,
+            "peak_tree_bytes": 417046528,
+            "peak_process_bytes": 416509952
+          },
+          "delivered": {
+            "archive": {
+              "bytes": 2063633,
+              "sha256": "bb0274005bde2468119ff3877a6b8469556e36b4c09dce5466092b6abcf9e53d"
+            },
+            "inventory": [
+              "LICENSE",
+              "compiler.vela",
+              "recovery.c",
+              "std",
+              "velac.exe"
+            ],
+            "executable": {
+              "bytes": 2875392,
+              "sha256": "2f67405ba670a44ebb71a44cdfbb47f4cd8c6f0b3ae22d801688678707ffb228"
+            },
+            "validated": [
+              "version",
+              "check using the unpacked standard library"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "complete": true
+}

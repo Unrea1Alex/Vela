@@ -121,3 +121,8 @@ fn|ffi_is_null||ForeignHandle|Bool||plain|0.7
 fn|ffi_close||ForeignHandle;String|WriteResult|state;process;io|write_result|0.7
 fn|ffi_retain||ForeignHandle|WriteResult|state|write_result|0.8
 fn|ffi_release||ForeignHandle|WriteResult|state|write_result|0.8
+fn|http_native_open||Int;Int;Int;String|SpawnResult|io;state|spawn_result|1.3
+fn|http_native_start||ForeignHandle;String;String;String;Int;Int;Int;Int|SpawnResult|io;state|spawn_result|1.3
+fn|http_native_call||ForeignHandle;Int|Int|io;state|located|1.3
+fn|http_native_wait||ForeignHandle;Int|Int|io;state;process|located|1.3
+fn|http_native_read||ForeignHandle;Int|StringResult|io;state|string_result|1.3

@@ -1,0 +1,916 @@
+{
+  "schema_version": 1,
+  "instrumentation": "Vela debug per-function counters and native GC report",
+  "workloads": [
+    {
+      "label": "config",
+      "functions": 26,
+      "top_inclusive": [
+        {
+          "name": "main",
+          "file": "tests/library13/profile.vela",
+          "line": 120,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 34711
+        },
+        {
+          "name": "json_work",
+          "file": "tests/library13/profile.vela",
+          "line": 36,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 34596
+        },
+        {
+          "name": "@3::integer",
+          "file": "std/config.vela",
+          "line": 85,
+          "column": 1,
+          "calls": 2000,
+          "completed": 2000,
+          "inclusive_us": 33599
+        },
+        {
+          "name": "@3::required",
+          "file": "std/config.vela",
+          "line": 58,
+          "column": 1,
+          "calls": 2000,
+          "completed": 2000,
+          "inclusive_us": 33478
+        },
+        {
+          "name": "@3::find",
+          "file": "std/config.vela",
+          "line": 49,
+          "column": 1,
+          "calls": 2000,
+          "completed": 2000,
+          "inclusive_us": 33351
+        },
+        {
+          "name": "@3::from_value",
+          "file": "std/config.vela",
+          "line": 15,
+          "column": 1,
+          "calls": 2001,
+          "completed": 2001,
+          "inclusive_us": 29350
+        },
+        {
+          "name": "@5::invalid_offset",
+          "file": "std/text.vela",
+          "line": 13,
+          "column": 1,
+          "calls": 128065,
+          "completed": 128065,
+          "inclusive_us": 5180
+        },
+        {
+          "name": "@4::read_value",
+          "file": "std/json.vela",
+          "line": 238,
+          "column": 1,
+          "calls": 65,
+          "completed": 65,
+          "inclusive_us": 1153
+        },
+        {
+          "name": "@3::parse",
+          "file": "std/config.vela",
+          "line": 39,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 820
+        },
+        {
+          "name": "@4::parse",
+          "file": "std/json.vela",
+          "line": 356,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 798
+        },
+        {
+          "name": "@4::parse_with_limits",
+          "file": "std/json.vela",
+          "line": 334,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 796
+        },
+        {
+          "name": "@4::parse_bounded",
+          "file": "std/json.vela",
+          "line": 312,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 793
+        }
+      ],
+      "validation_counters": [
+        {
+          "name": "@3::from_value",
+          "file": "std/config.vela",
+          "line": 15,
+          "column": 1,
+          "calls": 2001,
+          "completed": 2001,
+          "inclusive_us": 29350
+        },
+        {
+          "name": "@5::invalid_offset",
+          "file": "std/text.vela",
+          "line": 13,
+          "column": 1,
+          "calls": 128065,
+          "completed": 128065,
+          "inclusive_us": 5180
+        }
+      ],
+      "gc": {
+        "collections": 45,
+        "peak_managed_bytes": 1049918,
+        "before_teardown_bytes": 312334
+      }
+    },
+    {
+      "label": "text",
+      "functions": 10,
+      "top_inclusive": [
+        {
+          "name": "main",
+          "file": "tests/library13/profile.vela",
+          "line": 120,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 11294
+        },
+        {
+          "name": "text_work",
+          "file": "tests/library13/profile.vela",
+          "line": 74,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 11195
+        },
+        {
+          "name": "@5::slice",
+          "file": "std/text.vela",
+          "line": 71,
+          "column": 1,
+          "calls": 2000,
+          "completed": 2000,
+          "inclusive_us": 11014
+        },
+        {
+          "name": "@5::checked",
+          "file": "std/text.vela",
+          "line": 64,
+          "column": 1,
+          "calls": 4001,
+          "completed": 4001,
+          "inclusive_us": 10820
+        },
+        {
+          "name": "@5::decode",
+          "file": "std/text.vela",
+          "line": 57,
+          "column": 1,
+          "calls": 4001,
+          "completed": 4001,
+          "inclusive_us": 10624
+        },
+        {
+          "name": "@5::invalid_offset",
+          "file": "std/text.vela",
+          "line": 13,
+          "column": 1,
+          "calls": 4001,
+          "completed": 4001,
+          "inclusive_us": 10398
+        },
+        {
+          "name": "file",
+          "file": "tests/library13/profile.vela",
+          "line": 30,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 74
+        },
+        {
+          "name": "must<@5::Text,@5::Error>",
+          "file": "tests/library13/profile.vela",
+          "line": 12,
+          "column": 1,
+          "calls": 2001,
+          "completed": 2001,
+          "inclusive_us": 61
+        },
+        {
+          "name": "raw_arg",
+          "file": "tests/library13/profile.vela",
+          "line": 18,
+          "column": 1,
+          "calls": 3,
+          "completed": 3,
+          "inclusive_us": 3
+        },
+        {
+          "name": "number_arg",
+          "file": "tests/library13/profile.vela",
+          "line": 24,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 2
+        }
+      ],
+      "validation_counters": [
+        {
+          "name": "@5::slice",
+          "file": "std/text.vela",
+          "line": 71,
+          "column": 1,
+          "calls": 2000,
+          "completed": 2000,
+          "inclusive_us": 11014
+        },
+        {
+          "name": "@5::checked",
+          "file": "std/text.vela",
+          "line": 64,
+          "column": 1,
+          "calls": 4001,
+          "completed": 4001,
+          "inclusive_us": 10820
+        },
+        {
+          "name": "@5::invalid_offset",
+          "file": "std/text.vela",
+          "line": 13,
+          "column": 1,
+          "calls": 4001,
+          "completed": 4001,
+          "inclusive_us": 10398
+        }
+      ],
+      "gc": {
+        "collections": 0,
+        "peak_managed_bytes": 3104,
+        "before_teardown_bytes": 3104
+      }
+    },
+    {
+      "label": "path",
+      "functions": 10,
+      "top_inclusive": [
+        {
+          "name": "main",
+          "file": "tests/library13/profile.vela",
+          "line": 120,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 117961
+        },
+        {
+          "name": "text_work",
+          "file": "tests/library13/profile.vela",
+          "line": 74,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 117856
+        },
+        {
+          "name": "@10::parent",
+          "file": "std/path.vela",
+          "line": 55,
+          "column": 1,
+          "calls": 2000,
+          "completed": 2000,
+          "inclusive_us": 117662
+        },
+        {
+          "name": "@10::separator",
+          "file": "std/path.vela",
+          "line": 44,
+          "column": 1,
+          "calls": 2062000,
+          "completed": 2062000,
+          "inclusive_us": 50539
+        },
+        {
+          "name": "@10::checked",
+          "file": "std/path.vela",
+          "line": 29,
+          "column": 1,
+          "calls": 4001,
+          "completed": 4001,
+          "inclusive_us": 14745
+        },
+        {
+          "name": "@5::invalid_offset",
+          "file": "std/text.vela",
+          "line": 13,
+          "column": 1,
+          "calls": 4001,
+          "completed": 4001,
+          "inclusive_us": 10319
+        },
+        {
+          "name": "file",
+          "file": "tests/library13/profile.vela",
+          "line": 30,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 74
+        },
+        {
+          "name": "must<@10::Path,@10::Error>",
+          "file": "tests/library13/profile.vela",
+          "line": 12,
+          "column": 1,
+          "calls": 2001,
+          "completed": 2001,
+          "inclusive_us": 64
+        },
+        {
+          "name": "raw_arg",
+          "file": "tests/library13/profile.vela",
+          "line": 18,
+          "column": 1,
+          "calls": 3,
+          "completed": 3,
+          "inclusive_us": 2
+        },
+        {
+          "name": "number_arg",
+          "file": "tests/library13/profile.vela",
+          "line": 24,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 1
+        }
+      ],
+      "validation_counters": [
+        {
+          "name": "@10::parent",
+          "file": "std/path.vela",
+          "line": 55,
+          "column": 1,
+          "calls": 2000,
+          "completed": 2000,
+          "inclusive_us": 117662
+        },
+        {
+          "name": "@10::checked",
+          "file": "std/path.vela",
+          "line": 29,
+          "column": 1,
+          "calls": 4001,
+          "completed": 4001,
+          "inclusive_us": 14745
+        },
+        {
+          "name": "@5::invalid_offset",
+          "file": "std/text.vela",
+          "line": 13,
+          "column": 1,
+          "calls": 4001,
+          "completed": 4001,
+          "inclusive_us": 10319
+        }
+      ],
+      "gc": {
+        "collections": 0,
+        "peak_managed_bytes": 3104,
+        "before_teardown_bytes": 3104
+      }
+    },
+    {
+      "label": "json-tree",
+      "functions": 23,
+      "top_inclusive": [
+        {
+          "name": "@4::read_value",
+          "file": "std/json.vela",
+          "line": 238,
+          "column": 1,
+          "calls": 19500,
+          "completed": 19500,
+          "inclusive_us": 335947
+        },
+        {
+          "name": "main",
+          "file": "tests/library13/profile.vela",
+          "line": 120,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 224603
+        },
+        {
+          "name": "json_work",
+          "file": "tests/library13/profile.vela",
+          "line": 36,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 224497
+        },
+        {
+          "name": "@4::parse",
+          "file": "std/json.vela",
+          "line": 356,
+          "column": 1,
+          "calls": 300,
+          "completed": 300,
+          "inclusive_us": 224439
+        },
+        {
+          "name": "@4::parse_with_limits",
+          "file": "std/json.vela",
+          "line": 334,
+          "column": 1,
+          "calls": 300,
+          "completed": 300,
+          "inclusive_us": 224401
+        },
+        {
+          "name": "@4::parse_bounded",
+          "file": "std/json.vela",
+          "line": 312,
+          "column": 1,
+          "calls": 300,
+          "completed": 300,
+          "inclusive_us": 224360
+        },
+        {
+          "name": "@4::string_value",
+          "file": "std/json.vela",
+          "line": 97,
+          "column": 1,
+          "calls": 38100,
+          "completed": 38100,
+          "inclusive_us": 151049
+        },
+        {
+          "name": "@4::peek",
+          "file": "std/json.vela",
+          "line": 55,
+          "column": 1,
+          "calls": 1101900,
+          "completed": 1101900,
+          "inclusive_us": 126194
+        },
+        {
+          "name": "@4::position",
+          "file": "std/json.vela",
+          "line": 46,
+          "column": 1,
+          "calls": 2693400,
+          "completed": 2693400,
+          "inclusive_us": 61852
+        },
+        {
+          "name": "@4::skip",
+          "file": "std/json.vela",
+          "line": 61,
+          "column": 1,
+          "calls": 77700,
+          "completed": 77700,
+          "inclusive_us": 45209
+        },
+        {
+          "name": "@4::take_byte",
+          "file": "std/json.vela",
+          "line": 66,
+          "column": 1,
+          "calls": 97200,
+          "completed": 97200,
+          "inclusive_us": 22244
+        },
+        {
+          "name": "@4::move",
+          "file": "std/json.vela",
+          "line": 49,
+          "column": 1,
+          "calls": 413400,
+          "completed": 413400,
+          "inclusive_us": 9533
+        }
+      ],
+      "validation_counters": [
+        {
+          "name": "@5::invalid_offset",
+          "file": "std/text.vela",
+          "line": 13,
+          "column": 1,
+          "calls": 301,
+          "completed": 301,
+          "inclusive_us": 2240
+        }
+      ],
+      "gc": {
+        "collections": 27,
+        "peak_managed_bytes": 1049395,
+        "before_teardown_bytes": 273897
+      }
+    },
+    {
+      "label": "json-stream",
+      "functions": 33,
+      "top_inclusive": [
+        {
+          "name": "main",
+          "file": "tests/library13/profile.vela",
+          "line": 120,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 272267
+        },
+        {
+          "name": "json_work",
+          "file": "tests/library13/profile.vela",
+          "line": 36,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 272170
+        },
+        {
+          "name": "@8::skip_value",
+          "file": "std/json_stream.vela",
+          "line": 509,
+          "column": 1,
+          "calls": 300,
+          "completed": 300,
+          "inclusive_us": 269535
+        },
+        {
+          "name": "@8::advance",
+          "file": "std/json_stream.vela",
+          "line": 406,
+          "column": 1,
+          "calls": 39600,
+          "completed": 39600,
+          "inclusive_us": 266399
+        },
+        {
+          "name": "@8::string_value",
+          "file": "std/json_stream.vela",
+          "line": 192,
+          "column": 1,
+          "calls": 38100,
+          "completed": 38100,
+          "inclusive_us": 154554
+        },
+        {
+          "name": "@8::peek",
+          "file": "std/json_stream.vela",
+          "line": 102,
+          "column": 1,
+          "calls": 1197600,
+          "completed": 1197600,
+          "inclusive_us": 140066
+        },
+        {
+          "name": "@8::value",
+          "file": "std/json_stream.vela",
+          "line": 355,
+          "column": 1,
+          "calls": 19500,
+          "completed": 19500,
+          "inclusive_us": 122129
+        },
+        {
+          "name": "@8::position",
+          "file": "std/json_stream.vela",
+          "line": 96,
+          "column": 1,
+          "calls": 2922600,
+          "completed": 2922600,
+          "inclusive_us": 67651
+        },
+        {
+          "name": "@8::whitespace",
+          "file": "std/json_stream.vela",
+          "line": 108,
+          "column": 1,
+          "calls": 96900,
+          "completed": 96900,
+          "inclusive_us": 56873
+        },
+        {
+          "name": "@8::take",
+          "file": "std/json_stream.vela",
+          "line": 113,
+          "column": 1,
+          "calls": 77100,
+          "completed": 77100,
+          "inclusive_us": 19630
+        },
+        {
+          "name": "@8::quote",
+          "file": "std/json_stream.vela",
+          "line": 120,
+          "column": 1,
+          "calls": 19200,
+          "completed": 19200,
+          "inclusive_us": 10455
+        },
+        {
+          "name": "@8::move",
+          "file": "std/json_stream.vela",
+          "line": 99,
+          "column": 1,
+          "calls": 413400,
+          "completed": 413400,
+          "inclusive_us": 9776
+        }
+      ],
+      "validation_counters": [
+        {
+          "name": "@5::invalid_offset",
+          "file": "std/text.vela",
+          "line": 13,
+          "column": 1,
+          "calls": 301,
+          "completed": 301,
+          "inclusive_us": 2303
+        }
+      ],
+      "gc": {
+        "collections": 38,
+        "peak_managed_bytes": 1049803,
+        "before_teardown_bytes": 106888
+      }
+    },
+    {
+      "label": "json-typed",
+      "functions": 59,
+      "top_inclusive": [
+        {
+          "name": "main",
+          "file": "tests/library13/profile.vela",
+          "line": 120,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 587414
+        },
+        {
+          "name": "json_work",
+          "file": "tests/library13/profile.vela",
+          "line": 36,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 587319
+        },
+        {
+          "name": "@7::decode<Int>",
+          "file": "std/json_decode.vela",
+          "line": 99,
+          "column": 1,
+          "calls": 300,
+          "completed": 300,
+          "inclusive_us": 587231
+        },
+        {
+          "name": "@8::advance",
+          "file": "std/json_stream.vela",
+          "line": 406,
+          "column": 1,
+          "calls": 79200,
+          "completed": 79200,
+          "inclusive_us": 545797
+        },
+        {
+          "name": "@8::skip_value",
+          "file": "std/json_stream.vela",
+          "line": 509,
+          "column": 1,
+          "calls": 19500,
+          "completed": 19500,
+          "inclusive_us": 421942
+        },
+        {
+          "name": "@7::execute<Int>",
+          "file": "std/json_decode.vela",
+          "line": 89,
+          "column": 1,
+          "calls": 600,
+          "completed": 600,
+          "inclusive_us": 316746
+        },
+        {
+          "name": "@closure",
+          "file": "std/json_decode.vela",
+          "line": 469,
+          "column": 61,
+          "calls": 300,
+          "completed": 300,
+          "inclusive_us": 315084
+        },
+        {
+          "name": "@7::read_object",
+          "file": "std/json_decode.vela",
+          "line": 360,
+          "column": 1,
+          "calls": 300,
+          "completed": 300,
+          "inclusive_us": 313286
+        },
+        {
+          "name": "@8::string_value",
+          "file": "std/json_stream.vela",
+          "line": 192,
+          "column": 1,
+          "calls": 76200,
+          "completed": 76200,
+          "inclusive_us": 311500
+        },
+        {
+          "name": "@8::peek",
+          "file": "std/json_stream.vela",
+          "line": 102,
+          "column": 1,
+          "calls": 2497200,
+          "completed": 2497200,
+          "inclusive_us": 293646
+        },
+        {
+          "name": "@8::value",
+          "file": "std/json_stream.vela",
+          "line": 355,
+          "column": 1,
+          "calls": 39300,
+          "completed": 39300,
+          "inclusive_us": 245395
+        },
+        {
+          "name": "@8::next",
+          "file": "std/json_stream.vela",
+          "line": 482,
+          "column": 1,
+          "calls": 20100,
+          "completed": 20100,
+          "inclusive_us": 144699
+        }
+      ],
+      "validation_counters": [
+        {
+          "name": "@5::invalid_offset",
+          "file": "std/text.vela",
+          "line": 13,
+          "column": 1,
+          "calls": 901,
+          "completed": 901,
+          "inclusive_us": 4626
+        }
+      ],
+      "gc": {
+        "collections": 95,
+        "peak_managed_bytes": 1050163,
+        "before_teardown_bytes": 686870
+      }
+    },
+    {
+      "label": "compiler-check",
+      "functions": 215,
+      "top_inclusive": [
+        {
+          "name": "@6::collect_module",
+          "file": "selfhost/modules.vela",
+          "line": 66,
+          "column": 1,
+          "calls": 202,
+          "completed": 202,
+          "inclusive_us": 4723490
+        },
+        {
+          "name": "@9::check_block",
+          "file": "selfhost/semantic.vela",
+          "line": 395,
+          "column": 1,
+          "calls": 3504,
+          "completed": 3504,
+          "inclusive_us": 2608264
+        },
+        {
+          "name": "@9::check_statement",
+          "file": "selfhost/semantic.vela",
+          "line": 417,
+          "column": 1,
+          "calls": 6306,
+          "completed": 6306,
+          "inclusive_us": 2604747
+        },
+        {
+          "name": "main",
+          "file": "selfhost/driver.vela",
+          "line": 344,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 2046427
+        },
+        {
+          "name": "@9::check_expr",
+          "file": "selfhost/semantic.vela",
+          "line": 169,
+          "column": 1,
+          "calls": 30046,
+          "completed": 30046,
+          "inclusive_us": 1797210
+        },
+        {
+          "name": "@9::analyze_mode",
+          "file": "selfhost/semantic.vela",
+          "line": 569,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 1219616
+        },
+        {
+          "name": "@9::check_function_instances",
+          "file": "selfhost/semantic.vela",
+          "line": 656,
+          "column": 1,
+          "calls": 2,
+          "completed": 2,
+          "inclusive_us": 956375
+        },
+        {
+          "name": "@6::module_global_name",
+          "file": "selfhost/modules.vela",
+          "line": 211,
+          "column": 1,
+          "calls": 13882,
+          "completed": 13882,
+          "inclusive_us": 663539
+        },
+        {
+          "name": "@6::project_cached_context",
+          "file": "selfhost/modules.vela",
+          "line": 151,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 604565
+        },
+        {
+          "name": "@6::module_declaration",
+          "file": "selfhost/modules.vela",
+          "line": 193,
+          "column": 1,
+          "calls": 111969,
+          "completed": 111969,
+          "inclusive_us": 566174
+        },
+        {
+          "name": "@7::query_source_text",
+          "file": "selfhost/source.vela",
+          "line": 120,
+          "column": 1,
+          "calls": 203,
+          "completed": 203,
+          "inclusive_us": 435329
+        },
+        {
+          "name": "@7::utf8_valid",
+          "file": "selfhost/source.vela",
+          "line": 20,
+          "column": 1,
+          "calls": 406,
+          "completed": 406,
+          "inclusive_us": 394994
+        }
+      ],
+      "validation_counters": [],
+      "gc": {
+        "collections": 35,
+        "peak_managed_bytes": 82341725,
+        "before_teardown_bytes": 60586522
+      }
+    }
+  ],
+  "completed": true
+}

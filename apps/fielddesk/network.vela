@@ -9,7 +9,8 @@ pub struct Endpoint {
     transport: dyn http::Transport,
     request: http::Request,
     executable: path::Path,
-    trust: Option<path::Path>
+    trust: Option<path::Path>,
+    pool: Option<http::CurlMulti>
 }
 pub fn error(value: http::Error) -> String {
     return match value {
@@ -38,17 +39,26 @@ pub fn clock() -> Result<Int, String> effects { io } {
     };
 }
 pub fn endpoint(scheme: http::Scheme, host: String, port: Int, target: String, timeout: Int,
-    curl: String, ca: String) -> Result<Endpoint, String> {
+    curl: String, ca: String) -> Result<Endpoint, String> effects { state, io } {
     var trust = Option<path::Path>::None;
     if ca != "" {
         trust = Option<path::Path>::Some(path::Path(value: ca));
     }
-    let transport = result::map_error(http::curl(path::Path(value: curl), trust), error)?;
     let request = result::map_error(http::get(scheme, host, port, target, timeout, 4096), error)?;
+    if curl == "multi" {
+        let folder = result::explain(path::resource_base(), "Cannot locate HTTP adapter")?;
+        let adapter = result::explain(path::join(folder, path::Path(value: "vela-http.dll")),
+            "Invalid HTTP adapter path")?;
+        let pool = result::map_error(http::curl_multi(http::multi_limits(), trust), http::describe_multi_open)?;
+        return Result<Endpoint, String>::Ok(Endpoint(transport: dyn http::Transport(pool),
+            request: request, executable: adapter, trust: trust, pool: Option<http::CurlMulti>::Some(pool)));
+    }
+    let transport = result::map_error(http::curl(path::Path(value: curl), trust), error)?;
     return Result<Endpoint, String>::Ok(Endpoint(transport: dyn http::Transport(transport),
-        request: request, executable: path::Path(value: curl), trust: trust));
+        request: request, executable: path::Path(value: curl), trust: trust,
+        pool: Option<http::CurlMulti>::None));
 }
-pub fn parse(data: String) -> Result<Endpoint, String> effects { state } {
+pub fn parse(data: String) -> Result<Endpoint, String> effects { state, io } {
     let cfg = result::explain(config::parse(data), "Invalid endpoint JSON")?;
     let scheme = result::explain(config::string(cfg, "scheme"), "Missing endpoint scheme")?;
     var protocol = http::Scheme::Http;
@@ -62,9 +72,19 @@ pub fn parse(data: String) -> Result<Endpoint, String> effects { state } {
     let target = result::explain(config::string(cfg, "target"), "Missing endpoint target")?;
     let timeout = result::explain(config::integer(cfg, "timeout_ms"),
         "Missing endpoint timeout_ms")?;
-    let curl = result::explain(config::string(cfg, "curl"), "Missing endpoint curl")?;
+    var curl = "multi";
+    match result::explain(config::find(cfg, "curl"), "Invalid endpoint transport")? {
+        Option::None => {}
+        Option::Some(_) => { curl = result::explain(config::string(cfg, "curl"), "Invalid endpoint curl")?; }
+    }
     let ca = result::explain(config::string(cfg, "ca_file"), "Use empty ca_file for system trust")?;
     return endpoint(protocol, host, port, target, timeout, curl, ca);
+}
+pub fn close_endpoint(value: Endpoint) -> Result<Bool, String> effects { state, io } {
+    return match value.pool {
+        Option::None => Result<Bool, String>::Ok(true),
+        Option::Some(pool) => result::map_error(http::close_multi(pool), error)
+    };
 }
 pub fn body(response: http::Response) -> Result<String, String> {
     if response.status != 200 {
@@ -91,20 +111,21 @@ fn wait_for(scheduler: loop::Loop<process::Completed>, exchange: http::Exchange)
             Option::Some(response) => {
                 return body(response);
             }
-            Option::None => {}
+            Option::None => { let slept = host_sleep(1); }
         }
     }
     return Result<String, String>::Err("Unexpected HTTP loop exit");
 }
 pub fn fetch(port: Int, target: String, directory: path::Path) -> Result<String,
     String> effects { io, state, process } {
-    let curl = env("SystemRoot") + "/System32/curl.exe";
-    let value = endpoint(http::Scheme::Http, "127.0.0.1", port, target, 1500, curl, "")?;
+    let value = endpoint(http::Scheme::Http, "127.0.0.1", port, target, 1500, "multi", "")?;
+    defer { let closed = close_endpoint(value); }
     let scheduler = result::explain(loop::create<process::Completed>(clock()?),
         "Cannot create HTTP loop")?;
     let exchange = start(value, scheduler, directory)?;
     let outcome = wait_for(scheduler, exchange);
     let released = result::map_error(http::release(exchange), error)?;
     let closed = result::explain(loop::shutdown(scheduler), "Cannot close HTTP loop")?;
+    let released_owner = close_endpoint(value)?;
     return outcome;
 }

@@ -1,0 +1,1554 @@
+{
+  "stage": "1.3.4l",
+  "status": "verified",
+  "contract": "contracts/NATIVE-LTO-1.3.md",
+  "fixed": "1.3.4d",
+  "previous": "1.3.4k",
+  "hosts": {
+    "msvc": {
+      "workloads": {
+        "buildlens": {
+          "generated_c": {
+            "bytes": 1305871,
+            "sha256": "75b99f7608c2c0021281f3482ab836acdc8df87dc67e7738233c7558671a3fd0"
+          },
+          "workflow": {
+            "o2": {
+              "wall_ms": {
+                "median": 1922.2597,
+                "min": 1877.5711,
+                "max": 2791.0331
+              },
+              "cpu_ms": {
+                "median": 5062.5,
+                "min": 5000,
+                "max": 7046.875
+              },
+              "peak_tree_bytes": {
+                "median": 219656192,
+                "min": 215760896,
+                "max": 238551040
+              },
+              "peak_process_bytes": {
+                "median": 54153216,
+                "min": 53993472,
+                "max": 54206464
+              }
+            },
+            "lto": {
+              "wall_ms": {
+                "median": 2088.1426,
+                "min": 1934.9995,
+                "max": 2925.0418
+              },
+              "cpu_ms": {
+                "median": 6734.375,
+                "min": 6515.625,
+                "max": 8015.625
+              },
+              "peak_tree_bytes": {
+                "median": 354816000,
+                "min": 344580096,
+                "max": 360075264
+              },
+              "peak_process_bytes": {
+                "median": 79634432,
+                "min": 79581184,
+                "max": 79659008
+              }
+            },
+            "use": {
+              "wall_ms": {
+                "median": 2118.8793,
+                "min": 2083.3986,
+                "max": 2990.0239
+              },
+              "cpu_ms": {
+                "median": 5437.5,
+                "min": 5203.125,
+                "max": 6843.75
+              },
+              "peak_tree_bytes": {
+                "median": 288034816,
+                "min": 286904320,
+                "max": 290164736
+              },
+              "peak_process_bytes": {
+                "median": 79499264,
+                "min": 79462400,
+                "max": 79532032
+              }
+            },
+            "combined": {
+              "wall_ms": {
+                "median": 2168.7378,
+                "min": 2031.3197,
+                "max": 2527.4072
+              },
+              "cpu_ms": {
+                "median": 5390.625,
+                "min": 5250,
+                "max": 5812.5
+              },
+              "peak_tree_bytes": {
+                "median": 285978624,
+                "min": 283897856,
+                "max": 290123776
+              },
+              "peak_process_bytes": {
+                "median": 79581184,
+                "min": 79507456,
+                "max": 79589376
+              }
+            }
+          },
+          "preparation": {
+            "instrument": {
+              "wall_ms": 1174.228,
+              "cpu_ms": 2421.875,
+              "peak_tree_bytes": 199999488,
+              "peak_process_bytes": 80543744
+            },
+            "train": {
+              "wall_ms": 22565.1191,
+              "cpu_ms": 22296.875,
+              "peak_tree_bytes": 41725952,
+              "peak_process_bytes": 31096832
+            }
+          },
+          "wall_ms": {
+            "o2": {
+              "median": 306.6334,
+              "min": 299.9489,
+              "max": 311.6794
+            },
+            "lto": {
+              "median": 319.8557,
+              "min": 311.4622,
+              "max": 329.4851
+            },
+            "optimized": {
+              "median": 291.1587,
+              "min": 284.4687,
+              "max": 305.5371
+            },
+            "combined": {
+              "median": 298.5769,
+              "min": 292.8256,
+              "max": 303.9916
+            }
+          },
+          "cpu_ms": {
+            "o2": {
+              "median": 296.875,
+              "min": 296.875,
+              "max": 312.5
+            },
+            "lto": {
+              "median": 296.875,
+              "min": 296.875,
+              "max": 328.125
+            },
+            "optimized": {
+              "median": 281.25,
+              "min": 281.25,
+              "max": 312.5
+            },
+            "combined": {
+              "median": 296.875,
+              "min": 265.625,
+              "max": 296.875
+            }
+          },
+          "bytes": {
+            "o2": 638976,
+            "lto": 620032,
+            "pgo": 641536,
+            "pgo_lto": 641536
+          },
+          "archives": {
+            "o2": 314480,
+            "lto": 301485,
+            "pgo": 313772,
+            "combined": 313771
+          },
+          "size_reduction_percent": 2.96474358974359,
+          "improvement_percent": -4.312087332951994,
+          "combined_improvement_percent": -2.5478201406999044,
+          "combined_size_reduction_percent": 0,
+          "noise_percent": 1.398075815598461,
+          "profile_noise_percent": 1.5698985056894683,
+          "target": true,
+          "same_session": {
+            "fixed": {
+              "wall_ms": 365.4711,
+              "cpu_ms": 359.375,
+              "peak_tree_bytes": 9437184
+            },
+            "previous": {
+              "wall_ms": 316.6398,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10043392
+            },
+            "o2": {
+              "wall_ms": 331.7781,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10047488
+            },
+            "pgo": {
+              "wall_ms": 301.2097,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9641984
+            },
+            "previous_pgo": {
+              "wall_ms": 302.794,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9641984
+            },
+            "lto": {
+              "wall_ms": 322.3187,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9646080
+            },
+            "combined": {
+              "wall_ms": 300.1198,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176
+            }
+          }
+        },
+        "compiler": {
+          "generated_c": {
+            "bytes": 6098393,
+            "sha256": "2d7d304d85b16b5ea0617e09f5ae0a76322d6220396e551755a3f89d0c9f6239"
+          },
+          "workflow": {
+            "o2": {
+              "wall_ms": {
+                "median": 25232.1078,
+                "min": 25038.5532,
+                "max": 26164.6912
+              },
+              "cpu_ms": {
+                "median": 86500,
+                "min": 86359.375,
+                "max": 90125
+              },
+              "peak_tree_bytes": {
+                "median": 585768960,
+                "min": 568311808,
+                "max": 595030016
+              },
+              "peak_process_bytes": {
+                "median": 170471424,
+                "min": 170405888,
+                "max": 170483712
+              }
+            },
+            "lto": {
+              "wall_ms": {
+                "median": 14569.3718,
+                "min": 12798.0557,
+                "max": 15887.3756
+              },
+              "cpu_ms": {
+                "median": 120000,
+                "min": 113515.625,
+                "max": 121750
+              },
+              "peak_tree_bytes": {
+                "median": 902090752,
+                "min": 890445824,
+                "max": 911753216
+              },
+              "peak_process_bytes": {
+                "median": 182276096,
+                "min": 182013952,
+                "max": 182378496
+              }
+            },
+            "use": {
+              "wall_ms": {
+                "median": 12195.906,
+                "min": 11175.9002,
+                "max": 14067.3282
+              },
+              "cpu_ms": {
+                "median": 62265.625,
+                "min": 58515.625,
+                "max": 65296.875
+              },
+              "peak_tree_bytes": {
+                "median": 629018624,
+                "min": 627372032,
+                "max": 638844928
+              },
+              "peak_process_bytes": {
+                "median": 182284288,
+                "min": 182239232,
+                "max": 182358016
+              }
+            },
+            "combined": {
+              "wall_ms": {
+                "median": 12228.6802,
+                "min": 11146.4565,
+                "max": 13770.1322
+              },
+              "cpu_ms": {
+                "median": 62078.125,
+                "min": 57890.625,
+                "max": 65187.5
+              },
+              "peak_tree_bytes": {
+                "median": 628527104,
+                "min": 621690880,
+                "max": 654217216
+              },
+              "peak_process_bytes": {
+                "median": 182317056,
+                "min": 182267904,
+                "max": 182378496
+              }
+            }
+          },
+          "preparation": {
+            "instrument": {
+              "wall_ms": 15401.8035,
+              "cpu_ms": 47828.125,
+              "peak_tree_bytes": 490405888,
+              "peak_process_bytes": 184242176
+            },
+            "train": {
+              "wall_ms": 10600.203,
+              "cpu_ms": 10406.25,
+              "peak_tree_bytes": 67514368,
+              "peak_process_bytes": 31084544
+            }
+          },
+          "wall_ms": {
+            "o2": {
+              "median": 1427.1033,
+              "min": 1020.2248,
+              "max": 1439.5664
+            },
+            "lto": {
+              "median": 1439.2149,
+              "min": 1063.8144,
+              "max": 1514.7214
+            },
+            "optimized": {
+              "median": 1389.0945,
+              "min": 1020.9139,
+              "max": 1429.3779
+            },
+            "combined": {
+              "median": 1423.3471,
+              "min": 1361.7174,
+              "max": 1602.9146
+            }
+          },
+          "cpu_ms": {
+            "o2": {
+              "median": 1375,
+              "min": 1000,
+              "max": 1406.25
+            },
+            "lto": {
+              "median": 1421.875,
+              "min": 1062.5,
+              "max": 1500
+            },
+            "optimized": {
+              "median": 1359.375,
+              "min": 1000,
+              "max": 1406.25
+            },
+            "combined": {
+              "median": 1421.875,
+              "min": 1343.75,
+              "max": 1562.5
+            }
+          },
+          "bytes": {
+            "o2": 3292160,
+            "lto": 3195904,
+            "pgo": 2875392,
+            "pgo_lto": 2875392
+          },
+          "archives": {
+            "o2": 2296371,
+            "lto": 2241590,
+            "pgo": 2063632,
+            "combined": 2063633
+          },
+          "size_reduction_percent": 2.9237947122861585,
+          "improvement_percent": -0.8486841842493079,
+          "combined_improvement_percent": -2.465822159687482,
+          "combined_size_reduction_percent": 0,
+          "noise_percent": 2.316120439307735,
+          "profile_noise_percent": 1.628117816889351,
+          "target": true,
+          "same_session": {
+            "fixed": {
+              "wall_ms": 1444.8849,
+              "cpu_ms": 1406.25,
+              "peak_tree_bytes": 96874496
+            },
+            "previous": {
+              "wall_ms": 1046.0519,
+              "cpu_ms": 1031.25,
+              "peak_tree_bytes": 97144832
+            },
+            "o2": {
+              "wall_ms": 1010.5991,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97169408
+            },
+            "pgo": {
+              "wall_ms": 1035.3236,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97665024
+            },
+            "previous_pgo": {
+              "wall_ms": 1066.7434,
+              "cpu_ms": 1062.5,
+              "peak_tree_bytes": 97071104
+            },
+            "lto": {
+              "wall_ms": 1080.8906,
+              "cpu_ms": 1031.25,
+              "peak_tree_bytes": 97640448
+            },
+            "combined": {
+              "wall_ms": 1059.1314,
+              "cpu_ms": 1046.875,
+              "peak_tree_bytes": 96956416
+            }
+          }
+        }
+      },
+      "workflow": {
+        "host": "msvc",
+        "lto": true,
+        "checks": [
+          "O2 project output",
+          "LTO CLI boundaries, unsupported tools and shared checked C cache",
+          "size preference leaves the emitted loop in the normal policy",
+          "unsupported toolchain rejects without publishing",
+          "instrument publishes once and untrained use rejects",
+          "training rejects changed flags or companion and publishes nothing on failure",
+          "one concurrent trainer publishes and a second training is rejected",
+          "MSVC explicit LTO and PGO alone accept the same trained plan",
+          "PGO use and warm C cache preserve held-out output",
+          "changed payload, receipt, import and locked resource reject with old output intact",
+          "delivered executable and resource work without the profile or tools"
+        ],
+        "payload_bytes": 1134592,
+        "plan_sha256": "990a141bd054683c63bb154b89ede40ef065e2a24f90bd05b1188468a9cb535b",
+        "trained_sha256": "e805a4a9249b4095c9c1e8d61f114dcd89b67aa69f0f69ee45c7b084a64d69f8",
+        "packaged_executable_sha256": "841fb224392916ea2a1d947160bd4a1f01423dddf5c23ee20e5ce3c30bcb5732"
+      },
+      "compiler": {
+        "host": "msvc",
+        "expected": {
+          "authored": "2d7d304d85b16b5ea0617e09f5ae0a76322d6220396e551755a3f89d0c9f6239",
+          "bundle": "a80bbbe52ec2444d17d8bbde13add1defd521a92c913b5f451706166961205cf",
+          "bundler": "5793fa7206b81bfaa697ac8c26db8c91e7b1b8a9bf52e5a4f35600133b6c6ae6"
+        },
+        "outcome": {
+          "lto": {
+            "first_sha256": "2d7d304d85b16b5ea0617e09f5ae0a76322d6220396e551755a3f89d0c9f6239",
+            "second_sha256": "2d7d304d85b16b5ea0617e09f5ae0a76322d6220396e551755a3f89d0c9f6239",
+            "bundler_sha256": "5793fa7206b81bfaa697ac8c26db8c91e7b1b8a9bf52e5a4f35600133b6c6ae6",
+            "recovery_sha256": "a80bbbe52ec2444d17d8bbde13add1defd521a92c913b5f451706166961205cf",
+            "resumed": false,
+            "fixtures": [
+              "v134j_reachability",
+              "v134i_ranges",
+              "v134d_lowering"
+            ]
+          },
+          "combined-instrument": {
+            "first_sha256": "2d7d304d85b16b5ea0617e09f5ae0a76322d6220396e551755a3f89d0c9f6239",
+            "second_sha256": "2d7d304d85b16b5ea0617e09f5ae0a76322d6220396e551755a3f89d0c9f6239",
+            "bundler_sha256": "5793fa7206b81bfaa697ac8c26db8c91e7b1b8a9bf52e5a4f35600133b6c6ae6",
+            "recovery_sha256": "a80bbbe52ec2444d17d8bbde13add1defd521a92c913b5f451706166961205cf",
+            "resumed": false,
+            "fixtures": [
+              "v134j_reachability",
+              "v134i_ranges",
+              "v134d_lowering"
+            ]
+          },
+          "combined": {
+            "first_sha256": "2d7d304d85b16b5ea0617e09f5ae0a76322d6220396e551755a3f89d0c9f6239",
+            "second_sha256": "2d7d304d85b16b5ea0617e09f5ae0a76322d6220396e551755a3f89d0c9f6239",
+            "bundler_sha256": "5793fa7206b81bfaa697ac8c26db8c91e7b1b8a9bf52e5a4f35600133b6c6ae6",
+            "recovery_sha256": "a80bbbe52ec2444d17d8bbde13add1defd521a92c913b5f451706166961205cf",
+            "resumed": false,
+            "fixtures": [
+              "v134j_reachability",
+              "v134i_ranges",
+              "v134d_lowering"
+            ]
+          }
+        },
+        "ffi": {
+          "supported": true,
+          "stdout": "callbacks passed",
+          "executable_sha256": "3d5e1b0f0ccebcb98409ba2a0ede3d679934d16300c76e90a9bd3efbf638ada6",
+          "companion_sha256": "cd9a5ca6daaab11c6a646a0ebfc0d34eb1ce8f94fba771743c2e1067f97a6e36",
+          "gc_stress": true,
+          "lto_sha256": "e765d47104da9247bde273b352b8866a219baab6cf04b629267e2f5610af06b7"
+        }
+      },
+      "raw_profile": {
+        "file": "1.3.4l-msvc.json",
+        "sha256": "2384a163da458b31e372af6cf054529997914e95d96fbdd5264f47c79aff468d"
+      },
+      "raw_comparison": {
+        "file": "1.3.4l-msvc-compared.json",
+        "sha256": "5aa728d8eff5a578bca6b0d5c9ad0b3c21e3307f9fd4a99579f0a3f869de8655"
+      },
+      "raw_link": {
+        "file": "1.3.4l-msvc-link.json",
+        "sha256": "1b1f1567532f797c1a559f525324defa0a333275e7f1d9bddc27c0e3b73febd6"
+      },
+      "raw_compiler": {
+        "file": "1.3.4l-msvc-compiler.json",
+        "sha256": "431de35baad06390d74f0ca7e9be59e375fa3279ed8c1de72beb01106a9364ca"
+      }
+    },
+    "gcc": {
+      "workloads": {
+        "buildlens": {
+          "generated_c": {
+            "bytes": 1416595,
+            "sha256": "27b4c807062cd254fa62cd308dbfaeb71805231a6013cb9249c4854f0b34bfb3"
+          },
+          "workflow": {
+            "o2": {
+              "wall_ms": {
+                "median": 5988.445,
+                "min": 5877.312,
+                "max": 6767.238
+              },
+              "cpu_ms": {
+                "median": 5545.525,
+                "min": 5447.453,
+                "max": 6290.069
+              },
+              "peak_tree_bytes": {
+                "median": 297291776,
+                "min": 297209856,
+                "max": 297308160
+              },
+              "peak_process_bytes": {
+                "median": 47026176,
+                "min": 46985216,
+                "max": 47067136
+              }
+            },
+            "lto": {
+              "wall_ms": {
+                "median": 6762.755,
+                "min": 6630.891,
+                "max": 8970.969
+              },
+              "cpu_ms": {
+                "median": 6212.68,
+                "min": 6080.517,
+                "max": 8366.563
+              },
+              "peak_tree_bytes": {
+                "median": 227676160,
+                "min": 227606528,
+                "max": 251711488
+              },
+              "peak_process_bytes": {
+                "median": 154738688,
+                "min": 152895488,
+                "max": 160632832
+              }
+            },
+            "use": {
+              "wall_ms": {
+                "median": 5944.967,
+                "min": 5837.764,
+                "max": 8854.025
+              },
+              "cpu_ms": {
+                "median": 5140.904,
+                "min": 5058.327,
+                "max": 7868.646
+              },
+              "peak_tree_bytes": {
+                "median": 310104064,
+                "min": 309977088,
+                "max": 310165504
+              },
+              "peak_process_bytes": {
+                "median": 120918016,
+                "min": 114728960,
+                "max": 124780544
+              }
+            },
+            "combined": {
+              "wall_ms": {
+                "median": 6487.995,
+                "min": 6403.469,
+                "max": 9392.145
+              },
+              "cpu_ms": {
+                "median": 5641.793,
+                "min": 5576.54,
+                "max": 8394.42
+              },
+              "peak_tree_bytes": {
+                "median": 224968704,
+                "min": 224890880,
+                "max": 251944960
+              },
+              "peak_process_bytes": {
+                "median": 158056448,
+                "min": 156225536,
+                "max": 160833536
+              }
+            }
+          },
+          "preparation": {
+            "instrument": {
+              "wall_ms": 5402.759,
+              "cpu_ms": 4843.069,
+              "peak_tree_bytes": 312393728,
+              "peak_process_bytes": 118181888
+            },
+            "train": {
+              "wall_ms": 2656.108,
+              "cpu_ms": 2441.929,
+              "peak_tree_bytes": 80916480,
+              "peak_process_bytes": 72691712
+            },
+            "combined_instrument": {
+              "wall_ms": 6261.634,
+              "cpu_ms": 5664.584,
+              "peak_tree_bytes": 251637760,
+              "peak_process_bytes": 157753344
+            },
+            "combined_train": {
+              "wall_ms": 2973.757,
+              "cpu_ms": 2703.943,
+              "peak_tree_bytes": 117465088,
+              "peak_process_bytes": 108785664
+            }
+          },
+          "wall_ms": {
+            "o2": {
+              "median": 454.853,
+              "min": 447.085,
+              "max": 466.492
+            },
+            "lto": {
+              "median": 439.104,
+              "min": 436.026,
+              "max": 492.926
+            },
+            "optimized": {
+              "median": 420.759,
+              "min": 408.703,
+              "max": 484.935
+            },
+            "combined": {
+              "median": 425.409,
+              "min": 415.766,
+              "max": 498.056
+            }
+          },
+          "cpu_ms": {
+            "o2": {
+              "median": 435.865,
+              "min": 428.107,
+              "max": 445.295
+            },
+            "lto": {
+              "median": 420.453,
+              "min": 417.792,
+              "max": 466.341
+            },
+            "optimized": {
+              "median": 402.26,
+              "min": 390.492,
+              "max": 461.288
+            },
+            "combined": {
+              "median": 407.122,
+              "min": 397.352,
+              "max": 474.614
+            }
+          },
+          "bytes": {
+            "o2": 547640,
+            "lto": 529008,
+            "pgo": 470472,
+            "pgo_lto": 468128
+          },
+          "archives": {
+            "o2": 225623,
+            "lto": 221348,
+            "pgo": 204407,
+            "combined": 202452
+          },
+          "size_reduction_percent": 3.4022350449200203,
+          "improvement_percent": 3.462437314912735,
+          "combined_improvement_percent": -1.1051457009832177,
+          "combined_size_reduction_percent": 0.4982230610960907,
+          "noise_percent": 3.427574991242734,
+          "profile_noise_percent": 1.4777430663867026,
+          "target": true,
+          "same_session": {
+            "fixed": {
+              "wall_ms": 519.034,
+              "cpu_ms": 494.674,
+              "peak_tree_bytes": 7958528
+            },
+            "previous": {
+              "wall_ms": 441.846,
+              "cpu_ms": 422.75,
+              "peak_tree_bytes": 7352320
+            },
+            "o2": {
+              "wall_ms": 449.256,
+              "cpu_ms": 429.871,
+              "peak_tree_bytes": 7344128
+            },
+            "pgo": {
+              "wall_ms": 410.536,
+              "cpu_ms": 393.02,
+              "peak_tree_bytes": 7221248
+            },
+            "previous_pgo": {
+              "wall_ms": 423.085,
+              "cpu_ms": 403.698,
+              "peak_tree_bytes": 7110656
+            },
+            "lto": {
+              "wall_ms": 451.97,
+              "cpu_ms": 431.299,
+              "peak_tree_bytes": 7294976
+            },
+            "combined": {
+              "wall_ms": 427.331,
+              "cpu_ms": 408.845,
+              "peak_tree_bytes": 7131136
+            }
+          }
+        },
+        "compiler": {
+          "generated_c": {
+            "bytes": 6336041,
+            "sha256": "90ff795b70773d07f28d1361d8668819714e036e9b015ab1d3b8f8a02bb9ab41"
+          },
+          "workflow": {
+            "o2": {
+              "wall_ms": {
+                "median": 32536.008,
+                "min": 32115.346,
+                "max": 47689.055
+              },
+              "cpu_ms": {
+                "median": 31620.202,
+                "min": 31206.244,
+                "max": 46683.859
+              },
+              "peak_tree_bytes": {
+                "median": 567631872,
+                "min": 567619584,
+                "max": 567947264
+              },
+              "peak_process_bytes": {
+                "median": 162230272,
+                "min": 162095104,
+                "max": 162234368
+              }
+            },
+            "lto": {
+              "wall_ms": {
+                "median": 33810.398,
+                "min": 32621.107,
+                "max": 48336.354
+              },
+              "cpu_ms": {
+                "median": 32832.788,
+                "min": 31687.332,
+                "max": 47208.29
+              },
+              "peak_tree_bytes": {
+                "median": 587776000,
+                "min": 587722752,
+                "max": 587816960
+              },
+              "peak_process_bytes": {
+                "median": 268906496,
+                "min": 263110656,
+                "max": 271626240
+              }
+            },
+            "use": {
+              "wall_ms": {
+                "median": 23465.267,
+                "min": 23031.375,
+                "max": 31538.262
+              },
+              "cpu_ms": {
+                "median": 22106.869,
+                "min": 21640.935,
+                "max": 30116.293
+              },
+              "peak_tree_bytes": {
+                "median": 587411456,
+                "min": 587341824,
+                "max": 587497472
+              },
+              "peak_process_bytes": {
+                "median": 239120384,
+                "min": 232710144,
+                "max": 241475584
+              }
+            },
+            "combined": {
+              "wall_ms": {
+                "median": 25406.634,
+                "min": 25303.022,
+                "max": 26235.536
+              },
+              "cpu_ms": {
+                "median": 24009.224,
+                "min": 23910.795,
+                "max": 24832.377
+              },
+              "peak_tree_bytes": {
+                "median": 567078912,
+                "min": 566980608,
+                "max": 567173120
+              },
+              "peak_process_bytes": {
+                "median": 266907648,
+                "min": 265928704,
+                "max": 271360000
+              }
+            }
+          },
+          "preparation": {
+            "instrument": {
+              "wall_ms": 25202.552,
+              "cpu_ms": 24215.17,
+              "peak_tree_bytes": 593600512,
+              "peak_process_bytes": 239943680
+            },
+            "train": {
+              "wall_ms": 1529.658,
+              "cpu_ms": 1027.273,
+              "peak_tree_bytes": 90157056,
+              "peak_process_bytes": 78045184
+            },
+            "combined_instrument": {
+              "wall_ms": 26494.167,
+              "cpu_ms": 25458.685,
+              "peak_tree_bytes": 592687104,
+              "peak_process_bytes": 269930496
+            },
+            "combined_train": {
+              "wall_ms": 1613.414,
+              "cpu_ms": 1097.778,
+              "peak_tree_bytes": 117608448,
+              "peak_process_bytes": 112156672
+            }
+          },
+          "wall_ms": {
+            "o2": {
+              "median": 2605.239,
+              "min": 2500.155,
+              "max": 2714.617
+            },
+            "lto": {
+              "median": 2533.845,
+              "min": 2496.884,
+              "max": 2573.1
+            },
+            "optimized": {
+              "median": 2488.549,
+              "min": 2471.648,
+              "max": 2566.004
+            },
+            "combined": {
+              "median": 2502.804,
+              "min": 2465.107,
+              "max": 2610.833
+            }
+          },
+          "cpu_ms": {
+            "o2": {
+              "median": 2021.602,
+              "min": 1949.412,
+              "max": 2102.3
+            },
+            "lto": {
+              "median": 1955.278,
+              "min": 1948.921,
+              "max": 2003.273
+            },
+            "optimized": {
+              "median": 1935.446,
+              "min": 1915.466,
+              "max": 1995.22
+            },
+            "combined": {
+              "median": 1947.588,
+              "min": 1922.664,
+              "max": 2054.328
+            }
+          },
+          "bytes": {
+            "o2": 3040224,
+            "lto": 2841152,
+            "pgo": 2192384,
+            "pgo_lto": 2248112
+          },
+          "archives": {
+            "o2": 2254954,
+            "lto": 2189445,
+            "pgo": 1907235,
+            "combined": 1931576
+          },
+          "size_reduction_percent": 6.547938572947256,
+          "improvement_percent": 2.7404011685684204,
+          "combined_improvement_percent": -0.5728237619592826,
+          "combined_size_reduction_percent": -2.5418904717421764,
+          "noise_percent": 1.9072912738438634,
+          "profile_noise_percent": 2.2843322706475173,
+          "target": true,
+          "same_session": {
+            "fixed": {
+              "wall_ms": 2149.876,
+              "cpu_ms": 1653.243,
+              "peak_tree_bytes": 92618752
+            },
+            "previous": {
+              "wall_ms": 2685.741,
+              "cpu_ms": 2074.294,
+              "peak_tree_bytes": 91353088
+            },
+            "o2": {
+              "wall_ms": 2722.238,
+              "cpu_ms": 2117.874,
+              "peak_tree_bytes": 91357184
+            },
+            "pgo": {
+              "wall_ms": 2661.269,
+              "cpu_ms": 2068.032,
+              "peak_tree_bytes": 90451968
+            },
+            "previous_pgo": {
+              "wall_ms": 2655.854,
+              "cpu_ms": 2058.873,
+              "peak_tree_bytes": 90488832
+            },
+            "lto": {
+              "wall_ms": 2667.704,
+              "cpu_ms": 2060.589,
+              "peak_tree_bytes": 91377664
+            },
+            "combined": {
+              "wall_ms": 2653.49,
+              "cpu_ms": 2038.729,
+              "peak_tree_bytes": 90464256
+            }
+          }
+        }
+      },
+      "workflow": {
+        "host": "gcc",
+        "lto": true,
+        "checks": [
+          "O2 project output",
+          "LTO CLI boundaries, unsupported tools and shared checked C cache",
+          "size preference leaves the emitted loop in the normal policy",
+          "unsupported toolchain rejects without publishing",
+          "instrument publishes once and untrained use rejects",
+          "training rejects changed flags or companion and publishes nothing on failure",
+          "one concurrent trainer publishes and a second training is rejected",
+          "GCC rejects cross-mode profiles in both directions and ordinary PGO still runs",
+          "PGO use and warm C cache preserve held-out output",
+          "changed payload, receipt, import and locked resource reject with old output intact",
+          "delivered executable and resource work without the profile or tools"
+        ],
+        "payload_bytes": 2352,
+        "plan_sha256": "49746c30edf11b9243131327e0818bec1d9b2ce33a97ad1c3a62bb4d5c8d2623",
+        "trained_sha256": "3f6c9d700b1643a283a835504727cdc35e1e4dda7927e2cf37dcc372b09a6de4",
+        "packaged_executable_sha256": "247420bda8ac13f37e98a0806b894f48b7d64d7b31fa70ff4a3cc2b9555962d1"
+      },
+      "compiler": {
+        "host": "gcc",
+        "expected": {
+          "authored": "90ff795b70773d07f28d1361d8668819714e036e9b015ab1d3b8f8a02bb9ab41",
+          "bundle": "a80bbbe52ec2444d17d8bbde13add1defd521a92c913b5f451706166961205cf",
+          "bundler": "5793fa7206b81bfaa697ac8c26db8c91e7b1b8a9bf52e5a4f35600133b6c6ae6"
+        },
+        "outcome": {
+          "lto": {
+            "first_sha256": "90ff795b70773d07f28d1361d8668819714e036e9b015ab1d3b8f8a02bb9ab41",
+            "second_sha256": "90ff795b70773d07f28d1361d8668819714e036e9b015ab1d3b8f8a02bb9ab41",
+            "bundler_sha256": "5793fa7206b81bfaa697ac8c26db8c91e7b1b8a9bf52e5a4f35600133b6c6ae6",
+            "recovery_sha256": "a80bbbe52ec2444d17d8bbde13add1defd521a92c913b5f451706166961205cf",
+            "resumed": false,
+            "fixtures": [
+              "v134j_reachability",
+              "v134i_ranges",
+              "v134d_lowering"
+            ]
+          },
+          "combined-instrument": {
+            "first_sha256": "90ff795b70773d07f28d1361d8668819714e036e9b015ab1d3b8f8a02bb9ab41",
+            "second_sha256": "90ff795b70773d07f28d1361d8668819714e036e9b015ab1d3b8f8a02bb9ab41",
+            "bundler_sha256": "5793fa7206b81bfaa697ac8c26db8c91e7b1b8a9bf52e5a4f35600133b6c6ae6",
+            "recovery_sha256": "a80bbbe52ec2444d17d8bbde13add1defd521a92c913b5f451706166961205cf",
+            "resumed": false,
+            "fixtures": [
+              "v134j_reachability",
+              "v134i_ranges",
+              "v134d_lowering"
+            ]
+          },
+          "combined": {
+            "first_sha256": "90ff795b70773d07f28d1361d8668819714e036e9b015ab1d3b8f8a02bb9ab41",
+            "second_sha256": "90ff795b70773d07f28d1361d8668819714e036e9b015ab1d3b8f8a02bb9ab41",
+            "bundler_sha256": "5793fa7206b81bfaa697ac8c26db8c91e7b1b8a9bf52e5a4f35600133b6c6ae6",
+            "recovery_sha256": "a80bbbe52ec2444d17d8bbde13add1defd521a92c913b5f451706166961205cf",
+            "resumed": false,
+            "fixtures": [
+              "v134j_reachability",
+              "v134i_ranges",
+              "v134d_lowering"
+            ]
+          }
+        },
+        "ffi": {
+          "supported": false
+        }
+      },
+      "raw_profile": {
+        "file": "1.3.4l-gcc.json",
+        "sha256": "953479e6f2b12e46209e3ba8cb88762877a4ac86f301b50b311a84eb50c50028"
+      },
+      "raw_comparison": {
+        "file": "1.3.4l-gcc-compared.json",
+        "sha256": "0f2ef5fb3de1bc8097c7a576076b205ea52aff7ec3cf69e4625939153c10189b"
+      },
+      "raw_link": {
+        "file": "1.3.4l-gcc-link.json",
+        "sha256": "323ebc056883722e0e571a7a40f3d60997921315cebfc337d584fc613fa6d22a"
+      },
+      "raw_compiler": {
+        "file": "1.3.4l-gcc-compiler.json",
+        "sha256": "41e8d59da2efccc1c1f085aafd7e303c6ffc3b334ffcaa00436382ae80b4e683"
+      }
+    }
+  },
+  "windows_trials": [
+    {
+      "file": "1.3.4l-msvc-first-profile.json",
+      "sha256": "a19c6189975bb15343ab2cd52df82a32ed1e39de9e556bf5a638cacae196c735"
+    },
+    {
+      "file": "1.3.4l-msvc-first-recheck.json",
+      "sha256": "e5d08947ca8fa82edd4e1d55e0d87c15c7c1a66bf9e414ab303bdd8ea4773bd6"
+    },
+    {
+      "file": "1.3.4l-msvc-size-calibration.json",
+      "sha256": "7e483775e3b59ff90774c13e0e8733c411b0b7848f33b08a3d0603bbcb81ac3f"
+    },
+    {
+      "file": "1.3.4l-msvc-flag-calibration.json",
+      "sha256": "56107b8ddf4df5f4a10fb2e14a7aaad267184e2625695cc2b27329746cdeb591"
+    },
+    {
+      "file": "1.3.4l-msvc-candidate-preflight.json",
+      "sha256": "d703dc9be27984b0cfaa2a5c06bd492c1b17b8fe3c2c59351b31ff0bf3105162"
+    },
+    {
+      "file": "1.3.4l-msvc-pragma-calibration.json",
+      "sha256": "a599f5c337aa671996e6445040b65154f06377da5021764edcbe8be5f418159f"
+    },
+    {
+      "file": "1.3.4l-msvc-function-calibration.json",
+      "sha256": "b87ed71c0f0daa931879017b1405380137b37ae2ba70c558725151b554f843eb"
+    },
+    {
+      "file": "1.3.4l-msvc-function-preflight.json",
+      "sha256": "f594cf96bb5bc1665dea8dc291f6ead0ce0e88dba468a0222ea1a22c5bb04ecf"
+    },
+    {
+      "file": "1.3.4l-msvc-compact-o2.json",
+      "sha256": "7d03d3d02f82a2af5c4dbbd85bbaadadddc0629d2c58fc48b8ef77eb91c1dc83"
+    }
+  ],
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1450,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 569315,
+    "tests_run": true
+  },
+  "mode_suites": {
+    "lto": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 1450,
+      "failed": 0,
+      "skipped": 0,
+      "log_sha256": "db61e8a5cba2b979ffd4ba67b2d0a57d20b0b612a3fb6823a233327dcfd4a620"
+    },
+    "combined-instrument": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 1450,
+      "failed": 0,
+      "skipped": 0,
+      "log_sha256": "db61e8a5cba2b979ffd4ba67b2d0a57d20b0b612a3fb6823a233327dcfd4a620"
+    },
+    "combined": {
+      "schema_version": 1,
+      "runner": "Vela",
+      "passed": 1450,
+      "failed": 0,
+      "skipped": 0,
+      "log_sha256": "db61e8a5cba2b979ffd4ba67b2d0a57d20b0b612a3fb6823a233327dcfd4a620"
+    }
+  },
+  "verified_seed": {
+    "schema_version": 1,
+    "status": "passed",
+    "bootstrap": {
+      "schema_version": 1,
+      "version": "1.2.0",
+      "orchestrator": "Vela",
+      "fixed_point": true,
+      "bundler_fixed_point": true,
+      "source_bytes": 569315,
+      "tests_run": true
+    },
+    "files": {
+      "seed.exe": {
+        "bytes": 3291136,
+        "sha256": "c410ba8c067a75999330d32ddd0dc4a198d496df9c74f511c5debc2bf776736c"
+      },
+      "stage1.exe": {
+        "bytes": 3292160,
+        "sha256": "84fc9de8ab19ec00a4472719d3eb47ae81e9b20c8fbd49d5e63bac864589ebc5"
+      },
+      "stage2.exe": {
+        "bytes": 3292160,
+        "sha256": "87f01ee04b5f9c86f27e27b8124c5542e9770ad35fefe279471601f532bce59f"
+      },
+      "stage3.exe": {
+        "bytes": 3292160,
+        "sha256": "ada55e04321326a2381005e7dc5847acd28d751d00fd7dc820c6885a958febf7"
+      },
+      "stage1.c": {
+        "bytes": 6098393,
+        "sha256": "2d7d304d85b16b5ea0617e09f5ae0a76322d6220396e551755a3f89d0c9f6239"
+      },
+      "stage2.c": {
+        "bytes": 6098393,
+        "sha256": "2d7d304d85b16b5ea0617e09f5ae0a76322d6220396e551755a3f89d0c9f6239"
+      },
+      "stage3.c": {
+        "bytes": 6098393,
+        "sha256": "2d7d304d85b16b5ea0617e09f5ae0a76322d6220396e551755a3f89d0c9f6239"
+      },
+      "compiler.vela": {
+        "bytes": 569315,
+        "sha256": "5793fa7206b81bfaa697ac8c26db8c91e7b1b8a9bf52e5a4f35600133b6c6ae6"
+      },
+      "rebundled.vela": {
+        "bytes": 569315,
+        "sha256": "5793fa7206b81bfaa697ac8c26db8c91e7b1b8a9bf52e5a4f35600133b6c6ae6"
+      }
+    },
+    "scope": "mandatory verify transition from installed compiler through bundle seed and authored stages; independent hash comparisons"
+  },
+  "verify_log_sha256": "89b5b9c6ca8218322abb95e3589d9e5848974ba5e3cd0e9bb28118f3f756a285",
+  "ir": {
+    "cases": 22,
+    "mode_host_runs": 88,
+    "debug": {
+      "exit": 70,
+      "location": "debug.vela:2:5",
+      "trace": true,
+      "profile": true
+    },
+    "evidence": {
+      "file": "1.3.4l-oracles.json",
+      "sha256": "614fbbdbcb53a7cc790b9aa67df4cf80a79ec181a0a8e7b68b53ed291fd60f08"
+    }
+  },
+  "debug": {
+    "passed": 5,
+    "checks": [
+      "MSVC PDB Vela source path and profiled normal cleanup",
+      "generic panic, source location and nested stack",
+      "regular C export omits instrumentation",
+      "fiber isolation, cancellation cleanup and frame completion",
+      "panic through a native callback terminates with Vela frames"
+    ]
+  },
+  "mcp": {
+    "unit": 2,
+    "checks": 33,
+    "execution": {
+      "file": "1.3.4l-mcp.json",
+      "sha256": "923443b19603eb15fc69088e3f5e4b2d61ae9dd5f8b9129d64356c993ae0326a"
+    }
+  },
+  "tooling_example": {
+    "summary": {
+      "events": 15,
+      "duplicates": 1,
+      "selected": 14,
+      "tests": 11,
+      "failed": 2,
+      "flaky": 2,
+      "skipped": 1,
+      "total_ms": 18860
+    },
+    "sha256": "6c5ee078f9f4fc2bf2245c2708e485de0607151f80acd61c9919bdd159c1df9b"
+  },
+  "budget_decisions": {
+    "baseline": "1.3.4d",
+    "preceding": "1.3.4k",
+    "ordinary_limit_percent": 10,
+    "workloads": {
+      "msvc": {
+        "buildlens": {
+          "ordinary_runtime_same_session": {
+            "wall_ms": {
+              "preceding": 316.6398,
+              "current": 331.7781,
+              "percent": 4.780921412911458
+            },
+            "cpu_ms": {
+              "preceding": 312.5,
+              "current": 312.5,
+              "percent": 0
+            },
+            "peak_tree_bytes": {
+              "preceding": 10043392,
+              "current": 10047488,
+              "percent": 0.040783034257748776
+            }
+          },
+          "ordinary_build": {
+            "wall_ms": {
+              "preceding": 1866.5432,
+              "current": 1922.2597,
+              "percent": 2.9850099370858385
+            },
+            "cpu_ms": {
+              "preceding": 4859.375,
+              "current": 5062.5,
+              "percent": 4.180064308681672
+            },
+            "peak_tree_bytes": {
+              "preceding": 236650496,
+              "current": 219656192,
+              "percent": -7.181182497923013
+            }
+          },
+          "fixed_build_wall_ms": 2731.82,
+          "ordinary_build_change_from_fixed_percent": -29.634467131802246,
+          "lto_runtime_same_session": {
+            "wall_ms": {
+              "preceding": 331.7781,
+              "current": 322.3187,
+              "percent": -2.8511224821650423
+            },
+            "cpu_ms": {
+              "preceding": 312.5,
+              "current": 312.5,
+              "percent": 0
+            },
+            "peak_tree_bytes": {
+              "preceding": 10047488,
+              "current": 9646080,
+              "percent": -3.9951080309824705
+            }
+          },
+          "opt_in_build": {
+            "wall_ms": {
+              "preceding": 1922.2597,
+              "current": 2088.1426,
+              "percent": 8.629577990944723
+            },
+            "cpu_ms": {
+              "preceding": 5062.5,
+              "current": 6734.375,
+              "percent": 33.02469135802469
+            },
+            "peak_tree_bytes": {
+              "preceding": 219656192,
+              "current": 354816000,
+              "percent": 61.53243701866597
+            }
+          }
+        },
+        "compiler": {
+          "ordinary_runtime_same_session": {
+            "wall_ms": {
+              "preceding": 1046.0519,
+              "current": 1010.5991,
+              "percent": -3.389200860875059
+            },
+            "cpu_ms": {
+              "preceding": 1031.25,
+              "current": 1015.625,
+              "percent": -1.5151515151515151
+            },
+            "peak_tree_bytes": {
+              "preceding": 97144832,
+              "current": 97169408,
+              "percent": 0.025298309229666485
+            }
+          },
+          "ordinary_build": {
+            "wall_ms": {
+              "preceding": 24993.7368,
+              "current": 25232.1078,
+              "percent": 0.9537229342992954
+            },
+            "cpu_ms": {
+              "preceding": 86796.875,
+              "current": 86500,
+              "percent": -0.342034203420342
+            },
+            "peak_tree_bytes": {
+              "preceding": 571301888,
+              "current": 585768960,
+              "percent": 2.532299000559228
+            }
+          },
+          "fixed_build_wall_ms": 40441.4847,
+          "ordinary_build_change_from_fixed_percent": -37.608354423248954,
+          "lto_runtime_same_session": {
+            "wall_ms": {
+              "preceding": 1010.5991,
+              "current": 1080.8906,
+              "percent": 6.95542871550152
+            },
+            "cpu_ms": {
+              "preceding": 1015.625,
+              "current": 1031.25,
+              "percent": 1.5384615384615385
+            },
+            "peak_tree_bytes": {
+              "preceding": 97169408,
+              "current": 97640448,
+              "percent": 0.4847616237406736
+            }
+          },
+          "opt_in_build": {
+            "wall_ms": {
+              "preceding": 25232.1078,
+              "current": 14569.3718,
+              "percent": -42.258601954768125
+            },
+            "cpu_ms": {
+              "preceding": 86500,
+              "current": 120000,
+              "percent": 38.72832369942196
+            },
+            "peak_tree_bytes": {
+              "preceding": 585768960,
+              "current": 902090752,
+              "percent": 54.00111880288092
+            }
+          }
+        }
+      },
+      "gcc": {
+        "buildlens": {
+          "ordinary_runtime_same_session": {
+            "wall_ms": {
+              "preceding": 441.846,
+              "current": 449.256,
+              "percent": 1.6770549014815044
+            },
+            "cpu_ms": {
+              "preceding": 422.75,
+              "current": 429.871,
+              "percent": 1.6844470727380203
+            },
+            "peak_tree_bytes": {
+              "preceding": 7352320,
+              "current": 7344128,
+              "percent": -0.11142061281337047
+            }
+          },
+          "ordinary_build": {
+            "wall_ms": {
+              "preceding": 5714.874,
+              "current": 5988.445,
+              "percent": 4.7869996783831095
+            },
+            "cpu_ms": {
+              "preceding": 5288.463,
+              "current": 5545.525,
+              "percent": 4.860807383922321
+            },
+            "peak_tree_bytes": {
+              "preceding": 297160704,
+              "current": 297291776,
+              "percent": 0.04410812002922163
+            }
+          },
+          "fixed_build_wall_ms": 10916.375,
+          "ordinary_build_change_from_fixed_percent": -45.14254961010408,
+          "lto_runtime_same_session": {
+            "wall_ms": {
+              "preceding": 449.256,
+              "current": 451.97,
+              "percent": 0.604109906155968
+            },
+            "cpu_ms": {
+              "preceding": 429.871,
+              "current": 431.299,
+              "percent": 0.3321926810601314
+            },
+            "peak_tree_bytes": {
+              "preceding": 7344128,
+              "current": 7294976,
+              "percent": -0.6692693809258227
+            }
+          },
+          "opt_in_build": {
+            "wall_ms": {
+              "preceding": 5988.445,
+              "current": 6762.755,
+              "percent": 12.930067822281083
+            },
+            "cpu_ms": {
+              "preceding": 5545.525,
+              "current": 6212.68,
+              "percent": 12.030511087768978
+            },
+            "peak_tree_bytes": {
+              "preceding": 297291776,
+              "current": 227676160,
+              "percent": -23.41659662997203
+            }
+          }
+        },
+        "compiler": {
+          "ordinary_runtime_same_session": {
+            "wall_ms": {
+              "preceding": 2685.741,
+              "current": 2722.238,
+              "percent": 1.3589173341733192
+            },
+            "cpu_ms": {
+              "preceding": 2074.294,
+              "current": 2117.874,
+              "percent": 2.100955795080154
+            },
+            "peak_tree_bytes": {
+              "preceding": 91353088,
+              "current": 91357184,
+              "percent": 0.004483701744159978
+            }
+          },
+          "ordinary_build": {
+            "wall_ms": {
+              "preceding": 29746.003,
+              "current": 32536.008,
+              "percent": 9.379428220994939
+            },
+            "cpu_ms": {
+              "preceding": 28918.36,
+              "current": 31620.202,
+              "percent": 9.34299870393757
+            },
+            "peak_tree_bytes": {
+              "preceding": 565825536,
+              "current": 567631872,
+              "percent": 0.31923903837383544
+            }
+          },
+          "fixed_build_wall_ms": 55118.133,
+          "ordinary_build_change_from_fixed_percent": -40.97040986493501,
+          "lto_runtime_same_session": {
+            "wall_ms": {
+              "preceding": 2722.238,
+              "current": 2667.704,
+              "percent": -2.003278185081527
+            },
+            "cpu_ms": {
+              "preceding": 2117.874,
+              "current": 2060.589,
+              "percent": -2.704835131835032
+            },
+            "peak_tree_bytes": {
+              "preceding": 91357184,
+              "current": 91377664,
+              "percent": 0.022417503586800575
+            }
+          },
+          "opt_in_build": {
+            "wall_ms": {
+              "preceding": 32536.008,
+              "current": 33810.398,
+              "percent": 3.9168603597589455
+            },
+            "cpu_ms": {
+              "preceding": 31620.202,
+              "current": 32832.788,
+              "percent": 3.8348458368482254
+            },
+            "peak_tree_bytes": {
+              "preceding": 567631872,
+              "current": 587776000,
+              "percent": 3.5488014316433594
+            }
+          }
+        }
+      }
+    },
+    "decisions": [
+      {
+        "subject": "MSVC native compile and link tree",
+        "decision": "Retain the explicit LTO mode. The size target is met and runtime and default build stay within budget against the preceding stage. Opt-in LTO increases peak native build memory and compiler CPU in exchange for smaller executables and shorter compiler build wall time."
+      },
+      {
+        "subject": "GCC BuildLens opt-in build time",
+        "decision": "Retain GCC LTO. The opt-in mode exceeds the ordinary wall-time budget for building BuildLens, reduces delivered bytes and uses less peak build-tree memory on this workload. The default build remains within budget."
+      },
+      {
+        "subject": "Historical Linux selfhost check",
+        "fixed_wall_ms": 2149.876,
+        "preceding_wall_ms": 2685.741,
+        "current_wall_ms": 2722.238,
+        "fixed_change_percent": 26.623023839514445,
+        "decision": "Carry the cumulative Linux check cost into the 1.3.5a phase audit. The difference was already measured at 1.3.4j and persists in 1.3.4k. The same-session stage-to-stage change remains within budget."
+      }
+    ]
+  },
+  "next": "1.3.5"
+}

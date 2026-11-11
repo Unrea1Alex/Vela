@@ -567,6 +567,11 @@ pub fn analyze(c: Context) -> Unit effects { state, io, process } {
     analyze_mode(c, true);
 }
 pub fn analyze_mode(c: Context, require_entry: Bool) -> Unit effects { state, io, process } {
+    analyze_declarations(c, require_entry);
+    check_function_instances(c);
+    finish_analysis(c);
+}
+pub fn analyze_declarations(c: Context, require_entry: Bool) -> Unit effects { state, io, process } {
     install_prelude(c);
     bind_modules(c);
     var i = 0;
@@ -645,19 +650,33 @@ pub fn analyze_mode(c: Context, require_entry: Bool) -> Unit effects { state, io
             bad(c, "E207", "main must take no parameters and return Int or Unit.", empty_span());
         }
     }
-    check_function_instances(c);
+}
+pub fn finish_analysis(c: Context) -> Unit effects { state, io, process } {
     check_suspension_graph(c);
-    i = 0;
+    var i = 0;
     while i < list_len(c.types) {
         order_type(c, primitive_type_id(i + 1));
         i = i + 1;
     }
 }
 pub fn check_function_instances(c: Context) -> Unit effects { state, io, process } {
+    check_selected_functions(c, Option<List<Bool>>::None);
+}
+pub fn check_selected_functions(c: Context, reuse: Option<List<Bool>>) -> Unit effects { state,
+    io, process } {
     var i = 0;
     while i < list_len(c.instances) {
         let instance = list_get(c.instances, i);
         let syntax = list_get(c.bound_functions, instance.syntax_index);
+        match reuse {
+            Option::Some(modules) => {
+                if list_get(modules, source_unit_at(c, syntax.span.start)) {
+                    i = i + 1;
+                    continue;
+                }
+            }
+            Option::None => {}
+        }
         let sig_id = instance.signature;
         let sig = symbol_info(c, sig_id);
         push_scope(c);

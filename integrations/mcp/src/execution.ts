@@ -143,11 +143,13 @@ export class Execution {
       ['source','file','path'].includes(k)&&typeof v==='string'&&inside(project,v)?path.join(this.host.config.workspace,path.relative(project,v)):this.remap(v,project)]));
     return value;
   }
-  async request(kind:'build'|'test'|'run',input:string,external:AbortSignal,options:{text?:string;overlay_path?:string;args?:string[];timeout_ms?:number;outputs?:string[]}={}){
+  async request(kind:'build'|'test'|'run',input:string,external:AbortSignal,options:{text?:string;overlay_path?:string;args?:string[];timeout_ms?:number;outputs?:string[];native_optimization?:'o2'|'pgo-instrument'|'pgo-use'|'lto'|'pgo-lto'}={}){
     let snapshot='',root='';
     const answer=(status:Status,data:Record<string,unknown>={},message='')=>({schema_version:1 as const,status,
       compiler_id:this.host.compilerId,snapshot_id:snapshot,data:{execution_toolchain_id:this.sandbox.id,...data},message});
     if(!this.sandbox.ready)return answer('incompatible',{},this.reason);
+    if(kind==='build'&&options.native_optimization&&options.native_optimization!=='o2')
+      return answer('invalid_input',{},'PGO and LTO require the local Vela CLI. PGO also requires a trusted profile directory.');
     if(this.busy)return answer('limit',{},'One execution request at a time.');
     this.busy=true;
     const signal=AbortSignal.any([external,this.host.controller.signal]);

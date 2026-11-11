@@ -1,0 +1,30 @@
+import "input.vela" as input;
+
+fn known_round(total: Int) -> Int {
+    var sum = total;
+    for n in 0 .. 1000 {
+        let twice = n * 2;
+        let next = n + 1;
+        sum = sum + twice + next;
+    }
+    return sum;
+}
+
+fn unknown_round(total: Int, end: Int) -> Int {
+    var sum = total;
+    for n in 0 .. end {
+        let twice = n * 2;
+        let next = n + 1;
+        sum = sum + twice + next;
+    }
+    return sum;
+}
+
+fn main() -> Unit effects { args, io, process } {
+    let count = input::iterations();
+    var total = unknown_round(0, count % 1000);
+    for round in 0 .. count / 1000 {
+        total = known_round(total);
+    }
+    print(total);
+}

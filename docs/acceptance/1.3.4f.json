@@ -1,0 +1,482 @@
+{
+  "stage": "1.3.4f",
+  "status": "verified",
+  "contract": "contracts/GC-ROOTS-1.3.md",
+  "native": {
+    "schema_version": 1,
+    "runner": "Vela",
+    "passed": 1432,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bootstrap": {
+    "schema_version": 1,
+    "version": "1.2.0",
+    "orchestrator": "Vela",
+    "fixed_point": true,
+    "bundler_fixed_point": true,
+    "source_bytes": 521678,
+    "tests_run": true
+  },
+  "verify_log_sha256": "9a846b869ddc7b143a252e801bba1eab81a8aba893e2ef6e04c1eb684385831c",
+  "fixed_baseline": "1.3.4d",
+  "previous": "1.3.4e",
+  "profile": {
+    "msvc": {
+      "file": "1.3.4f-msvc.json",
+      "sha256": "02550085b760ce397ee37fe07c9309574451fde3b54aabcc59e9c8c6ba817645",
+      "toolchain": "��⨬������騩 ��������� Microsoft (R) C/C++ ���ᨨ 19.44.35222 ��� x64",
+      "compared_compilers": [
+        {
+          "label": "reference",
+          "version": "Vela 1.2.0 (self-hosted)",
+          "bytes": 4188160,
+          "sha256": "b104376ab47887dcf9b64597b858cacfd0c072be9c393a40f4e2d543341e97d7"
+        },
+        {
+          "label": "candidate",
+          "version": "Vela 1.2.0 (self-hosted)",
+          "bytes": 4083712,
+          "sha256": "ce5f480a1a0101e067a71ccae7f1e81bc4dea410d28f918c013f0e5a38b33542"
+        }
+      ],
+      "group_count": 30,
+      "pair_count": 5,
+      "scalar": {
+        "roots": {
+          "fixed": 21,
+          "previous": 21,
+          "candidate": 5,
+          "previous_percent": -76.19047619047619,
+          "fixed_percent": -76.19047619047619
+        },
+        "polls": {
+          "fixed": 51,
+          "previous": 51,
+          "candidate": 51,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "arithmetic_guards": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 5,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "temporaries": {
+          "fixed": 81,
+          "previous": 81,
+          "candidate": 81,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "functions": {
+          "fixed": 30,
+          "previous": 30,
+          "candidate": 26,
+          "previous_percent": -13.333333333333334,
+          "fixed_percent": -13.333333333333334
+        },
+        "types": {
+          "fixed": 16,
+          "previous": 16,
+          "candidate": 16,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 14,
+          "previous": 14,
+          "candidate": 10,
+          "previous_percent": -28.571428571428573,
+          "fixed_percent": -28.571428571428573
+        }
+      },
+      "mixed": {
+        "roots": {
+          "fixed": 33,
+          "previous": 33,
+          "candidate": 33,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 61,
+          "previous": 61,
+          "candidate": 61,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "arithmetic_guards": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 5,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "temporaries": {
+          "fixed": 94,
+          "previous": 94,
+          "candidate": 94,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "functions": {
+          "fixed": 29,
+          "previous": 29,
+          "candidate": 29,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 15,
+          "previous": 15,
+          "candidate": 15,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 13,
+          "previous": 13,
+          "candidate": 13,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "aggregate_large": {
+        "wall_ms": {
+          "fixed": 51.8424,
+          "previous": 52.629,
+          "candidate": 34.237,
+          "previous_percent": -34.94651237910657,
+          "fixed_percent": -33.95946175331388
+        },
+        "cpu_ms": {
+          "fixed": 46.875,
+          "previous": 46.875,
+          "candidate": 31.25,
+          "previous_percent": -33.333333333333336,
+          "fixed_percent": -33.333333333333336
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 6643712,
+          "previous": 6643712,
+          "candidate": 6635520,
+          "previous_percent": -0.12330456226880394,
+          "fixed_percent": -0.12330456226880394
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 2678784,
+          "previous": 2686976,
+          "candidate": 2686976,
+          "previous_percent": 0,
+          "fixed_percent": 0.3058103975535168
+        }
+      },
+      "compiler_build": {
+        "wall_ms": {
+          "fixed": 40441.4847,
+          "previous": 40087.322,
+          "candidate": 34499.5273,
+          "previous_percent": -13.93905709141658,
+          "fixed_percent": -14.692728133198333
+        },
+        "cpu_ms": {
+          "fixed": 144046.875,
+          "previous": 144125,
+          "candidate": 125062.5,
+          "previous_percent": -13.226366001734606,
+          "fixed_percent": -13.179303612105434
+        },
+        "peak_process_working_set_bytes": {
+          "fixed": 149155840,
+          "previous": 156246016,
+          "candidate": 158183424,
+          "previous_percent": 1.2399727363288418,
+          "fixed_percent": 6.052450913085267
+        },
+        "peak_tree_commit_bytes": {
+          "fixed": 786239488,
+          "previous": 803500032,
+          "candidate": 796364800,
+          "previous_percent": -0.8880188818710588,
+          "fixed_percent": 1.287815246440535
+        }
+      },
+      "compiler_roots": {
+        "fixed": 21920,
+        "previous": 21920,
+        "candidate": 19072,
+        "previous_percent": -12.992700729927007,
+        "fixed_percent": -12.992700729927007
+      },
+      "compiler_package": {
+        "fixed": 2649314,
+        "previous": 2654784,
+        "candidate": 2570401,
+        "previous_percent": -3.178526011909067,
+        "fixed_percent": -2.978620125813701
+      }
+    },
+    "gcc": {
+      "file": "1.3.4f-gcc.json",
+      "sha256": "836e7b3098092648010235c8bb58b88d2d2c87f88a1cbf8f1efb9c2a32ffe967",
+      "toolchain": "gcc (Alpine 14.2.0) 14.2.0",
+      "compared_compilers": [
+        {
+          "label": "reference",
+          "version": "Vela 1.2.0 (self-hosted)",
+          "bytes": 5848968,
+          "sha256": "fb141cda9f7c12fd186c1e28658b949a89c8582e0ba527a0a2b9b617064727fd"
+        },
+        {
+          "label": "candidate",
+          "version": "Vela 1.2.0 (self-hosted)",
+          "bytes": 5484072,
+          "sha256": "eb272c7925453289080709eb347724faf706be39b32b9b178d7c5ce43f976057"
+        }
+      ],
+      "group_count": 28,
+      "pair_count": 5,
+      "scalar": {
+        "roots": {
+          "fixed": 21,
+          "previous": 21,
+          "candidate": 5,
+          "previous_percent": -76.19047619047619,
+          "fixed_percent": -76.19047619047619
+        },
+        "polls": {
+          "fixed": 51,
+          "previous": 51,
+          "candidate": 51,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "arithmetic_guards": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 5,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "temporaries": {
+          "fixed": 81,
+          "previous": 81,
+          "candidate": 81,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "functions": {
+          "fixed": 30,
+          "previous": 30,
+          "candidate": 26,
+          "previous_percent": -13.333333333333334,
+          "fixed_percent": -13.333333333333334
+        },
+        "types": {
+          "fixed": 16,
+          "previous": 16,
+          "candidate": 16,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 14,
+          "previous": 14,
+          "candidate": 10,
+          "previous_percent": -28.571428571428573,
+          "fixed_percent": -28.571428571428573
+        }
+      },
+      "mixed": {
+        "roots": {
+          "fixed": 33,
+          "previous": 33,
+          "candidate": 33,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "polls": {
+          "fixed": 61,
+          "previous": 61,
+          "candidate": 61,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "arithmetic_guards": {
+          "fixed": 5,
+          "previous": 5,
+          "candidate": 5,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "temporaries": {
+          "fixed": 94,
+          "previous": 94,
+          "candidate": 94,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "functions": {
+          "fixed": 29,
+          "previous": 29,
+          "candidate": 29,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "types": {
+          "fixed": 15,
+          "previous": 15,
+          "candidate": 15,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        },
+        "traces": {
+          "fixed": 13,
+          "previous": 13,
+          "candidate": 13,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "aggregate_large": {
+        "wall_ms": {
+          "fixed": 30.593,
+          "previous": 31.517,
+          "candidate": 5.868,
+          "previous_percent": -81.38147666338801,
+          "fixed_percent": -80.81914163370706
+        },
+        "cpu_ms": {
+          "fixed": 27.81,
+          "previous": 28.711,
+          "candidate": 3.216,
+          "previous_percent": -88.79871826129357,
+          "fixed_percent": -88.43581445523192
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 548864,
+          "previous": 528384,
+          "candidate": 393216,
+          "previous_percent": -25.58139534883721,
+          "fixed_percent": -28.35820895522388
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 548864,
+          "previous": 528384,
+          "candidate": 479232,
+          "previous_percent": -9.30232558139535,
+          "fixed_percent": -12.686567164179104
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 446464,
+          "previous": 462848,
+          "candidate": 479232,
+          "previous_percent": 3.5398230088495577,
+          "fixed_percent": 7.339449541284404
+        },
+        "observed_processes": {
+          "fixed": 1,
+          "previous": 1,
+          "candidate": 1,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "compiler_build": {
+        "wall_ms": {
+          "fixed": 55118.133,
+          "previous": 55279.007,
+          "candidate": 53260.105,
+          "previous_percent": -3.652203810390434,
+          "fixed_percent": -3.3709922649230486
+        },
+        "cpu_ms": {
+          "fixed": 54200.313,
+          "previous": 54364.153,
+          "candidate": 52238.76,
+          "previous_percent": -3.9095486321657518,
+          "fixed_percent": -3.619080576158296
+        },
+        "peak_process_rss_bytes": {
+          "fixed": 155189248,
+          "previous": 144670720,
+          "candidate": 142729216,
+          "previous_percent": -1.3420158550396375,
+          "fixed_percent": -8.028927364864865
+        },
+        "peak_tree_rss_bytes": {
+          "fixed": 631148544,
+          "previous": 625979392,
+          "candidate": 603750400,
+          "previous_percent": -3.551074090311267,
+          "fixed_percent": -4.340997735075184
+        },
+        "peak_single_rss_wait4_bytes": {
+          "fixed": 480772096,
+          "previous": 481869824,
+          "candidate": 461324288,
+          "previous_percent": -4.263710856482269,
+          "fixed_percent": -4.045119956379498
+        },
+        "observed_processes": {
+          "fixed": 4,
+          "previous": 4,
+          "candidate": 4,
+          "previous_percent": 0,
+          "fixed_percent": 0
+        }
+      },
+      "compiler_roots": {
+        "fixed": 21920,
+        "previous": 21920,
+        "candidate": 19072,
+        "previous_percent": -12.992700729927007,
+        "fixed_percent": -12.992700729927007
+      },
+      "compiler_package": {
+        "fixed": 3289360,
+        "previous": 3298772,
+        "candidate": 3142775,
+        "previous_percent": -4.7289415576463,
+        "fixed_percent": -4.4563380110416615
+      }
+    }
+  },
+  "budget_exceeded": [],
+  "measurement_scope": "Both binaries compile identical frozen 1.3.4d authored source bytes. The frozen directory differs from the original path in the fixed-baseline report and emitted diagnostic path bytes reflect that. Compiler recovery separately uses current 1.3.4f sources.",
+  "gc_stress": {
+    "windows": {
+      "v134f_precise_roots": "vela gc: collections=127 peak=2221 bytes=2027",
+      "main": "vela gc: collections=180 peak=360 bytes=360",
+      "callbacks": "vela gc: collections=491 peak=744 bytes=480",
+      "parallel-values": "vela gc: collections=5034 peak=10881 bytes=7449"
+    },
+    "linux": [
+      "pass v134f_precise_roots vela gc: collections=127 peak=2221 bytes=2027",
+      "pass v106_dynamic vela gc: collections=142 peak=336 bytes=264",
+      "pass v08_defer vela gc: collections=89 peak=139 bytes=0",
+      "pass v134d_lowering vela gc: collections=345 peak=1041 bytes=666"
+    ]
+  },
+  "gui": {
+    "field": "FieldDesk window: load, concurrent edit, cancel, close",
+    "pulse": "PulseDeck window: cancel, save, run again, close",
+    "open_sockets_after": 0
+  },
+  "debug": [
+    "MSVC PDB Vela source path and profiled normal cleanup",
+    "generic panic, source location and nested stack",
+    "regular C export omits instrumentation",
+    "fiber isolation, cancellation cleanup and frame completion",
+    "panic through a native callback terminates with Vela frames"
+  ],
+  "recovery": {
+    "canonical_bundle_sha256": "3ac2d0095baa8856f8679a56e84f93362094d555f852e747bfde385e69cd4396",
+    "authored_windows_sha256": "70dc916dbf20d8fea16d6c1a2c41649341877294538b6e8e043d00a9a69239b6"
+  },
+  "mcp": { "passed": 2, "tests": ["native API lookup", "setup and real handshake"] },
+  "next": "1.3.4g"
+}

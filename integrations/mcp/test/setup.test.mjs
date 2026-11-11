@@ -26,7 +26,7 @@ test('setup idempotence, preserved config and real MCP handshake',async()=>{
   assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib/json.vela'),'utf8'),await fs.readFile(path.join(root,'std/json.vela'),'utf8'));
   assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib/event_loop.vela'),'utf8'),await fs.readFile(path.join(root,'std/event_loop.vela'),'utf8'));
   assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib/tasks.vela'),'utf8'),await fs.readFile(path.join(root,'std/tasks.vela'),'utf8'));
-  for(const name of ['parallel','io','stream_lines','json_decode','cell','set','algorithms','result_ops','option','cli_schema','json_stream','directory','task_group','async_io','gui','http','http_server']) assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib',name+'.vela'),'utf8'),await fs.readFile(path.join(root,'std',name+'.vela'),'utf8'));
+  for(const name of ['parallel','io','stream_lines','json_decode','cell','set','algorithms','result_ops','option','cli_schema','json_stream','json_tokens','config_snapshot','directory','task_group','async_io','gui','http','http_server']) assert.equal(await fs.readFile(path.join(workspace,'vela-stdlib',name+'.vela'),'utf8'),await fs.readFile(path.join(root,'std',name+'.vela'),'utf8'));
   const client=new Client({name:'vela-installed-library-gate',version:'1'});
   const transport=new StdioClientTransport({command:process.execPath,args:[path.join(pkg,'dist/index.js'),'--config',configPath]});
   try {

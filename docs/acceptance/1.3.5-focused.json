@@ -1,0 +1,329 @@
+{
+  "stage": "1.3.5",
+  "checks": [
+    {
+      "name": "cold and warm scopes",
+      "cold": [
+        4,
+        4,
+        4,
+        0
+      ],
+      "warm": [
+        4,
+        0,
+        0,
+        4
+      ]
+    },
+    {
+      "name": "trivia reuses the graph while query spans and C use current positions",
+      "modules": [
+        4,
+        0,
+        0,
+        4
+      ],
+      "beforeC": "4c9ad904e06d4b3c85905bf498c6e33d723e239149b768a82c0a1087f5e963e6",
+      "commentC": "f95d59a62550381bbe976a671b9b19f3346e05d179ee6e7a1b8b047875727a30"
+    },
+    {
+      "name": "private body edit checks one module",
+      "modules": [
+        4,
+        4,
+        1,
+        3
+      ],
+      "c_sha256": "5880399d99508d234db793f9e4f945f99dcbfc68af5023bf76e4120c26bb82e1"
+    },
+    {
+      "name": "public effect changes invalidate transitive importers",
+      "modules": [
+        4,
+        4,
+        3,
+        1
+      ],
+      "diagnostic": {
+        "severity": "error",
+        "code": "E209",
+        "message": "Call to '@2::value' requires undeclared effects: io.",
+        "source": "G:\\Vela\\build\\stage13\\incremental-135\\focused\\module-cache-ybDqAf\\hub.vela",
+        "span": {
+          "start": 61,
+          "end": 74,
+          "line": 2,
+          "column": 34,
+          "end_line": 2,
+          "end_column": 47
+        },
+        "range": {
+          "document": 1,
+          "start": {
+            "line": 1,
+            "character": 33,
+            "byte": 61
+          },
+          "end": {
+            "line": 1,
+            "character": 46,
+            "byte": 74
+          }
+        },
+        "notes": [],
+        "details": {
+          "callee": "@2::value",
+          "required_effects": [
+            "io"
+          ],
+          "allowed_effects": [],
+          "missing_effects": [
+            "io"
+          ]
+        },
+        "related": [
+          {
+            "message": "Called function declares these effects.",
+            "source": "G:\\Vela\\build\\stage13\\incremental-135\\focused\\module-cache-ybDqAf\\left.vela",
+            "span": {
+              "start": 0,
+              "end": 67,
+              "line": 1,
+              "column": 1,
+              "end_line": 1,
+              "end_column": 68
+            },
+            "range": {
+              "document": 2,
+              "start": {
+                "line": 0,
+                "character": 0,
+                "byte": 0
+              },
+              "end": {
+                "line": 0,
+                "character": 67,
+                "byte": 67
+              }
+            }
+          }
+        ],
+        "explanation": {
+          "category": "effects",
+          "root_cause": "Call to '@2::value' requires undeclared effects: io.",
+          "expected": "[\"io\"]",
+          "actual": "[]",
+          "guidance": "The call requires the listed effects. Only private ordinary root main may receive args/io/state; public, callable, async and process expansion need an explicit edit."
+        }
+      }
+    },
+    {
+      "name": "unsaved dependency query sees its diagnostic and preserves the successful disk graph"
+    },
+    {
+      "name": "public return type invalidates transitive consumers",
+      "modules": [
+        4,
+        4,
+        3,
+        1
+      ]
+    },
+    {
+      "name": "missing and renamed imports and an independent declared test root",
+      "renamed": [
+        4,
+        4,
+        4,
+        0
+      ],
+      "test": [
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "name": "checksum and shape corruption fall back and concurrent publication stays atomic"
+    },
+    {
+      "name": "generic body edits recheck dependent instantiations",
+      "modules": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "diagnostic": {
+        "severity": "error",
+        "code": "E201",
+        "message": "Expected Int, found Bool.",
+        "source": "G:\\Vela\\build\\stage13\\incremental-135\\focused\\module-cache-ybDqAf\\generic.vela",
+        "span": {
+          "start": 30,
+          "end": 42,
+          "line": 1,
+          "column": 31,
+          "end_line": 1,
+          "end_column": 43
+        },
+        "range": {
+          "document": 1,
+          "start": {
+            "line": 0,
+            "character": 30,
+            "byte": 30
+          },
+          "end": {
+            "line": 0,
+            "character": 42,
+            "byte": 42
+          }
+        },
+        "notes": [],
+        "details": {
+          "expected_type": "Int",
+          "actual_type": "Bool"
+        },
+        "related": [],
+        "explanation": {
+          "category": "types",
+          "root_cause": "Expected Int, found Bool.",
+          "expected": "Int",
+          "actual": "Bool",
+          "guidance": "Choose whether the value or its declared type is wrong. No implicit cast or literal replacement is proposed."
+        }
+      }
+    },
+    {
+      "name": "transitive blocking in a suspending graph remains rejected",
+      "diagnostic": {
+        "severity": "error",
+        "code": "E241",
+        "message": "Synchronous OS operation in a suspending call graph: print",
+        "source": "G:\\Vela\\build\\stage13\\incremental-135\\focused\\module-cache-ybDqAf\\worker.vela",
+        "span": {
+          "start": 39,
+          "end": 47,
+          "line": 1,
+          "column": 40,
+          "end_line": 1,
+          "end_column": 48
+        },
+        "range": {
+          "document": 1,
+          "start": {
+            "line": 0,
+            "character": 39,
+            "byte": 39
+          },
+          "end": {
+            "line": 0,
+            "character": 47,
+            "byte": 47
+          }
+        },
+        "notes": [],
+        "details": {
+          "reason": "blocking_async_call"
+        },
+        "related": [
+          {
+            "message": "Suspending body starts here.",
+            "source": "G:\\Vela\\build\\stage13\\incremental-135\\focused\\module-cache-ybDqAf\\async-main.vela",
+            "span": {
+              "start": 32,
+              "end": 90,
+              "line": 2,
+              "column": 1,
+              "end_line": 2,
+              "end_column": 59
+            },
+            "range": {
+              "document": 0,
+              "start": {
+                "line": 1,
+                "character": 0,
+                "byte": 32
+              },
+              "end": {
+                "line": 1,
+                "character": 58,
+                "byte": 90
+              }
+            }
+          }
+        ],
+        "explanation": {
+          "category": "general",
+          "root_cause": "Synchronous OS operation in a suspending call graph: print",
+          "expected": "",
+          "actual": "",
+          "guidance": "Inspect the original diagnostic and related source positions."
+        }
+      }
+    },
+    {
+      "name": "public invalidation terminates through a cycle",
+      "modules": [
+        4,
+        4,
+        3,
+        1
+      ]
+    },
+    {
+      "name": "comment-like text inside interpolation remains significant",
+      "modules": [
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "name": "native byte and lock changes separate successful checks",
+      "before": "3ca35f63f534845fa2737cb90bc85769cc7b83d77fb6efa032f752461fbd5d51",
+      "after": "eaa4649213aebe0b414c041a19f2c4e4a84329f296e31f472a6d63f60a378c91",
+      "diagnostic": {
+        "severity": "error",
+        "code": "E226",
+        "message": "Missing or stale lock; run vela lock PROJECT after reviewing dependencies.",
+        "source": "G:\\Vela\\build\\stage13\\incremental-135\\focused\\module-cache-ybDqAf\\vela.project",
+        "span": {
+          "start": 0,
+          "end": 0,
+          "line": 1,
+          "column": 1,
+          "end_line": 1,
+          "end_column": 1
+        },
+        "range": {
+          "document": 0,
+          "start": {
+            "line": 0,
+            "character": 0,
+            "byte": 0
+          },
+          "end": {
+            "line": 0,
+            "character": 0,
+            "byte": 0
+          }
+        },
+        "notes": [],
+        "details": {},
+        "related": [],
+        "explanation": {
+          "category": "general",
+          "root_cause": "Missing or stale lock; run vela lock PROJECT after reviewing dependencies.",
+          "expected": "",
+          "actual": "",
+          "guidance": "Inspect the original diagnostic and related source positions."
+        }
+      }
+    }
+  ]
+}

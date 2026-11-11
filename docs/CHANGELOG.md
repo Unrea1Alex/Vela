@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.3.0 — libraries, HTTP and compiler performance
+
+- Checked Text and Path values and typed Config snapshots are opt-in APIs.
+- JSON scanners and decoders share lexical validation. Typed file publication
+  preserves operation and cleanup errors and supports atomic replacement.
+- On Windows, the native HTTP client uses reusable libcurl multi sessions.
+  Applications retain explicit access to the legacy curl transport.
+- Checked IR gains conservative simplification, signed range proofs and C
+  reachability. Precise GC roots and safepoints preserve traced ownership.
+- The project checker reuses verified semantic results for eligible changes.
+  Local builds can explicitly select PGO and LTO.
+
+See [release acceptance and measured results](VALIDATION-1.3.md).
+
 ## 1.2.0 — compact agent entry and standard library
 
 1.2.1 adds compact installed entry instructions, on-demand capabilities/recipes

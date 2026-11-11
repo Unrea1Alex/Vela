@@ -129,7 +129,21 @@ pub fn parse(data: String) -> Result<Settings, String> effects { state } {
     let root = result::map_error(json::decode(data), json::describe)?;
     let demo_field = result::map_error(json::field(root, "demo"), json::describe)?;
     let demo = result::map_error(json::as_bool(demo_field), json::describe)?;
-    let curl = string(root, "curl")?;
+    var curl = "multi";
+    match json::field(root, "curl") {
+        Result::Ok(field) => { curl = result::map_error(json::as_string(field), json::describe)?; }
+        Result::Err(error) => {
+            match error.cause {
+                json::DecodeCause::Missing => {}
+                json::DecodeCause::Parse(_) => { return Result<Settings, String>::Err(json::describe(error)); }
+                json::DecodeCause::Selector(_) => { return Result<Settings, String>::Err(json::describe(error)); }
+                json::DecodeCause::Expected(_) => { return Result<Settings, String>::Err(json::describe(error)); }
+                json::DecodeCause::Index => { return Result<Settings, String>::Err(json::describe(error)); }
+                json::DecodeCause::NonFinite => { return Result<Settings, String>::Err(json::describe(error)); }
+                json::DecodeCause::IntegerPrecision => { return Result<Settings, String>::Err(json::describe(error)); }
+            }
+        }
+    }
     let ca = string(root, "ca_file")?;
     let concurrency = integer(root, "concurrency")?;
     if concurrency < 1 || concurrency > 4 {

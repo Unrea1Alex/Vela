@@ -1,0 +1,475 @@
+{
+  "original": {
+    "raw": [
+      {
+        "reference": {
+          "wall_ms": 25.5247,
+          "cpu_ms": 15.625,
+          "peak_process_working_set_bytes": 7659520,
+          "peak_tree_commit_bytes": 4186112
+        },
+        "candidate": {
+          "wall_ms": 26.654,
+          "cpu_ms": 15.625,
+          "peak_process_working_set_bytes": 7655424,
+          "peak_tree_commit_bytes": 4186112
+        }
+      },
+      {
+        "candidate": {
+          "wall_ms": 28.1627,
+          "cpu_ms": 15.625,
+          "peak_process_working_set_bytes": 7655424,
+          "peak_tree_commit_bytes": 4182016
+        },
+        "reference": {
+          "wall_ms": 26.3027,
+          "cpu_ms": 15.625,
+          "peak_process_working_set_bytes": 7659520,
+          "peak_tree_commit_bytes": 4190208
+        }
+      },
+      {
+        "reference": {
+          "wall_ms": 24.4953,
+          "cpu_ms": 31.25,
+          "peak_process_working_set_bytes": 7659520,
+          "peak_tree_commit_bytes": 4206592
+        },
+        "candidate": {
+          "wall_ms": 28.3971,
+          "cpu_ms": 31.25,
+          "peak_process_working_set_bytes": 7655424,
+          "peak_tree_commit_bytes": 4194304
+        }
+      },
+      {
+        "candidate": {
+          "wall_ms": 25.5248,
+          "cpu_ms": 31.25,
+          "peak_process_working_set_bytes": 7655424,
+          "peak_tree_commit_bytes": 4190208
+        },
+        "reference": {
+          "wall_ms": 24.5652,
+          "cpu_ms": 31.25,
+          "peak_process_working_set_bytes": 7659520,
+          "peak_tree_commit_bytes": 4194304
+        }
+      },
+      {
+        "reference": {
+          "wall_ms": 25.1895,
+          "cpu_ms": 15.625,
+          "peak_process_working_set_bytes": 7663616,
+          "peak_tree_commit_bytes": 4198400
+        },
+        "candidate": {
+          "wall_ms": 25.4778,
+          "cpu_ms": 31.25,
+          "peak_process_working_set_bytes": 7655424,
+          "peak_tree_commit_bytes": 4198400
+        }
+      }
+    ],
+    "ranges": {
+      "reference": {
+        "wall_ms": {
+          "min": 24.4953,
+          "median": 25.1895,
+          "max": 26.3027
+        },
+        "cpu_ms": {
+          "min": 15.625,
+          "median": 15.625,
+          "max": 31.25
+        },
+        "peak_process_working_set_bytes": {
+          "min": 7659520,
+          "median": 7659520,
+          "max": 7663616
+        },
+        "peak_tree_commit_bytes": {
+          "min": 4186112,
+          "median": 4194304,
+          "max": 4206592
+        }
+      },
+      "candidate": {
+        "wall_ms": {
+          "min": 25.4778,
+          "median": 26.654,
+          "max": 28.3971
+        },
+        "cpu_ms": {
+          "min": 15.625,
+          "median": 31.25,
+          "max": 31.25
+        },
+        "peak_process_working_set_bytes": {
+          "min": 7655424,
+          "median": 7655424,
+          "max": 7655424
+        },
+        "peak_tree_commit_bytes": {
+          "min": 4182016,
+          "median": 4190208,
+          "max": 4198400
+        }
+      }
+    }
+  },
+  "input_sha256": "2a07b733b181d9ceca45ae1f1f3e05187f92688e61c4324ee651d00536ea3781",
+  "cases": [
+    {
+      "iterations": 4000,
+      "count": 21,
+      "medians": {
+        "reference": {
+          "wall_ms": 23.2028,
+          "cpu_ms": 15.625,
+          "peak_tree_commit_bytes": 4468736
+        },
+        "candidate": {
+          "wall_ms": 23.2373,
+          "cpu_ms": 15.625,
+          "peak_tree_commit_bytes": 4464640
+        }
+      },
+      "cpu_delta_percent": 0,
+      "raw": [
+        {
+          "reference": {
+            "wall_ms": 23.7268,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4460544
+          },
+          "candidate": {
+            "wall_ms": 25.2699,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4472832
+          }
+        },
+        {
+          "candidate": {
+            "wall_ms": 22.6495,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4464640
+          },
+          "reference": {
+            "wall_ms": 23.2405,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4472832
+          }
+        },
+        {
+          "reference": {
+            "wall_ms": 23.0006,
+            "cpu_ms": 31.25,
+            "peak_tree_commit_bytes": 4460544
+          },
+          "candidate": {
+            "wall_ms": 22.7331,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4456448
+          }
+        },
+        {
+          "candidate": {
+            "wall_ms": 22.8966,
+            "cpu_ms": 62.5,
+            "peak_tree_commit_bytes": 4481024
+          },
+          "reference": {
+            "wall_ms": 23.0196,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4476928
+          }
+        },
+        {
+          "reference": {
+            "wall_ms": 23.3909,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4456448
+          },
+          "candidate": {
+            "wall_ms": 22.3258,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4456448
+          }
+        },
+        {
+          "candidate": {
+            "wall_ms": 24.9629,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4464640
+          },
+          "reference": {
+            "wall_ms": 24.5111,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4464640
+          }
+        },
+        {
+          "reference": {
+            "wall_ms": 22.5966,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4472832
+          },
+          "candidate": {
+            "wall_ms": 22.1701,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4464640
+          }
+        },
+        {
+          "candidate": {
+            "wall_ms": 26.5079,
+            "cpu_ms": 31.25,
+            "peak_tree_commit_bytes": 4460544
+          },
+          "reference": {
+            "wall_ms": 25.746,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4456448
+          }
+        },
+        {
+          "reference": {
+            "wall_ms": 22.9053,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4468736
+          },
+          "candidate": {
+            "wall_ms": 25.8587,
+            "cpu_ms": 31.25,
+            "peak_tree_commit_bytes": 4481024
+          }
+        },
+        {
+          "candidate": {
+            "wall_ms": 23.3759,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4468736
+          },
+          "reference": {
+            "wall_ms": 22.145,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4468736
+          }
+        },
+        {
+          "reference": {
+            "wall_ms": 22.7341,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4468736
+          },
+          "candidate": {
+            "wall_ms": 23.9048,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4464640
+          }
+        },
+        {
+          "candidate": {
+            "wall_ms": 23.8575,
+            "cpu_ms": 46.875,
+            "peak_tree_commit_bytes": 4485120
+          },
+          "reference": {
+            "wall_ms": 23.1586,
+            "cpu_ms": 0,
+            "peak_tree_commit_bytes": 4464640
+          }
+        },
+        {
+          "reference": {
+            "wall_ms": 23.4238,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4476928
+          },
+          "candidate": {
+            "wall_ms": 23.2373,
+            "cpu_ms": 31.25,
+            "peak_tree_commit_bytes": 4476928
+          }
+        },
+        {
+          "candidate": {
+            "wall_ms": 22.4746,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4460544
+          },
+          "reference": {
+            "wall_ms": 22.6868,
+            "cpu_ms": 0,
+            "peak_tree_commit_bytes": 4460544
+          }
+        },
+        {
+          "reference": {
+            "wall_ms": 22.9538,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4472832
+          },
+          "candidate": {
+            "wall_ms": 22.2726,
+            "cpu_ms": 62.5,
+            "peak_tree_commit_bytes": 4452352
+          }
+        },
+        {
+          "candidate": {
+            "wall_ms": 22.3063,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4460544
+          },
+          "reference": {
+            "wall_ms": 24.0898,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4472832
+          }
+        },
+        {
+          "reference": {
+            "wall_ms": 23.2028,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4472832
+          },
+          "candidate": {
+            "wall_ms": 24.4933,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4476928
+          }
+        },
+        {
+          "candidate": {
+            "wall_ms": 23.4878,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4468736
+          },
+          "reference": {
+            "wall_ms": 24.0043,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4468736
+          }
+        },
+        {
+          "reference": {
+            "wall_ms": 22.4468,
+            "cpu_ms": 31.25,
+            "peak_tree_commit_bytes": 4464640
+          },
+          "candidate": {
+            "wall_ms": 22.4281,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4464640
+          }
+        },
+        {
+          "candidate": {
+            "wall_ms": 23.195,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4468736
+          },
+          "reference": {
+            "wall_ms": 23.4137,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4464640
+          }
+        },
+        {
+          "reference": {
+            "wall_ms": 23.4572,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4476928
+          },
+          "candidate": {
+            "wall_ms": 23.2725,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4472832
+          }
+        }
+      ]
+    },
+    {
+      "iterations": 40000,
+      "count": 5,
+      "medians": {
+        "reference": {
+          "wall_ms": 28.4392,
+          "cpu_ms": 31.25,
+          "peak_tree_commit_bytes": 4472832
+        },
+        "candidate": {
+          "wall_ms": 27.7114,
+          "cpu_ms": 31.25,
+          "peak_tree_commit_bytes": 4472832
+        }
+      },
+      "cpu_delta_percent": 0,
+      "raw": [
+        {
+          "reference": {
+            "wall_ms": 28.0494,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4452352
+          },
+          "candidate": {
+            "wall_ms": 32.8055,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4472832
+          }
+        },
+        {
+          "candidate": {
+            "wall_ms": 27.707,
+            "cpu_ms": 31.25,
+            "peak_tree_commit_bytes": 4468736
+          },
+          "reference": {
+            "wall_ms": 26.6685,
+            "cpu_ms": 31.25,
+            "peak_tree_commit_bytes": 4444160
+          }
+        },
+        {
+          "reference": {
+            "wall_ms": 28.7307,
+            "cpu_ms": 31.25,
+            "peak_tree_commit_bytes": 4472832
+          },
+          "candidate": {
+            "wall_ms": 28.1035,
+            "cpu_ms": 31.25,
+            "peak_tree_commit_bytes": 4460544
+          }
+        },
+        {
+          "candidate": {
+            "wall_ms": 27.4053,
+            "cpu_ms": 31.25,
+            "peak_tree_commit_bytes": 4472832
+          },
+          "reference": {
+            "wall_ms": 28.4392,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4476928
+          }
+        },
+        {
+          "reference": {
+            "wall_ms": 29.2103,
+            "cpu_ms": 31.25,
+            "peak_tree_commit_bytes": 4472832
+          },
+          "candidate": {
+            "wall_ms": 27.7114,
+            "cpu_ms": 15.625,
+            "peak_tree_commit_bytes": 4485120
+          }
+        }
+      ]
+    }
+  ]
+}

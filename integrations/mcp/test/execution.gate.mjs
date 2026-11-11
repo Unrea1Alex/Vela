@@ -17,7 +17,7 @@ const transport=new StdioClientTransport({command:process.execPath,args:[path.re
 let stderr='';transport.stderr.on('data',b=>stderr+=b);
 const report={schema_version:1,platform:process.platform,release:os.release(),checks:[]};
 const check=(name,condition)=>{assert.ok(condition,name);report.checks.push(name);console.log('PASS',name);};
-const call=async(name,args={})=>(await client.callTool({name,arguments:args},undefined,{timeout:150000})).structuredContent;
+const call=async(name,args={})=>(await client.callTool({name,arguments:args},{timeout:150000})).structuredContent;
 const source='fn main()->Unit effects{io,process}{print("Привет 😀");print(env("VELA_GATE_SECRET"));}';
 await fs.writeFile(path.join(workspace,'main.vela'),source);
 try{
@@ -31,8 +31,36 @@ try{
   const executed=await call('vela_run',{artifact_id:built.data.artifact_id});
   check('isolated method call prints the expected value',executed.status==='ok'&&executed.data.exit_code===0&&executed.data.stdout.trim()==='42');
  }
+ const checkRoot='cache-main.vela',checkLeaf='cache-leaf.vela';
+ const diskLeaf='pub fn answer() -> Int { return 7; }\n';
+ const overlayLeaf='// я😀\npub fn answer() -> Int { return true; }\n';
+ await fs.writeFile(path.join(workspace,checkRoot),'import "cache-leaf.vela" as leaf;\nfn main() -> Int { return leaf::answer(); }\n');
+ await fs.writeFile(path.join(workspace,checkLeaf),diskLeaf);
+ try {
+  const original=await call('vela_check',{path:checkRoot});
+  check('disk check accepts the current import graph',original.status==='ok'&&original.data.native?.ok===true);
+  const edited=await call('vela_check',{path:checkRoot,overlay_path:checkLeaf,text:overlayLeaf});
+  const diagnostic=edited.data.native?.diagnostics?.[0];
+  const prefix=overlayLeaf.slice(0,overlayLeaf.indexOf('return'));
+  assert.deepEqual({status:edited.status,code:diagnostic?.code,source:diagnostic?.source,
+   start:diagnostic?.span.start,byte:diagnostic?.range.start.byte,line:diagnostic?.span.line,
+   actualType:diagnostic?.details?.actual_type},
+  {status:'rejected',code:'E201',source:path.join(workspace,checkLeaf),start:[...prefix].length,
+   byte:Buffer.byteLength(prefix),line:2,actualType:'Bool'});
+  check('unsaved dependency check reports current type and span',edited.snapshot_id!==original.snapshot_id);
+  const again=await call('vela_check',{path:checkRoot});
+  check('unsaved dependency leaves disk and its snapshot unchanged',again.status==='ok'&&again.snapshot_id===original.snapshot_id
+   &&await fs.readFile(path.join(workspace,checkLeaf),'utf8')===diskLeaf);
+ } finally {
+  await fs.rm(path.join(workspace,checkRoot),{force:true});
+  await fs.rm(path.join(workspace,checkLeaf),{force:true});
+ }
  const build=await call('vela_build',{path:'main.vela'});console.log('build',JSON.stringify(build));
  check('isolated MSVC build issues artifact',build.status==='ok'&&build.data.artifact_id?.length===64);
+ for(const mode of ['pgo-instrument','pgo-use','lto','pgo-lto']){
+  const rejected=await call('vela_build',{path:'main.vela',native_optimization:mode});
+  check('local optimization mode rejected '+mode,rejected.status==='invalid_input'&&rejected.message.includes('local Vela CLI')&&!rejected.data.artifact_id);
+ }
  const id=build.data.artifact_id;
  const run=await call('vela_run',{artifact_id:id});console.log('run',JSON.stringify(run));
  check('Unicode output and no inherited secret',run.status==='ok'&&run.data.exit_code===0&&run.data.stdout.replaceAll('\r','')==='Привет 😀\n\n');
@@ -59,7 +87,7 @@ try{
  await fs.rm(path.join(workspace,'bad.vproj'));await fs.rm(path.join(workspace,'evil.bin'));
  // Exercise the new OS handle primitive in the actual LPAC runtime, including
  // denial outside the snapshot. Checking source alone would miss access drift.
- const libraryFiles=['directory','path','text','json_stream'];
+ const libraryFiles=['directory','path','text','json_stream','json_tokens'];
  const privateDirectory=path.join(work,'host-private');await fs.mkdir(privateDirectory);
  await fs.writeFile(path.join(privateDirectory,'secret.txt'),'outside snapshot');
  try {
@@ -94,12 +122,19 @@ fn main()->Int effects{args,io,state}{
  check('execution concurrency limit',(await call('vela_run',{artifact_id:id})).status==='limit');
  check('wall time limit',(await pending).status==='timeout');
  const abort=new AbortController();
- const cancelled=client.callTool({name:'vela_run',arguments:{artifact_id:loop.data.artifact_id}},undefined,{signal:abort.signal,timeout:15000}).catch(e=>e);
- setTimeout(()=>abort.abort(),300);await cancelled;
- await new Promise(r=>setTimeout(r,500));
- check('server recovers after cancellation',(await call('vela_run',{artifact_id:id})).status==='ok');
+ const cancelled=client.callTool({name:'vela_run',arguments:{artifact_id:loop.data.artifact_id,timeout_ms:15000}},{signal:abort.signal,timeout:20000});
+ setTimeout(()=>abort.abort(),300);await assert.rejects(cancelled,/abort/i);
+ const recoveryDeadline=Date.now()+4000;
+ let recovered;
+ do{
+  recovered=await call('vela_run',{artifact_id:id});
+  if(recovered.status!=='limit')break;
+  await new Promise(r=>setTimeout(r,100));
+ }while(Date.now()<recoveryDeadline);
+ assert.equal(recovered.status,'ok',JSON.stringify(recovered));
+ check('server recovers after cancellation',true);
  check('transport stdout contains only MCP',stderr==='');
- const interrupted=client.callTool({name:'vela_run',arguments:{artifact_id:loop.data.artifact_id,timeout_ms:30000}},undefined,{timeout:35000}).catch(e=>e);
+ const interrupted=client.callTool({name:'vela_run',arguments:{artifact_id:loop.data.artifact_id,timeout_ms:30000}},{timeout:35000}).catch(e=>e);
  await new Promise(r=>setTimeout(r,600));await client.close();await interrupted;
  for(let i=0;i<60;i++){if(!(await fs.stat(manifest+'.lock').catch(()=>null)))break;await new Promise(r=>setTimeout(r,100));}
  check('MCP disconnect releases execution cache',!(await fs.stat(manifest+'.lock').catch(()=>null)));

@@ -1,0 +1,139 @@
+import "../../std/event_loop.vela" as loop;
+import "../../std/http.vela" as http;
+import "../../std/path.vela" as path;
+import "../../std/process.vela" as child;
+import "../../std/text.vela" as text;
+
+fn must<T, E>(answer: Result<T, E>) -> T effects { process } {
+    match answer {
+        Result::Ok(value) => { return value; }
+        Result::Err(_) => { panic("HTTP live fixture: expected Ok"); }
+    }
+}
+fn arg_text(index: Int) -> String effects { args, process } {
+    match arg(index) {
+        StringResult::Ok(value) => { return value; }
+        StringResult::Err(error) => { panic(error); }
+    }
+}
+fn request(url: String, budget: Int) -> http::Request effects { process } {
+    return must(http::from_url(url, budget, 1024));
+}
+fn start(transport: dyn http::Transport, url: String, budget: Int) -> http::Exchange effects { state, io, process } {
+    let scheduler = must(loop::create<child::Completed>(0));
+    return must(transport.start(scheduler, request(url, budget), path::Path(value: ".")));
+}
+fn wait(exchange: http::Exchange) -> Result<http::Response, http::Error> effects { io, state, process } {
+    for i in 0 .. 600 {
+        match http::poll(exchange) {
+            Result::Err(error) => { return Result<http::Response, http::Error>::Err(error); }
+            Result::Ok(value) => {
+                match value {
+                    Option::Some(response) => { return Result<http::Response, http::Error>::Ok(response); }
+                    Option::None => { let slept = host_sleep(1); }
+                }
+            }
+        }
+    }
+    panic("HTTP live fixture timed out waiting for terminal result");
+}
+fn good(exchange: http::Exchange, expected: Int, bytes: Int) -> http::Response effects { io, state, process } {
+    let reply = must(wait(exchange));
+    assert_true(reply.status == expected && str_len(reply.body.data) == bytes, "expected HTTP response");
+    assert_true(!http::cancel(exchange), "terminal response wins later cancellation");
+    assert_true(must(http::release(exchange)) && must(http::release(exchange)), "release idempotent");
+    return reply;
+}
+fn network(first: String, other: String) -> Unit effects { state, io, process } {
+    let settings = http::MultiLimits(connections: 2, per_origin: 1, queue: 1, idle_seconds: 30, connect_ms: 1500);
+    let pool = must(http::curl_multi(settings, Option<path::Path>::None));
+    let transport = dyn http::Transport(pool);
+    for i in 0 .. 10 {
+        let response = good(start(transport, first + "/reuse", 2500), 200, 64);
+    }
+    let closing_server = good(start(transport, first + "/server-close", 2500), 200, 64);
+    let new_connection = good(start(transport, first + "/after-server-close", 2500), 200, 64);
+    let stalled = start(transport, first + "/hold", 2500);
+    let waiting = start(transport, first + "/queued", 70);
+    let stats = http::multi_stats(pool);
+    assert_true(stats.active == 1 && stats.queued == 1 && stats.slots == 2, "separate active and queued reservations");
+    let scheduler = must(loop::create<child::Completed>(0));
+    match transport.start(scheduler, request(first + "/over-budget", 2500), path::Path(value: ".")) {
+        Result::Err(error) => {
+            assert_true(error_label(error) == "limit", "queue full limit");
+        }
+        Result::Ok(_) => { assert_true(false, "queue limit"); }
+    }
+    let peer = start(transport, other + "/peer", 2500);
+    assert_true(http::multi_stats(pool).active == 2, "busy origin does not block another origin");
+    match wait(waiting) {
+        Result::Err(error) => { assert_true(error_label(error) == "timeout", "queue deadline"); }
+        Result::Ok(_) => { assert_true(false, "expired queued request completed"); }
+    }
+    assert_true(must(http::release(waiting)), "timed-out slot released");
+    assert_true(http::cancel(stalled) && !http::cancel(stalled), "cancel idempotent");
+    match wait(stalled) {
+        Result::Err(error) => { assert_true(error_label(error) == "cancelled", "typed cancellation"); }
+        Result::Ok(_) => { assert_true(false, "cancelled request completed"); }
+    }
+    assert_true(must(http::release(stalled)), "cancelled slot released");
+    let result_value = good(peer, 200, 64);
+    let redirected = good(start(transport, first + "/redirect", 2500), 302, 64);
+    let binary = "A" + str_from_byte(0) + str_from_byte(255) + "B";
+    let submitted = must(http::with_method(request(first + "/delete", 2500), http::Method::Delete, text::Bytes(data: binary)));
+    let sent = must(transport.start(scheduler, submitted, path::Path(value: ".")));
+    let echoed = good(sent, 200, 4);
+    assert_true(echoed.body.data == binary, "binary DELETE response");
+    let mutation = must(http::with_method(request(first + "/no-replay", 2500), http::Method::Post,
+        text::Bytes(data: "commit")));
+    let lost = must(transport.start(scheduler, mutation, path::Path(value: ".")));
+    match wait(lost) {
+        Result::Err(error) => {
+            let label = error_label(error);
+            assert_true(str_len(label) >= 9 && str_slice(label, 0, 9) == "transfer:",
+                "lost write reply is a transfer error");
+        }
+        Result::Ok(_) => { assert_true(false, "failed write cannot be reported as success"); }
+    }
+    assert_true(must(http::release(lost)), "lost write slot released");
+    let held = start(transport, first + "/close", 2500);
+    let drive = http::poll(held);
+    let slept = host_sleep(30);
+    let drive_again = http::poll(held);
+    assert_true(must(http::close_multi(pool)) && must(http::close_multi(pool)), "pool close idempotent");
+    assert_true(http::multi_stats(pool).slots == 0 && !http::pending(held), "owner drained and released slots");
+    match http::poll(held) {
+        Result::Err(error) => { assert_true(error_label(error) == "closed", "owner invalidates aliases"); }
+        Result::Ok(_) => { assert_true(false, "closed owner poll"); }
+    }
+}
+fn error_label(error: http::Error) -> String {
+    return match error {
+        http::Error::TimedOut => "timeout", http::Error::Cancelled => "cancelled", http::Error::Closed => "closed",
+        http::Error::Tls(code) => "tls:" + to_string(code), http::Error::Limit => "limit",
+        http::Error::InvalidEndpoint => "endpoint", http::Error::InvalidLimit => "range",
+        http::Error::InvalidTransport => "transport", http::Error::InvalidHeaders => "headers", http::Error::InvalidBody => "body",
+        http::Error::Schedule(_) => "schedule", http::Error::Connect(code) => "connect:" + to_string(code),
+        http::Error::Transfer(code) => "transfer:" + to_string(code), http::Error::Protocol => "protocol",
+        http::Error::Pending => "pending", http::Error::Storage(message) => "storage:" + message
+    };
+}
+fn tls(base: String, good_file: String, bad_file: String) -> Unit effects { state, io, process } {
+    let good_pool = must(http::curl_multi(http::multi_limits(), Option<path::Path>::Some(path::Path(value: good_file))));
+    let bad_pool = must(http::curl_multi(http::multi_limits(), Option<path::Path>::Some(path::Path(value: bad_file))));
+    let trusted = dyn http::Transport(good_pool);
+    let good_reply = good(start(trusted, base + "/tls", 3000), 200, 64);
+    let rejected = start(dyn http::Transport(bad_pool), base + "/untrusted", 3000);
+    match wait(rejected) {
+        Result::Err(error) => { assert_true(error_label(error) == "tls:60", "TLS trust error"); }
+        Result::Ok(_) => { assert_true(false, "untrusted CA reused TLS connection"); }
+    }
+    assert_true(must(http::release(rejected)), "release TLS failure");
+    let again = good(start(trusted, base + "/tls", 3000), 200, 64);
+    assert_true(must(http::close_multi(good_pool)) && must(http::close_multi(bad_pool)), "closed both trust owners");
+}
+fn main() -> Unit effects { args, state, io, process } {
+    network(arg_text(0), arg_text(1));
+    tls(arg_text(2), arg_text(3), arg_text(4));
+    print("Vela HTTP multi passed");
+}

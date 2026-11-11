@@ -1,0 +1,2 @@
+import "../../../std/path.vela" as path;
+fn main() -> Unit { let value = path::CheckedPath(value: ""); }

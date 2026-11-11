@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "checks": [
+    "auto-created directory, cold miss, warm hit and JSON stdout parity",
+    "corrupt record is a visible miss and is repaired",
+    "failed atomic publication warns without report flag and preserves success",
+    "failed publication removes private temporary files",
+    "file as cache directory warns and falls back without touching source",
+    "missing parent is not silently created recursively",
+    "explicit disabled diagnostic",
+    "C stdout parity and source-change invalidation",
+    "c-v1 separates default and bypass results on cold and warm cache",
+    "debug-c-v1 separates default and bypass results on cold and warm cache",
+    "missing cache argument rejects without panic"
+  ],
+  "passed": 11,
+  "failed": 0
+}

@@ -285,20 +285,24 @@ pub fn project_lock_text(p: Project, json_mode: Bool) -> String effects { state,
     return strings_join(lines, "");
 }
 pub fn project_verify_lock(p: Project, json_mode: Bool) -> Unit effects { state, io, process } {
+    let verified = project_verified_lock(p, json_mode);
+}
+pub fn project_verified_lock(p: Project, json_mode: Bool) -> String effects { state, io, process } {
     if list_len(p.dependencies) == 0 && list_len(p.natives) == 0 && list_len(p.assets) == 0 {
-        return;
+        return "";
     }
     let expected = project_lock_text(p, json_mode);
     match source_text_result(p.manifest + ".lock") {
         Result::Ok(actual) => {
             if actual == expected {
-                return;
+                return expected;
             }
         }
         Result::Err(_) => {}
     }
     project_fail(p.manifest, "E226",
         "Missing or stale lock; run vela lock PROJECT after reviewing dependencies.", json_mode);
+    return "";
 }
 pub fn project_write_lock(p: Project, json_mode: Bool) -> Int effects { state, io, process } {
     if p.manifest == "" {

@@ -1,0 +1,6 @@
+import "../../../std/http.vela" as http;
+
+fn wait_without_process(pool: http::CurlMulti) -> Result<Bool, http::Error> effects { io, state } {
+    return http::multi_wait(pool, 2);
+}
+fn main() -> Unit {}

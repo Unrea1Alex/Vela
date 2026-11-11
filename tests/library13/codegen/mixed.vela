@@ -1,0 +1,26 @@
+import "input.vela" as input;
+
+struct Pair<T> { first: T, second: T }
+enum State { Ready(Pair<String>, List<Int>), Empty }
+struct Payload { state: State, bias: Int }
+
+fn make(n: Int, kept: List<Int>) -> Payload {
+    let name = "value-" + to_string(n);
+    return Payload(state: State::Ready(Pair<String>(first: name, second: "x"), kept), bias: n);
+}
+
+fn score(item: Payload) -> Int effects { state } {
+    return match item.state {
+        State::Ready(pair, kept) => str_len(pair.first) + str_len(pair.second) + list_get(kept, 0) + item.bias,
+        State::Empty => 0
+    };
+}
+
+fn main() -> Unit effects { args, io, process, state } {
+    let count = input::iterations();
+    let kept = list_new<Int>();
+    list_push(kept, 3);
+    var total = 0;
+    for n in 0 .. count { total = total + score(make(n, kept)); }
+    print(total);
+}

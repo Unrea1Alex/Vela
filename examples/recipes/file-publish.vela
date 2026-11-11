@@ -1,0 +1,22 @@
+import "../../std/fs.vela" as fs;
+import "../../std/path.vela" as path;
+import "../../std/text.vela" as text;
+
+fn main() -> Int effects { args, io, state } {
+    var output = "";
+    match arg(0) {
+        StringResult::Ok(value) => { output = value; }
+        StringResult::Err(_) => { eprint("Supply the destination file"); return 2; }
+    }
+    let bytes = text::Bytes(data: "vela" + str_from_byte(0));
+    let outcome = fs::write_atomic_detailed(path::Path(value: output), bytes);
+    match outcome.operation {
+        Result::Ok(count) => {
+            if outcome.committed { print(f"published={count:d}"); }
+        }
+        Result::Err(error) => { eprint(fs::describe_failure(error)); }
+    }
+    for error in outcome.cleanup { eprint(fs::describe_failure(error)); }
+    if outcome.committed && list_len(outcome.cleanup) == 0 { return 0; }
+    return 2;
+}

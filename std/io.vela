@@ -64,6 +64,15 @@ pub struct Failure {
     reader_close: Option<Error>,
     writer_close: Option<Error>
 }
+pub enum CopySide {
+    Source,
+    Destination,
+    Control
+}
+pub struct CopyError {
+    side: CopySide,
+    cause: Error
+}
 pub fn error(kind: ErrorKind, offset: Int, cause: String) -> Error {
     return Error(kind: kind, offset: offset, cause: cause);
 }
@@ -444,24 +453,30 @@ pub fn create(path: String) -> Result<Writer, Error> effects { state, io } {
         }
     }
 }
-pub fn copy(source: Reader, target: Writer, buffer: Int) -> Result<Statistics,
-    Error> effects { state, io } {
+fn copy_step<T>(answer: Result<T, Error>, side: CopySide) -> Result<T, CopyError> {
+    return match answer {
+        Result::Ok(value) => Result<T, CopyError>::Ok(value),
+        Result::Err(cause) => Result<T, CopyError>::Err(CopyError(side: side, cause: cause))
+    };
+}
+pub fn copy_detailed(source: Reader, target: Writer, buffer: Int) -> Result<Statistics,
+    CopyError> effects { state, io } {
     if buffer < 1 || buffer > 65536 {
-        return Result<Statistics, Error>::Err(error(ErrorKind::InvalidLimit, 0,
-            "buffer must be 1..65536"));
+        return Result<Statistics, CopyError>::Err(CopyError(side: CopySide::Control,
+            cause: error(ErrorKind::InvalidLimit, 0, "buffer must be 1..65536")));
     }
     var stats = Statistics(bytes: 0, reads: 0, writes: 0, peak_chunk: 0);
     while true {
         if stats.reads == 9223372036854775807 {
-            return Result<Statistics, Error>::Err(error(ErrorKind::TotalLimit, stats.bytes,
-                "copy counter limit"));
+            return Result<Statistics, CopyError>::Err(CopyError(side: CopySide::Control,
+                cause: error(ErrorKind::TotalLimit, stats.bytes, "copy counter limit")));
         }
         let before = reader_counters(source).calls;
-        let chunk = read(source, buffer)?;
+        let chunk = copy_step(read(source, buffer), CopySide::Source)?;
         stats.reads = stats.reads + (reader_counters(source).calls - before);
         match chunk {
             Chunk::End => {
-                return Result<Statistics, Error>::Ok(stats);
+                return Result<Statistics, CopyError>::Ok(stats);
             }
             Chunk::Data(data) => {
                 let size = str_len(data);
@@ -470,19 +485,26 @@ pub fn copy(source: Reader, target: Writer, buffer: Int) -> Result<Statistics,
                 }
                 var start = 0;
                 while start < size {
-                    let count = write(target, str_slice(data, start, size))?;
+                    let count = copy_step(write(target, str_slice(data, start, size)), CopySide::Destination)?;
                     start = start + count;
                     stats.writes = stats.writes + 1;
                 }
                 if size > 9223372036854775807 - stats.bytes {
-                    return Result<Statistics, Error>::Err(error(ErrorKind::TotalLimit, stats.bytes,
-                        "copy total limit"));
+                    return Result<Statistics, CopyError>::Err(CopyError(side: CopySide::Control,
+                        cause: error(ErrorKind::TotalLimit, stats.bytes, "copy total limit")));
                 }
                 stats.bytes = stats.bytes + size;
             }
         }
     }
-    return Result<Statistics, Error>::Ok(stats);
+    return Result<Statistics, CopyError>::Ok(stats);
+}
+pub fn copy(source: Reader, target: Writer, buffer: Int) -> Result<Statistics,
+    Error> effects { state, io } {
+    return match copy_detailed(source, target, buffer) {
+        Result::Ok(value) => Result<Statistics, Error>::Ok(value),
+        Result::Err(failure) => Result<Statistics, Error>::Err(failure.cause)
+    };
 }
 pub fn copy_owned(source: Reader, target: Writer, buffer: Int) -> Result<Statistics,
     Failure> effects { state, io } {

@@ -4,10 +4,11 @@ The generated `api-index.json` is the signature/effects index, obtained from
 checked public interfaces by `tools/help.vela`. Use [recipes](RECIPES.md) and
 [capabilities](CAPABILITIES.md) for purpose, ownership and platform limits;
 this guide explains behavior rather than defining a second signature catalog.
-The [1.2 evolution contract](contracts/STDLIB-EVOLUTION-1.2.md) specifies future
-opt-in modules and the separate later checked-value work; proposed APIs are not
-available until their implementation stage is verified. Frozen 1.1 fixtures
-preserve old aliases, callbacks, sorts, String line errors and public records.
+The [1.2 evolution contract](contracts/STDLIB-EVOLUTION-1.2.md) records the
+compatibility rules and the original plan for opt-in types. The current checked
+values are described in the [1.3 contract](contracts/CHECKED-VALUES-1.3.md).
+Frozen 1.1 fixtures preserve aliases, callbacks, sorts, String line errors
+and public records.
 
 `io` supplies opaque shared Reader/Writer handles, memory/file adapters and
 bounded copy. `Chunk::End` alone means EOF; empty Data/zero writes are typed
@@ -60,9 +61,10 @@ MCP snapshots require dependencies to be inside the configured workspace.
 
 | Module | Public API |
 |---|---|
-| text | Bytes/Text records; checked/decode/encode/slice/codepoint/invalid_offset; trim/split/html/pad_zero |
-| path | Path; checked/absolute/parent/join |
-| fs | read_bytes/read_text/write_atomic/write_text_atomic |
+| text | Bytes/Text records; checked/decode/encode/slice/codepoint/invalid_offset; trim/split/html/pad_zero; opt-in CheckedText |
+| path | Path; checked/absolute/parent/join; opt-in CheckedPath |
+| config_snapshot | opaque Snapshot; bounded parse/defensive copy, ordered keys, indexed scalar lookup and detached aggregates |
+| fs | read_bytes/read_text/write_atomic/write_text_atomic; write_atomic_detailed/copy_atomic/publish_owned and typed publication outcomes |
 | directory (1.1) | Kind/Entry/Error/Scan; open/next/close, entries/entries_bounded; Limits/WalkEntry/walk; Windows/Linux no-follow metadata |
 | process | run(argv, cwd, stdout, stderr, timeout_ms); schedule with a cooperative loop on Windows from 0.11.0-dev.1 |
 | event_loop | create/submit/tick/cancel/outcome/shutdown for explicit continuations from 0.11.0-dev.1 |
@@ -88,6 +90,13 @@ Fallible operations return typed errors in generic Result. Use qualified names t
 avoid collisions. Collection operations require state; file operations io;
 process.run requires state/io/process; cli.current additionally args. Check the
 authored module signatures before calling unfamiliar APIs.
+
+For file publication with explicit cleanup, use `fs::write_atomic_detailed`
+for bounded bytes, `fs::copy_atomic` for a source file, or `fs::publish_owned`
+to transfer ownership of an existing Reader. Each returns operation, cleanup
+and committed fields. Inspect all three before rendering an error.
+`io::copy_detailed` identifies the failing endpoint while borrowing both
+handles. [File publication contract](contracts/FILE-PUBLICATION-1.3.md).
 
 `directory::walk(root, directory::Limits(depth: 1024, entries: 1000000))`
 returns entries with relative `/` paths and explicit depths. Root is depth zero;
@@ -139,7 +148,7 @@ closing a window that owns both. [Typed task fixture](../tests/stdlib/tasks.vela
 [Contract](contracts/ASYNC-CANCELLATION.md).
 [Executable tests](../tests/stdlib/event-loop.vela).
 
-Text/Bytes/Path are ordinary nominal records during the compatibility migration.
+Legacy Text/Bytes/Path are ordinary nominal records.
 Text.data must be UTF-8, Path.value must be nonempty UTF-8 without NUL. Checked
 operations validate even forged record fields. String and old str_* still use
 raw bytes; indexing/slicing is in bytes. Text.slice rejects split code points.
@@ -148,6 +157,19 @@ empty separator. pad_zero uses total minimum width including a minus sign,
 bounded to 4096; it never truncates. HTML escapes &, <, >, quotes and apostrophes.
 Path parent/join are lexical, recognize Windows drive/UNC roots, and confer no
 filesystem permission. Absolute children replace the base in join.
+
+For repeated reads, use `text::validate` or `path::validate` to create an opaque
+CheckedText or CheckedPath. Construction validates the full input. Checked text
+slices check byte bounds and code point boundaries. Checked path operations use
+lexical separators. Both reuse validated immutable String storage. Conversion
+to public Text/Path copies the record. See the [checked values recipe](../examples/recipes/checked-values.vela)
+and [contract](contracts/CHECKED-VALUES-1.3.md).
+
+Use `config_snapshot::parse` for repeated reads of a bounded JSON object.
+`from_value` checks and copies nested arrays and objects supplied by the caller.
+Scalar lookups use an index. `keys` and aggregate lookups return independent
+lists so callers can mutate their copies. Missing fields, explicit null and
+wrong types remain distinct. See the [snapshot contract](contracts/CONFIG-SNAPSHOT-1.3.md).
 
 read_bytes/read_text accept a byte limit in 0..256 MiB, stop once exceeded and
 return a typed Limit; read_text also validates UTF-8. Atomic writes create a
@@ -169,14 +191,22 @@ MCP execution has its separate isolation contract.
 Get/Head/Post/Put/Delete and immutable `text::Bytes` (upload <=1 MiB).
 `with_headers` snapshots up to 32 validated headers; framing/auth headers reject.
 InvalidHeaders and InvalidBody are new Error variants; update exhaustive matches.
-Start it with an explicit
-`dyn http::Transport`, tick the process event loop, and poll the exchange.
-Use `http::curl_transfer` in 1.1 with an absolute path to a trusted curl 8.4+ executable
-for a complete-transfer timeout and separately bounded helper startup/drain.
-`http::curl` retains the 1.0 combined launch/transfer deadline. Configure either,
-or `http::scripted` for a test. Check the status separately from transport
-errors. Cancel and drive the loop while `http::pending` is true.
-`http::release` removes output and upload files after drain.
+Use `http::curl_multi(http::multi_limits(), ca_file)` for new Windows x64 clients.
+Ship `vela-http.dll` beside the executable. The opaque owner shares a bounded
+connection pool and queue. Its deadline includes time spent in the pool queue.
+Keep one owner across requests. Pass it as `dyn http::Transport` to
+`async_io::fetch` in a task scope, or start an exchange and drive it with
+`http::poll` or `http::multi_tick`. A synchronous console host may use
+`http::multi_wait` between turns. Check the HTTP status separately from
+transport errors. Cancel and drain before `http::release`, then call
+`http::close_multi` after the last exchange. Missing adapters and unsupported
+platforms return typed factory errors. See the [multi contract](contracts/HTTP-MULTI-1.3.md).
+
+Explicit compatibility factories take an absolute path to trusted curl 8.4+.
+`http::curl_transfer` retains the complete-transfer timeout with bounded helper
+startup/drain. `http::curl` retains the combined launch/transfer deadline.
+Release removes private files in these two transports. `http::scripted` supplies
+an in-memory transport for deterministic tests.
 `http_server` accepts one GET or HEAD per connection on Windows IPv4 loopback.
 Request adds `method`; Response constructors now require `content_type`, for example
 `"application/octet-stream"` or `"text/plain; charset=utf-8"`. HEAD has no body.
@@ -264,6 +294,13 @@ defaulted only substitutes absence, optional only makes absence optional, and
 nullable explicitly accepts null. integer checks lexical signed Int64 and bounds;
 number converts a finite Float64 with ordinary rounding and bounds. Arrays keep
 source order and typed failures stop further element callbacks.
+The reader scans ordinary unescaped string bytes locally before committing its
+cursor. Returned strings remain detached copies. Escape handling and byte offsets
+follow the existing rules. [Profile contract](contracts/JSON-PROFILE-1.3.md).
+Tree and stream parsing share lexical scans in the `json_tokens` implementation
+module. Typed record access walks already validated member spans and uses the
+same key quoting as the stream reader. Use `json`, `json_stream` and
+`json_decode` as application entry points. [Lexical contract](contracts/JSON-LEXICAL-1.3.md).
 
 Outer errors carry root-relative JSON path and UTF-8 byte offset; an optional
 json_stream cause is unchanged and uses its local span coordinates. Missing fields
@@ -271,8 +308,8 @@ point to the containing object. Syntax/input maxima remain 16 MiB/depth 4096/nod
 1000000; selected decoder nesting is separately 128, array count <=65536, fields
 <=256, declared key <=1024 bytes and outer path <=65536 bytes. This is eager
 in-memory decoding; span views retain backing input. Builders have state only;
-failure does not undo their explicit captured state. Old json/json_stream remain
-unchanged. [Contract](contracts/JSON-DECODE-1.2.md),
+failure does not undo their explicit captured state. The tree and stream APIs
+retain their public signatures, limits and error policies. [Contract](contracts/JSON-DECODE-1.2.md),
 [record recipe](../examples/recipes/json-schema.vela).
 
 Opt-in result_ops and option combinators call callbacks only for the matching

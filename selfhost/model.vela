@@ -210,6 +210,7 @@ pub struct Symbol {
     return_pattern: String
 }
 pub struct CheckedExpr {
+    safe_arithmetic: Bool,
     reference: SymbolId,
     arms: List<CheckedArm>,
     kind: Int,
@@ -265,6 +266,7 @@ pub struct Control {
     loop_depth: Int,
     in_contract: Bool,
     in_defer: Bool,
+    emitted_loop: Bool,
     instance_depth: Int,
     type_mapping: Dict<String, TypeId>,
     type_depth: Int,
@@ -291,6 +293,7 @@ pub struct Context {
     source_units: List<SourceUnit>,
     imports: List<ModuleImport>,
     declarations: List<ModuleDeclaration>,
+    module_names: List<Dict<String, Int>>,
     bound_types: List<SyntaxType>,
     bound_functions: List<SyntaxFunction>,
     bound_interfaces: List<SyntaxInterface>,
@@ -323,6 +326,7 @@ pub struct Context {
     signatures: List<SymbolId>,
     scopes: List<List<SymbolId>>,
     type_order: List<TypeId>,
+    untraced_types: Dict<TypeId, Bool>,
     control: List<Control>
 }
 pub struct QueryUse {
@@ -338,7 +342,8 @@ pub struct SourceUnit {
     code: String,
     start: Int,
     end: Int,
-    line_base: Int
+    line_base: Int,
+    line_count: Int
 }
 pub struct QueryOverlay {
     path: String,
@@ -475,6 +480,12 @@ pub fn add_stmt(c: Context, value: CheckedStmt) -> StmtId effects { state } {
     list_push(c.statements, value);
     return StmtId(list_len(c.statements));
 }
+pub fn set_checked_expr(c: Context, id: ExprId, value: CheckedExpr) -> Unit effects { state, io, process } {
+    list_set(c.expressions, table_index(id.value, list_len(c.expressions), "HIR expression"), value);
+}
+pub fn set_checked_stmt(c: Context, id: StmtId, value: CheckedStmt) -> Unit effects { state, io, process } {
+    list_set(c.statements, table_index(id.value, list_len(c.statements), "HIR statement"), value);
+}
 pub fn add_type(c: Context, value: TypeInfo) -> TypeId effects { state } {
     list_push(c.types, value);
     return TypeId(list_len(c.types));
@@ -503,7 +514,7 @@ pub fn syntax_statement(kind: Int, span: Span) -> SyntaxStmt effects { state } {
         no: list_new<AstStmtId>(), arms: list_new<SyntaxArm>());
 }
 pub fn expression_record(kind: Int, span: Span, type_id: TypeId) -> CheckedExpr effects { state } {
-    return CheckedExpr(reference: no_symbol(), arms: list_new<CheckedArm>(), kind: kind, span: span,
+    return CheckedExpr(safe_arithmetic: false, reference: no_symbol(), arms: list_new<CheckedArm>(), kind: kind, span: span,
         type_id: type_id, text: "", left: no_expr(), right: no_expr(),
         arguments: list_new<ExprId>(), symbol: no_symbol(), fields: list_new<SymbolId>());
 }

@@ -282,19 +282,20 @@ pub fn make_context(code: String, name: String, json_mode: Bool) -> Context effe
     }
     let control = list_new<Control>();
     list_push(control, Control(in_async: false, await_site: empty_span(), scope_base: 0,
-        loop_depth: 0, in_contract: false, in_defer: false, instance_depth: 0,
+        loop_depth: 0, in_contract: false, in_defer: false, emitted_loop: false, instance_depth: 0,
         type_mapping: dict_new<String, TypeId>(), type_depth: 0, type_instances: 0, cursor: 0,
         previous_end: 0, depth: 0, return_type: no_type(), allowed_effects: 0, temporary: 0,
         function_index: 0));
     let units = list_new<SourceUnit>();
     list_push(units, SourceUnit(path: name, name: name, identity: "", code: code, start: 0,
-        end: str_len(code), line_base: 0));
+        end: str_len(code), line_base: 0, line_count: list_len(lines)));
     return Context(repair_mode: false, repair_root: "", repair_document: -1,
         repair_overlays: list_new<QueryOverlay>(), debug_codegen: false, query_mode: false,
         query_uses: list_new<QueryUse>(), query_types: list_new<SyntaxName>(),
         generic_tokens: dict_new<Int, Bool>(), arm_commas: dict_new<Int, Bool>(),
         source_units: units, imports: list_new<ModuleImport>(),
-        declarations: list_new<ModuleDeclaration>(), bound_types: list_new<SyntaxType>(),
+        declarations: list_new<ModuleDeclaration>(), module_names: list_new<Dict<String, Int>>(),
+        bound_types: list_new<SyntaxType>(),
         bound_functions: list_new<SyntaxFunction>(), bound_interfaces: list_new<SyntaxInterface>(),
         bound_impls: list_new<SyntaxImpl>(), interface_operations: list_new<InterfaceOperation>(),
         loop_labels: list_new<String>(), loop_cleanup_depths: list_new<Int>(),
@@ -309,5 +310,5 @@ pub fn make_context(code: String, name: String, json_mode: Bool) -> Context effe
         statements: list_new<CheckedStmt>(), types: list_new<TypeInfo>(),
         symbols: list_new<Symbol>(), functions: list_new<CheckedFunction>(),
         signatures: list_new<SymbolId>(), scopes: list_new<List<SymbolId>>(),
-        type_order: list_new<TypeId>(), control: control);
+        type_order: list_new<TypeId>(), untraced_types: dict_new<TypeId, Bool>(), control: control);
 }

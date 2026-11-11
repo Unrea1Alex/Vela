@@ -1,0 +1,3526 @@
+{
+  "schema_version": 1,
+  "stage": "1.3.4l",
+  "host": "msvc",
+  "work": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc",
+  "toolchain": "��⨬������騩 ��������� Microsoft (R) C/C++ ���ᨨ 19.44.35222 ��� x64",
+  "compiler": {
+    "sha256": "e7caf8bd2d409e66217a7bfb29b89bbe0859c43839bd5380925aa2632fd87ef1",
+    "bytes": 3291136
+  },
+  "training": {
+    "buildlens": {
+      "sha256": "d3f1bf5bb88b9e246b0b5bdab2475aa7ac5c279c322900aabe03390aef0f06ba",
+      "bytes": 3000656,
+      "expected": {
+        "events": 30000,
+        "duplicates": 0,
+        "selected": 30000,
+        "tests": 511,
+        "failed": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "total_ms": 359940
+      }
+    },
+    "fielddesk": {
+      "sha256": "de630fe1cfa7875217b613ff0472bd69495fdb8d292ddd325ab7495dc4b7037e",
+      "bytes": 11406
+    }
+  },
+  "evaluation": {
+    "buildlens": {
+      "bytes": 857890,
+      "sha256": "78935360046e36e57e9b137b485b8876252d546a7150e93eacfcfa37e546f38c",
+      "expected": {
+        "events": 10000,
+        "duplicates": 0,
+        "selected": 10000,
+        "tests": 100,
+        "failed": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "total_ms": 100000
+      }
+    },
+    "compiler": {
+      "artifacts.vela": "f6ea9d33508b1c9d7f649e5d37c47dd411670b387bb20dcf559c9b41e1b118d6",
+      "callables.vela": "2ec95c242e180bb76ae34cb4c13e24e273e23c05d881a1103fb060c124527096",
+      "compiler.vela": "c1690c7a14ad10c298e5520b870bb883d468f7e91565c7e2d5bc546c95a87ad3",
+      "control.vela": "7bd095b636fc576774ad4de487e8eb9d7f7f70603796cde74a080450d16604c0",
+      "core.vela": "3115450169d74468a7cf106c25029450bcd9ece9d754056a7ad55d42721b6988",
+      "driver.vela": "4d0c2603e6fc539e3a04f1a8b808bb026d62ce496c2b1197d54ce2237f735391",
+      "dynamic.vela": "c7c6261025e8138355e8b3dbf0ab605b2b641370a1b7af182fc1be086062dcc3",
+      "embedded.vela": "9a3639a34b9c42b9aba748d3977cf11c4cef24f9cc369caed44a906a51212848",
+      "emitter.vela": "b33b28b4383bbe569265c5b82ed9b9528550ef19b2e5a4d63083c9b6ef803661",
+      "errors.vela": "64e982313d5652cf929b4c9b725245e9353f1f7c803a021b2fda7995d7a5efc9",
+      "formatter.vela": "9d48b89f72b414265c3b2e3ae49769ebb7074828bd56f7c53de0a196a61c7f8c",
+      "generics.vela": "2eb4efcd609db1fe9da8343b6735cc0340cd9e20c43acad98a10d3f7dc725a0a",
+      "help.vela": "b2c19454051afddff15617fee04062a2e9414e841ced10707a34f2913a6c3bbf",
+      "incremental.vela": "461f6e09fec4660da57ab70da9d745882b5f50f7946a1fa3b3395e123774b6a7",
+      "interfaces.vela": "a46edd1bb9c7e664ca59079804b17871f57ac0faa5827a7fd1130c2a42e750cc",
+      "intrinsics.vela": "1d67c93e6ded331a72edb082694d17c5bcad2c7b66a1ba4f467475cc5316eb24",
+      "lexer.vela": "8e69d37ee7fcde774c7cf31368f8436dcd4229a05cc12471dd6585b969ddc60e",
+      "model.vela": "0cbe7409a07b30cc5c734c877109fedbd634ec492e9dfd1a0bd4d38b4e0e297b",
+      "modules.vela": "57ca31de84e656b9fafe65d252b8d0d6cf40e86e8361fd4daaf8ef9b258fd7e8",
+      "parser.vela": "703767193f56e6f44b520a0355f8d58708afcc2f6b8335219ad43df30ab618d7",
+      "projects.vela": "d8258606e2004c8669da39c4c8da8f1f3348f9bc3aa4b5060c512e7612a5f185",
+      "project_cli.vela": "143aa80404692b709e99389ded1da9aeeca0ce10adf2e5037c68470fe4556f76",
+      "query.vela": "749d2925efca055bb17cc25dc527069349659c5abe4a539632a9f3548d3d36cd",
+      "repairs.vela": "482f0d2c025e14fd3d3b6a3e9be7f5651a6c350c71229e4562572b31e15c3e8e",
+      "scaffold.vela": "6cc565c247784bb20fbe885488055d6c94836e2edec814a311b11d3d1a6aeef4",
+      "semantic.vela": "3086d000413263bd7134b6b11fb6930ad4f97c5f2c4919e442651d828ac6be6f",
+      "source.vela": "2274b38e20fed51d59ee2896331f0c28795d8c9549948547d34586c880a41745",
+      "suspension.vela": "1a4272f6828d157220008637cfc4b6cf889017d08ebc8adbdd05439868244eb2",
+      "types.vela": "2b5b1bc21a29f67a27af80144a2fee6f454a10a80d47009d70be52863ec956c1",
+      "vela.project": "11ef219470ce55523192f5fd67c8b10f4f9a4648c9aaa8ccd3775164ec6abcb6"
+    }
+  },
+  "workloads": {
+    "buildlens": {
+      "first": {
+        "o2": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc\\buildlens-warm\\o2.exe",
+        "optimized": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc\\buildlens-warm\\pgo.exe",
+        "lto": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc\\buildlens-warm\\lto.exe",
+        "combined": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc\\buildlens-warm\\pgo-lto.exe",
+        "profile": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc\\buildlens-warm\\profile",
+        "combined_profile": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc\\buildlens-warm\\profile",
+        "metrics": {
+          "instrument": {
+            "wall_ms": 1273.6715,
+            "cpu_ms": 2343.75,
+            "peak_tree_bytes": 203632640,
+            "peak_process_bytes": 80318464
+          },
+          "train": {
+            "wall_ms": 28507.4127,
+            "cpu_ms": 28390.625,
+            "peak_tree_bytes": 41963520,
+            "peak_process_bytes": 31633408
+          },
+          "o2": {
+            "wall_ms": 2641.2019,
+            "cpu_ms": 6343.75,
+            "peak_tree_bytes": 232599552,
+            "peak_process_bytes": 52142080
+          },
+          "lto": {
+            "wall_ms": 2668.1338,
+            "cpu_ms": 7828.125,
+            "peak_tree_bytes": 350195712,
+            "peak_process_bytes": 78237696
+          },
+          "use": {
+            "wall_ms": 2310.9172,
+            "cpu_ms": 5296.875,
+            "peak_tree_bytes": 287080448,
+            "peak_process_bytes": 79646720
+          },
+          "combined": {
+            "wall_ms": 2261.3299,
+            "cpu_ms": 5390.625,
+            "peak_tree_bytes": 290271232,
+            "peak_process_bytes": 79593472
+          }
+        },
+        "logs": {
+          "o2": {
+            "sha256": "8cc3d148dc009908b7219f59fcef62a5b0840009612ff96181d718ffb275a570",
+            "bytes": 11
+          },
+          "lto": {
+            "sha256": "591933a842d8f85b35be6c14b1ec80026c299852c3d7677d9a247c80091d14de",
+            "bytes": 113
+          },
+          "use": {
+            "sha256": "ee435dfa2e19182c94d1d7b92bae7358aff994b9a724443e1a7e3632d2876afa",
+            "bytes": 857
+          },
+          "combined": {
+            "sha256": "ee435dfa2e19182c94d1d7b92bae7358aff994b9a724443e1a7e3632d2876afa",
+            "bytes": 857
+          }
+        },
+        "artifacts": {
+          "o2": {
+            "sha256": "28dd6ea04e84bca4f659d09612df2df9a5c5b3bb88e3676046820da73ec84747",
+            "bytes": 638976
+          },
+          "pgo": {
+            "sha256": "8d68993323e01a1991dcf909fdec834db0ad33079137143d190816003a13beb1",
+            "bytes": 641536
+          },
+          "lto": {
+            "sha256": "94e8419f82a57bdf73cd3429ce100f493cc42b4c1e0676f6cf3226aec1ddf9e4",
+            "bytes": 646656
+          },
+          "pgo_lto": {
+            "sha256": "9b6f2d9adbf2a9ccf6d67dd214a028cf290a7472a4e0caed053e99d3bd0f873d",
+            "bytes": 641536
+          },
+          "instrumented": {
+            "sha256": "cd69e8ca723713c12bdad5a17311a26b3793e13f930efd18069f55ef86e50abc",
+            "bytes": 799232
+          },
+          "combined_instrumented": {
+            "sha256": "cd69e8ca723713c12bdad5a17311a26b3793e13f930efd18069f55ef86e50abc",
+            "bytes": 799232
+          },
+          "trained": {
+            "sha256": "1a69b8a3d9831d1d0ccf44f589abaf65059973dd849ebba480ed5a81da44d2a6",
+            "bytes": 1691648
+          },
+          "combined_trained": {
+            "sha256": "1a69b8a3d9831d1d0ccf44f589abaf65059973dd849ebba480ed5a81da44d2a6",
+            "bytes": 1691648
+          },
+          "plan": {
+            "sha256": "1d76fb861ede2c10ecab446b1ec937c7729f0cb594fa73e767be36dbc31b6aba",
+            "bytes": 476
+          },
+          "combined_plan": {
+            "sha256": "1d76fb861ede2c10ecab446b1ec937c7729f0cb594fa73e767be36dbc31b6aba",
+            "bytes": 476
+          }
+        }
+      },
+      "runtime": {
+        "noise": [
+          [
+            {
+              "wall_ms": 505.34,
+              "cpu_ms": 484.375,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 570.6305,
+              "cpu_ms": 562.5,
+              "peak_tree_bytes": 10043392,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 547.9296,
+              "cpu_ms": 515.625,
+              "peak_tree_bytes": 10047488,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 555.8222,
+              "cpu_ms": 515.625,
+              "peak_tree_bytes": 10059776,
+              "peak_process_bytes": 15921152
+            }
+          ],
+          [
+            {
+              "wall_ms": 579.0954,
+              "cpu_ms": 578.125,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 671.5432,
+              "cpu_ms": 609.375,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15921152
+            }
+          ],
+          [
+            {
+              "wall_ms": 478.6717,
+              "cpu_ms": 453.125,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15912960
+            },
+            {
+              "wall_ms": 424.2695,
+              "cpu_ms": 390.625,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 315.0849,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10055680,
+              "peak_process_bytes": 15921152
+            },
+            {
+              "wall_ms": 318.5387,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10035200,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 325.0664,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15921152
+            },
+            {
+              "wall_ms": 366.6136,
+              "cpu_ms": 343.75,
+              "peak_tree_bytes": 10031104,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 307.9775,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10035200,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 315.2114,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 318.8053,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10043392,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 317.2276,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15921152
+            }
+          ],
+          [
+            {
+              "wall_ms": 308.0948,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15921152
+            },
+            {
+              "wall_ms": 310.041,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 318.2914,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10043392,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 313.1749,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10047488,
+              "peak_process_bytes": 15921152
+            }
+          ],
+          [
+            {
+              "wall_ms": 356.5431,
+              "cpu_ms": 343.75,
+              "peak_tree_bytes": 10031104,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 307.6255,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10043392,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 312.8761,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 310.2527,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 308.3786,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15921152
+            },
+            {
+              "wall_ms": 304.4929,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15921152
+            }
+          ],
+          [
+            {
+              "wall_ms": 317.9945,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10059776,
+              "peak_process_bytes": 15921152
+            },
+            {
+              "wall_ms": 301.5047,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10047488,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 307.5804,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 303.1604,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10055680,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 330.7077,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 10043392,
+              "peak_process_bytes": 15921152
+            },
+            {
+              "wall_ms": 312.0161,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 302.1424,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 313.9051,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10047488,
+              "peak_process_bytes": 15921152
+            }
+          ],
+          [
+            {
+              "wall_ms": 305.7491,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15921152
+            },
+            {
+              "wall_ms": 297.5362,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10047488,
+              "peak_process_bytes": 15921152
+            }
+          ],
+          [
+            {
+              "wall_ms": 309.6204,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 10059776,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 307.0647,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10043392,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 312.8079,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10022912,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 304.9192,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 304.2383,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10035200,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 297.7356,
+              "cpu_ms": 265.625,
+              "peak_tree_bytes": 10031104,
+              "peak_process_bytes": 15917056
+            }
+          ]
+        ],
+        "profile_noise": [
+          [
+            {
+              "wall_ms": 477.7341,
+              "cpu_ms": 484.375,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 479.7306,
+              "cpu_ms": 468.75,
+              "peak_tree_bytes": 9654272,
+              "peak_process_bytes": 13123584
+            }
+          ],
+          [
+            {
+              "wall_ms": 541.6511,
+              "cpu_ms": 500,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 642.7364,
+              "cpu_ms": 593.75,
+              "peak_tree_bytes": 9629696,
+              "peak_process_bytes": 13111296
+            }
+          ],
+          [
+            {
+              "wall_ms": 654.8346,
+              "cpu_ms": 578.125,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 551.7495,
+              "cpu_ms": 531.25,
+              "peak_tree_bytes": 9658368,
+              "peak_process_bytes": 13123584
+            }
+          ],
+          [
+            {
+              "wall_ms": 376.5162,
+              "cpu_ms": 375,
+              "peak_tree_bytes": 9498624,
+              "peak_process_bytes": 13058048
+            },
+            {
+              "wall_ms": 334.3463,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9658368,
+              "peak_process_bytes": 13123584
+            }
+          ],
+          [
+            {
+              "wall_ms": 307.5978,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 303.9807,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13123584
+            }
+          ],
+          [
+            {
+              "wall_ms": 368.2566,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13119488
+            },
+            {
+              "wall_ms": 331.7569,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9654272,
+              "peak_process_bytes": 13123584
+            }
+          ],
+          [
+            {
+              "wall_ms": 283.8339,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13062144
+            },
+            {
+              "wall_ms": 303.9768,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13119488
+            }
+          ],
+          [
+            {
+              "wall_ms": 294.7845,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13119488
+            },
+            {
+              "wall_ms": 296.6917,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13123584
+            }
+          ],
+          [
+            {
+              "wall_ms": 289.7987,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13119488
+            },
+            {
+              "wall_ms": 314.9859,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13115392
+            }
+          ],
+          [
+            {
+              "wall_ms": 306.0839,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 296.2312,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9629696,
+              "peak_process_bytes": 13119488
+            }
+          ],
+          [
+            {
+              "wall_ms": 321.1822,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 305.1695,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13115392
+            }
+          ],
+          [
+            {
+              "wall_ms": 315.682,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13119488
+            },
+            {
+              "wall_ms": 316.2094,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13119488
+            }
+          ],
+          [
+            {
+              "wall_ms": 287.8399,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 315.019,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13119488
+            }
+          ],
+          [
+            {
+              "wall_ms": 295.0353,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 288.6807,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9633792,
+              "peak_process_bytes": 13066240
+            }
+          ],
+          [
+            {
+              "wall_ms": 307.8978,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9428992,
+              "peak_process_bytes": 12967936
+            },
+            {
+              "wall_ms": 298.7708,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13123584
+            }
+          ],
+          [
+            {
+              "wall_ms": 303.7265,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9654272,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 303.1511,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13119488
+            }
+          ],
+          [
+            {
+              "wall_ms": 290.1215,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 288.7191,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13119488
+            }
+          ],
+          [
+            {
+              "wall_ms": 285.7551,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13115392
+            },
+            {
+              "wall_ms": 300.5605,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13123584
+            }
+          ],
+          [
+            {
+              "wall_ms": 289.8417,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9654272,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 295.267,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13115392
+            }
+          ],
+          [
+            {
+              "wall_ms": 287.6356,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13119488
+            },
+            {
+              "wall_ms": 290.8509,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13119488
+            }
+          ],
+          [
+            {
+              "wall_ms": 290.2357,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13119488
+            },
+            {
+              "wall_ms": 295.5235,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13119488
+            }
+          ]
+        ],
+        "pairs": [
+          {
+            "o2": {
+              "wall_ms": 524.7437,
+              "cpu_ms": 515.625,
+              "peak_tree_bytes": 10063872,
+              "peak_process_bytes": 15921152
+            },
+            "lto": {
+              "wall_ms": 542.9383,
+              "cpu_ms": 500,
+              "peak_tree_bytes": 9654272,
+              "peak_process_bytes": 13258752
+            },
+            "optimized": {
+              "wall_ms": 443.1143,
+              "cpu_ms": 406.25,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13119488
+            },
+            "combined": {
+              "wall_ms": 574.6342,
+              "cpu_ms": 546.875,
+              "peak_tree_bytes": 9658368,
+              "peak_process_bytes": 13119488
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 540.4044,
+              "cpu_ms": 500,
+              "peak_tree_bytes": 9662464,
+              "peak_process_bytes": 13127680
+            },
+            "optimized": {
+              "wall_ms": 492.6414,
+              "cpu_ms": 484.375,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13123584
+            },
+            "lto": {
+              "wall_ms": 443.8557,
+              "cpu_ms": 484.375,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13254656
+            },
+            "o2": {
+              "wall_ms": 548.9798,
+              "cpu_ms": 578.125,
+              "peak_tree_bytes": 10063872,
+              "peak_process_bytes": 15921152
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 537.9126,
+              "cpu_ms": 515.625,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            },
+            "lto": {
+              "wall_ms": 454.9743,
+              "cpu_ms": 453.125,
+              "peak_tree_bytes": 9515008,
+              "peak_process_bytes": 13107200
+            },
+            "optimized": {
+              "wall_ms": 433.5893,
+              "cpu_ms": 421.875,
+              "peak_tree_bytes": 9494528,
+              "peak_process_bytes": 12992512
+            },
+            "combined": {
+              "wall_ms": 540.9159,
+              "cpu_ms": 500,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13119488
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 320.0322,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9654272,
+              "peak_process_bytes": 13123584
+            },
+            "optimized": {
+              "wall_ms": 306.8073,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13119488
+            },
+            "lto": {
+              "wall_ms": 324.1354,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9633792,
+              "peak_process_bytes": 13250560
+            },
+            "o2": {
+              "wall_ms": 320.8649,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10047488,
+              "peak_process_bytes": 15921152
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 323.2746,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10035200,
+              "peak_process_bytes": 15912960
+            },
+            "lto": {
+              "wall_ms": 310.9707,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9633792,
+              "peak_process_bytes": 13250560
+            },
+            "optimized": {
+              "wall_ms": 300.9549,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9654272,
+              "peak_process_bytes": 13123584
+            },
+            "combined": {
+              "wall_ms": 309.2629,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13119488
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 321.3776,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13123584
+            },
+            "optimized": {
+              "wall_ms": 307.0136,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13123584
+            },
+            "lto": {
+              "wall_ms": 326.3971,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13254656
+            },
+            "o2": {
+              "wall_ms": 312.3899,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15921152
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 308.1148,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15921152
+            },
+            "lto": {
+              "wall_ms": 310.4206,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13250560
+            },
+            "optimized": {
+              "wall_ms": 300.5885,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13123584
+            },
+            "combined": {
+              "wall_ms": 300.6737,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13119488
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 294.0697,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13119488
+            },
+            "optimized": {
+              "wall_ms": 288.222,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13123584
+            },
+            "lto": {
+              "wall_ms": 305.0151,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13254656
+            },
+            "o2": {
+              "wall_ms": 305.0377,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10055680,
+              "peak_process_bytes": 15921152
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 318.7155,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15921152
+            },
+            "lto": {
+              "wall_ms": 311.1083,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13258752
+            },
+            "optimized": {
+              "wall_ms": 289.9854,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13119488
+            },
+            "combined": {
+              "wall_ms": 300.7787,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9654272,
+              "peak_process_bytes": 13123584
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 339.3739,
+              "cpu_ms": 343.75,
+              "peak_tree_bytes": 9666560,
+              "peak_process_bytes": 13123584
+            },
+            "optimized": {
+              "wall_ms": 303.6305,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13115392
+            },
+            "lto": {
+              "wall_ms": 347.775,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13254656
+            },
+            "o2": {
+              "wall_ms": 331.947,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 317.7783,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10035200,
+              "peak_process_bytes": 15917056
+            },
+            "lto": {
+              "wall_ms": 313.2122,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13254656
+            },
+            "optimized": {
+              "wall_ms": 321.0451,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13123584
+            },
+            "combined": {
+              "wall_ms": 324.2597,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13119488
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 306.1862,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13115392
+            },
+            "optimized": {
+              "wall_ms": 307.2754,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13119488
+            },
+            "lto": {
+              "wall_ms": 322.949,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9633792,
+              "peak_process_bytes": 13254656
+            },
+            "o2": {
+              "wall_ms": 309.4159,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10047488,
+              "peak_process_bytes": 15917056
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 324.8495,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10055680,
+              "peak_process_bytes": 15917056
+            },
+            "lto": {
+              "wall_ms": 301.2093,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9658368,
+              "peak_process_bytes": 13254656
+            },
+            "optimized": {
+              "wall_ms": 289.919,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13123584
+            },
+            "combined": {
+              "wall_ms": 294.5661,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9654272,
+              "peak_process_bytes": 13119488
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 288.3879,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9662464,
+              "peak_process_bytes": 13119488
+            },
+            "optimized": {
+              "wall_ms": 290.1129,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13123584
+            },
+            "lto": {
+              "wall_ms": 304.0265,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13250560
+            },
+            "o2": {
+              "wall_ms": 306.4821,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10043392,
+              "peak_process_bytes": 15917056
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 304.643,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10043392,
+              "peak_process_bytes": 15917056
+            },
+            "lto": {
+              "wall_ms": 305.5557,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13250560
+            },
+            "optimized": {
+              "wall_ms": 327.3339,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13123584
+            },
+            "combined": {
+              "wall_ms": 312.2465,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9654272,
+              "peak_process_bytes": 13123584
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 316.8183,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13115392
+            },
+            "optimized": {
+              "wall_ms": 338.7237,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13119488
+            },
+            "lto": {
+              "wall_ms": 324.6445,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 9654272,
+              "peak_process_bytes": 13254656
+            },
+            "o2": {
+              "wall_ms": 305.6892,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15917056
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 307.1632,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            },
+            "lto": {
+              "wall_ms": 299.1093,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13254656
+            },
+            "optimized": {
+              "wall_ms": 288.3891,
+              "cpu_ms": 265.625,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13066240
+            },
+            "combined": {
+              "wall_ms": 299.4559,
+              "cpu_ms": 265.625,
+              "peak_tree_bytes": 9658368,
+              "peak_process_bytes": 13123584
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 302.3716,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13119488
+            },
+            "optimized": {
+              "wall_ms": 291.6119,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13123584
+            },
+            "lto": {
+              "wall_ms": 305.4552,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13254656
+            },
+            "o2": {
+              "wall_ms": 300.8899,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10055680,
+              "peak_process_bytes": 15917056
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 313.8078,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15888384
+            },
+            "lto": {
+              "wall_ms": 305.0442,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13254656
+            },
+            "optimized": {
+              "wall_ms": 315.1944,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13115392
+            },
+            "combined": {
+              "wall_ms": 313.345,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13119488
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 300.775,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9658368,
+              "peak_process_bytes": 13123584
+            },
+            "optimized": {
+              "wall_ms": 287.7011,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13115392
+            },
+            "lto": {
+              "wall_ms": 299.1776,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13254656
+            },
+            "o2": {
+              "wall_ms": 302.6618,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 321.5243,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10047488,
+              "peak_process_bytes": 15921152
+            },
+            "lto": {
+              "wall_ms": 304.8874,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13254656
+            },
+            "optimized": {
+              "wall_ms": 292.4377,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13123584
+            },
+            "combined": {
+              "wall_ms": 298.3227,
+              "cpu_ms": 343.75,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13123584
+            }
+          }
+        ],
+        "ranges": {
+          "o2": {
+            "wall_ms": {
+              "median": 313.8078,
+              "min": 300.8899,
+              "max": 548.9798
+            },
+            "cpu_ms": {
+              "median": 296.875,
+              "min": 281.25,
+              "max": 578.125
+            },
+            "peak_tree_bytes": {
+              "median": 10047488,
+              "min": 10035200,
+              "max": 10063872
+            },
+            "peak_process_bytes": {
+              "median": 15917056,
+              "min": 15888384,
+              "max": 15921152
+            }
+          },
+          "lto": {
+            "wall_ms": {
+              "median": 310.9707,
+              "min": 299.1093,
+              "max": 542.9383
+            },
+            "cpu_ms": {
+              "median": 312.5,
+              "min": 281.25,
+              "max": 500
+            },
+            "peak_tree_bytes": {
+              "median": 9650176,
+              "min": 9515008,
+              "max": 9658368
+            },
+            "peak_process_bytes": {
+              "median": 13254656,
+              "min": 13107200,
+              "max": 13258752
+            }
+          },
+          "optimized": {
+            "wall_ms": {
+              "median": 303.6305,
+              "min": 287.7011,
+              "max": 492.6414
+            },
+            "cpu_ms": {
+              "median": 296.875,
+              "min": 265.625,
+              "max": 484.375
+            },
+            "peak_tree_bytes": {
+              "median": 9641984,
+              "min": 9494528,
+              "max": 9654272
+            },
+            "peak_process_bytes": {
+              "median": 13123584,
+              "min": 12992512,
+              "max": 13123584
+            }
+          },
+          "combined": {
+            "wall_ms": {
+              "median": 309.2629,
+              "min": 288.3879,
+              "max": 574.6342
+            },
+            "cpu_ms": {
+              "median": 296.875,
+              "min": 265.625,
+              "max": 546.875
+            },
+            "peak_tree_bytes": {
+              "median": 9650176,
+              "min": 9637888,
+              "max": 9666560
+            },
+            "peak_process_bytes": {
+              "median": 13119488,
+              "min": 13115392,
+              "max": 13127680
+            }
+          }
+        },
+        "noise_percent": 2.3215753682390696,
+        "improvement_percent": 0.9040884261002958,
+        "size_reduction_percent": -1.2019230769230769,
+        "combined_improvement_percent": -1.8550178588778197,
+        "combined_size_reduction_percent": 0,
+        "profile_noise_percent": 3.00889151012596,
+        "target": false
+      },
+      "initial_runtime": {
+        "noise": [
+          [
+            {
+              "wall_ms": 328.7503,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 10031104,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 331.3983,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10043392,
+              "peak_process_bytes": 15921152
+            }
+          ],
+          [
+            {
+              "wall_ms": 302.8565,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 315.2803,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15912960
+            }
+          ],
+          [
+            {
+              "wall_ms": 319.7489,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10047488,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 306.7782,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 306.6825,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10035200,
+              "peak_process_bytes": 15912960
+            },
+            {
+              "wall_ms": 327.7989,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15917056
+            }
+          ],
+          [
+            {
+              "wall_ms": 307.4818,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10043392,
+              "peak_process_bytes": 15917056
+            },
+            {
+              "wall_ms": 299.602,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 10051584,
+              "peak_process_bytes": 15921152
+            }
+          ]
+        ],
+        "profile_noise": [
+          [
+            {
+              "wall_ms": 304.344,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 331.1956,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13119488
+            }
+          ],
+          [
+            {
+              "wall_ms": 291.0788,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13123584
+            },
+            {
+              "wall_ms": 290.3385,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9633792,
+              "peak_process_bytes": 13119488
+            }
+          ],
+          [
+            {
+              "wall_ms": 318.532,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13119488
+            },
+            {
+              "wall_ms": 403.1652,
+              "cpu_ms": 390.625,
+              "peak_tree_bytes": 9637888,
+              "peak_process_bytes": 13123584
+            }
+          ],
+          [
+            {
+              "wall_ms": 296.8741,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13119488
+            },
+            {
+              "wall_ms": 286.4181,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9658368,
+              "peak_process_bytes": 13123584
+            }
+          ],
+          [
+            {
+              "wall_ms": 316.8095,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13119488
+            },
+            {
+              "wall_ms": 285.6361,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13119488
+            }
+          ]
+        ],
+        "pairs": [
+          {
+            "o2": {
+              "wall_ms": 304.4656,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            },
+            "lto": {
+              "wall_ms": 306.2119,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9658368,
+              "peak_process_bytes": 13258752
+            },
+            "optimized": {
+              "wall_ms": 304.1336,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9629696,
+              "peak_process_bytes": 13119488
+            },
+            "combined": {
+              "wall_ms": 291.115,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13119488
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 297.523,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13119488
+            },
+            "optimized": {
+              "wall_ms": 296.5386,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13123584
+            },
+            "lto": {
+              "wall_ms": 301.7354,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9625600,
+              "peak_process_bytes": 13254656
+            },
+            "o2": {
+              "wall_ms": 305.3626,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10039296,
+              "peak_process_bytes": 15917056
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 311.9078,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10035200,
+              "peak_process_bytes": 15912960
+            },
+            "lto": {
+              "wall_ms": 336.8696,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13254656
+            },
+            "optimized": {
+              "wall_ms": 343.4591,
+              "cpu_ms": 343.75,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13127680
+            },
+            "combined": {
+              "wall_ms": 312.3229,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13119488
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 299.1025,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9523200,
+              "peak_process_bytes": 13004800
+            },
+            "optimized": {
+              "wall_ms": 309.43,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9641984,
+              "peak_process_bytes": 13119488
+            },
+            "lto": {
+              "wall_ms": 313.4541,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13254656
+            },
+            "o2": {
+              "wall_ms": 300.1548,
+              "cpu_ms": 296.875,
+              "peak_tree_bytes": 10047488,
+              "peak_process_bytes": 15917056
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 315.7555,
+              "cpu_ms": 312.5,
+              "peak_tree_bytes": 10035200,
+              "peak_process_bytes": 15921152
+            },
+            "lto": {
+              "wall_ms": 297.3485,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9646080,
+              "peak_process_bytes": 13254656
+            },
+            "optimized": {
+              "wall_ms": 302.5676,
+              "cpu_ms": 328.125,
+              "peak_tree_bytes": 9633792,
+              "peak_process_bytes": 13115392
+            },
+            "combined": {
+              "wall_ms": 291.127,
+              "cpu_ms": 281.25,
+              "peak_tree_bytes": 9650176,
+              "peak_process_bytes": 13123584
+            }
+          }
+        ],
+        "ranges": {
+          "o2": {
+            "wall_ms": {
+              "median": 305.3626,
+              "min": 300.1548,
+              "max": 315.7555
+            },
+            "cpu_ms": {
+              "median": 296.875,
+              "min": 296.875,
+              "max": 312.5
+            },
+            "peak_tree_bytes": {
+              "median": 10039296,
+              "min": 10035200,
+              "max": 10047488
+            },
+            "peak_process_bytes": {
+              "median": 15917056,
+              "min": 15912960,
+              "max": 15921152
+            }
+          },
+          "lto": {
+            "wall_ms": {
+              "median": 306.2119,
+              "min": 297.3485,
+              "max": 336.8696
+            },
+            "cpu_ms": {
+              "median": 296.875,
+              "min": 281.25,
+              "max": 328.125
+            },
+            "peak_tree_bytes": {
+              "median": 9646080,
+              "min": 9625600,
+              "max": 9658368
+            },
+            "peak_process_bytes": {
+              "median": 13254656,
+              "min": 13254656,
+              "max": 13258752
+            }
+          },
+          "optimized": {
+            "wall_ms": {
+              "median": 304.1336,
+              "min": 296.5386,
+              "max": 343.4591
+            },
+            "cpu_ms": {
+              "median": 296.875,
+              "min": 296.875,
+              "max": 343.75
+            },
+            "peak_tree_bytes": {
+              "median": 9641984,
+              "min": 9629696,
+              "max": 9650176
+            },
+            "peak_process_bytes": {
+              "median": 13119488,
+              "min": 13115392,
+              "max": 13127680
+            }
+          },
+          "combined": {
+            "wall_ms": {
+              "median": 297.523,
+              "min": 291.115,
+              "max": 312.3229
+            },
+            "cpu_ms": {
+              "median": 281.25,
+              "min": 281.25,
+              "max": 296.875
+            },
+            "peak_tree_bytes": {
+              "median": 9650176,
+              "min": 9523200,
+              "max": 9650176
+            },
+            "peak_process_bytes": {
+              "median": 13119488,
+              "min": 13004800,
+              "max": 13123584
+            }
+          }
+        },
+        "noise_percent": 4.019757438806435,
+        "improvement_percent": -0.27812836280540837,
+        "size_reduction_percent": -1.2019230769230769,
+        "combined_improvement_percent": 2.17358424061004,
+        "combined_size_reduction_percent": 0,
+        "profile_noise_percent": 8.450016332577864,
+        "target": false
+      }
+    },
+    "compiler": {
+      "first": {
+        "o2": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc\\compiler-warm\\o2.exe",
+        "optimized": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc\\compiler-warm\\pgo.exe",
+        "lto": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc\\compiler-warm\\lto.exe",
+        "combined": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc\\compiler-warm\\pgo-lto.exe",
+        "profile": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc\\compiler-warm\\profile",
+        "combined_profile": "G:\\Vela\\build\\stage13\\lto-msvc-MrsREc\\compiler-warm\\profile",
+        "metrics": {
+          "instrument": {
+            "wall_ms": 17199.758,
+            "cpu_ms": 54562.5,
+            "peak_tree_bytes": 472494080,
+            "peak_process_bytes": 184098816
+          },
+          "train": {
+            "wall_ms": 7692.9933,
+            "cpu_ms": 7593.75,
+            "peak_tree_bytes": 67346432,
+            "peak_process_bytes": 31113216
+          },
+          "o2": {
+            "wall_ms": 27270.0488,
+            "cpu_ms": 96406.25,
+            "peak_tree_bytes": 588210176,
+            "peak_process_bytes": 169816064
+          },
+          "lto": {
+            "wall_ms": 15326.1332,
+            "cpu_ms": 124437.5,
+            "peak_tree_bytes": 916033536,
+            "peak_process_bytes": 182468608
+          },
+          "use": {
+            "wall_ms": 13448.1513,
+            "cpu_ms": 62406.25,
+            "peak_tree_bytes": 626708480,
+            "peak_process_bytes": 182386688
+          },
+          "combined": {
+            "wall_ms": 13070.1185,
+            "cpu_ms": 62359.375,
+            "peak_tree_bytes": 630636544,
+            "peak_process_bytes": 182378496
+          }
+        },
+        "logs": {
+          "o2": {
+            "sha256": "8cc3d148dc009908b7219f59fcef62a5b0840009612ff96181d718ffb275a570",
+            "bytes": 11
+          },
+          "lto": {
+            "sha256": "591933a842d8f85b35be6c14b1ec80026c299852c3d7677d9a247c80091d14de",
+            "bytes": 113
+          },
+          "use": {
+            "sha256": "83b3732a0fb80111fa4f06b929841dd438353289c095f04be2ec177457e07253",
+            "bytes": 858
+          },
+          "combined": {
+            "sha256": "83b3732a0fb80111fa4f06b929841dd438353289c095f04be2ec177457e07253",
+            "bytes": 858
+          }
+        },
+        "artifacts": {
+          "o2": {
+            "sha256": "999b93ebf9d3ff072268872cd4d4eb5c4b0b41bddc89a3be6354e090e236835a",
+            "bytes": 3291136
+          },
+          "pgo": {
+            "sha256": "f7b1d15bd3ed3e83f1a9559fed2115a380ff811307941d3004e381ea3a78407c",
+            "bytes": 2868736
+          },
+          "lto": {
+            "sha256": "9800a3c50e1f6f2f6a0c34f389ed0e3dcd90059b849d492fc04c37d4e13f4c83",
+            "bytes": 3267072
+          },
+          "pgo_lto": {
+            "sha256": "a2099d1139dbd2a7a79dfa7f504203ac987ce4323c517a880a027c549f89df1a",
+            "bytes": 2868736
+          },
+          "instrumented": {
+            "sha256": "732f6e68786c5374194f963dc2c56cf6b74e02176a5b60a1e025ddc28ce5e59c",
+            "bytes": 3881984
+          },
+          "combined_instrumented": {
+            "sha256": "732f6e68786c5374194f963dc2c56cf6b74e02176a5b60a1e025ddc28ce5e59c",
+            "bytes": 3881984
+          },
+          "trained": {
+            "sha256": "2f731aaf1d068a2bf0bd4ce19fa404471873f8533ea7e2f5a4440e45a678669b",
+            "bytes": 3534848
+          },
+          "combined_trained": {
+            "sha256": "2f731aaf1d068a2bf0bd4ce19fa404471873f8533ea7e2f5a4440e45a678669b",
+            "bytes": 3534848
+          },
+          "plan": {
+            "sha256": "aace8b4e75c53b703b9e80a18aa29279a70931d21a55c6a0767ae9dde036aaaf",
+            "bytes": 476
+          },
+          "combined_plan": {
+            "sha256": "aace8b4e75c53b703b9e80a18aa29279a70931d21a55c6a0767ae9dde036aaaf",
+            "bytes": 476
+          }
+        }
+      },
+      "runtime": {
+        "noise": [
+          [
+            {
+              "wall_ms": 984.6399,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97136640,
+              "peak_process_bytes": 95420416
+            },
+            {
+              "wall_ms": 990.8885,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95412224
+            }
+          ],
+          [
+            {
+              "wall_ms": 996.0768,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97144832,
+              "peak_process_bytes": 95363072
+            },
+            {
+              "wall_ms": 975.6177,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95330304
+            }
+          ],
+          [
+            {
+              "wall_ms": 959.2228,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97120256,
+              "peak_process_bytes": 95404032
+            },
+            {
+              "wall_ms": 1002.5074,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97148928,
+              "peak_process_bytes": 95395840
+            }
+          ],
+          [
+            {
+              "wall_ms": 977.3532,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95268864
+            },
+            {
+              "wall_ms": 977.185,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97136640,
+              "peak_process_bytes": 95395840
+            }
+          ],
+          [
+            {
+              "wall_ms": 1041.6698,
+              "cpu_ms": 1031.25,
+              "peak_tree_bytes": 97128448,
+              "peak_process_bytes": 95371264
+            },
+            {
+              "wall_ms": 1028.2396,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97136640,
+              "peak_process_bytes": 95383552
+            }
+          ],
+          [
+            {
+              "wall_ms": 1004.8288,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95428608
+            },
+            {
+              "wall_ms": 1028.7597,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95387648
+            }
+          ],
+          [
+            {
+              "wall_ms": 984.8496,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97148928,
+              "peak_process_bytes": 95387648
+            },
+            {
+              "wall_ms": 970.8045,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95420416
+            }
+          ],
+          [
+            {
+              "wall_ms": 986.4806,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95330304
+            },
+            {
+              "wall_ms": 984.3513,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97128448,
+              "peak_process_bytes": 95322112
+            }
+          ],
+          [
+            {
+              "wall_ms": 975.7716,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95424512
+            },
+            {
+              "wall_ms": 984.7155,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97148928,
+              "peak_process_bytes": 95338496
+            }
+          ],
+          [
+            {
+              "wall_ms": 990.6922,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97128448,
+              "peak_process_bytes": 95350784
+            },
+            {
+              "wall_ms": 1079.8227,
+              "cpu_ms": 1062.5,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95469568
+            }
+          ],
+          [
+            {
+              "wall_ms": 1002.217,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97148928,
+              "peak_process_bytes": 95473664
+            },
+            {
+              "wall_ms": 1006.196,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97136640,
+              "peak_process_bytes": 95379456
+            }
+          ],
+          [
+            {
+              "wall_ms": 1003.3159,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97153024,
+              "peak_process_bytes": 95387648
+            },
+            {
+              "wall_ms": 1021.4445,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97157120,
+              "peak_process_bytes": 95416320
+            }
+          ],
+          [
+            {
+              "wall_ms": 1039.8065,
+              "cpu_ms": 1031.25,
+              "peak_tree_bytes": 97136640,
+              "peak_process_bytes": 95436800
+            },
+            {
+              "wall_ms": 1029.9397,
+              "cpu_ms": 1031.25,
+              "peak_tree_bytes": 97128448,
+              "peak_process_bytes": 95367168
+            }
+          ],
+          [
+            {
+              "wall_ms": 1108.7382,
+              "cpu_ms": 1078.125,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95363072
+            },
+            {
+              "wall_ms": 1083.9408,
+              "cpu_ms": 1078.125,
+              "peak_tree_bytes": 97148928,
+              "peak_process_bytes": 95358976
+            }
+          ],
+          [
+            {
+              "wall_ms": 1090.8542,
+              "cpu_ms": 1093.75,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95408128
+            },
+            {
+              "wall_ms": 1059.3063,
+              "cpu_ms": 1062.5,
+              "peak_tree_bytes": 97148928,
+              "peak_process_bytes": 95371264
+            }
+          ],
+          [
+            {
+              "wall_ms": 1022.9653,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95367168
+            },
+            {
+              "wall_ms": 1006.4906,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97136640,
+              "peak_process_bytes": 95375360
+            }
+          ],
+          [
+            {
+              "wall_ms": 992.063,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97136640,
+              "peak_process_bytes": 95416320
+            },
+            {
+              "wall_ms": 997.2817,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97136640,
+              "peak_process_bytes": 95432704
+            }
+          ],
+          [
+            {
+              "wall_ms": 981.7726,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97128448,
+              "peak_process_bytes": 95285248
+            },
+            {
+              "wall_ms": 966.7047,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97128448,
+              "peak_process_bytes": 95277056
+            }
+          ],
+          [
+            {
+              "wall_ms": 964.3772,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95354880
+            },
+            {
+              "wall_ms": 986.9966,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97148928,
+              "peak_process_bytes": 95395840
+            }
+          ],
+          [
+            {
+              "wall_ms": 946.3041,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97128448,
+              "peak_process_bytes": 95363072
+            },
+            {
+              "wall_ms": 952.7802,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97144832,
+              "peak_process_bytes": 95358976
+            }
+          ],
+          [
+            {
+              "wall_ms": 949.2267,
+              "cpu_ms": 921.875,
+              "peak_tree_bytes": 97136640,
+              "peak_process_bytes": 95322112
+            },
+            {
+              "wall_ms": 962.102,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97148928,
+              "peak_process_bytes": 95383552
+            }
+          ]
+        ],
+        "profile_noise": [
+          [
+            {
+              "wall_ms": 983.7133,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92504064
+            },
+            {
+              "wall_ms": 978.1997,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97067008,
+              "peak_process_bytes": 92487680
+            }
+          ],
+          [
+            {
+              "wall_ms": 973.8647,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92483584
+            },
+            {
+              "wall_ms": 976.5961,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92430336
+            }
+          ],
+          [
+            {
+              "wall_ms": 958.0178,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92389376
+            },
+            {
+              "wall_ms": 945.4918,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92475392
+            }
+          ],
+          [
+            {
+              "wall_ms": 965.1124,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92446720
+            },
+            {
+              "wall_ms": 955.3841,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92499968
+            }
+          ],
+          [
+            {
+              "wall_ms": 980.7678,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92438528
+            },
+            {
+              "wall_ms": 952.518,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92553216
+            }
+          ],
+          [
+            {
+              "wall_ms": 1004.0269,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92413952
+            },
+            {
+              "wall_ms": 994.9192,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92450816
+            }
+          ],
+          [
+            {
+              "wall_ms": 963.2453,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92545024
+            },
+            {
+              "wall_ms": 968.5558,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92508160
+            }
+          ],
+          [
+            {
+              "wall_ms": 959.2324,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97058816,
+              "peak_process_bytes": 92426240
+            },
+            {
+              "wall_ms": 946.829,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92409856
+            }
+          ],
+          [
+            {
+              "wall_ms": 958.5157,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92508160
+            },
+            {
+              "wall_ms": 963.9827,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92459008
+            }
+          ],
+          [
+            {
+              "wall_ms": 1069.1558,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92520448
+            },
+            {
+              "wall_ms": 1011.3114,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92553216
+            }
+          ],
+          [
+            {
+              "wall_ms": 999.1136,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92442624
+            },
+            {
+              "wall_ms": 967.7588,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92397568
+            }
+          ],
+          [
+            {
+              "wall_ms": 1008.4295,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92434432
+            },
+            {
+              "wall_ms": 1003.7834,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97067008,
+              "peak_process_bytes": 92442624
+            }
+          ],
+          [
+            {
+              "wall_ms": 1046.7276,
+              "cpu_ms": 1046.875,
+              "peak_tree_bytes": 97067008,
+              "peak_process_bytes": 92463104
+            },
+            {
+              "wall_ms": 1064.3413,
+              "cpu_ms": 1046.875,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92512256
+            }
+          ],
+          [
+            {
+              "wall_ms": 1042.9596,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92393472
+            },
+            {
+              "wall_ms": 1064.3151,
+              "cpu_ms": 1062.5,
+              "peak_tree_bytes": 97067008,
+              "peak_process_bytes": 92438528
+            }
+          ],
+          [
+            {
+              "wall_ms": 1024.2492,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92483584
+            },
+            {
+              "wall_ms": 1018.9251,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97062912,
+              "peak_process_bytes": 92471296
+            }
+          ],
+          [
+            {
+              "wall_ms": 1045.346,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92397568
+            },
+            {
+              "wall_ms": 992.1808,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97062912,
+              "peak_process_bytes": 92438528
+            }
+          ],
+          [
+            {
+              "wall_ms": 944.3704,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97087488,
+              "peak_process_bytes": 92471296
+            },
+            {
+              "wall_ms": 987.0874,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97058816,
+              "peak_process_bytes": 92491776
+            }
+          ],
+          [
+            {
+              "wall_ms": 937.4678,
+              "cpu_ms": 906.25,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92450816
+            },
+            {
+              "wall_ms": 960.3609,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97083392,
+              "peak_process_bytes": 92499968
+            }
+          ],
+          [
+            {
+              "wall_ms": 991.815,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92487680
+            },
+            {
+              "wall_ms": 950.7865,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92495872
+            }
+          ],
+          [
+            {
+              "wall_ms": 959.3967,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97067008,
+              "peak_process_bytes": 92459008
+            },
+            {
+              "wall_ms": 940.9263,
+              "cpu_ms": 921.875,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92504064
+            }
+          ],
+          [
+            {
+              "wall_ms": 953.6377,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97067008,
+              "peak_process_bytes": 92520448
+            },
+            {
+              "wall_ms": 967.053,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97067008,
+              "peak_process_bytes": 92413952
+            }
+          ]
+        ],
+        "pairs": [
+          {
+            "o2": {
+              "wall_ms": 1001.6454,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95399936
+            },
+            "lto": {
+              "wall_ms": 988.8152,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97038336,
+              "peak_process_bytes": 92729344
+            },
+            "optimized": {
+              "wall_ms": 953.4351,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92401664
+            },
+            "combined": {
+              "wall_ms": 970.6467,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97570816,
+              "peak_process_bytes": 92495872
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 964.4167,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97574912,
+              "peak_process_bytes": 92487680
+            },
+            "optimized": {
+              "wall_ms": 953.0952,
+              "cpu_ms": 921.875,
+              "peak_tree_bytes": 97062912,
+              "peak_process_bytes": 92459008
+            },
+            "lto": {
+              "wall_ms": 959.5892,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97046528,
+              "peak_process_bytes": 92688384
+            },
+            "o2": {
+              "wall_ms": 972.433,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95350784
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 962.1459,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97136640,
+              "peak_process_bytes": 95350784
+            },
+            "lto": {
+              "wall_ms": 956.7436,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97042432,
+              "peak_process_bytes": 92684288
+            },
+            "optimized": {
+              "wall_ms": 946.2943,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92483584
+            },
+            "combined": {
+              "wall_ms": 945.7146,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97558528,
+              "peak_process_bytes": 92467200
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 1079.6616,
+              "cpu_ms": 1078.125,
+              "peak_tree_bytes": 97566720,
+              "peak_process_bytes": 92528640
+            },
+            "optimized": {
+              "wall_ms": 1009.434,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97067008,
+              "peak_process_bytes": 92413952
+            },
+            "lto": {
+              "wall_ms": 1022.487,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97034240,
+              "peak_process_bytes": 92753920
+            },
+            "o2": {
+              "wall_ms": 1011.4997,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95350784
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 1008.2909,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95367168
+            },
+            "lto": {
+              "wall_ms": 1078.9265,
+              "cpu_ms": 1062.5,
+              "peak_tree_bytes": 97042432,
+              "peak_process_bytes": 92696576
+            },
+            "optimized": {
+              "wall_ms": 1003.3983,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97062912,
+              "peak_process_bytes": 92520448
+            },
+            "combined": {
+              "wall_ms": 987.247,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97566720,
+              "peak_process_bytes": 92520448
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 989.833,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97570816,
+              "peak_process_bytes": 92532736
+            },
+            "optimized": {
+              "wall_ms": 980.9343,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92405760
+            },
+            "lto": {
+              "wall_ms": 1001.0897,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97050624,
+              "peak_process_bytes": 92692480
+            },
+            "o2": {
+              "wall_ms": 978.0061,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97148928,
+              "peak_process_bytes": 95371264
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 964.8607,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95354880
+            },
+            "lto": {
+              "wall_ms": 963.8987,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97046528,
+              "peak_process_bytes": 92741632
+            },
+            "optimized": {
+              "wall_ms": 956.6668,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92442624
+            },
+            "combined": {
+              "wall_ms": 983.0795,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97583104,
+              "peak_process_bytes": 92499968
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 962.241,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97570816,
+              "peak_process_bytes": 92573696
+            },
+            "optimized": {
+              "wall_ms": 989.5802,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92561408
+            },
+            "lto": {
+              "wall_ms": 974.7401,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97046528,
+              "peak_process_bytes": 92708864
+            },
+            "o2": {
+              "wall_ms": 968.4561,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97128448,
+              "peak_process_bytes": 95383552
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 985.0476,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97124352,
+              "peak_process_bytes": 95358976
+            },
+            "lto": {
+              "wall_ms": 957.2349,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97030144,
+              "peak_process_bytes": 92667904
+            },
+            "optimized": {
+              "wall_ms": 966.5048,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92434432
+            },
+            "combined": {
+              "wall_ms": 934.2854,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97570816,
+              "peak_process_bytes": 92524544
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 1026.2005,
+              "cpu_ms": 1031.25,
+              "peak_tree_bytes": 97570816,
+              "peak_process_bytes": 92528640
+            },
+            "optimized": {
+              "wall_ms": 1016.068,
+              "cpu_ms": 1031.25,
+              "peak_tree_bytes": 97062912,
+              "peak_process_bytes": 92450816
+            },
+            "lto": {
+              "wall_ms": 1007.4143,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97034240,
+              "peak_process_bytes": 92741632
+            },
+            "o2": {
+              "wall_ms": 1034.5887,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97144832,
+              "peak_process_bytes": 95358976
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 1011.0263,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97144832,
+              "peak_process_bytes": 95391744
+            },
+            "lto": {
+              "wall_ms": 995.5549,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97026048,
+              "peak_process_bytes": 92762112
+            },
+            "optimized": {
+              "wall_ms": 960.7058,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92524544
+            },
+            "combined": {
+              "wall_ms": 976.1956,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97562624,
+              "peak_process_bytes": 92569600
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 970.874,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97566720,
+              "peak_process_bytes": 92479488
+            },
+            "optimized": {
+              "wall_ms": 1006.4559,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92528640
+            },
+            "lto": {
+              "wall_ms": 1028.8729,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97042432,
+              "peak_process_bytes": 92651520
+            },
+            "o2": {
+              "wall_ms": 1012.4475,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95428608
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 1044.4988,
+              "cpu_ms": 1031.25,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95457280
+            },
+            "lto": {
+              "wall_ms": 1002.0559,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97046528,
+              "peak_process_bytes": 92672000
+            },
+            "optimized": {
+              "wall_ms": 1056.506,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97062912,
+              "peak_process_bytes": 92467200
+            },
+            "combined": {
+              "wall_ms": 1035.1966,
+              "cpu_ms": 1031.25,
+              "peak_tree_bytes": 97566720,
+              "peak_process_bytes": 92540928
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 1040.5051,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 96735232,
+              "peak_process_bytes": 92405760
+            },
+            "optimized": {
+              "wall_ms": 1053.426,
+              "cpu_ms": 1046.875,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92516352
+            },
+            "lto": {
+              "wall_ms": 1032.9593,
+              "cpu_ms": 1046.875,
+              "peak_tree_bytes": 97050624,
+              "peak_process_bytes": 92692480
+            },
+            "o2": {
+              "wall_ms": 1080.0269,
+              "cpu_ms": 1078.125,
+              "peak_tree_bytes": 97148928,
+              "peak_process_bytes": 95371264
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 1093.9728,
+              "cpu_ms": 1093.75,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95453184
+            },
+            "lto": {
+              "wall_ms": 1089.6321,
+              "cpu_ms": 1078.125,
+              "peak_tree_bytes": 97050624,
+              "peak_process_bytes": 92692480
+            },
+            "optimized": {
+              "wall_ms": 1044.5567,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92426240
+            },
+            "combined": {
+              "wall_ms": 1020.6534,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97579008,
+              "peak_process_bytes": 92614656
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 973.7207,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97566720,
+              "peak_process_bytes": 92504064
+            },
+            "optimized": {
+              "wall_ms": 999.2545,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92471296
+            },
+            "lto": {
+              "wall_ms": 958.96,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97030144,
+              "peak_process_bytes": 92655616
+            },
+            "o2": {
+              "wall_ms": 952.2254,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97136640,
+              "peak_process_bytes": 95342592
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 976.7331,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97148928,
+              "peak_process_bytes": 95383552
+            },
+            "lto": {
+              "wall_ms": 952.2863,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97038336,
+              "peak_process_bytes": 92663808
+            },
+            "optimized": {
+              "wall_ms": 947.6116,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 96804864,
+              "peak_process_bytes": 92508160
+            },
+            "combined": {
+              "wall_ms": 955.1307,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97570816,
+              "peak_process_bytes": 92577792
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 950.4568,
+              "cpu_ms": 875,
+              "peak_tree_bytes": 97574912,
+              "peak_process_bytes": 92454912
+            },
+            "optimized": {
+              "wall_ms": 942.5911,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 96796672,
+              "peak_process_bytes": 92512256
+            },
+            "lto": {
+              "wall_ms": 960.4811,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97030144,
+              "peak_process_bytes": 92749824
+            },
+            "o2": {
+              "wall_ms": 970.4408,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97128448,
+              "peak_process_bytes": 95346688
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 971.7166,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95350784
+            },
+            "lto": {
+              "wall_ms": 957.7629,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97038336,
+              "peak_process_bytes": 92684288
+            },
+            "optimized": {
+              "wall_ms": 955.0998,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92442624
+            },
+            "combined": {
+              "wall_ms": 948.9339,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97570816,
+              "peak_process_bytes": 92581888
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 932.8676,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97562624,
+              "peak_process_bytes": 92565504
+            },
+            "optimized": {
+              "wall_ms": 960.1638,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92413952
+            },
+            "lto": {
+              "wall_ms": 960.8392,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97026048,
+              "peak_process_bytes": 92741632
+            },
+            "o2": {
+              "wall_ms": 961.4165,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95412224
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 947.1384,
+              "cpu_ms": 921.875,
+              "peak_tree_bytes": 97148928,
+              "peak_process_bytes": 95342592
+            },
+            "lto": {
+              "wall_ms": 940.9482,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97034240,
+              "peak_process_bytes": 92766208
+            },
+            "optimized": {
+              "wall_ms": 972.1566,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97058816,
+              "peak_process_bytes": 92467200
+            },
+            "combined": {
+              "wall_ms": 958.4563,
+              "cpu_ms": 906.25,
+              "peak_tree_bytes": 97574912,
+              "peak_process_bytes": 92569600
+            }
+          }
+        ],
+        "ranges": {
+          "o2": {
+            "wall_ms": {
+              "median": 978.0061,
+              "min": 947.1384,
+              "max": 1093.9728
+            },
+            "cpu_ms": {
+              "median": 968.75,
+              "min": 921.875,
+              "max": 1093.75
+            },
+            "peak_tree_bytes": {
+              "median": 97136640,
+              "min": 97124352,
+              "max": 97148928
+            },
+            "peak_process_bytes": {
+              "median": 95367168,
+              "min": 95342592,
+              "max": 95457280
+            }
+          },
+          "lto": {
+            "wall_ms": {
+              "median": 974.7401,
+              "min": 940.9482,
+              "max": 1089.6321
+            },
+            "cpu_ms": {
+              "median": 968.75,
+              "min": 937.5,
+              "max": 1078.125
+            },
+            "peak_tree_bytes": {
+              "median": 97038336,
+              "min": 97026048,
+              "max": 97050624
+            },
+            "peak_process_bytes": {
+              "median": 92692480,
+              "min": 92651520,
+              "max": 92766208
+            }
+          },
+          "optimized": {
+            "wall_ms": {
+              "median": 972.1566,
+              "min": 942.5911,
+              "max": 1056.506
+            },
+            "cpu_ms": {
+              "median": 968.75,
+              "min": 921.875,
+              "max": 1046.875
+            },
+            "peak_tree_bytes": {
+              "median": 97071104,
+              "min": 96796672,
+              "max": 97079296
+            },
+            "peak_process_bytes": {
+              "median": 92467200,
+              "min": 92401664,
+              "max": 92561408
+            }
+          },
+          "combined": {
+            "wall_ms": {
+              "median": 970.874,
+              "min": 932.8676,
+              "max": 1079.6616
+            },
+            "cpu_ms": {
+              "median": 968.75,
+              "min": 875,
+              "max": 1078.125
+            },
+            "peak_tree_bytes": {
+              "median": 97570816,
+              "min": 96735232,
+              "max": 97583104
+            },
+            "peak_process_bytes": {
+              "median": 92528640,
+              "min": 92405760,
+              "max": 92614656
+            }
+          }
+        },
+        "noise_percent": 1.4363583007854046,
+        "improvement_percent": 0.33394474737938373,
+        "size_reduction_percent": 0.731176104542626,
+        "combined_improvement_percent": 0.13193347656128673,
+        "combined_size_reduction_percent": 0,
+        "profile_noise_percent": 1.39692455427623,
+        "target": false
+      },
+      "initial_runtime": {
+        "noise": [
+          [
+            {
+              "wall_ms": 1028.3256,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97124352,
+              "peak_process_bytes": 95416320
+            },
+            {
+              "wall_ms": 1000.1371,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97153024,
+              "peak_process_bytes": 95330304
+            }
+          ],
+          [
+            {
+              "wall_ms": 974.9528,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97136640,
+              "peak_process_bytes": 95346688
+            },
+            {
+              "wall_ms": 969.0852,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97144832,
+              "peak_process_bytes": 95424512
+            }
+          ],
+          [
+            {
+              "wall_ms": 1118.1983,
+              "cpu_ms": 1078.125,
+              "peak_tree_bytes": 97124352,
+              "peak_process_bytes": 95346688
+            },
+            {
+              "wall_ms": 1064.0283,
+              "cpu_ms": 1046.875,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95342592
+            }
+          ],
+          [
+            {
+              "wall_ms": 986.8288,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95412224
+            },
+            {
+              "wall_ms": 1017.6648,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95383552
+            }
+          ],
+          [
+            {
+              "wall_ms": 964.5758,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95342592
+            },
+            {
+              "wall_ms": 973.6866,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95395840
+            }
+          ]
+        ],
+        "profile_noise": [
+          [
+            {
+              "wall_ms": 981.9735,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97067008,
+              "peak_process_bytes": 92528640
+            },
+            {
+              "wall_ms": 972.7005,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97062912,
+              "peak_process_bytes": 92446720
+            }
+          ],
+          [
+            {
+              "wall_ms": 987.2531,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97091584,
+              "peak_process_bytes": 92504064
+            },
+            {
+              "wall_ms": 980.4168,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97067008,
+              "peak_process_bytes": 92356608
+            }
+          ],
+          [
+            {
+              "wall_ms": 1004.5743,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97083392,
+              "peak_process_bytes": 92495872
+            },
+            {
+              "wall_ms": 1059.0997,
+              "cpu_ms": 1046.875,
+              "peak_tree_bytes": 97067008,
+              "peak_process_bytes": 92499968
+            }
+          ],
+          [
+            {
+              "wall_ms": 978.0241,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97079296,
+              "peak_process_bytes": 92454912
+            },
+            {
+              "wall_ms": 968.0672,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92422144
+            }
+          ],
+          [
+            {
+              "wall_ms": 959.5214,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97062912,
+              "peak_process_bytes": 92520448
+            },
+            {
+              "wall_ms": 962.7267,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97062912,
+              "peak_process_bytes": 92438528
+            }
+          ]
+        ],
+        "pairs": [
+          {
+            "o2": {
+              "wall_ms": 995.1687,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97144832,
+              "peak_process_bytes": 95346688
+            },
+            "lto": {
+              "wall_ms": 986.3979,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97046528,
+              "peak_process_bytes": 92725248
+            },
+            "optimized": {
+              "wall_ms": 978.6276,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92405760
+            },
+            "combined": {
+              "wall_ms": 978.8617,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97570816,
+              "peak_process_bytes": 92491776
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 1036.0482,
+              "cpu_ms": 1031.25,
+              "peak_tree_bytes": 97579008,
+              "peak_process_bytes": 92516352
+            },
+            "optimized": {
+              "wall_ms": 966.8781,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97251328,
+              "peak_process_bytes": 92626944
+            },
+            "lto": {
+              "wall_ms": 1003.8302,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 96759808,
+              "peak_process_bytes": 92745728
+            },
+            "o2": {
+              "wall_ms": 1025.907,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97144832,
+              "peak_process_bytes": 95367168
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 1041.8268,
+              "cpu_ms": 1015.625,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95395840
+            },
+            "lto": {
+              "wall_ms": 1056.9294,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97038336,
+              "peak_process_bytes": 92700672
+            },
+            "optimized": {
+              "wall_ms": 973.6141,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97083392,
+              "peak_process_bytes": 92463104
+            },
+            "combined": {
+              "wall_ms": 991.5097,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97574912,
+              "peak_process_bytes": 92516352
+            }
+          },
+          {
+            "combined": {
+              "wall_ms": 1020.3785,
+              "cpu_ms": 1000,
+              "peak_tree_bytes": 97570816,
+              "peak_process_bytes": 92487680
+            },
+            "optimized": {
+              "wall_ms": 963.4862,
+              "cpu_ms": 953.125,
+              "peak_tree_bytes": 97071104,
+              "peak_process_bytes": 92471296
+            },
+            "lto": {
+              "wall_ms": 949.0643,
+              "cpu_ms": 921.875,
+              "peak_tree_bytes": 97042432,
+              "peak_process_bytes": 92704768
+            },
+            "o2": {
+              "wall_ms": 968.4591,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97140736,
+              "peak_process_bytes": 95383552
+            }
+          },
+          {
+            "o2": {
+              "wall_ms": 987.7371,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97132544,
+              "peak_process_bytes": 95354880
+            },
+            "lto": {
+              "wall_ms": 960.9113,
+              "cpu_ms": 937.5,
+              "peak_tree_bytes": 97050624,
+              "peak_process_bytes": 92729344
+            },
+            "optimized": {
+              "wall_ms": 974.1658,
+              "cpu_ms": 968.75,
+              "peak_tree_bytes": 97075200,
+              "peak_process_bytes": 92483584
+            },
+            "combined": {
+              "wall_ms": 968.2788,
+              "cpu_ms": 984.375,
+              "peak_tree_bytes": 97558528,
+              "peak_process_bytes": 92536832
+            }
+          }
+        ],
+        "ranges": {
+          "o2": {
+            "wall_ms": {
+              "median": 995.1687,
+              "min": 968.4591,
+              "max": 1041.8268
+            },
+            "cpu_ms": {
+              "median": 984.375,
+              "min": 968.75,
+              "max": 1015.625
+            },
+            "peak_tree_bytes": {
+              "median": 97140736,
+              "min": 97132544,
+              "max": 97144832
+            },
+            "peak_process_bytes": {
+              "median": 95367168,
+              "min": 95346688,
+              "max": 95395840
+            }
+          },
+          "lto": {
+            "wall_ms": {
+              "median": 986.3979,
+              "min": 949.0643,
+              "max": 1056.9294
+            },
+            "cpu_ms": {
+              "median": 968.75,
+              "min": 921.875,
+              "max": 1000
+            },
+            "peak_tree_bytes": {
+              "median": 97042432,
+              "min": 96759808,
+              "max": 97050624
+            },
+            "peak_process_bytes": {
+              "median": 92725248,
+              "min": 92700672,
+              "max": 92745728
+            }
+          },
+          "optimized": {
+            "wall_ms": {
+              "median": 973.6141,
+              "min": 963.4862,
+              "max": 978.6276
+            },
+            "cpu_ms": {
+              "median": 968.75,
+              "min": 953.125,
+              "max": 968.75
+            },
+            "peak_tree_bytes": {
+              "median": 97075200,
+              "min": 97071104,
+              "max": 97251328
+            },
+            "peak_process_bytes": {
+              "median": 92471296,
+              "min": 92405760,
+              "max": 92626944
+            }
+          },
+          "combined": {
+            "wall_ms": {
+              "median": 991.5097,
+              "min": 968.2788,
+              "max": 1036.0482
+            },
+            "cpu_ms": {
+              "median": 984.375,
+              "min": 953.125,
+              "max": 1031.25
+            },
+            "peak_tree_bytes": {
+              "median": 97570816,
+              "min": 97558528,
+              "max": 97579008
+            },
+            "peak_process_bytes": {
+              "median": 92516352,
+              "min": 92487680,
+              "max": 92536832
+            }
+          }
+        },
+        "noise_percent": 2.779296853720787,
+        "improvement_percent": 0.881338008319584,
+        "size_reduction_percent": 0.731176104542626,
+        "combined_improvement_percent": -1.8380588366581734,
+        "combined_size_reduction_percent": 0,
+        "profile_noise_percent": 0.9488027159516023,
+        "target": false
+      }
+    }
+  },
+  "primary_target": false
+}

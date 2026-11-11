@@ -1,0 +1,721 @@
+{
+  "cases": 21,
+  "modes": 2,
+  "hosts": 2,
+  "evidence": [
+    {
+      "case": "overflow",
+      "mode": "default",
+      "c_sha256": "b003b2805f42cbec13ecac76f5893d0d9c845fb91581b34599536d1e13ff64eb",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow.vela:1:42: runtime error: integer overflow in addition\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow.vela:1:42: runtime error: integer overflow in addition\n"
+        }
+      }
+    },
+    {
+      "case": "overflow",
+      "mode": "bypass",
+      "c_sha256": "b003b2805f42cbec13ecac76f5893d0d9c845fb91581b34599536d1e13ff64eb",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow.vela:1:42: runtime error: integer overflow in addition\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow.vela:1:42: runtime error: integer overflow in addition\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_2",
+      "mode": "default",
+      "c_sha256": "06ea3d8d9946d0456c80abd294cfd1264abb3b4527e9117977f2b7a67bac0dba",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_2.vela:1:42: runtime error: integer overflow in addition\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_2.vela:1:42: runtime error: integer overflow in addition\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_2",
+      "mode": "bypass",
+      "c_sha256": "06ea3d8d9946d0456c80abd294cfd1264abb3b4527e9117977f2b7a67bac0dba",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_2.vela:1:42: runtime error: integer overflow in addition\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_2.vela:1:42: runtime error: integer overflow in addition\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_3",
+      "mode": "default",
+      "c_sha256": "d77c5cb1a81da15897981e47db6d5c99a77449344c0eb0ec477feff9bddbd5b8",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_3.vela:1:42: runtime error: integer overflow in subtraction\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_3.vela:1:42: runtime error: integer overflow in subtraction\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_3",
+      "mode": "bypass",
+      "c_sha256": "d77c5cb1a81da15897981e47db6d5c99a77449344c0eb0ec477feff9bddbd5b8",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_3.vela:1:42: runtime error: integer overflow in subtraction\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_3.vela:1:42: runtime error: integer overflow in subtraction\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_4",
+      "mode": "default",
+      "c_sha256": "4c48395278d8de52c6160a91adb299e8313fe80e40b4ce919dcd6d975d0442ba",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_4.vela:1:42: runtime error: integer overflow in subtraction\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_4.vela:1:42: runtime error: integer overflow in subtraction\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_4",
+      "mode": "bypass",
+      "c_sha256": "4c48395278d8de52c6160a91adb299e8313fe80e40b4ce919dcd6d975d0442ba",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_4.vela:1:42: runtime error: integer overflow in subtraction\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_4.vela:1:42: runtime error: integer overflow in subtraction\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_5",
+      "mode": "default",
+      "c_sha256": "21ca50732958a2093e3eaa4ae5eec05c9a26c8e5a611bf2dd46cd6c3772ade52",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_5.vela:1:42: runtime error: integer overflow in multiplication\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_5.vela:1:42: runtime error: integer overflow in multiplication\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_5",
+      "mode": "bypass",
+      "c_sha256": "21ca50732958a2093e3eaa4ae5eec05c9a26c8e5a611bf2dd46cd6c3772ade52",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_5.vela:1:42: runtime error: integer overflow in multiplication\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_5.vela:1:42: runtime error: integer overflow in multiplication\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_6",
+      "mode": "default",
+      "c_sha256": "b6b444692c6df46c86acc0293de8e825ab1e88320a07d0e0fc40b4ac1c714707",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_6.vela:1:42: runtime error: integer overflow in multiplication\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_6.vela:1:42: runtime error: integer overflow in multiplication\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_6",
+      "mode": "bypass",
+      "c_sha256": "b6b444692c6df46c86acc0293de8e825ab1e88320a07d0e0fc40b4ac1c714707",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_6.vela:1:42: runtime error: integer overflow in multiplication\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_6.vela:1:42: runtime error: integer overflow in multiplication\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_7",
+      "mode": "default",
+      "c_sha256": "e3653272a1b74c7ed1a2ac27ea445ea415a7e839c1e38f7d44896d07640d6448",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_7.vela:1:42: runtime error: integer overflow in multiplication\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_7.vela:1:42: runtime error: integer overflow in multiplication\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_7",
+      "mode": "bypass",
+      "c_sha256": "e3653272a1b74c7ed1a2ac27ea445ea415a7e839c1e38f7d44896d07640d6448",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_7.vela:1:42: runtime error: integer overflow in multiplication\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_7.vela:1:42: runtime error: integer overflow in multiplication\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_8",
+      "mode": "default",
+      "c_sha256": "ee4b21e0b1a66bddac4ed30508d4dac5e4bfe1d451b316f556dd5c8b37c730a3",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_8.vela:1:42: runtime error: integer overflow in negation\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_8.vela:1:42: runtime error: integer overflow in negation\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_8",
+      "mode": "bypass",
+      "c_sha256": "ee4b21e0b1a66bddac4ed30508d4dac5e4bfe1d451b316f556dd5c8b37c730a3",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_8.vela:1:42: runtime error: integer overflow in negation\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_8.vela:1:42: runtime error: integer overflow in negation\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_9",
+      "mode": "default",
+      "c_sha256": "45902262fab9b7ec9d54d5daafa2a5572e7669f66de62acd7aa22652be8cc33a",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_9.vela:1:42: runtime error: integer overflow in division\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_9.vela:1:42: runtime error: integer overflow in division\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_9",
+      "mode": "bypass",
+      "c_sha256": "45902262fab9b7ec9d54d5daafa2a5572e7669f66de62acd7aa22652be8cc33a",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_9.vela:1:42: runtime error: integer overflow in division\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_9.vela:1:42: runtime error: integer overflow in division\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_10",
+      "mode": "default",
+      "c_sha256": "6f2ca3a07970500f35d840f2466fc1adcc50ca43e594c14cf3c5d60735772711",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_10.vela:1:42: runtime error: division by zero\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_10.vela:1:42: runtime error: division by zero\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_10",
+      "mode": "bypass",
+      "c_sha256": "6f2ca3a07970500f35d840f2466fc1adcc50ca43e594c14cf3c5d60735772711",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_10.vela:1:42: runtime error: division by zero\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_10.vela:1:42: runtime error: division by zero\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_11",
+      "mode": "default",
+      "c_sha256": "e7012c54f1a1627eec140302b5496521208bfe20e47d4b2a575886c5d75f5a2f",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_11.vela:1:42: runtime error: remainder by zero\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_11.vela:1:42: runtime error: remainder by zero\n"
+        }
+      }
+    },
+    {
+      "case": "overflow_11",
+      "mode": "bypass",
+      "c_sha256": "e7012c54f1a1627eec140302b5496521208bfe20e47d4b2a575886c5d75f5a2f",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_11.vela:1:42: runtime error: remainder by zero\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "overflow_11.vela:1:42: runtime error: remainder by zero\n"
+        }
+      }
+    },
+    {
+      "case": "v134i_range_trap",
+      "mode": "default",
+      "c_sha256": "98036cb87a872667f4ec9564e2caef1afade78af75a9e8510e48d2ef368ff33f",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "v134i_range_trap.vela:3:15: runtime error: integer overflow in multiplication\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "v134i_range_trap.vela:3:15: runtime error: integer overflow in multiplication\n"
+        }
+      }
+    },
+    {
+      "case": "v134i_range_trap",
+      "mode": "bypass",
+      "c_sha256": "98036cb87a872667f4ec9564e2caef1afade78af75a9e8510e48d2ef368ff33f",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "v134i_range_trap.vela:3:15: runtime error: integer overflow in multiplication\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "v134i_range_trap.vela:3:15: runtime error: integer overflow in multiplication\n"
+        }
+      }
+    },
+    {
+      "case": "precondition",
+      "mode": "default",
+      "c_sha256": "98aa2d0a1b0586ebb33e5deae4aecdc9e497a0d7f173f1aca91b76ed0fe7cfa6",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "precondition.vela:1:37: runtime error: precondition failed: n > 0\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "precondition.vela:1:37: runtime error: precondition failed: n > 0\n"
+        }
+      }
+    },
+    {
+      "case": "precondition",
+      "mode": "bypass",
+      "c_sha256": "98aa2d0a1b0586ebb33e5deae4aecdc9e497a0d7f173f1aca91b76ed0fe7cfa6",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "precondition.vela:1:37: runtime error: precondition failed: n > 0\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "precondition.vela:1:37: runtime error: precondition failed: n > 0\n"
+        }
+      }
+    },
+    {
+      "case": "postcondition",
+      "mode": "default",
+      "c_sha256": "484791a5d89e40aea75316e2f7b537c14b7a9c7430a39587edad1ad72f28101c",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "postcondition.vela:1:36: runtime error: postcondition failed: result > 0\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "postcondition.vela:1:36: runtime error: postcondition failed: result > 0\n"
+        }
+      }
+    },
+    {
+      "case": "postcondition",
+      "mode": "bypass",
+      "c_sha256": "484791a5d89e40aea75316e2f7b537c14b7a9c7430a39587edad1ad72f28101c",
+      "outcome": {
+        "msvc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "postcondition.vela:1:36: runtime error: postcondition failed: result > 0\n"
+        },
+        "gcc": {
+          "code": 70,
+          "stdout": "",
+          "stderr": "postcondition.vela:1:36: runtime error: postcondition failed: result > 0\n"
+        }
+      }
+    },
+    {
+      "case": "v134i_ranges",
+      "mode": "default",
+      "c_sha256": "3299330b1cd3c418a7d5326c88af3a576093ee2c8746606f41aef82091ae272a",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "checked ranges passed\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "checked ranges passed\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v134i_ranges",
+      "mode": "bypass",
+      "c_sha256": "227ec100ab2a3da03271cabdefc59cf19d2720a87a7dc8bf583aa4ce1898b2b2",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "checked ranges passed\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "checked ranges passed\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v134h_ir",
+      "mode": "default",
+      "c_sha256": "691b2eab6bc3e713c46453e9597c135e67dc7c301efa87e7063c1b08de2bc7bc",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "checked simplification passed\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "checked simplification passed\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v134h_ir",
+      "mode": "bypass",
+      "c_sha256": "0c3007ec82e3902b562c1e67c36ca3979c8211c50c9c95f377cf78a12e61ab88",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "checked simplification passed\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "checked simplification passed\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v134d_lowering",
+      "mode": "default",
+      "c_sha256": "64e1c45eff7d3612e640db2bd7aee3ff5735607baee2f1c45a8f99fe3930f533",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "lowering boundaries passed\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "lowering boundaries passed\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v134d_lowering",
+      "mode": "bypass",
+      "c_sha256": "1f40e644b90a5967542424ea79c34271c6e141aa6b6850552cae736494af34dc",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "lowering boundaries passed\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "lowering boundaries passed\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v07_float",
+      "mode": "default",
+      "c_sha256": "826e30f10158c34ad0b72f59261d8fc06f8da4343fd2731e635740037249ec69",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "float=2.5\n-1.5\nfloat checks passed\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "float=2.5\n-1.5\nfloat checks passed\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v07_float",
+      "mode": "bypass",
+      "c_sha256": "826e30f10158c34ad0b72f59261d8fc06f8da4343fd2731e635740037249ec69",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "float=2.5\n-1.5\nfloat checks passed\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "float=2.5\n-1.5\nfloat checks passed\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v08_defer",
+      "mode": "default",
+      "c_sha256": "f49625fac056b2d2811a730fbcaa5a732415d079d6c239eedcbf98bb6f76605a",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "fallthrough\niteration-0\niteration-1\ninner\nchanged\nouter\nvalue-7\niteration-0\niteration-1\ninner\nchanged\nouter\nunavailable\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "fallthrough\niteration-0\niteration-1\ninner\nchanged\nouter\nvalue-7\niteration-0\niteration-1\ninner\nchanged\nouter\nunavailable\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v08_defer",
+      "mode": "bypass",
+      "c_sha256": "f49625fac056b2d2811a730fbcaa5a732415d079d6c239eedcbf98bb6f76605a",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "fallthrough\niteration-0\niteration-1\ninner\nchanged\nouter\nvalue-7\niteration-0\niteration-1\ninner\nchanged\nouter\nunavailable\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "fallthrough\niteration-0\niteration-1\ninner\nchanged\nouter\nvalue-7\niteration-0\niteration-1\ninner\nchanged\nouter\nunavailable\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v103_methods",
+      "mode": "default",
+      "c_sha256": "c21f3035bb6be81958b53fdf74ae7400c8ebfb998f6b8fdff15c8f76f3397e77",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "receiver\na\nb\nbody\n1,2,9\nreceiver\na\nb\ncleanup\n7\nhello!\nhello!\ntrue\n42\n100\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "receiver\na\nb\nbody\n1,2,9\nreceiver\na\nb\ncleanup\n7\nhello!\nhello!\ntrue\n42\n100\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v103_methods",
+      "mode": "bypass",
+      "c_sha256": "c21f3035bb6be81958b53fdf74ae7400c8ebfb998f6b8fdff15c8f76f3397e77",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "receiver\na\nb\nbody\n1,2,9\nreceiver\na\nb\ncleanup\n7\nhello!\nhello!\ntrue\n42\n100\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "receiver\na\nb\nbody\n1,2,9\nreceiver\na\nb\ncleanup\n7\nhello!\nhello!\ntrue\n42\n100\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v105_callables",
+      "mode": "default",
+      "c_sha256": "f2b934d49ce5f9ee9bb7a3b87199685661a8d39ae8f8101423080b3fd0196fca",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "1\n9\n7\n5\n8\n42\n2\n10\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "1\n9\n7\n5\n8\n42\n2\n10\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "case": "v105_callables",
+      "mode": "bypass",
+      "c_sha256": "f2b934d49ce5f9ee9bb7a3b87199685661a8d39ae8f8101423080b3fd0196fca",
+      "outcome": {
+        "msvc": {
+          "code": 0,
+          "stdout": "1\n9\n7\n5\n8\n42\n2\n10\n",
+          "stderr": ""
+        },
+        "gcc": {
+          "code": 0,
+          "stdout": "1\n9\n7\n5\n8\n42\n2\n10\n",
+          "stderr": ""
+        }
+      }
+    }
+  ]
+}

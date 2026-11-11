@@ -1,0 +1,22 @@
+import "../../std/text.vela" as text;
+import "../../std/path.vela" as path;
+import "../../std/result.vela" as result;
+
+fn example() -> Result<String, String> {
+    let value = result::map_error(text::validate("я🙂"), fn [ ](e: text::Error) -> String {
+        return "invalid text";
+    })?;
+    let first = result::map_error(text::checked_slice(value, 0, 2), fn [ ](e: text::Error) -> String {
+        return "invalid byte boundary";
+    })?;
+    let file = result::map_error(path::validate("/data/report.json"), fn [ ](e: path::Error) -> String {
+        return "invalid path";
+    })?;
+    return Result<String, String>::Ok(text::checked_data(first) + ":" + path::checked_data(path::checked_parent(file)));
+}
+fn main() -> Int effects { io } {
+    match example() {
+        Result::Ok(value) => { print(value); return 0; }
+        Result::Err(error) => { eprint(error); return 1; }
+    }
+}

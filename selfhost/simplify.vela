@@ -1,0 +1,164 @@
+import "model.vela";
+
+enum ConstantKind { Unknown, Integer, Boolean }
+struct Constant { kind: ConstantKind, number: Int }
+
+fn unknown_constant() -> Constant {
+    return Constant(kind: ConstantKind::Unknown, number: 0);
+}
+fn integer_constant(value: Int) -> Constant {
+    return Constant(kind: ConstantKind::Integer, number: value);
+}
+fn boolean_constant(value: Bool) -> Constant {
+    var number = 0;
+    if value { number = 1; }
+    return Constant(kind: ConstantKind::Boolean, number: number);
+}
+pub fn evaluate_int_arithmetic(op: String, a: Int, b: Int) -> Option<Int> {
+    let low = -9223372036854775808;
+    let high = 9223372036854775807;
+    if op == "+" {
+        if (b > 0 && a > high - b) || (b < 0 && a < low - b) { return Option<Int>::None; }
+        return Option<Int>::Some(a + b);
+    }
+    if op == "-" {
+        if (b > 0 && a < low + b) || (b < 0 && a > high + b) { return Option<Int>::None; }
+        return Option<Int>::Some(a - b);
+    }
+    if op == "*" {
+        if (a > 0 && b > 0 && a > high / b) || (a > 0 && b < 0 && b < low / a)
+            || (a < 0 && b > 0 && a < low / b) || (a < 0 && b < 0 && a < high / b) {
+            return Option<Int>::None;
+        }
+        return Option<Int>::Some(a * b);
+    }
+    if op == "/" {
+        if b == 0 || (a == low && b == -1) { return Option<Int>::None; }
+        return Option<Int>::Some(a / b);
+    }
+    if op == "%" {
+        if b == 0 { return Option<Int>::None; }
+        if a == low && b == -1 { return Option<Int>::Some(0); }
+        return Option<Int>::Some(a % b);
+    }
+    return Option<Int>::None;
+}
+fn fold_integer(op: String, a: Int, b: Int) -> Constant {
+    match evaluate_int_arithmetic(op, a, b) {
+        Option::Some(value) => { return integer_constant(value); }
+        Option::None => {}
+    }
+    if op == "<" { return boolean_constant(a < b); }
+    if op == "<=" { return boolean_constant(a <= b); }
+    if op == ">" { return boolean_constant(a > b); }
+    if op == ">=" { return boolean_constant(a >= b); }
+    if op == "==" { return boolean_constant(a == b); }
+    if op == "!=" { return boolean_constant(a != b); }
+    return unknown_constant();
+}
+fn replace_constant(c: Context, id: ExprId, original: CheckedExpr, value: Constant) -> Unit effects { state, io, process } {
+    if value.kind == ConstantKind::Unknown { return; }
+    var node = original;
+    node.left = no_expr();
+    node.right = no_expr();
+    node.symbol = no_symbol();
+    if value.kind == ConstantKind::Integer {
+        node.kind = 101;
+        node.text = to_string(value.number);
+    } else {
+        node.kind = 102;
+        node.text = "false";
+        if value.number != 0 { node.text = "true"; }
+    }
+    set_checked_expr(c, id, node);
+}
+fn simplify_binary(c: Context, bindings: Dict<SymbolId, Constant>, node: CheckedExpr) -> Constant effects { state, io, process } {
+    let left = simplify_expression(c, bindings, node.left);
+    let op = node.text;
+    if left.kind == ConstantKind::Boolean {
+        if op == "&&" && left.number == 0 { return boolean_constant(false); }
+        if op == "||" && left.number != 0 { return boolean_constant(true); }
+    }
+    let right = simplify_expression(c, bindings, node.right);
+    if left.kind == ConstantKind::Integer && right.kind == ConstantKind::Integer {
+        return fold_integer(op, left.number, right.number);
+    }
+    if left.kind == ConstantKind::Boolean && right.kind == ConstantKind::Boolean {
+        if op == "&&" || op == "||" { return right; }
+        if op == "==" { return boolean_constant(left.number == right.number); }
+        if op == "!=" { return boolean_constant(left.number != right.number); }
+    }
+    return unknown_constant();
+}
+fn simplify_expression(c: Context, bindings: Dict<SymbolId, Constant>, id: ExprId) -> Constant effects { state, io, process } {
+    if !has_expr(id) { return unknown_constant(); }
+    let node = checked_expr(c, id);
+    if node.kind == 101 {
+        return match parse_int(node.text) {
+            IntResult::Ok(value) => integer_constant(value),
+            IntResult::Err(_) => unknown_constant()
+        };
+    }
+    if node.kind == 102 { return boolean_constant(node.text == "true"); }
+    if node.kind == 104 {
+        let value = dict_get_or(bindings, node.symbol, unknown_constant());
+        replace_constant(c, id, node, value);
+        return value;
+    }
+    if node.kind == 105 {
+        let operand = simplify_expression(c, bindings, node.left);
+        var value = unknown_constant();
+        if operand.kind == ConstantKind::Boolean && node.text == "!" {
+            value = boolean_constant(operand.number == 0);
+        } else if operand.kind == ConstantKind::Integer && node.text == "-" && operand.number != -9223372036854775808 {
+            value = integer_constant(-operand.number);
+        }
+        replace_constant(c, id, node, value);
+        return value;
+    }
+    if node.kind == 106 {
+        let value = simplify_binary(c, bindings, node);
+        replace_constant(c, id, node, value);
+        return value;
+    }
+    let left = simplify_expression(c, bindings, node.left);
+    let right = simplify_expression(c, bindings, node.right);
+    for i in 0 .. list_len(node.arguments) {
+        let argument = simplify_expression(c, bindings, list_get(node.arguments, i));
+    }
+    for i in 0 .. list_len(node.arms) {
+        let arm = simplify_expression(c, bindings, list_get(node.arms, i).value);
+    }
+    return unknown_constant();
+}
+fn simplify_block(c: Context, bindings: Dict<SymbolId, Constant>, body: List<StmtId>) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(body) {
+        let id = list_get(body, i);
+        var node = checked_stmt(c, id);
+        let value = simplify_expression(c, bindings, node.value);
+        if node.kind == 130 && value.kind != ConstantKind::Unknown && !symbol_info(c, node.binding).mutable {
+            dict_set(bindings, node.binding, value);
+        }
+        if value.kind == ConstantKind::Boolean && (node.kind == 134 || (node.kind == 135 && value.number == 0)) {
+            if value.number == 0 { node.yes = node.no; }
+            node.kind = 143;
+            node.value = no_expr();
+            node.no = list_new<StmtId>();
+            set_checked_stmt(c, id, node);
+        }
+        if node.kind == 141 {
+            let end = simplify_expression(c, bindings, node.target);
+        }
+        simplify_block(c, bindings, node.yes);
+        simplify_block(c, bindings, node.no);
+        for j in 0 .. list_len(node.arms) {
+            simplify_block(c, bindings, list_get(node.arms, j).body);
+        }
+    }
+}
+pub fn simplify_checked(c: Context) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(c.functions) {
+        let bindings = dict_new<SymbolId, Constant>();
+        simplify_block(c, bindings, list_get(c.functions, i).body);
+    }
+}

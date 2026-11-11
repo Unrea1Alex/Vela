@@ -1,0 +1,165 @@
+import "../../std/algorithms.vela" as algo;
+import "../../std/cell.vela" as cell;
+import "../../std/config.vela" as config;
+import "../../std/config_snapshot.vela" as snapshot;
+import "../../std/io.vela" as io;
+import "../../std/json.vela" as json;
+import "../../std/json_decode.vela" as decode;
+import "../../std/json_stream.vela" as stream;
+import "../../std/path.vela" as path;
+import "../../std/set.vela" as set;
+import "../../std/text.vela" as text;
+
+fn must<T, E>(result_value: Result<T, E>) -> T effects { process } {
+    match result_value {
+        Result::Ok(value) => { return value; }
+        Result::Err(_) => { panic("profile workload failed"); }
+    }
+}
+fn raw_arg(index: Int) -> String effects { args, process } {
+    match arg(index) {
+        StringResult::Ok(value) => { return value; }
+        StringResult::Err(error) => { panic(error); }
+    }
+}
+fn number_arg(index: Int) -> Int effects { args, process } {
+    match parse_int(raw_arg(index)) {
+        IntResult::Ok(value) => { return value; }
+        IntResult::Err(error) => { panic(error); }
+    }
+}
+fn file(file_path: String) -> String effects { io, process } {
+    match read_file(file_path) {
+        StringResult::Ok(value) => { return value; }
+        StringResult::Err(error) => { panic(error); }
+    }
+}
+fn indexed(mode: String, raw: String) -> snapshot::Snapshot effects { state, process } {
+    if mode == "snapshot-parse" { return must(snapshot::parse(raw)); }
+    return must(snapshot::from_value(must(json::parse(raw))));
+}
+fn json_work(mode: String, raw: String, rounds: Int) -> Int effects { state, process } {
+    if mode == "config" {
+        let settings = must(config::parse(raw));
+        var sum = 0;
+        for i in 0 .. rounds { sum = sum + must(config::integer(settings, "target")); }
+        return sum;
+    }
+    if mode == "snapshot-parse" || mode == "snapshot-copy" {
+        let settings = indexed(mode, raw);
+        var sum = 0;
+        for i in 0 .. rounds { sum = sum + must(snapshot::integer(settings, "target")); }
+        return sum;
+    }
+    let names = list_new<String>();
+    list_push(names, "target");
+    let seven = must(decode::integer(0, 10));
+    let decoder = must(decode::object(names, decode::Unknown::Ignore, fn [ seven ](
+        fields: decode::Fields) -> Result<Int, decode::Error> effects { state } {
+        return decode::required(fields, "target", seven);
+    }));
+    var sum = 0;
+    for i in 0 .. rounds {
+        if mode == "json-tree" {
+            let value = must(json::parse(raw));
+            match value {
+                json::Value::Object(_) => { sum = sum + 1; }
+                json::Value::Null => {}
+                json::Value::Boolean(_) => {}
+                json::Value::Integer(_) => {}
+                json::Value::Number(_) => {}
+                json::Value::StringValue(_) => {}
+                json::Value::Array(_) => {}
+            }
+        } else if mode == "json-stream" {
+            let reader = must(stream::create(raw, stream::default_limits()));
+            let skipped = must(stream::skip_value(reader));
+            let finished = must(stream::finish(reader));
+            if skipped && finished { sum = sum + 1; }
+        } else {
+            sum = sum + must(decode::decode(decoder, raw, stream::default_limits()));
+        }
+    }
+    return sum;
+}
+fn text_work(mode: String, raw: String, rounds: Int) -> Int effects { process } {
+    var sum = 0;
+    if mode == "checked-text" {
+        let value = must(text::validate(raw));
+        for i in 0 .. rounds {
+            let part = must(text::checked_slice(value, 0, 1));
+            if text::checked_data(part) == "/" { sum = sum + 1; }
+        }
+    } else if mode == "checked-path" {
+        let value = must(path::validate(raw));
+        for i in 0 .. rounds {
+            let parent = path::checked_parent(value);
+            if path::checked_data(parent) == "/папка" { sum = sum + 1; }
+        }
+    } else if mode == "text" {
+        let value = must(text::checked(raw));
+        for i in 0 .. rounds {
+            let part = must(text::slice(value, 0, 1));
+            if part.data == "/" { sum = sum + 1; }
+        }
+    } else if mode == "path" {
+        let value = must(path::checked(raw));
+        for i in 0 .. rounds {
+            let parent = must(path::parent(value));
+            if parent.value == "/папка" { sum = sum + 1; }
+        }
+    } else {
+        for i in 0 .. rounds {
+            let part = str_slice(raw, 0, str_len(raw) - 1) + "Z";
+            if str_len(part) == str_len(raw) && str_byte(part, str_len(part) - 1) == 90 {
+                sum = sum + 1;
+            }
+        }
+    }
+    return sum;
+}
+fn collections(mode: String, size: Int, rounds: Int) -> Int effects { state } {
+    let values = list_new<Int>();
+    for i in 1 .. size + 1 { list_push(values, i); }
+    var sum = 0;
+    for i in 0 .. rounds {
+        if mode == "fold" {
+            sum = sum + algo::fold(values, 0, fn [ ](acc: Int, value: Int) -> Int {
+                return acc + value;
+            });
+        } else if mode == "set" {
+            let keys = set::create<Int>();
+            for item in values { let added = set::insert(keys, item); }
+            for item in values { assert_true(!set::insert(keys, item), "duplicate key"); }
+            sum = sum + set::size(keys);
+        } else {
+            let counter = cell::create(0);
+            for item in values { cell::set(counter, cell::get(counter) + 1); }
+            sum = sum + cell::get(counter);
+        }
+    }
+    return sum;
+}
+fn main() -> Int effects { args, io, state, process } {
+    let mode = raw_arg(0);
+    let input = raw_arg(1);
+    let rounds = number_arg(2);
+    var answer = 0;
+    if mode == "file" {
+        let reader = must(io::open(input, 16777216));
+        let writer = must(io::create(raw_arg(3)));
+        let stats = must(io::copy_owned(reader, writer, 16384));
+        answer = stats.bytes;
+    } else if mode == "config" || mode == "snapshot-parse" || mode == "snapshot-copy"
+        || mode == "json-tree" || mode == "json-stream" || mode == "json-typed" {
+        answer = json_work(mode, file(input), rounds);
+    } else if mode == "text" || mode == "path" || mode == "checked-text" || mode == "checked-path" || mode == "strings" {
+        answer = text_work(mode, file(input), rounds);
+    } else if mode == "fold" || mode == "set" || mode == "cell" {
+        answer = collections(mode, number_arg(1), rounds);
+    } else {
+        panic("unknown workload");
+    }
+    print(to_string(answer));
+    return 0;
+}

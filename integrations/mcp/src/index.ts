@@ -113,15 +113,16 @@ function createServer() {
     });
     for(const kind of ['build','test','run'] as const){
       const sourceSchema=z.object({path:z.string().min(1).max(1024),text:z.string().max(2*1024*1024).optional(),overlay_path:z.string().min(1).max(1024).optional()}).strict();
+      const buildSchema=sourceSchema.extend({native_optimization:z.enum(['o2','pgo-instrument','pgo-use','lto','pgo-lto']).optional()});
       const runSchema=z.object({artifact_id:id,args:z.array(z.string()).max(64).optional(),timeout_ms:z.number().int().min(1).max(30000).optional(),
         outputs:z.array(z.string().min(1).max(72)).min(1).max(outputLimits.per_run).optional()}).strict();
       server.registerTool('vela_'+kind,{
-        description:kind==='build'?'Build an isolated snapshot; return an opaque artifact_id without writing to the workspace.':
+        description:kind==='build'?'Build an isolated O2 snapshot and return an opaque artifact_id. PGO and LTO require the local Vela CLI.':
           kind==='test'?'Compile and execute native tests in the OS sandbox.':'Run an artifact_id in the OS sandbox. Optionally export declared files written under ../export/ after a successful run.',
-        inputSchema:kind==='run'?runSchema:sourceSchema,outputSchema,
+        inputSchema:kind==='run'?runSchema:kind==='build'?buildSchema:sourceSchema,outputSchema,
         annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:false,openWorldHint:false}
       },async(input:unknown,ctx:{mcpReq:{signal:AbortSignal}})=>{
-        const value=input as {path?:string;artifact_id?:string;text?:string;overlay_path?:string;args?:string[];timeout_ms?:number;outputs?:string[]};
+        const value=input as {path?:string;artifact_id?:string;text?:string;overlay_path?:string;args?:string[];timeout_ms?:number;outputs?:string[];native_optimization?:'o2'|'pgo-instrument'|'pgo-use'|'lto'|'pgo-lto'};
         const pending=execution.request(kind,(kind==='run'?value.artifact_id:value.path)!,ctx.mcpReq.signal,value);
         host.pending.add(pending);try{return wrap(await pending);}finally{host.pending.delete(pending);}
       });

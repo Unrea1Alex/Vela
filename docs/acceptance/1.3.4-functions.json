@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "instrumentation": "Vela debug per-function counters and native GC report",
+  "workloads": [
+    {
+      "label": "json-typed",
+      "functions": 59,
+      "top_inclusive": [
+        {
+          "name": "main",
+          "file": "tests/library13/profile.vela",
+          "line": 143,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 321280
+        },
+        {
+          "name": "json_work",
+          "file": "tests/library13/profile.vela",
+          "line": 41,
+          "column": 1,
+          "calls": 1,
+          "completed": 1,
+          "inclusive_us": 321152
+        },
+        {
+          "name": "@8::decode<Int>",
+          "file": "std/json_decode.vela",
+          "line": 99,
+          "column": 1,
+          "calls": 300,
+          "completed": 300,
+          "inclusive_us": 321046
+        },
+        {
+          "name": "@9::advance",
+          "file": "std/json_stream.vela",
+          "line": 418,
+          "column": 1,
+          "calls": 79200,
+          "completed": 79200,
+          "inclusive_us": 277958
+        },
+        {
+          "name": "@9::skip_value",
+          "file": "std/json_stream.vela",
+          "line": 521,
+          "column": 1,
+          "calls": 19500,
+          "completed": 19500,
+          "inclusive_us": 204142
+        },
+        {
+          "name": "@8::execute<Int>",
+          "file": "std/json_decode.vela",
+          "line": 89,
+          "column": 1,
+          "calls": 600,
+          "completed": 600,
+          "inclusive_us": 181844
+        },
+        {
+          "name": "@closure",
+          "file": "std/json_decode.vela",
+          "line": 469,
+          "column": 61,
+          "calls": 300,
+          "completed": 300,
+          "inclusive_us": 179984
+        },
+        {
+          "name": "@8::read_object",
+          "file": "std/json_decode.vela",
+          "line": 360,
+          "column": 1,
+          "calls": 300,
+          "completed": 300,
+          "inclusive_us": 178016
+        },
+        {
+          "name": "@9::peek",
+          "file": "std/json_stream.vela",
+          "line": 102,
+          "column": 1,
+          "calls": 1152000,
+          "completed": 1152000,
+          "inclusive_us": 139053
+        },
+        {
+          "name": "@9::whitespace",
+          "file": "std/json_stream.vela",
+          "line": 108,
+          "column": 1,
+          "calls": 213600,
+          "completed": 213600,
+          "inclusive_us": 129097
+        },
+        {
+          "name": "@9::next",
+          "file": "std/json_stream.vela",
+          "line": 494,
+          "column": 1,
+          "calls": 20100,
+          "completed": 20100,
+          "inclusive_us": 95152
+        },
+        {
+          "name": "@9::value",
+          "file": "std/json_stream.vela",
+          "line": 367,
+          "column": 1,
+          "calls": 39300,
+          "completed": 39300,
+          "inclusive_us": 71563
+        }
+      ],
+      "validation_counters": [
+        {
+          "name": "@5::invalid_offset",
+          "file": "std/text.vela",
+          "line": 16,
+          "column": 1,
+          "calls": 901,
+          "completed": 901,
+          "inclusive_us": 4998
+        }
+      ],
+      "gc": {
+        "collections": 58,
+        "peak_managed_bytes": 1049068,
+        "before_teardown_bytes": 561454
+      }
+    }
+  ],
+  "completed": true
+}

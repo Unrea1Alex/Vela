@@ -1,0 +1,127 @@
+import "model.vela";
+import "core.vela";
+import "types.vela";
+
+pub struct Reachability {
+    functions: Dict<SymbolId, Bool>,
+    layouts: List<TypeId>,
+    dynamic_boxes: List<ExprId>,
+    entry_index: Int
+}
+
+struct ReachWork {
+    index: Dict<SymbolId, Int>,
+    functions: Dict<SymbolId, Bool>,
+    pending: List<Int>,
+    types: Dict<TypeId, Bool>,
+    dynamic_boxes: List<ExprId>
+}
+
+fn retain_type(c: Context, work: ReachWork, id: TypeId) -> Unit effects { state, io, process } {
+    if !has_type(id) || dict_has(work.types, id) { return; }
+    dict_set(work.types, id, true);
+    let info = type_info(c, id);
+    retain_types(c, work, info.fields);
+    for i in 0 .. list_len(info.variants) {
+        let variant = symbol_info(c, list_get(info.variants, i));
+        retain_types(c, work, variant.parameters);
+    }
+    for i in 0 .. list_len(info.arguments) {
+        retain_type(c, work, list_get(info.arguments, i));
+    }
+    retain_type(c, work, info.base);
+}
+
+fn retain_types(c: Context, work: ReachWork, symbols: List<SymbolId>) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(symbols) {
+        let id = list_get(symbols, i);
+        if has_symbol(id) { retain_type(c, work, symbol_info(c, id).type_id); }
+    }
+}
+
+fn retain_function(work: ReachWork, id: SymbolId) -> Unit effects { state } {
+    if dict_has(work.functions, id) || !dict_has(work.index, id) { return; }
+    dict_set(work.functions, id, true);
+    list_push(work.pending, dict_get(work.index, id));
+}
+
+fn retain_expression(c: Context, work: ReachWork, id: ExprId) -> Unit effects { state, io, process } {
+    if !has_expr(id) { return; }
+    let n = checked_expr(c, id);
+    retain_type(c, work, n.type_id);
+    if n.kind == 107 || n.kind == 118 || n.kind == 120 {
+        retain_function(work, n.symbol);
+    } else if n.kind == 121 {
+        list_push(work.dynamic_boxes, id);
+        for i in 0 .. list_len(n.fields) {
+            retain_function(work, list_get(n.fields, i));
+        }
+    }
+    retain_expression(c, work, n.left);
+    retain_expression(c, work, n.right);
+    for i in 0 .. list_len(n.arguments) {
+        retain_expression(c, work, list_get(n.arguments, i));
+    }
+    retain_arms(c, work, n.arms);
+}
+
+fn retain_arms(c: Context, work: ReachWork, arms: List<CheckedArm>) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(arms) {
+        let arm = list_get(arms, i);
+        retain_types(c, work, arm.bindings);
+        retain_expression(c, work, arm.value);
+        retain_body(c, work, arm.body);
+    }
+}
+
+fn retain_body(c: Context, work: ReachWork, body: List<StmtId>) -> Unit effects { state, io, process } {
+    for i in 0 .. list_len(body) {
+        let n = checked_stmt(c, list_get(body, i));
+        if has_symbol(n.binding) {
+            retain_type(c, work, symbol_info(c, n.binding).type_id);
+        }
+        retain_expression(c, work, n.value);
+        retain_expression(c, work, n.target);
+        retain_arms(c, work, n.arms);
+        retain_body(c, work, n.yes);
+        retain_body(c, work, n.no);
+    }
+}
+
+pub fn reachable_code(c: Context, entry: SymbolId) -> Reachability effects { state, io, process } {
+    let work = ReachWork(index: dict_new<SymbolId, Int>(), functions: dict_new<SymbolId, Bool>(),
+        pending: list_new<Int>(), types: dict_new<TypeId, Bool>(), dynamic_boxes: list_new<ExprId>());
+    for i in 0 .. list_len(c.functions) {
+        dict_set(work.index, list_get(c.functions, i).symbol, i);
+    }
+    if !dict_has(work.index, entry) {
+        bad(c, "E207", "Build requires a concrete entry function.", empty_span());
+    }
+    // These layouts are part of the generated runtime conversion prelude.
+    let results = split_text("IntResult;Int32Result;FloatResult;ReadResult;StreamResult;SpawnResult;CallbackResult;ProcessResult;StringResult;WriteResult", 59);
+    for name in results { retain_type(c, work, find_type(c, name)); }
+
+    retain_function(work, entry);
+    var next = 0;
+    while next < list_len(work.pending) {
+        let f = list_get(c.functions, list_get(work.pending, next));
+        next = next + 1;
+        retain_type(c, work, symbol_info(c, f.result_binding).type_id);
+        retain_types(c, work, f.parameters);
+        retain_types(c, work, f.captures);
+        for i in 0 .. list_len(f.preconditions) {
+            retain_expression(c, work, list_get(f.preconditions, i));
+        }
+        for i in 0 .. list_len(f.postconditions) {
+            retain_expression(c, work, list_get(f.postconditions, i));
+        }
+        retain_body(c, work, f.body);
+    }
+    let layouts = list_new<TypeId>();
+    for i in 0 .. list_len(c.type_order) {
+        let id = list_get(c.type_order, i);
+        if dict_has(work.types, id) { list_push(layouts, id); }
+    }
+    return Reachability(functions: work.functions, layouts: layouts, dynamic_boxes: work.dynamic_boxes,
+        entry_index: dict_get(work.index, entry));
+}

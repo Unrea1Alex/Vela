@@ -1,0 +1,3 @@
+import "../../../std/path.vela" as path;
+fn peek(value: path::CheckedPath) -> String { return value.value; }
+fn main() -> Unit {}

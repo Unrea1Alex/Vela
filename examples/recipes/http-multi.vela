@@ -1,0 +1,54 @@
+import "../../std/event_loop.vela" as loop;
+import "../../std/http.vela" as http;
+import "../../std/path.vela" as path;
+import "../../std/process.vela" as child;
+import "../../std/result.vela" as result;
+
+fn fetch(transport: dyn http::Transport, scheduler: loop::Loop<child::Completed>,
+    request: http::Request) -> Result<http::Response, http::Error> effects { io, process, state } {
+    let exchange = transport.start(scheduler, request, path::Path(value: "."))?;
+    while http::pending(exchange) {
+        match http::poll(exchange) {
+            Result::Ok(_) => {}
+            Result::Err(error) => {
+                let released = http::release(exchange)?;
+                return Result<http::Response, http::Error>::Err(error);
+            }
+        }
+        if http::pending(exchange) { let slept = host_sleep(1); }
+    }
+    let response = http::poll(exchange);
+    let released = http::release(exchange)?;
+    match response? {
+        Option::Some(value) => { return Result<http::Response, http::Error>::Ok(value); }
+        Option::None => { return Result<http::Response, http::Error>::Err(http::Error::Pending); }
+    }
+}
+fn exchange(pool: http::CurlMulti, request: http::Request) -> Result<Int, String> effects { io, process, state } {
+    let scheduler = result::explain(loop::create<child::Completed>(0), "Cannot create scheduler")?;
+    let transport = dyn http::Transport(pool);
+    for i in 0 .. 2 {
+        let response = result::explain(fetch(transport, scheduler, request), "HTTP exchange failed")?;
+        print(f"status={response.status:d} bytes={str_len(response.body.data):d}");
+    }
+    return Result<Int, String>::Ok(0);
+}
+fn run() -> Result<Int, String> effects { args, io, process, state } {
+    var url = "";
+    match arg(0) {
+        StringResult::Ok(value) => { url = value; }
+        StringResult::Err(_) => { return Result<Int, String>::Err("Supply an absolute HTTP URL"); }
+    }
+    let request = result::explain(http::from_url(url, 3000, 65536), "Invalid request")?;
+    let pool = result::map_error(http::curl_multi(http::multi_limits(), Option<path::Path>::None),
+        http::describe_multi_open)?;
+    let answer = exchange(pool, request);
+    let closed = result::explain(http::close_multi(pool), "Cannot close HTTP pool")?;
+    return answer;
+}
+fn main() -> Int effects { args, io, process, state } {
+    match run() {
+        Result::Ok(code) => { return code; }
+        Result::Err(message) => { eprint(message); return 2; }
+    }
+}

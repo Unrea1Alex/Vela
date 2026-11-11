@@ -1,0 +1,336 @@
+{
+  "buildlens": {
+    "medians": {
+      "o2": 298.2369,
+      "lto": 313.2453,
+      "small-loopfree": 318.5672
+    },
+    "raw": [
+      {
+        "o2": {
+          "wall_ms": 311.052,
+          "cpu_ms": 296.875,
+          "peak_tree_bytes": 9482240
+        },
+        "lto": {
+          "wall_ms": 333.6871,
+          "cpu_ms": 328.125,
+          "peak_tree_bytes": 9490432
+        },
+        "small-loopfree": {
+          "wall_ms": 323.6658,
+          "cpu_ms": 312.5,
+          "peak_tree_bytes": 9474048
+        }
+      },
+      {
+        "small-loopfree": {
+          "wall_ms": 343.3455,
+          "cpu_ms": 343.75,
+          "peak_tree_bytes": 9494528
+        },
+        "lto": {
+          "wall_ms": 332.3255,
+          "cpu_ms": 328.125,
+          "peak_tree_bytes": 9482240
+        },
+        "o2": {
+          "wall_ms": 307.8334,
+          "cpu_ms": 296.875,
+          "peak_tree_bytes": 9498624
+        }
+      },
+      {
+        "o2": {
+          "wall_ms": 308.4844,
+          "cpu_ms": 296.875,
+          "peak_tree_bytes": 9478144
+        },
+        "lto": {
+          "wall_ms": 312.41,
+          "cpu_ms": 296.875,
+          "peak_tree_bytes": 9478144
+        },
+        "small-loopfree": {
+          "wall_ms": 313.7289,
+          "cpu_ms": 296.875,
+          "peak_tree_bytes": 9494528
+        }
+      },
+      {
+        "small-loopfree": {
+          "wall_ms": 316.1908,
+          "cpu_ms": 343.75,
+          "peak_tree_bytes": 9482240
+        },
+        "lto": {
+          "wall_ms": 313.2453,
+          "cpu_ms": 296.875,
+          "peak_tree_bytes": 9490432
+        },
+        "o2": {
+          "wall_ms": 290.3051,
+          "cpu_ms": 281.25,
+          "peak_tree_bytes": 9482240
+        }
+      },
+      {
+        "o2": {
+          "wall_ms": 293.5623,
+          "cpu_ms": 312.5,
+          "peak_tree_bytes": 9494528
+        },
+        "lto": {
+          "wall_ms": 296.7617,
+          "cpu_ms": 281.25,
+          "peak_tree_bytes": 9490432
+        },
+        "small-loopfree": {
+          "wall_ms": 317.8686,
+          "cpu_ms": 312.5,
+          "peak_tree_bytes": 9433088
+        }
+      },
+      {
+        "small-loopfree": {
+          "wall_ms": 318.5672,
+          "cpu_ms": 312.5,
+          "peak_tree_bytes": 9486336
+        },
+        "lto": {
+          "wall_ms": 314.6083,
+          "cpu_ms": 312.5,
+          "peak_tree_bytes": 9490432
+        },
+        "o2": {
+          "wall_ms": 298.2369,
+          "cpu_ms": 296.875,
+          "peak_tree_bytes": 9482240
+        }
+      },
+      {
+        "o2": {
+          "wall_ms": 304.9291,
+          "cpu_ms": 296.875,
+          "peak_tree_bytes": 9486336
+        },
+        "lto": {
+          "wall_ms": 311.1875,
+          "cpu_ms": 296.875,
+          "peak_tree_bytes": 9490432
+        },
+        "small-loopfree": {
+          "wall_ms": 311.0106,
+          "cpu_ms": 312.5,
+          "peak_tree_bytes": 9465856
+        }
+      },
+      {
+        "small-loopfree": {
+          "wall_ms": 338.0835,
+          "cpu_ms": 328.125,
+          "peak_tree_bytes": 9359360
+        },
+        "lto": {
+          "wall_ms": 299.2264,
+          "cpu_ms": 296.875,
+          "peak_tree_bytes": 9482240
+        },
+        "o2": {
+          "wall_ms": 295.4892,
+          "cpu_ms": 296.875,
+          "peak_tree_bytes": 9494528
+        }
+      },
+      {
+        "o2": {
+          "wall_ms": 290.4073,
+          "cpu_ms": 281.25,
+          "peak_tree_bytes": 9482240
+        },
+        "lto": {
+          "wall_ms": 315.2212,
+          "cpu_ms": 312.5,
+          "peak_tree_bytes": 9494528
+        },
+        "small-loopfree": {
+          "wall_ms": 325.7091,
+          "cpu_ms": 312.5,
+          "peak_tree_bytes": 9478144
+        }
+      }
+    ],
+    "bytes": [
+      638976,
+      646656,
+      620032
+    ]
+  },
+  "compiler": {
+    "medians": {
+      "o2": 969.7458,
+      "lto": 982.4665,
+      "small-loopfree": 1033.5697
+    },
+    "raw": [
+      {
+        "o2": {
+          "wall_ms": 1043.5806,
+          "cpu_ms": 1031.25,
+          "peak_tree_bytes": 97357824
+        },
+        "lto": {
+          "wall_ms": 1028.9013,
+          "cpu_ms": 1015.625,
+          "peak_tree_bytes": 97300480
+        },
+        "small-loopfree": {
+          "wall_ms": 1052.1697,
+          "cpu_ms": 1046.875,
+          "peak_tree_bytes": 97378304
+        }
+      },
+      {
+        "small-loopfree": {
+          "wall_ms": 1064.2595,
+          "cpu_ms": 1062.5,
+          "peak_tree_bytes": 97370112
+        },
+        "lto": {
+          "wall_ms": 1035.0742,
+          "cpu_ms": 1015.625,
+          "peak_tree_bytes": 97308672
+        },
+        "o2": {
+          "wall_ms": 1022.7832,
+          "cpu_ms": 1015.625,
+          "peak_tree_bytes": 97349632
+        }
+      },
+      {
+        "o2": {
+          "wall_ms": 1021.4666,
+          "cpu_ms": 984.375,
+          "peak_tree_bytes": 97353728
+        },
+        "lto": {
+          "wall_ms": 1014.1224,
+          "cpu_ms": 1000,
+          "peak_tree_bytes": 97308672
+        },
+        "small-loopfree": {
+          "wall_ms": 1033.5697,
+          "cpu_ms": 1000,
+          "peak_tree_bytes": 97378304
+        }
+      },
+      {
+        "small-loopfree": {
+          "wall_ms": 1032.5116,
+          "cpu_ms": 1031.25,
+          "peak_tree_bytes": 97378304
+        },
+        "lto": {
+          "wall_ms": 982.4665,
+          "cpu_ms": 968.75,
+          "peak_tree_bytes": 97325056
+        },
+        "o2": {
+          "wall_ms": 966.2358,
+          "cpu_ms": 937.5,
+          "peak_tree_bytes": 97349632
+        }
+      },
+      {
+        "o2": {
+          "wall_ms": 969.7458,
+          "cpu_ms": 968.75,
+          "peak_tree_bytes": 97349632
+        },
+        "lto": {
+          "wall_ms": 961.9269,
+          "cpu_ms": 937.5,
+          "peak_tree_bytes": 97308672
+        },
+        "small-loopfree": {
+          "wall_ms": 1002.097,
+          "cpu_ms": 1000,
+          "peak_tree_bytes": 97374208
+        }
+      },
+      {
+        "small-loopfree": {
+          "wall_ms": 1084.3747,
+          "cpu_ms": 1062.5,
+          "peak_tree_bytes": 97370112
+        },
+        "lto": {
+          "wall_ms": 971.9341,
+          "cpu_ms": 968.75,
+          "peak_tree_bytes": 97312768
+        },
+        "o2": {
+          "wall_ms": 959.5232,
+          "cpu_ms": 953.125,
+          "peak_tree_bytes": 97361920
+        }
+      },
+      {
+        "o2": {
+          "wall_ms": 963.2117,
+          "cpu_ms": 968.75,
+          "peak_tree_bytes": 97357824
+        },
+        "lto": {
+          "wall_ms": 958.8757,
+          "cpu_ms": 937.5,
+          "peak_tree_bytes": 97304576
+        },
+        "small-loopfree": {
+          "wall_ms": 1034.9294,
+          "cpu_ms": 1015.625,
+          "peak_tree_bytes": 97386496
+        }
+      },
+      {
+        "small-loopfree": {
+          "wall_ms": 995.5716,
+          "cpu_ms": 984.375,
+          "peak_tree_bytes": 97378304
+        },
+        "lto": {
+          "wall_ms": 974.9124,
+          "cpu_ms": 968.75,
+          "peak_tree_bytes": 97308672
+        },
+        "o2": {
+          "wall_ms": 978.2715,
+          "cpu_ms": 968.75,
+          "peak_tree_bytes": 97357824
+        }
+      },
+      {
+        "o2": {
+          "wall_ms": 953.8719,
+          "cpu_ms": 953.125,
+          "peak_tree_bytes": 97345536
+        },
+        "lto": {
+          "wall_ms": 997.4204,
+          "cpu_ms": 953.125,
+          "peak_tree_bytes": 97296384
+        },
+        "small-loopfree": {
+          "wall_ms": 1022.3915,
+          "cpu_ms": 1046.875,
+          "peak_tree_bytes": 97382400
+        }
+      }
+    ],
+    "bytes": [
+      3291136,
+      3267072,
+      3193856
+    ]
+  }
+}

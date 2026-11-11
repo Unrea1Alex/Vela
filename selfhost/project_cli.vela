@@ -8,6 +8,8 @@ import "projects.vela";
 import "semantic.vela";
 import "formatter.vela";
 import "emitter.vela";
+import "simplify.vela";
+import "ranges.vela";
 import "driver.vela";
 import "types.vela";
 import "artifacts.vela";
@@ -50,6 +52,8 @@ pub fn project_test(p: Project, json_mode: Bool) -> Int effects { state, io, pro
         let c = project_module_context(path, path, load_source(path, json_mode), json_mode, p.dependencies);
         parse_program(c);
         analyze(c);
+        simplify_checked(c);
+        prove_ranges(c);
         let entries = list_new<SymbolId>();
         let names = list_new<String>();
         for declaration in c.bound_functions {

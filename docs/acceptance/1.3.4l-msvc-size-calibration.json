@@ -1,0 +1,244 @@
+{
+  "reason": "Independent validation of a size preference for pure MSVC LTO.",
+  "flags": {
+    "o2": [
+      "/O2"
+    ],
+    "size-only": [
+      "/O2",
+      "/Os"
+    ],
+    "lto-size": [
+      "/O2",
+      "/Os",
+      "/GL",
+      "/LTCG"
+    ]
+  },
+  "workloads": {
+    "fielddesk": {
+      "c": {
+        "bytes": 2068571,
+        "sha256": "f7c40eea6784e3a917e72704e4a06c8d6a559d719834c8e9c3829637fdffc58a"
+      },
+      "binaries": {
+        "o2": {
+          "bytes": 870912,
+          "sha256": "920a0d38efc6f3f0c43ed0bf4bb2f28471c867d4d80330e9615de6435a958e32"
+        },
+        "size-only": {
+          "bytes": 740864,
+          "sha256": "575a005d2a329cc64bc2b626530c69c3250a21253a7a539898fdf293deff98b4"
+        },
+        "lto-size": {
+          "bytes": 745472,
+          "sha256": "c4210d451fd24cc1b692a2377964caa724243b4c25fe36f36ff6e4a52488741f"
+        }
+      },
+      "wall_medians": {
+        "o2": 51.185,
+        "size-only": 43.3151,
+        "lto-size": 43.4366
+      },
+      "raw": [
+        {
+          "o2": {
+            "wall_ms": 46.6084,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4788224
+          },
+          "size-only": {
+            "wall_ms": 40.0729,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4104192
+          },
+          "lto-size": {
+            "wall_ms": 41.8725,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4096000
+          }
+        },
+        {
+          "lto-size": {
+            "wall_ms": 43.4366,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4116480
+          },
+          "size-only": {
+            "wall_ms": 46.0212,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4124672
+          },
+          "o2": {
+            "wall_ms": 51.185,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4796416
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 51.5895,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4800512
+          },
+          "size-only": {
+            "wall_ms": 43.3151,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4120576
+          },
+          "lto-size": {
+            "wall_ms": 45.0966,
+            "cpu_ms": 93.75,
+            "peak_tree_bytes": 4120576
+          }
+        },
+        {
+          "lto-size": {
+            "wall_ms": 46.3309,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4108288
+          },
+          "size-only": {
+            "wall_ms": 44.6203,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4108288
+          },
+          "o2": {
+            "wall_ms": 53.15,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4775936
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 46.2145,
+            "cpu_ms": 46.875,
+            "peak_tree_bytes": 4784128
+          },
+          "size-only": {
+            "wall_ms": 42.1041,
+            "cpu_ms": 31.25,
+            "peak_tree_bytes": 4108288
+          },
+          "lto-size": {
+            "wall_ms": 42.5658,
+            "cpu_ms": 15.625,
+            "peak_tree_bytes": 4096000
+          }
+        }
+      ]
+    },
+    "compiler": {
+      "c": {
+        "bytes": 6029257,
+        "sha256": "475349363d0b62ea9a112f16087c326c9b2d936b96652ac2f0fc19d29e0398f7"
+      },
+      "binaries": {
+        "o2": {
+          "bytes": 3038720,
+          "sha256": "6658ffe05b922f8526275bd0271f953ace2c85339a115c2ed16298b58af127d9"
+        },
+        "size-only": {
+          "bytes": 2533888,
+          "sha256": "d2ca3ed84885312d20821c9c9ec244b6dc817a092234d9bcfe51f9924a182451"
+        },
+        "lto-size": {
+          "bytes": 2555392,
+          "sha256": "a5c7224e04c10ac1d9e52df9caa0c4b50bd526a550f46173b90b37661275090c"
+        }
+      },
+      "wall_medians": {
+        "o2": 244.6443,
+        "size-only": 308.5709,
+        "lto-size": 306.3006
+      },
+      "raw": [
+        {
+          "o2": {
+            "wall_ms": 237.7922,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 39329792
+          },
+          "size-only": {
+            "wall_ms": 306.0444,
+            "cpu_ms": 296.875,
+            "peak_tree_bytes": 38727680
+          },
+          "lto-size": {
+            "wall_ms": 303.3674,
+            "cpu_ms": 296.875,
+            "peak_tree_bytes": 38883328
+          }
+        },
+        {
+          "lto-size": {
+            "wall_ms": 306.3006,
+            "cpu_ms": 296.875,
+            "peak_tree_bytes": 38871040
+          },
+          "size-only": {
+            "wall_ms": 308.5709,
+            "cpu_ms": 296.875,
+            "peak_tree_bytes": 38715392
+          },
+          "o2": {
+            "wall_ms": 250.9684,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 39342080
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 244.6443,
+            "cpu_ms": 234.375,
+            "peak_tree_bytes": 39337984
+          },
+          "size-only": {
+            "wall_ms": 320.2501,
+            "cpu_ms": 312.5,
+            "peak_tree_bytes": 38723584
+          },
+          "lto-size": {
+            "wall_ms": 349.0694,
+            "cpu_ms": 343.75,
+            "peak_tree_bytes": 38879232
+          }
+        },
+        {
+          "lto-size": {
+            "wall_ms": 316.5556,
+            "cpu_ms": 296.875,
+            "peak_tree_bytes": 38879232
+          },
+          "size-only": {
+            "wall_ms": 318.2785,
+            "cpu_ms": 328.125,
+            "peak_tree_bytes": 38719488
+          },
+          "o2": {
+            "wall_ms": 255.323,
+            "cpu_ms": 250,
+            "peak_tree_bytes": 39329792
+          }
+        },
+        {
+          "o2": {
+            "wall_ms": 237.0739,
+            "cpu_ms": 218.75,
+            "peak_tree_bytes": 39333888
+          },
+          "size-only": {
+            "wall_ms": 300.968,
+            "cpu_ms": 296.875,
+            "peak_tree_bytes": 38711296
+          },
+          "lto-size": {
+            "wall_ms": 304.7459,
+            "cpu_ms": 296.875,
+            "peak_tree_bytes": 38768640
+          }
+        }
+      ]
+    }
+  }
+}

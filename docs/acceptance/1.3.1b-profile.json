@@ -1,0 +1,1055 @@
+{
+  "schema_version": 1,
+  "stage": "1.3.1b",
+  "groups": [
+    {
+      "mode": "config",
+      "label": "small",
+      "size": 8,
+      "rounds": 1,
+      "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296",
+      "samples": [
+        {
+          "wall_ms": 21.4542,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2699264
+        },
+        {
+          "wall_ms": 21.3159,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2699264
+        },
+        {
+          "wall_ms": 23.1059,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 23.3561,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 22.7548,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        }
+      ],
+      "wall_ms": {
+        "min": 21.3159,
+        "median": 22.7548,
+        "max": 23.3561
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 2686976,
+        "median": 2691072,
+        "max": 2699264
+      },
+      "counters": {
+        "invalid_offset": 17,
+        "from_value": 2,
+        "index": 0,
+        "checked_copy": 0
+      },
+      "paired_wall_reduction": 0,
+      "paired_commit_increase": 0
+    },
+    {
+      "mode": "snapshot-parse",
+      "label": "small",
+      "size": 8,
+      "rounds": 1,
+      "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296",
+      "samples": [
+        {
+          "wall_ms": 21.2514,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 22.1167,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2695168
+        },
+        {
+          "wall_ms": 22.0533,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2695168
+        },
+        {
+          "wall_ms": 21.9425,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 21.1022,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2699264
+        }
+      ],
+      "wall_ms": {
+        "min": 21.1022,
+        "median": 21.9425,
+        "max": 22.1167
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2686976,
+        "median": 2695168,
+        "max": 2699264
+      },
+      "counters": {
+        "invalid_offset": 1,
+        "from_value": 0,
+        "index": 1,
+        "checked_copy": 0
+      },
+      "paired_wall_reduction": 0.03569796262766545,
+      "paired_commit_increase": 0.0015220700152207556
+    },
+    {
+      "mode": "snapshot-copy",
+      "label": "small",
+      "size": 8,
+      "rounds": 1,
+      "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296",
+      "samples": [
+        {
+          "wall_ms": 22.307,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 22.3748,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 21.6633,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 22.432,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 21.5699,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2682880
+        }
+      ],
+      "wall_ms": {
+        "min": 21.5699,
+        "median": 22.307,
+        "max": 22.432
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 2682880,
+        "median": 2686976,
+        "max": 2686976
+      },
+      "counters": {
+        "invalid_offset": 16,
+        "from_value": 1,
+        "index": 1,
+        "checked_copy": 9
+      },
+      "paired_wall_reduction": 0.019679364353894613,
+      "paired_commit_increase": -0.0015220700152207556
+    },
+    {
+      "mode": "config",
+      "label": "small",
+      "size": 8,
+      "rounds": 2000,
+      "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296",
+      "samples": [
+        {
+          "wall_ms": 27.5255,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3944448
+        },
+        {
+          "wall_ms": 25.8374,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3952640
+        },
+        {
+          "wall_ms": 26.9511,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3932160
+        },
+        {
+          "wall_ms": 26.901,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3948544
+        },
+        {
+          "wall_ms": 26.8511,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 3944448
+        }
+      ],
+      "wall_ms": {
+        "min": 25.8374,
+        "median": 26.901,
+        "max": 27.5255
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 31.25,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 3932160,
+        "median": 3944448,
+        "max": 3952640
+      },
+      "counters": {
+        "invalid_offset": 16009,
+        "from_value": 2001,
+        "index": 0,
+        "checked_copy": 0
+      },
+      "paired_wall_reduction": 0,
+      "paired_commit_increase": 0,
+      "historical_wall_reduction": 0.03258520305965018,
+      "historical_commit_increase": 0
+    },
+    {
+      "mode": "snapshot-parse",
+      "label": "small",
+      "size": 8,
+      "rounds": 2000,
+      "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296",
+      "samples": [
+        {
+          "wall_ms": 21.9228,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2699264
+        },
+        {
+          "wall_ms": 20.8296,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2678784
+        },
+        {
+          "wall_ms": 22.6439,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2691072
+        },
+        {
+          "wall_ms": 22.573,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2703360
+        },
+        {
+          "wall_ms": 21.0053,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2691072
+        }
+      ],
+      "wall_ms": {
+        "min": 20.8296,
+        "median": 21.9228,
+        "max": 22.6439
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 31.25
+      },
+      "peak_job_commit_bytes": {
+        "min": 2678784,
+        "median": 2691072,
+        "max": 2703360
+      },
+      "counters": {
+        "invalid_offset": 1,
+        "from_value": 0,
+        "index": 1,
+        "checked_copy": 0
+      },
+      "paired_wall_reduction": 0.18505631760901087,
+      "paired_commit_increase": -0.31775700934579443,
+      "historical_wall_reduction": 0.21161142298190028,
+      "historical_commit_increase": -0.31775700934579443
+    },
+    {
+      "mode": "snapshot-copy",
+      "label": "small",
+      "size": 8,
+      "rounds": 2000,
+      "sha256": "06d96dab3c1fd63676f4a16b429fe9b4bdd3ffab612692b3fbcd9dabe47dd296",
+      "samples": [
+        {
+          "wall_ms": 21.7794,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2695168
+        },
+        {
+          "wall_ms": 22.9033,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 20.9583,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 21.5308,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2686976
+        },
+        {
+          "wall_ms": 23.6281,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2691072
+        }
+      ],
+      "wall_ms": {
+        "min": 20.9583,
+        "median": 21.7794,
+        "max": 23.6281
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2686976,
+        "median": 2686976,
+        "max": 2695168
+      },
+      "counters": {
+        "invalid_offset": 16,
+        "from_value": 1,
+        "index": 1,
+        "checked_copy": 9
+      },
+      "paired_wall_reduction": 0.190386974461916,
+      "paired_commit_increase": -0.31879543094496365,
+      "historical_wall_reduction": 0.2167683792988122,
+      "historical_commit_increase": -0.31879543094496365
+    },
+    {
+      "mode": "config",
+      "label": "medium",
+      "size": 64,
+      "rounds": 1,
+      "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077",
+      "samples": [
+        {
+          "wall_ms": 21.5836,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2793472
+        },
+        {
+          "wall_ms": 25.9573,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2793472
+        },
+        {
+          "wall_ms": 21.4902,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2797568
+        },
+        {
+          "wall_ms": 22.9441,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2797568
+        },
+        {
+          "wall_ms": 23.4429,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2801664
+        }
+      ],
+      "wall_ms": {
+        "min": 21.4902,
+        "median": 22.9441,
+        "max": 25.9573
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2793472,
+        "median": 2797568,
+        "max": 2801664
+      },
+      "counters": {
+        "invalid_offset": 129,
+        "from_value": 2,
+        "index": 0,
+        "checked_copy": 0
+      },
+      "paired_wall_reduction": 0,
+      "paired_commit_increase": 0
+    },
+    {
+      "mode": "snapshot-parse",
+      "label": "medium",
+      "size": 64,
+      "rounds": 1,
+      "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077",
+      "samples": [
+        {
+          "wall_ms": 23.0192,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2777088
+        },
+        {
+          "wall_ms": 21.2287,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2797568
+        },
+        {
+          "wall_ms": 20.8169,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2789376
+        },
+        {
+          "wall_ms": 20.9496,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2805760
+        },
+        {
+          "wall_ms": 22.6753,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2785280
+        }
+      ],
+      "wall_ms": {
+        "min": 20.8169,
+        "median": 21.2287,
+        "max": 23.0192
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2777088,
+        "median": 2789376,
+        "max": 2805760
+      },
+      "counters": {
+        "invalid_offset": 1,
+        "from_value": 0,
+        "index": 1,
+        "checked_copy": 0
+      },
+      "paired_wall_reduction": 0.07476431849582243,
+      "paired_commit_increase": -0.002928257686676372
+    },
+    {
+      "mode": "snapshot-copy",
+      "label": "medium",
+      "size": 64,
+      "rounds": 1,
+      "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077",
+      "samples": [
+        {
+          "wall_ms": 20.592,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2797568
+        },
+        {
+          "wall_ms": 28.9173,
+          "cpu_ms": 31.25,
+          "peak_job_commit_bytes": 2809856
+        },
+        {
+          "wall_ms": 21.1356,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2801664
+        },
+        {
+          "wall_ms": 24.9066,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 2809856
+        },
+        {
+          "wall_ms": 23.7718,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2801664
+        }
+      ],
+      "wall_ms": {
+        "min": 20.592,
+        "median": 23.7718,
+        "max": 28.9173
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 2797568,
+        "median": 2801664,
+        "max": 2809856
+      },
+      "counters": {
+        "invalid_offset": 128,
+        "from_value": 1,
+        "index": 1,
+        "checked_copy": 65
+      },
+      "paired_wall_reduction": -0.03607463356592766,
+      "paired_commit_increase": 0.0014641288433381305
+    },
+    {
+      "mode": "config",
+      "label": "medium",
+      "size": 64,
+      "rounds": 2000,
+      "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077",
+      "samples": [
+        {
+          "wall_ms": 58.0706,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4235264
+        },
+        {
+          "wall_ms": 57.9775,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4231168
+        },
+        {
+          "wall_ms": 56.4226,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 4251648
+        },
+        {
+          "wall_ms": 56.817,
+          "cpu_ms": 62.5,
+          "peak_job_commit_bytes": 4255744
+        },
+        {
+          "wall_ms": 52.4206,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 4251648
+        }
+      ],
+      "wall_ms": {
+        "min": 52.4206,
+        "median": 56.817,
+        "max": 58.0706
+      },
+      "cpu_ms": {
+        "min": 46.875,
+        "median": 46.875,
+        "max": 62.5
+      },
+      "peak_job_commit_bytes": {
+        "min": 4231168,
+        "median": 4251648,
+        "max": 4255744
+      },
+      "counters": {
+        "invalid_offset": 128065,
+        "from_value": 2001,
+        "index": 0,
+        "checked_copy": 0
+      },
+      "paired_wall_reduction": 0,
+      "paired_commit_increase": 0,
+      "historical_wall_reduction": -0.07552955874836731,
+      "historical_commit_increase": -0.006698564593301426
+    },
+    {
+      "mode": "snapshot-parse",
+      "label": "medium",
+      "size": 64,
+      "rounds": 2000,
+      "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077",
+      "samples": [
+        {
+          "wall_ms": 22.1355,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2793472
+        },
+        {
+          "wall_ms": 22.5159,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 2793472
+        },
+        {
+          "wall_ms": 22.2397,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2789376
+        },
+        {
+          "wall_ms": 22.0298,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 2793472
+        },
+        {
+          "wall_ms": 23.5635,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2801664
+        }
+      ],
+      "wall_ms": {
+        "min": 22.0298,
+        "median": 22.2397,
+        "max": 23.5635
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 2789376,
+        "median": 2793472,
+        "max": 2801664
+      },
+      "counters": {
+        "invalid_offset": 1,
+        "from_value": 0,
+        "index": 1,
+        "checked_copy": 0
+      },
+      "paired_wall_reduction": 0.6085731383212771,
+      "paired_commit_increase": -0.34296724470134876,
+      "historical_wall_reduction": 0.579008840176425,
+      "historical_commit_increase": -0.34736842105263155
+    },
+    {
+      "mode": "snapshot-copy",
+      "label": "medium",
+      "size": 64,
+      "rounds": 2000,
+      "sha256": "7d62ef6312677018a12d61404561d4f9c2dd73bb3b11947ed205adfdb8329077",
+      "samples": [
+        {
+          "wall_ms": 22.2783,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2818048
+        },
+        {
+          "wall_ms": 21.7489,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2801664
+        },
+        {
+          "wall_ms": 22.622,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2793472
+        },
+        {
+          "wall_ms": 22.6323,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2805760
+        },
+        {
+          "wall_ms": 21.9784,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 2801664
+        }
+      ],
+      "wall_ms": {
+        "min": 21.7489,
+        "median": 22.2783,
+        "max": 22.6323
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 2793472,
+        "median": 2801664,
+        "max": 2818048
+      },
+      "counters": {
+        "invalid_offset": 128,
+        "from_value": 1,
+        "index": 1,
+        "checked_copy": 65
+      },
+      "paired_wall_reduction": 0.6078937641902951,
+      "paired_commit_increase": -0.34104046242774566,
+      "historical_wall_reduction": 0.5782781532171049,
+      "historical_commit_increase": -0.34545454545454546
+    },
+    {
+      "mode": "config",
+      "label": "large",
+      "size": 256,
+      "rounds": 1,
+      "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a",
+      "samples": [
+        {
+          "wall_ms": 25.7361,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3272704
+        },
+        {
+          "wall_ms": 23.4039,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3268608
+        },
+        {
+          "wall_ms": 25.0871,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3264512
+        },
+        {
+          "wall_ms": 22.5929,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3276800
+        },
+        {
+          "wall_ms": 22.225,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3272704
+        }
+      ],
+      "wall_ms": {
+        "min": 22.225,
+        "median": 23.4039,
+        "max": 25.7361
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 3264512,
+        "median": 3272704,
+        "max": 3276800
+      },
+      "counters": {
+        "invalid_offset": 513,
+        "from_value": 2,
+        "index": 0,
+        "checked_copy": 0
+      },
+      "paired_wall_reduction": 0,
+      "paired_commit_increase": 0
+    },
+    {
+      "mode": "snapshot-parse",
+      "label": "large",
+      "size": 256,
+      "rounds": 1,
+      "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a",
+      "samples": [
+        {
+          "wall_ms": 25.403,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3178496
+        },
+        {
+          "wall_ms": 22.3454,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3194880
+        },
+        {
+          "wall_ms": 22.9539,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3186688
+        },
+        {
+          "wall_ms": 23.7064,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3194880
+        },
+        {
+          "wall_ms": 22.6531,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3186688
+        }
+      ],
+      "wall_ms": {
+        "min": 22.3454,
+        "median": 22.9539,
+        "max": 25.403
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 3178496,
+        "median": 3186688,
+        "max": 3194880
+      },
+      "counters": {
+        "invalid_offset": 1,
+        "from_value": 0,
+        "index": 1,
+        "checked_copy": 0
+      },
+      "paired_wall_reduction": 0.019227564636663086,
+      "paired_commit_increase": -0.026282853566958697
+    },
+    {
+      "mode": "snapshot-copy",
+      "label": "large",
+      "size": 256,
+      "rounds": 1,
+      "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a",
+      "samples": [
+        {
+          "wall_ms": 24.4761,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3301376
+        },
+        {
+          "wall_ms": 24.0383,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3301376
+        },
+        {
+          "wall_ms": 23.6209,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3297280
+        },
+        {
+          "wall_ms": 23.3527,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3301376
+        },
+        {
+          "wall_ms": 22.8271,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3289088
+        }
+      ],
+      "wall_ms": {
+        "min": 22.8271,
+        "median": 23.6209,
+        "max": 24.4761
+      },
+      "cpu_ms": {
+        "min": 15.625,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 3289088,
+        "median": 3301376,
+        "max": 3301376
+      },
+      "counters": {
+        "invalid_offset": 512,
+        "from_value": 1,
+        "index": 1,
+        "checked_copy": 257
+      },
+      "paired_wall_reduction": -0.00927195894701316,
+      "paired_commit_increase": 0.008760951188986343
+    },
+    {
+      "mode": "config",
+      "label": "large",
+      "size": 256,
+      "rounds": 2000,
+      "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a",
+      "samples": [
+        {
+          "wall_ms": 122.537,
+          "cpu_ms": 140.625,
+          "peak_job_commit_bytes": 4157440
+        },
+        {
+          "wall_ms": 122.872,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 4177920
+        },
+        {
+          "wall_ms": 122.016,
+          "cpu_ms": 125,
+          "peak_job_commit_bytes": 4177920
+        },
+        {
+          "wall_ms": 122.7661,
+          "cpu_ms": 109.375,
+          "peak_job_commit_bytes": 4173824
+        },
+        {
+          "wall_ms": 123.8416,
+          "cpu_ms": 109.375,
+          "peak_job_commit_bytes": 4177920
+        }
+      ],
+      "wall_ms": {
+        "min": 122.016,
+        "median": 122.7661,
+        "max": 123.8416
+      },
+      "cpu_ms": {
+        "min": 109.375,
+        "median": 125,
+        "max": 140.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 4157440,
+        "median": 4177920,
+        "max": 4177920
+      },
+      "counters": {
+        "invalid_offset": 512257,
+        "from_value": 2001,
+        "index": 0,
+        "checked_copy": 0
+      },
+      "paired_wall_reduction": 0,
+      "paired_commit_increase": 0,
+      "historical_wall_reduction": 0.01756153539595684,
+      "historical_commit_increase": 0.042944785276073594
+    },
+    {
+      "mode": "snapshot-parse",
+      "label": "large",
+      "size": 256,
+      "rounds": 2000,
+      "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a",
+      "samples": [
+        {
+          "wall_ms": 23.2486,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3182592
+        },
+        {
+          "wall_ms": 21.5491,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3190784
+        },
+        {
+          "wall_ms": 22.7529,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3190784
+        },
+        {
+          "wall_ms": 24.0385,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3198976
+        },
+        {
+          "wall_ms": 22.2963,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3198976
+        }
+      ],
+      "wall_ms": {
+        "min": 21.5491,
+        "median": 22.7529,
+        "max": 24.0385
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 15.625
+      },
+      "peak_job_commit_bytes": {
+        "min": 3182592,
+        "median": 3190784,
+        "max": 3198976
+      },
+      "counters": {
+        "invalid_offset": 1,
+        "from_value": 0,
+        "index": 1,
+        "checked_copy": 0
+      },
+      "paired_wall_reduction": 0.8146646346181885,
+      "paired_commit_increase": -0.23627450980392162,
+      "historical_wall_reduction": 0.8179194081974639,
+      "historical_commit_increase": -0.20347648261758688
+    },
+    {
+      "mode": "snapshot-copy",
+      "label": "large",
+      "size": 256,
+      "rounds": 2000,
+      "sha256": "6fb54ceadf05e79b5e3150c8781136591d3b72054639abb078686387e6741c6a",
+      "samples": [
+        {
+          "wall_ms": 22.8226,
+          "cpu_ms": 46.875,
+          "peak_job_commit_bytes": 3289088
+        },
+        {
+          "wall_ms": 23.3834,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3297280
+        },
+        {
+          "wall_ms": 21.8897,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3297280
+        },
+        {
+          "wall_ms": 23.2981,
+          "cpu_ms": 0,
+          "peak_job_commit_bytes": 3305472
+        },
+        {
+          "wall_ms": 23.351,
+          "cpu_ms": 15.625,
+          "peak_job_commit_bytes": 3305472
+        }
+      ],
+      "wall_ms": {
+        "min": 21.8897,
+        "median": 23.2981,
+        "max": 23.3834
+      },
+      "cpu_ms": {
+        "min": 0,
+        "median": 15.625,
+        "max": 46.875
+      },
+      "peak_job_commit_bytes": {
+        "min": 3289088,
+        "median": 3297280,
+        "max": 3305472
+      },
+      "counters": {
+        "invalid_offset": 512,
+        "from_value": 1,
+        "index": 1,
+        "checked_copy": 257
+      },
+      "paired_wall_reduction": 0.8102236692376804,
+      "paired_commit_increase": -0.21078431372549022,
+      "historical_wall_reduction": 0.8135564329876777,
+      "historical_commit_increase": -0.17689161554192234
+    }
+  ],
+  "targets": {
+    "medium_wall_reduction": 0.2,
+    "peak_commit_increase": 0.1
+  },
+  "passed": true
+}

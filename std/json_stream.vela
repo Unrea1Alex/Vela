@@ -1,3 +1,4 @@
+import "json_tokens.vela" as tokens;
 import "text.vela" as text;
 pub struct Limits {
     bytes: Int,
@@ -67,8 +68,7 @@ pub fn describe(error: Error) -> String {
     return error.path + " at byte " + to_string(error.offset) + ": " + error.message;
 }
 pub fn create(data: String, limits: Limits) -> Result<Reader, Error> effects { state } {
-    if limits.bytes < 0 || limits.bytes > 16777216 || limits.depth < 0 || limits.depth > 4096
-        || limits.nodes < 1 || limits.nodes > 1000000 {
+    if !tokens::valid_limits(limits.bytes, limits.depth, limits.nodes, 4096, 1000000) {
         return Result<Reader, Error>::Err(Error(offset: 0, path: "$",
             kind: ErrorKind::InvalidLimits, message: "invalid JSON reader limits"));
     }
@@ -105,10 +105,9 @@ fn peek(reader: Reader) -> Int effects { state } {
     }
     return str_byte(reader.data, position(reader));
 }
+
 fn whitespace(reader: Reader) -> Unit effects { state } {
-    while peek(reader) == 32 || peek(reader) == 9 || peek(reader) == 10 || peek(reader) == 13 {
-        move(reader, position(reader) + 1);
-    }
+    move(reader, tokens::whitespace_at(reader.data, position(reader)));
 }
 fn take(reader: Reader, byte: Int) -> Bool effects { state } {
     if peek(reader) != byte {
@@ -116,28 +115,6 @@ fn take(reader: Reader, byte: Int) -> Bool effects { state } {
     }
     move(reader, position(reader) + 1);
     return true;
-}
-fn quote(value: String) -> String effects { state } {
-    let parts = strings_new();
-    strings_push(parts, "\"");
-    var start = 0;
-    let digits = "0123456789abcdef";
-    for i in 0 .. str_len(value) {
-        let byte = str_byte(value, i);
-        if byte == 34 || byte == 92 || byte < 32 {
-            strings_push(parts, str_slice(value, start, i));
-            if byte < 32 {
-                strings_push(parts, "\\u00" + str_slice(digits, byte / 16, byte / 16 + 1)
-                    + str_slice(digits, byte % 16, byte % 16 + 1));
-            } else {
-                strings_push(parts, "\\" + str_from_byte(byte));
-            }
-            start = i + 1;
-        }
-    }
-    strings_push(parts, str_slice(value, start, str_len(value)));
-    strings_push(parts, "\"");
-    return strings_join(parts, "");
 }
 fn location(reader: Reader, leaf: String) -> String effects { state } {
     let parts = strings_new();
@@ -164,110 +141,25 @@ fn token(reader: Reader, event: Event, offset: Int, leaf: String,
     }
     return Token(event: event, offset: offset, path: path_value);
 }
-fn hex(byte: Int) -> Int {
-    if byte >= 48 && byte <= 57 {
-        return byte - 48;
-    }
-    if byte >= 65 && byte <= 70 {
-        return byte - 65 + 10;
-    }
-    if byte >= 97 && byte <= 102 {
-        return byte - 97 + 10;
-    }
-    return -1;
-}
-fn hex4(reader: Reader, leaf: String) -> Result<Int, Error> effects { state } {
-    var value = 0;
-    for i in 0 .. 4 {
-        let digit = hex(peek(reader));
-        if digit < 0 {
-            return fail<Int>(reader, ErrorKind::Syntax, position(reader), leaf,
-                "expected four hex digits");
+
+fn scanned<T>(reader: Reader, leaf: String, result_value: Result<T, tokens::ScanError>)
+    -> Result<T, Error> effects { state } {
+    match result_value {
+        Result::Ok(value) => { return Result<T, Error>::Ok(value); }
+        Result::Err(error) => {
+            move(reader, error.consumed);
+            return fail<T>(reader, ErrorKind::Syntax, error.offset, leaf, error.message);
         }
-        value = value * 16 + digit;
-        move(reader, position(reader) + 1);
     }
-    return Result<Int, Error>::Ok(value);
 }
 fn string_value(reader: Reader, leaf: String) -> Result<String, Error> effects { state } {
-    if !take(reader, 34) {
-        return fail<String>(reader, ErrorKind::Syntax, position(reader), leaf, "expected string");
-    }
-    let parts = strings_new();
-    var start = position(reader);
-    while peek(reader) >= 0 {
-        let byte = peek(reader);
-        if byte == 34 {
-            strings_push(parts, str_slice(reader.data, start, position(reader)));
-            move(reader, position(reader) + 1);
-            return Result<String, Error>::Ok(strings_join(parts, ""));
-        }
-        if byte < 32 {
-            return fail<String>(reader, ErrorKind::Syntax, position(reader), leaf,
-                "unescaped control character");
-        }
-        if byte != 92 {
-            move(reader, position(reader) + 1);
-            continue;
-        }
-        strings_push(parts, str_slice(reader.data, start, position(reader)));
-        move(reader, position(reader) + 1);
-        let escape_at = position(reader);
-        let escape = peek(reader);
-        if escape < 0 {
-            return fail<String>(reader, ErrorKind::Syntax, escape_at, leaf, "incomplete escape");
-        }
-        move(reader, position(reader) + 1);
-        var piece = "";
-        if escape == 34 || escape == 92 || escape == 47 {
-            piece = str_from_byte(escape);
-        } else if escape == 98 {
-            piece = str_from_byte(8);
-        } else if escape == 102 {
-            piece = str_from_byte(12);
-        } else if escape == 110 {
-            piece = "\n";
-        } else if escape == 114 {
-            piece = "\r";
-        } else if escape == 116 {
-            piece = "\t";
-        } else if escape == 117 {
-            var cp = hex4(reader, leaf)?;
-            if cp >= 55296 && cp <= 56319 {
-                if !take(reader, 92) || !take(reader, 117) {
-                    return fail<String>(reader, ErrorKind::Syntax, position(reader), leaf,
-                        "missing low surrogate");
-                }
-                let low = hex4(reader, leaf)?;
-                if low < 56320 || low > 57343 {
-                    return fail<String>(reader, ErrorKind::Syntax, position(reader) - 4, leaf,
-                        "invalid low surrogate");
-                }
-                cp = 65536 + (cp - 55296) * 1024 + low - 56320;
-            }
-            match text::codepoint(cp) {
-                Result::Ok(value) => {
-                    piece = value.data;
-                }
-                Result::Err(_) => {
-                    return fail<String>(reader, ErrorKind::Syntax, escape_at, leaf,
-                        "invalid Unicode scalar");
-                }
-            }
-        } else {
-            return fail<String>(reader, ErrorKind::Syntax, escape_at, leaf, "invalid escape");
-        }
-        strings_push(parts, piece);
-        start = position(reader);
-    }
-    return fail<String>(reader, ErrorKind::Syntax, position(reader), leaf, "unterminated string");
-}
-fn digit(byte: Int) -> Bool {
-    return byte >= 48 && byte <= 57;
+    let parsed = scanned(reader, leaf, tokens::string(reader.data, position(reader)))?;
+    move(reader, parsed.end);
+    return Result<String, Error>::Ok(parsed.value);
 }
 fn boundary(reader: Reader, leaf: String) -> Result<Bool, Error> effects { state } {
     let byte = peek(reader);
-    if byte == -1 || byte == 32 || byte == 9 || byte == 10 || byte == 13 || byte == 44 || byte == 93
+    if byte == -1 || tokens::is_whitespace(byte) || byte == 44 || byte == 93
         || byte == 125 {
         return Result<Bool, Error>::Ok(true);
     }
@@ -275,62 +167,26 @@ fn boundary(reader: Reader, leaf: String) -> Result<Bool, Error> effects { state
 }
 fn number(reader: Reader, leaf: String, paths: Bool) -> Result<Token, Error> effects { state } {
     let start = position(reader);
-    let negative = take(reader, 45);
-    if take(reader, 48) {
-        if digit(peek(reader)) {
-            return fail<Token>(reader, ErrorKind::Syntax, position(reader), leaf, "leading zero");
-        }
-    } else {
-        if peek(reader) < 49 || peek(reader) > 57 {
-            return fail<Token>(reader, ErrorKind::Syntax, position(reader), leaf,
-                "expected number");
-        }
-        while digit(peek(reader)) {
-            move(reader, position(reader) + 1);
-        }
-    }
-    var integral = true;
-    if take(reader, 46) {
-        integral = false;
-        if !digit(peek(reader)) {
-            return fail<Token>(reader, ErrorKind::Syntax, position(reader), leaf,
-                "expected fraction");
-        }
-        while digit(peek(reader)) {
-            move(reader, position(reader) + 1);
-        }
-    }
-    if peek(reader) == 101 || peek(reader) == 69 {
-        integral = false;
-        move(reader, position(reader) + 1);
-        if peek(reader) == 43 || peek(reader) == 45 {
-            move(reader, position(reader) + 1);
-        }
-        if !digit(peek(reader)) {
-            return fail<Token>(reader, ErrorKind::Syntax, position(reader), leaf,
-                "expected exponent");
-        }
-        while digit(peek(reader)) {
-            move(reader, position(reader) + 1);
-        }
-    }
+
+    let parsed = scanned(reader, leaf, tokens::number(reader.data, start))?;
+    move(reader, parsed.end);
     let checked = boundary(reader, leaf)?;
     var path_value = "";
     if paths {
         path_value = location(reader, leaf);
     }
-    let value = Number(raw: str_slice(reader.data, start, position(reader)), integral: integral,
+    let value = Number(raw: str_slice(reader.data, start, position(reader)), integral: parsed.integral,
         offset: start, path: path_value);
     return Result<Token, Error>::Ok(Token(event: Event::NumberLiteral(value), offset: start,
         path: path_value));
 }
+
 fn word(reader: Reader, literal: String, leaf: String) -> Result<Bool, Error> effects { state } {
-    for i in 0 .. str_len(literal) {
-        if peek(reader) != str_byte(literal, i) {
-            return fail<Bool>(reader, ErrorKind::Syntax, position(reader), leaf, "expected "
-                + literal);
-        }
-        move(reader, position(reader) + 1);
+    let start = position(reader);
+    let end = tokens::literal_end(reader.data, start, literal);
+    move(reader, end);
+    if end != start + str_len(literal) {
+        return fail<Bool>(reader, ErrorKind::Syntax, end, leaf, "expected " + literal);
     }
     return boundary(reader, leaf);
 }
@@ -376,7 +232,7 @@ fn value(reader: Reader, leaf: String, paths: Bool) -> Result<Token, Error> effe
         return Result<Token, Error>::Ok(token(reader, Event::StringValue(data), start, leaf,
             paths));
     }
-    if byte == 45 || digit(byte) {
+    if byte == 45 || tokens::digit(byte) {
         return number(reader, leaf, paths);
     }
     if byte == 110 {
@@ -452,7 +308,7 @@ fn advance(reader: Reader, paths: Bool) -> Result<Option<Token>, Error> effects 
         if frame.object {
             let start = position(reader);
             let name = string_value(reader, "")?;
-            let segment = "[" + quote(name) + "]";
+            let segment = "[" + tokens::quote(name) + "]";
             if dict_has(frame.seen, name) {
                 return fail<Option<Token>>(reader, ErrorKind::Syntax, start, segment,
                     "duplicate key");

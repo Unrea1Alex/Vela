@@ -1,0 +1,2 @@
+import "../../../std/text.vela" as text;
+fn main() -> Unit { let value = text::CheckedText(data: "forged"); }

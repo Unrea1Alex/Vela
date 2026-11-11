@@ -1,4 +1,4 @@
-# Incremental analysis and independent builds, 0.11.4 / 1.0.1b
+# Incremental analysis and independent builds
 
 ## Cache diagnostics contract (1.0.0-dev.2)
 
@@ -9,9 +9,12 @@ Cache directories remain trusted local inputs, never a trust/security boundary.
 
 `--cache-report` on check/emit-c/build emits JSON Lines to stderr, independent of
 `--json` and generated C on stdout. It reports directory readiness, every import
-record and the whole-program check/C record: read hit/miss with reason, and write
-stored/failed. Each event has schema_version=1, kind="cache", phase, layer, status,
-reason, directory, key and message. No timestamps or elapsed-time heuristic.
+record, the exact check/C record and the semantic module record. Events report
+read hits and misses, write results and semantic analysis counts. Each event
+has schema_version=1, kind="cache", phase, layer, status, reason, directory,
+key and message. The semantic completion event adds `modules`,
+`declarations_checked`, `bodies_checked` and `reused_modules`. No timestamps
+or elapsed-time heuristic.
 Missing and unreadable records share reason `read_error` (the file API does not
 expose errno); invalid headers/checksums are `corrupt`, oversized records `limit`.
 Directory failures and failed publications are emitted even without the reporting
@@ -35,12 +38,28 @@ a private sibling file and atomic replacement. Concurrent compiler
 processes may compute the same entry. A failed compile never stores a
 successful check.
 
+The C cache key separates default checked simplification and `--no-ir-simplify`.
+The cache-report layer name remains `c-v1` or `debug-c-v1` in both modes.
+Profile use reads the same generated-C layer. The native phase revalidates
+source, toolchain, flags and the trained payload on every request. A C cache
+hit has no effect on profile compatibility or executable identity.
+[Native PGO contract](NATIVE-PGO-1.3.md).
+LTO shares the same generated-C layer. GCC profiles bind the LTO setting
+in their native flag and toolchain identity. MSVC PGO and explicit
+PGO plus LTO share the effective native configuration.
+[Native LTO contract](NATIVE-LTO-1.3.md).
+
 Per-module cache entries retain the lexically verified leading imports,
 including spans, for identical normalized source. After graph resolution,
 the analysis key includes the compiler source fingerprint, ordered paths,
 source names, normalized bytes and resolved import edges. An exact
-successful check or generated C is reusable. A graph change rechecks the
-connected Vela program, including cross-module generics, effects and types.
+successful check or generated C is reusable. Check keys bind the verified lock.
+On an exact check miss, matching token fingerprints can reuse successful
+validation after a trivia edit. After a body change in a supported scalar
+graph, check binds current declarations and verifies affected bodies and
+transitive importers of changed interfaces. Other semantic edits take the
+full path. Queries and C misses always analyze current source in full.
+[Semantic cache contract](SEMANTIC-CACHE-1.3.md).
 This design avoids serializing compiler arenas. The target compiler
 and toolchain are invoked on each native build. Native dependencies are
 verified and staged using the usual project rules. Cache records cannot

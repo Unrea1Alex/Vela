@@ -1,0 +1,8 @@
+struct First { value: String }
+struct Second { value: String }
+fn first() -> First { return First(value: "first"); }
+fn second() -> Second { return Second(value: "second"); }
+
+fn main() -> Unit effects { process } { panic("wrong entry"); }
+test "first root" effects { io } { print(first().value); }
+test "second root" effects { io } { print(second().value); }

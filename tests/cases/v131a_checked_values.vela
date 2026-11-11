@@ -1,0 +1,125 @@
+import "../../../std/text.vela" as text;
+import "../../../std/path.vela" as path;
+
+fn must<T, E>(outcome: Result<T, E>) -> T effects { process } {
+    match outcome {
+        Result::Ok(value) => { return value; }
+        Result::Err(_) => { panic("checked value fixture: expected Ok"); }
+    }
+}
+fn bad_slice(value: text::CheckedText, start: Int, end: Int) -> Unit {
+    match text::checked_slice(value, start, end) {
+        Result::Ok(_) => { assert_true(false, "invalid slice accepted"); }
+        Result::Err(error) => {
+            match error {
+                text::Error::InvalidSlice => {}
+                text::Error::InvalidUtf8(_) => { assert_true(false, "wrong slice cause"); }
+                text::Error::InvalidCodepoint => { assert_true(false, "wrong slice cause"); }
+                text::Error::Limit => { assert_true(false, "wrong slice cause"); }
+            }
+        }
+    }
+}
+fn path_of(value: String) -> path::CheckedPath effects { process } {
+    return must(path::validate(value));
+}
+fn path_cause(error: path::Error) -> String {
+    return match error {
+        path::Error::Empty => "empty",
+        path::Error::Nul => "nul",
+        path::Error::Encoding(at) => "encoding:" + to_string(at)
+    };
+}
+fn check_text() -> Unit effects { process } {
+    let value = must(text::validate("Aя😀Z"));
+    let alias = value;
+    assert_true(text::checked_data(must(text::checked_slice(alias, 1, 7))) == "я😀", "byte range");
+    assert_true(text::checked_data(must(text::checked_slice(alias, 8, 8))) == "", "empty at end");
+    assert_true(text::checked_data(must(text::validate(""))) == "", "empty text valid");
+    bad_slice(value, 2, 7);
+    bad_slice(value, 1, 6);
+    bad_slice(value, -1, 8);
+    bad_slice(value, 8, 7);
+    bad_slice(value, 0, 9);
+    let nul = str_from_byte(0);
+    assert_true(text::checked_data(must(text::validate(nul))) == nul, "NUL permitted in text");
+    let bad = "a" + str_from_byte(192) + str_from_byte(175);
+    match text::validate(bad) {
+        Result::Ok(_) => { assert_true(false, "overlong UTF-8 accepted"); }
+        Result::Err(error) => {
+            match error {
+                text::Error::InvalidUtf8(at) => { assert_true(at == 1, "UTF-8 error byte"); }
+                text::Error::InvalidSlice => { assert_true(false, "wrong encoding cause"); }
+                text::Error::InvalidCodepoint => { assert_true(false, "wrong encoding cause"); }
+                text::Error::Limit => { assert_true(false, "wrong encoding cause"); }
+            }
+        }
+    }
+    var legacy = text::legacy_text(value);
+    legacy.data = bad;
+    assert_true(text::checked_data(alias) == "Aя😀Z", "legacy Text copy independent");
+    match text::encode(legacy) {
+        Result::Ok(_) => { assert_true(false, "legacy Text encoding guard"); }
+        Result::Err(_) => {}
+    }
+}
+fn check_path() -> Unit effects { process } {
+    let original = path_of("/папка/файл");
+    let alias = original;
+    let parent = path::checked_parent(alias);
+    assert_true(path::checked_data(parent) == "/папка", "Unicode parent");
+    assert_true(path::checked_absolute(parent), "Unix slash root");
+    assert_true(path::checked_data(path::checked_parent(path_of("/"))) == "/", "root stable");
+    assert_true(path::checked_data(path::checked_parent(path_of("file"))) == ".", "relative parent");
+    assert_true(path::checked_data(path::checked_join(parent, path_of("x"))) == "/папка/x", "relative join");
+    assert_true(path::checked_data(path::checked_join(parent, path_of("/x"))) == "/x", "absolute child");
+    if platform() == "windows" {
+        let drive = path_of("C:\\файл");
+        assert_true(path::checked_absolute(drive), "drive absolute");
+        assert_true(path::checked_data(path::checked_parent(drive)) == "C:\\", "drive root");
+        let unc = path_of("\\\\server\\share\\файл");
+        assert_true(path::checked_absolute(unc), "UNC absolute");
+        assert_true(path::checked_data(path::checked_parent(unc)) == "\\\\server\\share\\", "UNC root");
+        assert_true(!path::checked_absolute(path_of("C:file")), "drive-relative");
+    } else {
+        assert_true(!path::checked_absolute(path_of("C:\\file")), "backslash is ordinary on Linux");
+    }
+    var legacy = path::legacy_path(original);
+    legacy.value = "";
+    assert_true(path::checked_data(alias) == "/папка/файл", "legacy Path copy independent");
+    match path::absolute(legacy) {
+        Result::Ok(_) => { assert_true(false, "legacy path guard"); }
+        Result::Err(error) => { assert_true(path_cause(error) == "empty", "empty path cause"); }
+    }
+    match path::validate("x" + str_from_byte(0)) {
+        Result::Ok(_) => { assert_true(false, "NUL path accepted"); }
+        Result::Err(error) => { assert_true(path_cause(error) == "nul", "NUL path cause"); }
+    }
+    match path::validate("") {
+        Result::Ok(_) => { assert_true(false, "empty path accepted"); }
+        Result::Err(error) => { assert_true(path_cause(error) == "empty", "empty path cause"); }
+    }
+    match path::validate(str_from_byte(255)) {
+        Result::Ok(_) => { assert_true(false, "invalid UTF-8 path accepted"); }
+        Result::Err(error) => {
+            match error {
+                path::Error::Encoding(at) => { assert_true(at == 0, "encoding byte"); }
+                path::Error::Empty => { assert_true(false, "wrong path cause"); }
+                path::Error::Nul => { assert_true(false, "wrong path cause"); }
+            }
+        }
+    }
+}
+fn retained() -> text::CheckedText effects { process } {
+    let value = must(text::validate("prefix " + to_string(42)));
+    return must(text::checked_slice(value, 7, 9));
+}
+fn main() -> Unit effects { io, process } {
+    check_text();
+    check_path();
+    let slice = retained();
+    let read = fn [ slice ]() -> String { return text::checked_data(slice); };
+    for i in 0 .. 64 { let garbage = path_of("/folder/" + to_string(i)); }
+    assert_true(read() == "42", "checked slice backing retained across GC and closure");
+    print("checked values passed");
+}

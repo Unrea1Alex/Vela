@@ -1,10 +1,13 @@
-param([switch]$SkipNamedTests)
+param([switch]$SkipNamedTests, [string]$Compiler, [string]$EvidencePath)
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $output = Join-Path $root 'build/fielddesk-validation'
+if (!$Compiler) { $Compiler = Join-Path $root 'vela.cmd' }
+if (!$EvidencePath) { $EvidencePath = Join-Path $output 'validation.json' }
 New-Item -ItemType Directory -Force $output | Out-Null
 $exe = Join-Path $PSScriptRoot 'bin/fielddesk.exe'
 $asset = Join-Path $PSScriptRoot 'bin/assets/settings.json'
+$httpAdapter = Join-Path $PSScriptRoot 'bin/vela-http.dll'
 $config = Join-Path $PSScriptRoot 'demo.json'
 $data = Join-Path $PSScriptRoot 'demo.ndjson'
 $checks = [Collections.Generic.List[object]]::new()
@@ -33,7 +36,7 @@ function Text([string]$File, [string]$Value) { [IO.File]::WriteAllText($File,$Va
 Push-Location $root
 try {
     if (!$SkipNamedTests) {
-        & .\vela.cmd test apps/fielddesk/vela.project --json > "$output/named-tests.log"
+        & $Compiler test apps/fielddesk/vela.project --json > "$output/named-tests.log"
         Ensure ($LASTEXITCODE -eq 0) 'Named tests failed'
     }
     $named = Get-Content "$output/named-tests.log" | Where-Object { $_.StartsWith('{"schema_version":2') } | Select-Object -Last 1 | ConvertFrom-Json
@@ -72,7 +75,11 @@ try {
         Ensure ((Get-FileHash $data).Hash -eq $hash) 'Hard linked input changed'
     }
     Check 'worker logs cannot overwrite input' { Copy-Item $data "$output/alias-log.html.worker.out"; $hash=(Get-FileHash "$output/alias-log.html.worker.out").Hash; $null=Run @($config,"$output/alias-log.html.worker.out","$output/alias-log.html") 2; Ensure ((Get-FileHash "$output/alias-log.html.worker.out").Hash -eq $hash) 'Log alias changed input' }
-    Check 'cannot overwrite executable or adapter' { $null=Run @('--demo',$exe) 2; $null=Run @('--gui',(Join-Path $PSScriptRoot 'bin/vela-gui.dll')) 2 }
+    Check 'cannot overwrite executable or adapter' {
+        $null=Run @('--demo',$exe) 2
+        $null=Run @('--gui',(Join-Path $PSScriptRoot 'bin/vela-gui.dll')) 2
+        $null=Run @('--gui',$httpAdapter) 2
+    }
     Check 'missing input' { $null=Run @($config,"$output/missing.ndjson","$output/missing.html") 2 }
     Check 'oversized file' { Text "$output/large.ndjson" (' ' * 524289); $null=Run @($config,"$output/large.ndjson","$output/large.html") 2 }
     Check 'invalid UTF8' { [IO.File]::WriteAllBytes("$output/invalid.ndjson",[byte[]]@(255,10)); $null=Run @($config,"$output/invalid.ndjson","$output/invalid.html") 2 }
@@ -82,7 +89,7 @@ try {
     Check 'relocated path with spaces and Unicode on system PATH' {
         $relocated = Join-Path $output 'Перенос FieldDesk'
         New-Item -ItemType Directory -Force $relocated | Out-Null
-        Copy-Item $exe,$(Join-Path $PSScriptRoot 'bin/vela-gui.dll') $relocated -Force
+        Copy-Item $exe,$httpAdapter,$(Join-Path $PSScriptRoot 'bin/vela-gui.dll') $relocated -Force
         $assets = Join-Path $relocated 'assets'
         New-Item -ItemType Directory -Force $assets | Out-Null
         Copy-Item -LiteralPath $asset -Destination $assets -Force
@@ -92,7 +99,7 @@ try {
         finally { $env:PATH=$oldPath }
     }
     Check 'forced GC repeated analysis' {
-        & .\vela.cmd build apps/fielddesk/soak.vela -o "$output/soak.exe"
+        & $Compiler build apps/fielddesk/soak.vela -o "$output/soak.exe"
         Ensure ($LASTEXITCODE -eq 0) 'Soak build failed'
         $oldStress=$env:VELA_GC_STRESS; $oldReport=$env:VELA_GC_REPORT
         try {
@@ -104,7 +111,7 @@ try {
             Ensure ($long.stdout.Contains('soak-ok 40')) 'Soak incomplete'
         } finally { $env:VELA_GC_STRESS=$oldStress; $env:VELA_GC_REPORT=$oldReport }
     }
-    $evidence = @{schema_version=1;compiler=((& "$root/bin/velac.exe" --version) -replace '^Vela (\S+) \(self-hosted\)$','$1');named_tests=@{passed=$named.passed;failed=$named.failed};cli_checks=$checks;executable_sha256=(Get-FileHash $exe -Algorithm SHA256).Hash.ToLower();adapter_sha256=(Get-FileHash (Join-Path $PSScriptRoot 'bin/vela-gui.dll') -Algorithm SHA256).Hash.ToLower();resource_sha256=(Get-FileHash -LiteralPath $asset).Hash.ToLowerInvariant();gc_short=(Get-Content "$output/gc-short.log" -Raw);gc_long=(Get-Content "$output/gc-long.log" -Raw)}
-    $evidence | ConvertTo-Json -Depth 8 | Set-Content "$PSScriptRoot/validation.json" -Encoding utf8NoBOM
+    $evidence = @{schema_version=1;compiler=((& $Compiler --version) -replace '^Vela (\S+) \(self-hosted\)$','$1');named_tests=@{passed=$named.passed;failed=$named.failed};cli_checks=$checks;executable_sha256=(Get-FileHash $exe -Algorithm SHA256).Hash.ToLower();adapter_sha256=(Get-FileHash (Join-Path $PSScriptRoot 'bin/vela-gui.dll') -Algorithm SHA256).Hash.ToLower();http_adapter_sha256=(Get-FileHash -LiteralPath $httpAdapter).Hash.ToLowerInvariant();resource_sha256=(Get-FileHash -LiteralPath $asset).Hash.ToLowerInvariant();gc_short=(Get-Content "$output/gc-short.log" -Raw);gc_long=(Get-Content "$output/gc-long.log" -Raw)}
+    $evidence | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $EvidencePath -Encoding utf8NoBOM
     Write-Host "$($named.passed) named tests; $($checks.Count) CLI checks passed"
 } finally { Pop-Location }

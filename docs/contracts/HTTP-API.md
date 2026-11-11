@@ -1,4 +1,10 @@
-# HTTP API boundary — 1.0.1d
+# HTTP API boundary
+
+For Windows x64, `curl_multi` is the recommended client owner. It plugs into the
+same Transport interface with the same request validation and typed response,
+using bounded in-process bytes and queue-inclusive deadlines. Ship the sibling
+adapter and close the owner after draining and releasing its exchanges.
+[Pool, dependency and lifetime contract](HTTP-MULTI-1.3.md).
 
 Compatible 1.1 opt-in: `curl_transfer(executable, ca_file)` returns the same opaque
 Curl/Transport API with a complete-transfer timeout and a separate bounded helper
@@ -20,8 +26,9 @@ conversion or relative URL resolution. `get` remains compatible and pure.
 
 `with_method(request, Method, Bytes)` supports Get/Head/Post/Put/Delete. Get/Head
 require an empty body; other bodies are at most 1 MiB. A snapshot of the immutable
-bytes is stored in opaque Request. The worker reads a private staged upload file,
-which is removed on start failure or after acknowledged cancellation/completion.
+bytes is stored in opaque Request. Multi copies it to a bounded native buffer.
+The compatibility worker reads a private staged upload file, which is removed
+on start failure or after acknowledged cancellation/completion.
 No retry of non-idempotent requests. HEAD returns headers/status with an empty
 body; its Content-Length describes the representation, not transferred bytes.
 
@@ -32,8 +39,9 @@ CR/LF/NUL, and Host, Content-Length, Transfer-Encoding, Connection, Expect, Upgr
 Authorization, Proxy-Authorization and Cookie reject. Framing, authentication and
 connection policy are adapter-owned. Transport config, proxies, redirects, cookie
 storage and automatic client certificates stay disabled. TLS verification remains
-mandatory. Response body <=1 MiB, headers <=32 KiB, timeout <=120 s; existing
-post-transfer header/output budgets are not a claim of kernel disk quotas.
+mandatory. Response body <=1 MiB and timeout <=120 s for both paths. The
+compatibility header limit is 32 KiB after transfer. Multi caps raw headers
+at 64 KiB during transfer.
 
 Server: Request adds a Method (only Get/Head). Response adds content_type; callers
 migrate octet-stream explicitly or select a validated ASCII media type, up to 128
@@ -45,11 +53,9 @@ Request bodies and other methods remain rejected with 400, as do transfer encodi
 and pipelining. Input headers <=8192 bytes, output body <=1 MiB, <=16 connections,
 one request per connection, accept-to-final-send deadline. No server TLS/auth.
 
-Connection reuse is explicitly outside 1.0: every client exchange owns a curl
-process and every server response closes its socket. Existing three-request overlap
-proves concurrency, not pooling. A persistent transport needs its own connection/
-TLS-session ownership, cross-request cancellation/isolation, resource and latency
-benchmarks. This is a retained post-1.0 commitment, not an implemented capability.
+Each compatibility client exchange owns a curl process. Multi can reuse a
+connection within its owner when the server keeps the socket open. The Vela
+loopback server still closes its socket after each response.
 
 Acceptance: URL defaults and rejections, method/body/header validation, live binary
 POST/PUT/DELETE echo, HEAD with large representation Content-Length, headers and
